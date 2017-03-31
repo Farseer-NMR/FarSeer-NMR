@@ -429,11 +429,11 @@ class FarseerSet:
             
             # loads the chemical shift for F1 of the ref res
             ref_data['F1_cs'] = \
-                self.allpeaklists[z][y][x].loc[res_mask,'Position F1']
+                self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F1']
             
             # loads the chemical shift for the F2 of the ref res
             ref_data['F2_cs'] = \
-                self.allpeaklists[z][y][x].loc[res_mask,'Position F2']
+                self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F2']
             
             # copies the chemical shift values to a new column
             self.allpeaklists[z][y][x].loc[:,'Position F1 original'] =\
