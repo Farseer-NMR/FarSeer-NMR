@@ -1,3 +1,8 @@
+from current.fslibs.Peak import Peak
+
+TYPE_DICT = {1:None, 2:'Random noise', 3:'Truncation artifact'}
+DIM_KEYS = (('X_PPM','XW'), ('Y_PPM','YW'), ('Z_PPM','ZW'))
+
 def parseAnsig(peaklist_file):
     pass
 
@@ -47,21 +52,19 @@ def parseNmrDraw(peaklist_file):
     volume = float(data[colDict['VOL']])
     details = TYPE_DICT[int(float(data[colDict['TYPE']]))]
     annotations = data[colDict['ASS']].split(';')
-
+    atoms = [anno.split('.')[1] for anno in annotations if anno]
     for dim in range(numDim):
       ppmKey, linewidthKey = DIM_KEYS[dim]
       ppms[dim] = float(data[colDict[ppmKey]])
       lineWidths[dim] = float(data[colDict[linewidthKey]])
 
-
+    peak = Peak(peak_number=data[0], assignments=annotations, atoms=atoms, height=height, volume=volume, positions=ppms,
+                linewidths=lineWidths)
     peakList.append(peak)
 
   fileObj.close()
 
-  extraInfo = {}
-  extraInfo['isotopes'] = isotopes
-
-  return peakList, extraInfo
+  return peakList
 
 
 def parseNmrView(peaklist_file):
@@ -185,8 +188,9 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
     if not line:
       continue
 
+    atoms = []
     if line.startswith('#'):
-      continue
+      atoms.append(line.strip().split()[-1])
 
     data = line.split()
     ppms = [0] * numDim
@@ -202,7 +206,9 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
       ppms[dim] = float(data[dim+1])
       if data[dim+9] != '0':
         annotations[dim] = annotation_dict[int(data[dim+9])]
-    print(annotations)
+
+    peak = Peak(peak_number=data[0], positions=ppms, assignments=annotations, atoms=atoms, linewidths=lineWidth, volume=volume,
+                height=height)
 
 
 
@@ -221,4 +227,12 @@ def test_nmrview():
 
 def test_nmrdraw():
     peaks = 'nmrdraw.peaks'
-    parseNmrDraw(peaks)
+    peaklist = parseNmrDraw(peaks)
+    i=0
+    for line in open(peaks, 'r').readlines()  :
+        l = line.strip()
+        if l:
+            if l[0].isdigit():
+                i+=1
+
+    print(len(peaklist) == i)
