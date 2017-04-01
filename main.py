@@ -280,6 +280,7 @@ class SideBar(QTreeWidget):
         self.setDragEnabled(True)
         self.setExpandsOnDoubleClick(False)
         self.setDragDropMode(self.InternalMove)
+        self.acceptDrops()
         self.setMinimumWidth(200)
         self.addLists()
 
@@ -295,6 +296,10 @@ class SideBar(QTreeWidget):
         item = self.itemAt(event.pos())
         text = item.text(0)
         event.mimeData().setText(text)
+
+    def dropEvent(self, event):
+        event.accept()
+        print(event.data())
 
 
 if __name__ == '__main__':

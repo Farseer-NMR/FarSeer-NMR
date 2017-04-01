@@ -15,6 +15,7 @@ WHITESPACE_AND_NULL = set(['\x00', '\t', '\n', '\r', '\x0b', '\x0c'])
 TYPE_DICT = {1:None, 2:'Random noise', 3:'Truncation artifact'}
 DIM_KEYS = (('X_PPM','XW'), ('Y_PPM','YW'), ('Z_PPM','ZW'))
 
+
 res1to3dict = {
 
      'A': 'Ala',
@@ -50,9 +51,6 @@ def getPeakListFileFormat(filePath):
     fileObj.close()
 
     testData = set([c for c in firstData]) - WHITESPACE_AND_NULL
-#     print(testData)
-#     if min([ord(c) for c in testData]) < 32:
-#         return
 
     fileObj = open(filePath, 'r')
 
@@ -83,7 +81,6 @@ def getPeakListFileFormat(filePath):
 
         if AUTOASSIGN_PATTERN.search(line):
             return "AUTOASSIGN"
-
 
 def parseAnsig(peaklist_file):
     peakList = []
@@ -195,7 +192,7 @@ def parseNmrView(peaklist_file):
     null = fileObj.readline()
     dimNames = fileObj.readline().strip().split()
     numDim = len(dimNames)
-
+    print(numDim)
     name = fileObj.readline()
     line = fileObj.readline()
     line = line.replace('{', '')
@@ -237,7 +234,6 @@ def parseNmrView(peaklist_file):
         volume = float(volume)
         height = float(height)
         details = comment[1:-1].strip()
-
         ppms = [0] * numDim
         annotations = [None] * numDim
         lineWidths = [None] * numDim
@@ -299,7 +295,6 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
   fileObj = open(peaklist_file, 'rU')
 
   numDim = int(fileObj.readline().strip().split()[-1])
-
   lineWidth = None
   boxWidth = None
   anno = '?'
@@ -313,13 +308,15 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
     atoms = []
     if line.startswith('#'):
       atoms.append(line.strip().split()[-1])
-
+      continue
     data = line.split()
+
+    if len(data) < 10:
+        continue
     ppms = [0] * numDim
     annotations = [None] * numDim
     lineWidths = [None] * numDim
     boxWidths = [None] * numDim
-
     volume = float(data[numDim+3])
     height = None
     details = None
@@ -350,16 +347,32 @@ def parseSparkyPeakList(peaklist_file):
             resname = assignment[0]
             resnumber = assignment[1]
             atoms = [assignment[2].split('-')[0], assignment[-1]]
-            annotations = [resnumber+res1to3dict[resname]+x[0] for x in  atoms]
+            annotations = [resnumber+res1to3dict[resname]+x[0] for x in atoms]
             lineWidths = [None] * 2
             ppms = [l[1], l[2]]
             height = l[3]
             volume = l[4]
-            peak = Peak(peak_number=ii+1, positions=ppms, assignments=annotations, atoms=atoms, linewidths=lineWidths, volume=volume,
-                height=height)
+            peak = Peak(peak_number=ii+1, positions=ppms, assignments=annotations, atoms=atoms, linewidths=lineWidths,
+                        volume=volume, height=height)
             peakList.append(peak)
 
     return peakList
+
+def read_peaklist(peaklist_file, prot_file=None, seq_file=None):
+    file_format = getPeakListFileFormat(peaklist_file)
+
+    if file_format == 'ANSIG':
+        return parseAnsig(peaklist_file)
+    elif file_format == 'CYANA':
+        return parseXeasy(peaklist_file, prot_file, seq_file)
+    elif file_format == 'NMRDRAW':
+        return parseNmrDraw(peaklist_file)
+    elif file_format == 'NMRVIEW':
+        return parseNmrView(peaklist_file)
+    elif file_format == 'SPARKY':
+        return parseSparkyPeakList(peaklist_file)
+    elif file_format == 'XEASY':
+        return parseXeasy(peaklist_file, prot_file, seq_file)
 
 def test_xeasy():
     prot_file = 'cyana.prot'
@@ -380,8 +393,6 @@ def test_nmrdraw():
         if l:
             if l[0].isdigit():
                 i+=1
-
-    print(len(peaklist) == i)
 
 def test_ansig():
     peaks = 'ansig.peaks'
