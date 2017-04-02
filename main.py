@@ -1,9 +1,14 @@
-from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QLabel, QGridLayout, QSpinBox, QLineEdit,
-                             QGraphicsScene, QGraphicsView, QGraphicsTextItem, QGraphicsLineItem, QTreeWidget, QTreeWidgetItem,
-                             QPushButton)
-from PyQt5 import QtCore
 import sys
 from functools import partial
+
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget
+from gui.components.PeakListArea import PeakListArea
+from gui.components.Sidebar import SideBar
+from gui.components.ValuesField import ValueField
+
+from gui.components.LabelledCheckbox import LabelledCheckbox
+from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 
 valuesDict = {
             'x': [],
@@ -11,18 +16,84 @@ valuesDict = {
             'z': []
         }
 
-width = 600
-height = 400
+
+class Main(QTabWidget):
+
+    def __init__(self):
+        QTabWidget.__init__(self, parent=None)
+        tab1 = Settings()
+        tab2 = Interface()
+        tab3 = QWidget()
+        self.addTab(tab1, "Settings")
+        self.addTab(tab2, "PeakList Selection")
+        self.addTab(tab3, "Results")
+
+
+class Settings(QWidget):
+    def __init__(self):
+        QWidget.__init__(self, parent=None)
+        grid = QGridLayout()
+        grid.setAlignment(QtCore.Qt.AlignTop)
+        self.setLayout(grid)
+
+        label1 = QLabel("General Settings", self)
+        label2 = QLabel("Spectrum Path", self)
+        label3 = QLabel("Log file Path", self)
+
+
+        self.ext_bar_checkbox = LabelledCheckbox(self, "Extended Bar")
+        self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
+        self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
+        self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
+
+        self.ext_bar_button = QPushButton("Settings", self)
+        self.ext_bar_button.clicked.connect(self.show_extended_bar_popup)
+
+        self.comp_bar_button = QPushButton("Settings", self)
+        self.vert_bar_button = QPushButton("Settings", self)
+        self.res_evo_button = QPushButton("Settings", self)
+
+
+        self.spectra_path = QLineEdit()
+        self.logfile_path = QLineEdit()
+        self.has_sidechains_checkbox = LabelledCheckbox(self, "Sidechain Peaks?")
+        self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
+        self.perform_controls_checkbox = LabelledCheckbox(self, "Perform Controls?")
+
+        grid.layout().addWidget(label1, 0, 0)
+        grid.layout().addWidget(label2, 1, 0)
+        grid.layout().addWidget(label3, 2, 0)
+        grid.layout().addWidget(self.spectra_path, 1, 1, 1, 4)
+        grid.layout().addWidget(self.logfile_path, 2, 1, 1, 4)
+        grid.layout().addWidget(self.has_sidechains_checkbox, 3, 0, 1, 1)
+        grid.layout().addWidget(self.use_sidechains_checkbox, 3, 1, 1, 1)
+        grid.layout().addWidget(self.perform_controls_checkbox, 3, 2, 1, 1)
+
+        grid.layout().addWidget(self.ext_bar_checkbox, 6, 0, 1, 1)
+        grid.layout().addWidget(self.comp_bar_checkbox, 6, 1, 1, 1)
+        grid.layout().addWidget(self.vert_bar_checkbox, 6, 2, 1, 1)
+        grid.layout().addWidget(self.res_evo_checkbox, 6, 3, 1, 1)
+
+        grid.layout().addWidget(self.ext_bar_button, 7, 0, 1, 1)
+        grid.layout().addWidget(self.comp_bar_button, 7, 1, 1, 1)
+        grid.layout().addWidget(self.vert_bar_button, 7, 2, 1, 1)
+        grid.layout().addWidget(self.res_evo_button, 7, 3, 1, 1)
+
+    def show_extended_bar_popup(self):
+        popup = ExtendedBarPopup()
+        popup.exec()
+        popup.raise_()
+
 
 class Interface(QWidget):
-
+ 
     def __init__(self):
         QWidget.__init__(self, parent=None)
 
         self.initUI()
 
     def initUI(self):
-        self.peakListArea = PeakListArea(self)
+        self.peakListArea = PeakListArea(self, valuesDict=valuesDict)
         grid = QGridLayout()
         grid1 = QGridLayout()
         grid2 = QGridLayout()
@@ -36,13 +107,13 @@ class Interface(QWidget):
         self.widget2 = QWidget(self)
         self.widget2.setLayout(grid2)
         axes_label = QLabel("Use axes", self)
-        x_checkbox = LabelledCheckbox(self, "x")
-        y_checkbox = LabelledCheckbox(self, "y")
-        z_checkbox = LabelledCheckbox(self, "z")
+        self.x_checkbox = LabelledCheckbox(self, "x", fixed=True)
+        self.y_checkbox = LabelledCheckbox(self, "y", fixed=True)
+        self.z_checkbox = LabelledCheckbox(self, "z", fixed=True)
         self.widget2.layout().addWidget(axes_label, 0, 0, 1, 1)
-        self.widget2.layout().addWidget(x_checkbox, 3, 0)
-        self.widget2.layout().addWidget(y_checkbox, 2, 0)
-        self.widget2.layout().addWidget(z_checkbox, 1, 0)
+        self.widget2.layout().addWidget(self.x_checkbox, 3, 0)
+        self.widget2.layout().addWidget(self.y_checkbox, 2, 0)
+        self.widget2.layout().addWidget(self.z_checkbox, 1, 0)
 
         self.sideBar = SideBar(self)
 
@@ -78,9 +149,11 @@ class Interface(QWidget):
 
         self.layout().addWidget(self.showTreeButton, 2, 1, 1, 3)
         self.layout().addWidget(self.peakListArea, 3, 1, 1, 3)
-        # self.peakListArea.updateTree(1, 1, 1)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
+        self.peakListArea.hide()
         
+
+
     def update_condition_boxes(self, row, dim, value):
 
         self.x, self.y, self.z = self.x_combobox.value(), self.y_combobox.value(), self.z_combobox.value()
@@ -97,214 +170,16 @@ class Interface(QWidget):
         if len(valuesDict[dim]) > value:
             valuesDict[dim] = valuesDict[dim][:value]
         for x in range(value):
-            text_box = ValueField(self, x, dim)
+            text_box = ValueField(self, x, dim, valuesDict)
             text_box.setFixedWidth(50)
             text_box.setText(str(valuesDict[dim][x]))
             layout.addWidget(text_box, row, x+2, 1, 1)
 
 
-class ValueField(QLineEdit):
-
-    def __init__(self, parent, index, dim):
-        QLineEdit.__init__(self, parent)
-        self.index = index
-        self.dim = dim
-        self.textChanged.connect(self.updateValuesDict)
-
-    def updateValuesDict(self, value):
-        valuesDict[self.dim][self.index] = value
-
-
-class PeakListArea(QWidget):
-    def __init__(self, parent):
-
-        QWidget.__init__(self, parent)
-        self.scene = QGraphicsScene(self)
-        self.scrollContents = QGraphicsView(self.scene, self)
-        layout = QGridLayout()
-        self.setLayout(layout)
-        self.layout().addWidget(self.scrollContents)
-        self.scrollContents.setFixedSize(width, height)
-        self.scrollContents.setAcceptDrops(True)
-        # self.setAcceptDrops(True)
-        self.setEvents()
-
-
-    def setEvents(self):
-        self.scrollContents.scene().dragEnterEvent = self._dragEnterEvent
-
-    def _dragEnterEvent(self, event):
-        event.accept()
-
-
-    def updateTree(self):
-        self.parent().sideBar.addLists()
-        self.scene.clear()
-        z_conds = valuesDict['z']
-        y_conds = valuesDict['y']
-        x_conds = valuesDict['x']
-        # z_conds = ['298K', '278K']
-        # y_conds = ['dia', 'para']
-        # x_conds = [0, 10, 50]
-        num_x = len(x_conds)
-        num_y = len(y_conds)
-        num_z = len(z_conds)
-        total_x = num_x*num_y*num_z
-        x_spacing = height/total_x
-        y_spacing = height/(num_z*num_y)
-        z_spacing = height /2
-        zz_pos = 0
-        yy_pos = width*0.25
-        xx_pos = width*0.5
-        pl_pos = width*0.75
-
-        xx_vertical = -height / 2
-        yy_vertical = -height / 2 + x_spacing
-        zz_vertical = -height / 3.5
-        num = 0
-        for i, z in enumerate(z_conds):
-            if i % 2 == 0:
-                z = ConditionLabel(str(z), [zz_pos, zz_vertical])
-                self.scene.addItem(z)
-                zz_vertical += z_spacing
-            else:
-                z = ConditionLabel(str(z), [zz_pos, zz_vertical])
-                self.scene.addItem(z)
-                zz_vertical += z_spacing
-            for j, y in enumerate(y_conds):
-                y = ConditionLabel(str(y), [yy_pos, yy_vertical])
-                self.scene.addItem(y)
-                self._addConnectingLine(z, y)
-                yy_vertical+=y_spacing
-                for k, x in enumerate(x_conds):
-                    x = ConditionLabel(str(x), [xx_pos, xx_vertical])
-                    self.scene.addItem(x)
-                    self._addConnectingLine(y, x)
-                    pl = PeakListLabel('Drop peaklist here', self.scene, [pl_pos, xx_vertical])
-                    self.scene.addItem(pl)
-                    xx_vertical+=x_spacing
-                    self._addConnectingLine(x, pl)
-                    num+=1
-
-
-    def _addConnectingLine(self, atom1, atom2):
-        """
-        Adds a line between two GuiNmrAtoms using the width, colour, displacement and style specified.
-        """
-        if atom1.y() > atom2.y():
-            y1 = atom1.y() + (atom1.boundingRect().height() * .5)
-            y2 = atom2.y() + (atom2.boundingRect().height() * .5)
-
-        elif atom1.y() < atom2.y():
-            y1 = atom1.y() + (atom1.boundingRect().height() * .5)
-            y2 = atom2.y() + (atom2.boundingRect().height() * .5)
-
-        else:
-            y1 = atom1.y() + (atom1.boundingRect().height() * 0.5)
-            y2 = atom2.y() + (atom2.boundingRect().height() * 0.5)
-
-        if atom1.x() > atom2.x():
-            x1 = atom1.x()
-            x2 = atom2.x() + atom2.boundingRect().width()
-
-        elif atom1.x() < atom2.x():
-            x1 = atom1.x() + atom1.boundingRect().width()
-            x2 = atom2.x()
-
-        else:
-            x1 = atom1.x() + (atom1.boundingRect().width() / 2)
-            x2 = atom2.x() + (atom1.boundingRect().width() / 2)
-
-
-        newLine = QGraphicsLineItem(x1, y1, x2, y2)
-        self.scene.addItem(newLine)
-
-class ConditionLabel(QGraphicsTextItem):
-
-
-  def __init__(self, text, pos=None):
-      QGraphicsTextItem.__init__(self)
-      self.setPlainText(text)
-      self.setPos(QtCore.QPointF(pos[0], pos[1]))
-
-class PeakListLabel(QGraphicsTextItem):
-
-  def __init__(self, text, scene, pos=None):
-      QGraphicsTextItem.__init__(self)
-      self.setPlainText(text)
-      self.setPos(QtCore.QPointF(pos[0], pos[1]))
-      self.setAcceptDrops(True)
-      self.scene = scene
-
-
-  def dragEnterEvent(self, event):
-    event.accept()
-
-  def dragMoveEvent(self, event):
-    event.accept()
-
-
-
-
-  def dropEvent(self, event):
-
-    mimeData = event.mimeData()
-    self.setPlainText(mimeData.text())
-    event.accept()
-
-
-
-class LabelledCheckbox(QWidget):
-
-    def __init__(self, parent, text, callback=None, **kw):
-        QWidget.__init__(self, parent)
-        grid = QGridLayout()
-        self.setLayout(grid)
-        checkBox = QCheckBox()
-
-        label = QLabel(text, self)
-        self.layout().addWidget(checkBox, 0, 0)
-        self.layout().addWidget(label, 0, 1)
-        self.setFixedWidth(50)
-
-        if callback:
-            self.setCallback(callback)
-
-    def setCallback(self, callback):
-        self.connect(self, QtCore.SIGNAL('clicked()'), callback)
-
-class SideBar(QTreeWidget):
-    def __init__(self, parent=None):
-        QTreeWidget.__init__(self, parent)
-        # self.header().hide()
-        self.setDragEnabled(True)
-        self.setExpandsOnDoubleClick(False)
-        self.setDragDropMode(self.InternalMove)
-        self.acceptDrops()
-        self.setMinimumWidth(200)
-        self.addLists()
-
-    def addLists(self):
-        self.clear()
-        for i in range(1, 13):
-            self.projectItem = QTreeWidgetItem(self)
-            self.projectItem.setFlags(self.projectItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
-            self.projectItem.setText(0, "peaklist%s" % str(i))
-
-    def dragEnterEvent(self, event):
-        event.accept()
-        item = self.itemAt(event.pos())
-        text = item.text(0)
-        event.mimeData().setText(text)
-
-    def dropEvent(self, event):
-        event.accept()
-        print(event.data())
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Interface()
+    ex = Main()
     ex.show()
     ex.raise_()
     sys.exit(app.exec_())
