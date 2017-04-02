@@ -9,6 +9,7 @@ from gui.components.ValuesField import ValueField
 
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
+from gui.popups.CompactBarPopup import CompactBarPopup
 
 valuesDict = {
             'x': [],
@@ -50,6 +51,7 @@ class Settings(QWidget):
         self.ext_bar_button.clicked.connect(self.show_extended_bar_popup)
 
         self.comp_bar_button = QPushButton("Settings", self)
+        self.comp_bar_button.clicked.connect(self.show_compact_bar_popup)
         self.vert_bar_button = QPushButton("Settings", self)
         self.res_evo_button = QPushButton("Settings", self)
 
@@ -81,6 +83,12 @@ class Settings(QWidget):
 
     def show_extended_bar_popup(self):
         popup = ExtendedBarPopup()
+        popup.exec()
+        popup.raise_()
+
+
+    def show_compact_bar_popup(self):
+        popup = CompactBarPopup()
         popup.exec()
         popup.raise_()
 
