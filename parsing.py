@@ -192,7 +192,6 @@ def parseNmrView(peaklist_file):
     null = fileObj.readline()
     dimNames = fileObj.readline().strip().split()
     numDim = len(dimNames)
-    print(numDim)
     name = fileObj.readline()
     line = fileObj.readline()
     line = line.replace('{', '')
@@ -266,7 +265,7 @@ def parseNmrView(peaklist_file):
 
     fileObj.close()
 
-  # return peakList, extraInfo
+    return peakList
 
 
 def parseProtFile(prot_file, seq_file):
@@ -358,7 +357,14 @@ def parseSparkyPeakList(peaklist_file):
 
     return peakList
 
-def read_peaklist(peaklist_file, prot_file=None, seq_file=None):
+def fixpath(path):
+    if path.startswith('/'):
+        path = os.path.normpath(path[1:])
+    else:
+        path = os.path.normpath(os.path.expanduser(path))
+    return path
+def read_peaklist(fileObj, prot_file=None, seq_file=None):
+    peaklist_file = fixpath(fileObj)
     file_format = getPeakListFileFormat(peaklist_file)
 
     if file_format == 'ANSIG':

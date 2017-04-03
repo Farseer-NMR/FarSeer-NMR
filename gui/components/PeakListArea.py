@@ -131,11 +131,10 @@ class PeakListLabel(QGraphicsTextItem):
   def dragMoveEvent(self, event):
     event.accept()
 
-
   def dropEvent(self, event):
 
     mimeData = event.mimeData()
+    print(mimeData.text())
     self.setPlainText(mimeData.text())
     event.accept()
-
 
