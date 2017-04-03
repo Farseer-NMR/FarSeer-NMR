@@ -100,7 +100,7 @@ class FarseerSet:
                 brinch = brinch.setdefault(part, {})
             # reads the .csv file to a pd.DataFrame removes
             # the '.csv' from the key name to increase asthetics in output
-            if parts[-1].endswith('.csv'):
+            if parts[-1].lower().endswith('.csv'):
                 lessparts = parts[-1][:-4]
                 branch[lessparts] = branch.get(parts[-1], pd.read_csv(p))
                 # sets sidechains to 0
@@ -108,12 +108,16 @@ class FarseerSet:
                 
                 fsut.write_log('===> file read :: {}\n'.format(p))
                 
-            elif parts[-1].endswith('.fasta'):
+            elif parts[-1].lower().endswith('.fasta'):
                 lessparts = parts[-1][:-4]
                 brinch[lessparts] = brinch.get(parts[-1], 
                                                self.read_FASTA(p,
                                                          start=self.FASTAstart))
                 fsut.write_log('===> file read :: {}\n'.format(p))
+            elif parts[-1].lower().endswith('.pre'):
+                pass
+            else:
+                raise ValueError('@@@ There is a file in spectra with other extension than .csv, .fasta or .pre')
         
         fsut.write_log(fsut.titlesperator)
     
@@ -248,12 +252,12 @@ class FarseerSet:
         
         # logs activity, which keys where found in each dimension
         str2write = \
-'''{}> zz keys: {}
-> yy keys: {}
-> xx keys: {}
+'''{}> 1st titration variables (titvar1): {}
+> 2nd titration variables (titvar2): {}
+> 3rd titration variables (titvar3): {}
 {}
-'''.format(fsut.write_title('AXES NAMES IDENTIFIED', onlytitle=True),
-           self.zzcoords, self.yycoords, self.xxcoords, fsut.titlesperator)
+'''.format(fsut.write_title('IDENTIFIED TITRATION VARIABLES', onlytitle=True),
+           self.xxcoords, self.yycoords, self.zzcoords, fsut.titlesperator)
 
         fsut.write_log(str2write)
     
@@ -392,9 +396,9 @@ class FarseerSet:
             #self.allsidechains[z][y][x].sort_values(by='Assign F1', inplace=True)
             
             # adds 'a' or 'b'
-            self.allsidechains[z][y][x].loc[:,'Res#'] = \
-                self.allsidechains[z][y][x].loc[:,'Res#'] + \
+            self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                 self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
+            
             
             # creates backbone peaklist without sidechains
             self.allpeaklists[z][y][x] = \
@@ -408,7 +412,7 @@ class FarseerSet:
         # the script does not correct for the fact that the user set no sidechains
         # but that actually are sidechains, though the log file register such occurrence.
         str2write = '*** new columns inserted:  {}  *** sidechains user setting: {} ** sidechains identified: {} ** SD count: {}.\n'.\
-            format(columns_OK, self.has_sidechains, (True in sd_count), sd_count[True])
+            format(columns_OK, self.has_sidechains, (True in sidechains_bool.value_counts()), sd_count[True])
         fsut.write_log(str2write)
     
     def correct_shifts(self, z, y, x, ref_data, ref_res='1'):
@@ -526,7 +530,8 @@ class FarseerSet:
         fsut.write_log(str2write)
     
     def column_organizor(self, z, y, x, tmp_vars, peaklist,
-                         performed_cs_correction=False):
+                         performed_cs_correction=False,
+                         sidechains=False):
         """
         pd.DataFrame -> pd.DataFrame(ordered columns):
 
@@ -534,7 +539,7 @@ class FarseerSet:
 
         Returns the organized dataframe.
         """
-        if performed_cs_correction:
+        if performed_cs_correction and not(sidechains):
             col_order = ['Res#',
                          '1-letter',
                          '3-letter',
@@ -559,33 +564,89 @@ class FarseerSet:
                          'Pos F1 correction',
                          'Pos F2 correction']
                          #                         'index',
-        else:
+        elif performed_cs_correction and sidechains:
             col_order = ['Res#',
-                 '1-letter',
-                 '3-letter',
-                 'Peak Status',
-                 'Merit',
-                 'Position F1',
-                 'Position F2',
-                 'Height',
-                 'Volume',
-                 'Line Width F1 (Hz)',
-                 'Line Width F2 (Hz)',
-                 'Fit Method',
-                 'Vol. Method',
-                 'Assign F1',
-                 'Assign F2',
-                 'Details',
-                 'Number',
-                 '#',
-                 'index']
+                         'ATOM',
+                         '1-letter',
+                         '3-letter',
+                         'Peak Status',
+                         'Merit',
+                         'Position F1',
+                         'Position F2',
+                         'Height',
+                         'Volume',
+                         'Line Width F1 (Hz)',
+                         'Line Width F2 (Hz)',
+                         'Fit Method',
+                         'Vol. Method',
+                         'Assign F1',
+                         'Assign F2',
+                         'Details',
+                         'Number',
+                         '#',
+                         'index',
+                         'Position F1 original',
+                         'Position F2 original',
+                         'Pos F1 correction',
+                         'Pos F2 correction']
+        
+        elif not(performed_cs_correction) and not(sidechains):
+            col_order = ['Res#',
+                         '1-letter',
+                         '3-letter',
+                         'Peak Status',
+                         'Merit',
+                         'Position F1',
+                         'Position F2',
+                         'Height',
+                         'Volume',
+                         'Line Width F1 (Hz)',
+                         'Line Width F2 (Hz)',
+                         'Fit Method',
+                         'Vol. Method',
+                         'Assign F1',
+                         'Assign F2',
+                         'Details',
+                         'Number',
+                         '#',
+                         'index']
+        
+        elif not(performed_cs_correction) and sidechains:
+            col_order = ['Res#',
+                         'ATOM',
+                         '1-letter',
+                         '3-letter',
+                         'Peak Status',
+                         'Merit',
+                         'Position F1',
+                         'Position F2',
+                         'Height',
+                         'Volume',
+                         'Line Width F1 (Hz)',
+                         'Line Width F2 (Hz)',
+                         'Fit Method',
+                         'Vol. Method',
+                         'Assign F1',
+                         'Assign F2',
+                         'Details',
+                         'Number',
+                         '#',
+                         'index']
         
         print(peaklist[z][y][x].columns)
         peaklist[z][y][x] = peaklist[z][y][x][col_order]
-        str2write = '> Columns organized :: [{}|{}|{}]\n'.format(z, y, x)
+        str2write = ' > Columns organized :: [{}|{}|{}]\n'.format(z, y, x)
         fsut.write_log(str2write)
     
     def gen_Farseer_cube(self, use_sidechains=False):
+        """
+        Creates a pd.Panel5D with the information of all the parsed peaklists
+        From this panel, the information will be accessed and used to create the
+        titration objects, upon each the calculations will be performed.
+        
+        If there are sidechains, creates a Panel5D for the sidechains, which
+        are treated separately from the backbone atoms.
+        """
         Panel5D = pd.core.panelnd.create_nd_panel_factory(klass_name='Panel5D',
                                                   orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
                                                   slices={'labels': 'labels',
@@ -596,9 +657,7 @@ class FarseerSet:
                                                   aliases={'major': 'index', 'minor': 'minor_axis'},
                                                   stat_axis=2)
 
-        # creates a Panel5D with the information of all the parsed peaklists
-        # from this panel, the information will be accessed and used for the calculation
-        # routines
+        
         self.peaklists_p5d = Panel5D(self.allpeaklists)
         
         if use_sidechains:
@@ -626,39 +685,61 @@ class FarseerSet:
         tsv_output.close()
     
     def gen_titration(self, titpanel, D_attributes):
-            tmp = fsT.Titration(np.array(titpanel),
-                 items=titpanel.items,
-                 minor_axis=titpanel.minor_axis,
-                 major_axis=titpanel.major_axis)
-            tmp.create_titration_attributes(**D_attributes)
-            #tmp.resonance_type = res_type
-            return tmp
+        """
+        Creates a titration object fsT.Titration.
+        """
+        tmp = fsT.Titration(np.array(titpanel),
+             items=titpanel.items,
+             minor_axis=titpanel.minor_axis,
+             major_axis=titpanel.major_axis)
+             
+        # activates the titration attibutes
+        tmp.create_titration_attributes(**D_attributes)
+        #tmp.resonance_type = res_type
+        return tmp
     
-    def gen_titration_dict(self, panelT, tittype, owndims, nextdims1, nextdims2, reso_type):
+    def gen_titration_dict(self, panelT, tittype, owndim_pts, nextdims1, nextdims2, reso_type):
         '''
+        :panelT: the pd.Panel5D storing all the information of the titration set
+                 transposed so that the items are the observed dimension.
+        :tittype: defines whether we are analysing the first, the 2nd o the 3rd dim/condition.
+        :owndim_pts: the points in the titype dimension.
+        :nextdims1: the points in the next dimension of the titype.
+        :nextdims2: the points in the 2nd next dimension.
+        :res_type: whether is backbone or sidechain.
+        
+        
         Generates a dictionary that stores the titrations corresponding to the
-        analysis of a given condition. The generated dictionary has main key
-        equal to the 2nd next dimension, subkey equal to the next dimension
-        and stores a Titration object (an inherited pd.Panel that stores the
-        titration experiments peaklists as Items.
+        analysis of a given condition (1D, 2D or 3D). The generated dictionary
+        has main key equal to the 2nd next dimension, subkey equal to the next dimension
+        and stores a Titration object fsT.
+        
+        Therefore the dictionary[1D] stores all the experiments along the first
+        dimension/condition.
         '''
         
+        # initiates dictionary
         D = {}
+        
+        # initiates attributes that will be pased as kwargs
         D_attributes = {}
         D_attributes['resonance_type'] = reso_type
         D_attributes['tittype'] = tittype
-        D_attributes['owndims'] = owndims
-        for nextdim2 in nextdims2:
-            fsut.write_log(fsut.dim_sperator(nextdim2, 'top'))
-            D.setdefault(nextdim2, {})
-            for nextdim1 in nextdims1:
-                fsut.write_log(fsut.dim_sperator(nextdim1, 'midle'))
-                D_attributes['nextdim2'] = nextdim2
-                D_attributes['nextdim1'] = nextdim1
-                D[nextdim2][nextdim1] = \
-                    self.gen_titration(panelT.loc[nextdim2, nextdim1, :, :, :],
-                                    D_attributes)
-                fsut.write_log(str(D[nextdim2][nextdim1])+'\n')
+        D_attributes['owndim_pts'] = owndim_pts
+        
+        
+        for dim2_pts in nextdims2:
+            fsut.write_log(fsut.dim_sperator(dim2_pts, 'top'))
+            D.setdefault(dim2_pts, {})
+            for dim1_pts in nextdims1:
+                fsut.write_log(fsut.dim_sperator(dim1_pts, 'midle'))
+                D_attributes['dim2_pts'] = dim2_pts
+                D_attributes['dim1_pts'] = dim1_pts
+                D[dim2_pts][dim1_pts] = \
+                    self.gen_titration(panelT.loc[dim2_pts, dim1_pts, :, :, :],
+                                       D_attributes)
+                
+                fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         return D
     
     
