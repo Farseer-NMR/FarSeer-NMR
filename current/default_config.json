@@ -1,0 +1,175 @@
+{
+  "general_settings": {
+          "spectrum_path": "",
+          "logfile_name": "",
+          "has_sidechains": "",
+          "use_sidechains": "",
+          "chimera_att_select_format": ":",
+          "fig_file_type": "pdf",
+          "fig_dpi": 300
+    
+  },
+  
+  "fitting_settings": {
+    "do1D": true,
+    "do2D": true, 
+    "do3D": true,
+    "expand_lost_yy": false,
+    "expand_lost_zz": false,
+    "perform_controls": true,
+    "perform_resevo_fitting": false,
+    "fit_line_color": "black",
+    "fit_line_width": 1
+  },          
+
+  "cs_settings": {
+          "perform_cs_correction": "",
+          "cs_correction_res_ref": ""
+  },
+
+  "csp_settings": {
+          "csp_res4alpha": "",
+          "csp_res_exceptions": "",
+          "cs_lost": ""
+  },
+
+  "fasta_settings": {
+          "applyFASTA": true,
+          "FASTAstart": 1
+  },
+  
+  "extended_bar_settings": {
+          "ext_bar_cols_page": 1,
+          "ext_bar_rows_page": 6,
+          "ext_bar_apply_status_2_bar_color": true,
+          "ext_bar_color_measured": "k",
+          "ext_bar_color_lost": "red",
+          "ext_bar_color_unassigned": "grey",
+          "ext_bar_bar_width": 0.7,
+          "ext_bar_bar_alpha": 1,
+          "ext_bar_bar_linewidth": 0,
+          "ext_bar_title_y": 1.05,
+          "ext_bar_title_fs": 10,
+          "ext_bar_title_fn": "Arial",
+          "ext_bar_plot_threshold": true,
+          "ext_bar_plot_threshold_color": "red",
+          "ext_bar_plot_threshold_lw": 1,
+          "ext_bar_x_ticks_rot": 90,
+          "ext_bar_x_ticks_fs": 6,
+          "ext_bar_x_ticks_fn": "monospace",
+          "ext_bar_x_ticks_pad": 0.1,
+          "ext_bar_y_ticks_fs": 9,
+          "ext_bar_y_grid_color": "grey",
+          "ext_bar_mark_prolines": true,
+          "ext_bar_proline_mark": "P",
+          "ext_bar_mark_user_details": true
+  },
+  
+  "compact_bar_settings": {
+          "comp_bar_cols_page": 3,
+          "comp_bar_rows_page": 5,
+          "comp_bar_apply_status_2_bar_color": true,
+          "comp_bar_color_measured": "k",
+          "comp_bar_color_lost": "red",
+          "comp_bar_color_unassigned": "grey",
+          "comp_bar_bar_width": 0.7,
+          "comp_bar_bar_alpha": 1,
+          "comp_bar_bar_linewidth": 0,
+          "comp_bar_title_y": 1.01,
+          "comp_bar_title_fs": 8,
+          "comp_bar_title_fn": "Arial",
+          "comp_bar_plot_threshold": true,
+          "comp_bar_plot_threshold_color": "red",
+          "comp_bar_plot_threshold_lw": 1,
+          "comp_bar_x_ticks_rot": 0,
+          "comp_bar_x_ticks_fs": 6,
+          "comp_bar_x_ticks_fn": "Arial",
+          "comp_bar_x_ticks_pad": 1,
+          "comp_bar_y_ticks_fs": 9,
+          "comp_bar_y_ticks_pad": -3,
+          "comp_bar_y_grid_color": "grey",
+          "comp_bar_mark_prolines": true,
+          "comp_bar_proline_mark": "P",
+          "comp_bar_mark_user_details": true,
+          "comp_bar_mark_fs": 3,
+          "comp_bar_unassigned_shade": true,
+          "comp_bar_unassigned_shade_color": "grey",
+          "comp_bar_unassigned_shade_alpha": 0.5
+  },
+  
+  
+  "vert_bar_settings": {
+          "vert_bar_cols_page": 6,
+          "vert_bar_rows_page": 1
+  },
+  
+  "plots_PosF1_settings":{
+          "plots_PosF1_delta": true,
+          "yy_label_PosF1_delta": "ppm",
+          "calccol_name_PosF1_delta": "H1_delta",
+          "yy_scale_PosF1_delta": 0.1
+  },
+  
+  "plots_PosF2_settings":{
+          "plots_PosF2_delta": true,
+          "yy_label_PosF2_delta": "ppm",
+          "calccol_name_PosF2_delta": "N15_delta",
+          "yy_scale_PosF2_delta": 0.25
+  },
+  
+  "plots_CSP_settings":{
+           "plots_CSP": true,
+           "yy_label_CSP": "CSPs (ppm)",
+           "calccol_name_CSP": "CSP",
+           "yy_scale_CSP": 0.05
+  },
+  
+  "plots_Height_ratio_settings":{
+            "plots_Height_ratio": true,
+            "yy_label_Height_ratio": "Hi/H0",
+            "calccol_name_Height_ratio": "Height_ratio",
+            "yy_scale_Height_ratio": 1.0
+  },
+  
+  "plots_Volume_ratio_settings": {
+            "plots_Volume_ratio": true,
+            "yy_label_Volume_ratio": "Vi/V0",
+            "calccol_name_Volume_ratio": "Vol_ratio",
+            "yy_scale_Volume_ratio": 1.0
+  },
+
+  "res_evo_settings": {
+          "res_evo_cols_page": 4,
+          "res_evo_rows_page": 6,
+          "res_evo_title_y": 0.97,
+          "res_evo_title_fs": 8,
+          "res_evo_title_fn": "Arial",
+          "res_evo_set_x_values": true,
+          "res_evo_x_ticks_pad": 1,
+          "res_evo_x_ticks_fs": 7,
+          "res_evo_xlabel_flag": false,
+          "res_evo_y_ticks_pad": 1,
+          "res_evo_y_ticks_fs": 7,
+          "res_evo_line_style": "-",
+          "res_evo_plot_color": "r",
+          "res_evo_marker_style": "o",
+          "res_evo_marker_color": "darkred",
+          "res_evo_marker_size": 3,
+          "res_evo_line_width": 1,
+          "res_evo_fill_between": true,
+          "res_evo_fill_color": "pink",
+          "res_evo_fill_alpha": 0.5
+  },
+  
+  "user_mark_settings": {
+          "H0": "H",
+          "V0": "V",
+          "low":"l",
+          "p1": "1",
+          "p2": "2",
+          "p3": "3",
+          "p4": "4",
+          "p5": "5"
+  }
+  
+}

@@ -6,7 +6,7 @@ class CompactBarPopup(QDialog):
 
     def __init__(self, parent=None, **kw):
         super(CompactBarPopup, self).__init__(parent)
-        self.setWindowTitle("Extended Bar Plot")
+        self.setWindowTitle("Compact Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
@@ -20,7 +20,7 @@ class CompactBarPopup(QDialog):
         bar_width_label = QLabel("Bar Width", self)
         bar_alpha_label = QLabel("Bar Alpha", self)
         bar_linewidth = QLabel("Bar Line Width", self)
-        bar_title_label = QLabel("Title Label", self)
+        bar_title_y_label = QLabel("Title Y", self)
         bar_font_size_label = QLabel("Title Font Size", self)
         bar_font_label = QLabel("Title Font", self)
         bar_threshold_label = QLabel("Bar Threshold", self)
@@ -50,7 +50,7 @@ class CompactBarPopup(QDialog):
         self.layout().addWidget(bar_width_label, 6, 0)
         self.layout().addWidget(bar_alpha_label, 7, 0)
         self.layout().addWidget(bar_linewidth, 8, 0)
-        self.layout().addWidget(bar_title_label, 9, 0)
+        self.layout().addWidget(bar_title_y_label, 9, 0)
         self.layout().addWidget(bar_font_size_label, 10, 0)
         self.layout().addWidget(bar_font_label, 11, 0)
         self.layout().addWidget(bar_threshold_label, 12, 0)
@@ -80,7 +80,7 @@ class CompactBarPopup(QDialog):
         self.bar_width = QDoubleSpinBox()
         self.bar_alpha = QSpinBox()
         self.bar_linewidth = QDoubleSpinBox()
-        self.bar_title = QLineEdit()
+        self.bar_title_y = QDoubleSpinBox()
         self.bar_font_size = QSpinBox()
         self.title_font = QLineEdit()
         self.title_font_size = QSpinBox()
@@ -111,7 +111,7 @@ class CompactBarPopup(QDialog):
         self.layout().addWidget(self.bar_width, 6, 1)
         self.layout().addWidget(self.bar_alpha, 7, 1)
         self.layout().addWidget(self.bar_linewidth, 8, 1)
-        self.layout().addWidget(self.bar_title, 9, 1)
+        self.layout().addWidget(self.bar_title_y, 9, 1)
         self.layout().addWidget(self.bar_font_size, 10, 1)
         self.layout().addWidget(self.title_font, 11, 1)
         self.layout().addWidget(self.bar_threshold, 12, 1)
@@ -132,11 +132,11 @@ class CompactBarPopup(QDialog):
         self.layout().addWidget(self.unassigned_shade_colour, 27, 1)
         self.layout().addWidget(self.unassigned_shade_alpha, 28, 1)
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.Reset)
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
         self.buttonBox.accepted.connect(self.setValues)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.Reset).clicked.connect(self.set_defaults)
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.set_defaults)
 
         self.layout().addWidget(self.buttonBox, 29, 0, 1, 2)
 
@@ -152,7 +152,7 @@ class CompactBarPopup(QDialog):
         self.bar_width.setValue(0.7)
         self.bar_alpha.setValue(1)
         self.bar_linewidth.setValue(0)
-        self.bar_title.setText("1.01")
+        self.bar_title_y.setValue(1.01)
         self.title_font.setText('Arial')
         self.title_font_size.setValue(8)
         self.bar_threshold.setChecked(True)

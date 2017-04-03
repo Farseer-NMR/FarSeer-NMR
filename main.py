@@ -2,14 +2,21 @@ import sys
 from functools import partial
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
 
 from gui.components.LabelledCheckbox import LabelledCheckbox
+from gui.components.LabelledCombobox import LabelledCombobox
+from gui.components.LabelledSpinBox import LabelledSpinBox
+from gui.components.LabelledLineEdit import LabelledLineEdit
+from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
+from gui.popups.VerticalBar import VerticalBarPopup
+from gui.popups.ResidueEvolution import ResidueEvolutionPopup
+from gui.popups.UserMarksPopup import UserMarksPopup
 
 valuesDict = {
             'x': [],
@@ -37,7 +44,7 @@ class Settings(QWidget):
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
 
-        label1 = QLabel("General Settings", self)
+        # label1 = QLabel("General Settings", self)
         label2 = QLabel("Spectrum Path", self)
         label3 = QLabel("Log file Path", self)
 
@@ -46,14 +53,21 @@ class Settings(QWidget):
         self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
         self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
         self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
+        self.user_details_checkbox = LabelledCheckbox(self, "User Details")
 
         self.ext_bar_button = QPushButton("Settings", self)
-        self.ext_bar_button.clicked.connect(self.show_extended_bar_popup)
+        self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup))
 
         self.comp_bar_button = QPushButton("Settings", self)
-        self.comp_bar_button.clicked.connect(self.show_compact_bar_popup)
+        self.comp_bar_button.clicked.connect(partial(self.show_popup, CompactBarPopup))
         self.vert_bar_button = QPushButton("Settings", self)
+        self.vert_bar_button.clicked.connect(partial(self.show_popup, VerticalBarPopup))
+
         self.res_evo_button = QPushButton("Settings", self)
+        self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup))
+
+        self.user_details_button = QPushButton("Settings", self)
+        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup))
 
 
         self.spectra_path = QLineEdit()
@@ -61,30 +75,110 @@ class Settings(QWidget):
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Sidechain Peaks?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_controls_checkbox = LabelledCheckbox(self, "Perform Controls?")
+        self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
+        self.fasta_start = LabelledSpinBox(self, "Fasta start")
 
-        grid.layout().addWidget(label1, 0, 0)
+        self.res_evo_fitting = LabelledCheckbox(self, "Fit Parameter Evolution?")
+        self.res_evo_fit_line_colour = LabelledLineEdit(self, text="Fit Line Colour")
+        self.res_evo_fit_line_width = LabelledSpinBox(self, "Fit Line Width")
+
+        self.expand_lost_yy = LabelledCheckbox(self, "Analyse Lost Y Residues?")
+        self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
+
         grid.layout().addWidget(label2, 1, 0)
         grid.layout().addWidget(label3, 2, 0)
         grid.layout().addWidget(self.spectra_path, 1, 1, 1, 4)
         grid.layout().addWidget(self.logfile_path, 2, 1, 1, 4)
+
         grid.layout().addWidget(self.has_sidechains_checkbox, 3, 0, 1, 1)
         grid.layout().addWidget(self.use_sidechains_checkbox, 3, 1, 1, 1)
         grid.layout().addWidget(self.perform_controls_checkbox, 3, 2, 1, 1)
+        grid.layout().addWidget(self.apply_fasta_checkbox, 3, 3, 1, 1)
+        grid.layout().addWidget(self.fasta_start, 3, 4, 1, 1)
 
-        grid.layout().addWidget(self.ext_bar_checkbox, 6, 0, 1, 1)
-        grid.layout().addWidget(self.comp_bar_checkbox, 6, 1, 1, 1)
-        grid.layout().addWidget(self.vert_bar_checkbox, 6, 2, 1, 1)
-        grid.layout().addWidget(self.res_evo_checkbox, 6, 3, 1, 1)
+        grid.layout().addWidget(self.res_evo_fitting, 4, 0, 1, 1)
+        grid.layout().addWidget(self.res_evo_fit_line_colour, 4, 1, 1, 1)
+        grid.layout().addWidget(self.res_evo_fit_line_width, 4, 2, 1, 1)
+        grid.layout().addWidget(self.expand_lost_yy, 4, 3, 1, 1)
+        grid.layout().addWidget(self.expand_lost_zz, 4, 4, 1, 1)
 
-        grid.layout().addWidget(self.ext_bar_button, 7, 0, 1, 1)
-        grid.layout().addWidget(self.comp_bar_button, 7, 1, 1, 1)
-        grid.layout().addWidget(self.vert_bar_button, 7, 2, 1, 1)
-        grid.layout().addWidget(self.res_evo_button, 7, 3, 1, 1)
 
-    def show_extended_bar_popup(self):
-        popup = ExtendedBarPopup()
-        popup.exec()
-        popup.raise_()
+        self.cs_correction = LabelledCheckbox(self, "Perform CS Correction?")
+        self.cs_correction_res_ref = LabelledLineEdit(self, text="Correction Residue")
+        self.csp_alpha = LabelledLineEdit(self, text="CSP Alpha")
+        self.csp_lost = LabelledCombobox(self, text="CSP Lost Mode", items=['prev', 'full'])
+        self.csp_exceptions = QPushButton("CSP Exceptions", self)
+
+        grid.layout().addWidget(self.cs_correction, 5, 0, 1, 1)
+        grid.layout().addWidget(self.cs_correction_res_ref, 5, 1, 1, 1)
+        grid.layout().addWidget(self.csp_alpha, 5, 2, 1, 1)
+        grid.layout().addWidget(self.csp_lost, 5, 3, 1, 1)
+        grid.layout().addWidget(self.csp_exceptions, 5, 4, 1, 1)
+
+        self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
+        self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
+        self.plot_CSP = LabelledCheckbox(self, text="Plot CSPs")
+        self.plot_height_ratio = LabelledCheckbox(self, text="Plot Height Ratio")
+        self.plot_volume_ratio = LabelledCheckbox(self, text="Plot Volume Ratio")
+
+        self.plot_F1_y_label = LabelledLineEdit(self, text="Y Axis Label")
+        self.plot_F2_y_label = LabelledLineEdit(self, text="Y Axis Label")
+        self.plot_CSP_y_label = LabelledLineEdit(self, text="Y Axis Label")
+        self.plot_height_y_label = LabelledLineEdit(self, text="Y Axis Label")
+        self.plot_volume_y_label = LabelledLineEdit(self, text="Y Axis Label")
+
+        self.plot_F1_calccol = LabelledLineEdit(self, text="Data Column")
+        self.plot_F2_calccol = LabelledLineEdit(self, text="Data Column")
+        self.plot_CSP_calccol = LabelledLineEdit(self, text="Data Column")
+        self.plot_height_calccol = LabelledLineEdit(self, text="Data Column")
+        self.plot_volume_calccol = LabelledLineEdit(self, text="Data Column")
+
+        self.plot_F1_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
+        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
+        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
+        self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
+        self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
+
+        grid.layout().addWidget(self.plot_F1_data, 6, 0, 1, 1)
+        grid.layout().addWidget(self.plot_F2_data, 6, 1, 1, 1)
+        grid.layout().addWidget(self.plot_CSP, 6, 2, 1, 1)
+        grid.layout().addWidget(self.plot_height_ratio, 6, 3, 1, 1)
+        grid.layout().addWidget(self.plot_volume_ratio, 6, 4, 1, 1)
+
+        grid.layout().addWidget(self.plot_F1_y_label, 7, 0, 1, 1)
+        grid.layout().addWidget(self.plot_F2_y_label, 7, 1, 1, 1)
+        grid.layout().addWidget(self.plot_CSP_y_label, 7, 2, 1, 1)
+        grid.layout().addWidget(self.plot_height_y_label, 7, 3, 1, 1)
+        grid.layout().addWidget(self.plot_volume_y_label, 7, 4, 1, 1)
+
+        grid.layout().addWidget(self.plot_F1_calccol, 8, 0, 1, 1)
+        grid.layout().addWidget(self.plot_F2_calccol, 8, 1, 1, 1)
+        grid.layout().addWidget(self.plot_CSP_calccol, 8, 2, 1, 1)
+        grid.layout().addWidget(self.plot_height_calccol, 8, 3, 1, 1)
+        grid.layout().addWidget(self.plot_volume_calccol, 8, 4, 1, 1)
+
+        grid.layout().addWidget(self.plot_F1_y_scale, 9, 0, 1, 1)
+        grid.layout().addWidget(self.plot_F2_y_scale, 9, 1, 1, 1)
+        grid.layout().addWidget(self.plot_CSP_y_scale, 9, 2, 1, 1)
+        grid.layout().addWidget(self.plot_height_y_scale, 9, 3, 1, 1)
+        grid.layout().addWidget(self.plot_volume_y_scale, 9, 4, 1, 1)
+
+        grid.layout().addWidget(self.ext_bar_checkbox, 10, 0, 1, 1)
+        grid.layout().addWidget(self.comp_bar_checkbox, 10, 1, 1, 1)
+        grid.layout().addWidget(self.vert_bar_checkbox, 10, 2, 1, 1)
+        grid.layout().addWidget(self.res_evo_checkbox, 10, 3, 1, 1)
+        grid.layout().addWidget(self.user_details_checkbox, 10, 4, 1, 1)
+
+        grid.layout().addWidget(self.ext_bar_button, 11, 0, 1, 1)
+        grid.layout().addWidget(self.comp_bar_button, 11, 1, 1, 1)
+        grid.layout().addWidget(self.vert_bar_button, 11, 2, 1, 1)
+        grid.layout().addWidget(self.res_evo_button, 11, 3, 1, 1)
+        grid.layout().addWidget(self.user_details_button, 11, 4, 1, 1)
+
+    def show_popup(self, popup):
+        p = popup()
+        p.exec()
+        p.raise_()
 
 
     def show_compact_bar_popup(self):
@@ -158,7 +252,7 @@ class Interface(QWidget):
         self.layout().addWidget(self.showTreeButton, 2, 1, 1, 3)
         self.layout().addWidget(self.peakListArea, 3, 1, 1, 3)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
-        self.peakListArea.hide()
+        # self.peakListArea.hide()
         
 
 

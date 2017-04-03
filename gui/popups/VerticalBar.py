@@ -2,11 +2,11 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QSpinBox, QLineEdit, QCheckBox, QDoubleSpinBox, QDialogButtonBox
 
 
-class VerticalBar(QDialog):
+class VerticalBarPopup(QDialog):
 
     def __init__(self, parent=None, **kw):
-        super(VerticalBar, self).__init__(parent)
-        self.setWindowTitle("Extended Bar Plot")
+        super(VerticalBarPopup, self).__init__(parent)
+        self.setWindowTitle("Vertical Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
@@ -26,11 +26,11 @@ class VerticalBar(QDialog):
         self.layout().addWidget(self.bar_cols, 0, 1)
         self.layout().addWidget(self.bar_rows, 1, 1)
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.Reset)
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
         self.buttonBox.accepted.connect(self.setValues)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.Reset).clicked.connect(self.set_defaults)
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.set_defaults)
 
         self.layout().addWidget(self.buttonBox, 2, 0, 1, 2)
 
