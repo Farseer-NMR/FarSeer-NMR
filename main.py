@@ -2,7 +2,7 @@ import sys
 from functools import partial
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QGroupBox, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
@@ -90,17 +90,35 @@ class Settings(QWidget):
         grid.layout().addWidget(self.spectra_path, 1, 1, 1, 4)
         grid.layout().addWidget(self.logfile_path, 2, 1, 1, 4)
 
-        grid.layout().addWidget(self.has_sidechains_checkbox, 3, 0, 1, 1)
-        grid.layout().addWidget(self.use_sidechains_checkbox, 3, 1, 1, 1)
-        grid.layout().addWidget(self.perform_controls_checkbox, 3, 2, 1, 1)
-        grid.layout().addWidget(self.apply_fasta_checkbox, 3, 3, 1, 1)
-        grid.layout().addWidget(self.fasta_start, 3, 4, 1, 1)
+        general_groupbox = QGroupBox()
+        general_groupbox_layout = QHBoxLayout()
+        general_groupbox.setLayout(general_groupbox_layout)
 
-        grid.layout().addWidget(self.res_evo_fitting, 4, 0, 1, 1)
-        grid.layout().addWidget(self.res_evo_fit_line_colour, 4, 1, 1, 1)
-        grid.layout().addWidget(self.res_evo_fit_line_width, 4, 2, 1, 1)
-        grid.layout().addWidget(self.expand_lost_yy, 4, 3, 1, 1)
-        grid.layout().addWidget(self.expand_lost_zz, 4, 4, 1, 1)
+        general_groupbox.layout().addWidget(self.has_sidechains_checkbox)
+        general_groupbox.layout().addWidget(self.use_sidechains_checkbox)
+        general_groupbox.layout().addWidget(self.perform_controls_checkbox)
+        general_groupbox.layout().addWidget(self.expand_lost_yy)
+        general_groupbox.layout().addWidget(self.expand_lost_zz)
+
+        grid.layout().addWidget(general_groupbox, 3, 0, 1, 5)
+
+        res_evo_groupbox = QGroupBox()
+        res_evo_groupbox_layout = QHBoxLayout()
+        res_evo_groupbox.setLayout(res_evo_groupbox_layout)
+
+        res_evo_groupbox.layout().addWidget(self.res_evo_fitting)
+        res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_colour)
+        res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_width)
+
+        grid.layout().addWidget(res_evo_groupbox, 4, 0, 1, 3)
+
+        fasta_groupbox = QGroupBox()
+        fasta_groupbox_layout = QHBoxLayout()
+        fasta_groupbox.setLayout(fasta_groupbox_layout)
+
+        fasta_groupbox.layout().addWidget(self.apply_fasta_checkbox)
+        fasta_groupbox.layout().addWidget(self.fasta_start)
+        grid.layout().addWidget(fasta_groupbox, 4, 3, 1, 2)
 
 
         self.cs_correction = LabelledCheckbox(self, "Perform CS Correction?")
@@ -109,11 +127,18 @@ class Settings(QWidget):
         self.csp_lost = LabelledCombobox(self, text="CSP Lost Mode", items=['prev', 'full'])
         self.csp_exceptions = QPushButton("CSP Exceptions", self)
 
-        grid.layout().addWidget(self.cs_correction, 5, 0, 1, 1)
-        grid.layout().addWidget(self.cs_correction_res_ref, 5, 1, 1, 1)
-        grid.layout().addWidget(self.csp_alpha, 5, 2, 1, 1)
-        grid.layout().addWidget(self.csp_lost, 5, 3, 1, 1)
-        grid.layout().addWidget(self.csp_exceptions, 5, 4, 1, 1)
+        cs_groupbox = QGroupBox()
+        cs_groupbox_layout = QHBoxLayout()
+        cs_groupbox.setLayout(cs_groupbox_layout)
+
+
+        cs_groupbox.layout().addWidget(self.cs_correction)
+        cs_groupbox.layout().addWidget(self.cs_correction_res_ref)
+        cs_groupbox.layout().addWidget(self.csp_alpha)
+        cs_groupbox.layout().addWidget(self.csp_lost)
+        cs_groupbox.layout().addWidget(self.csp_exceptions)
+
+        grid.layout().addWidget(cs_groupbox, 5, 0, 1, 5)
 
         self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
         self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
@@ -139,41 +164,91 @@ class Settings(QWidget):
         self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
         self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="Y Axis Scale")
 
-        grid.layout().addWidget(self.plot_F1_data, 6, 0, 1, 1)
-        grid.layout().addWidget(self.plot_F2_data, 6, 1, 1, 1)
-        grid.layout().addWidget(self.plot_CSP, 6, 2, 1, 1)
-        grid.layout().addWidget(self.plot_height_ratio, 6, 3, 1, 1)
-        grid.layout().addWidget(self.plot_volume_ratio, 6, 4, 1, 1)
+        plot_F1_group_box = QGroupBox(self)
+        plot_F2_group_box = QGroupBox(self)
+        plot_csp_group_box = QGroupBox(self)
+        plot_height_group_box = QGroupBox(self)
+        plot_volume_group_box = QGroupBox(self)
 
-        grid.layout().addWidget(self.plot_F1_y_label, 7, 0, 1, 1)
-        grid.layout().addWidget(self.plot_F2_y_label, 7, 1, 1, 1)
-        grid.layout().addWidget(self.plot_CSP_y_label, 7, 2, 1, 1)
-        grid.layout().addWidget(self.plot_height_y_label, 7, 3, 1, 1)
-        grid.layout().addWidget(self.plot_volume_y_label, 7, 4, 1, 1)
+        plot_F1_layout = QVBoxLayout()
+        plot_F2_layout = QVBoxLayout()
+        plot_csp_layout = QVBoxLayout()
+        plot_height_layout = QVBoxLayout()
+        plot_volume_layout = QVBoxLayout()
 
-        grid.layout().addWidget(self.plot_F1_calccol, 8, 0, 1, 1)
-        grid.layout().addWidget(self.plot_F2_calccol, 8, 1, 1, 1)
-        grid.layout().addWidget(self.plot_CSP_calccol, 8, 2, 1, 1)
-        grid.layout().addWidget(self.plot_height_calccol, 8, 3, 1, 1)
-        grid.layout().addWidget(self.plot_volume_calccol, 8, 4, 1, 1)
+        plot_F1_group_box.setLayout(plot_F1_layout)
+        plot_F2_group_box.setLayout(plot_F2_layout)
+        plot_csp_group_box.setLayout(plot_csp_layout)
+        plot_height_group_box.setLayout(plot_height_layout)
+        plot_volume_group_box.setLayout(plot_volume_layout)
 
-        grid.layout().addWidget(self.plot_F1_y_scale, 9, 0, 1, 1)
-        grid.layout().addWidget(self.plot_F2_y_scale, 9, 1, 1, 1)
-        grid.layout().addWidget(self.plot_CSP_y_scale, 9, 2, 1, 1)
-        grid.layout().addWidget(self.plot_height_y_scale, 9, 3, 1, 1)
-        grid.layout().addWidget(self.plot_volume_y_scale, 9, 4, 1, 1)
 
-        grid.layout().addWidget(self.ext_bar_checkbox, 10, 0, 1, 1)
-        grid.layout().addWidget(self.comp_bar_checkbox, 10, 1, 1, 1)
-        grid.layout().addWidget(self.vert_bar_checkbox, 10, 2, 1, 1)
-        grid.layout().addWidget(self.res_evo_checkbox, 10, 3, 1, 1)
-        grid.layout().addWidget(self.user_details_checkbox, 10, 4, 1, 1)
+        plot_F1_group_box.layout().addWidget(self.plot_F1_data)
+        plot_F1_group_box.layout().addWidget(self.plot_F1_y_label)
+        plot_F1_group_box.layout().addWidget(self.plot_F1_calccol)
+        plot_F1_group_box.layout().addWidget(self.plot_F1_y_scale)
 
-        grid.layout().addWidget(self.ext_bar_button, 11, 0, 1, 1)
-        grid.layout().addWidget(self.comp_bar_button, 11, 1, 1, 1)
-        grid.layout().addWidget(self.vert_bar_button, 11, 2, 1, 1)
-        grid.layout().addWidget(self.res_evo_button, 11, 3, 1, 1)
-        grid.layout().addWidget(self.user_details_button, 11, 4, 1, 1)
+        plot_F2_group_box.layout().addWidget(self.plot_F2_data)
+        plot_F2_group_box.layout().addWidget(self.plot_F2_y_label)
+        plot_F2_group_box.layout().addWidget(self.plot_F2_calccol)
+        plot_F2_group_box.layout().addWidget(self.plot_F2_y_scale)
+
+        plot_csp_group_box.layout().addWidget(self.plot_CSP)
+        plot_csp_group_box.layout().addWidget(self.plot_CSP_y_label)
+        plot_csp_group_box.layout().addWidget(self.plot_CSP_calccol)
+        plot_csp_group_box.layout().addWidget(self.plot_CSP_y_scale)
+
+        plot_height_group_box.layout().addWidget(self.plot_height_ratio)
+        plot_height_group_box.layout().addWidget(self.plot_height_y_label)
+        plot_height_group_box.layout().addWidget(self.plot_height_calccol)
+        plot_height_group_box.layout().addWidget(self.plot_height_y_scale)
+
+        plot_volume_group_box.layout().addWidget(self.plot_volume_ratio)
+        plot_volume_group_box.layout().addWidget(self.plot_volume_y_label)
+        plot_volume_group_box.layout().addWidget(self.plot_volume_calccol)
+        plot_volume_group_box.layout().addWidget(self.plot_volume_y_scale)
+
+        grid.layout().addWidget(plot_F1_group_box, 6, 0, 4, 1)
+        grid.layout().addWidget(plot_F2_group_box, 6, 1, 4, 1)
+        grid.layout().addWidget(plot_csp_group_box, 6, 2, 4, 1)
+        grid.layout().addWidget(plot_height_group_box, 6, 3, 4, 1)
+        grid.layout().addWidget(plot_volume_group_box, 6, 4, 4, 1)
+
+        ext_bar_group_box = QGroupBox(self)
+        comp_bar_group_box = QGroupBox(self)
+        vert_bar_group_box = QGroupBox(self)
+        res_evo_plot_group_box = QGroupBox(self)
+        user_details_group_box = QGroupBox(self)
+
+        ext_bar_group_box_layout = QVBoxLayout()
+        comp_bar_group_box_layout = QVBoxLayout()
+        vert_bar_group_box_layout = QVBoxLayout()
+        res_evo_plot_group_box_layout = QVBoxLayout()
+        user_details_group_box_layout = QVBoxLayout()
+
+        ext_bar_group_box.setLayout(ext_bar_group_box_layout)
+        comp_bar_group_box.setLayout(comp_bar_group_box_layout)
+        vert_bar_group_box.setLayout(vert_bar_group_box_layout)
+        res_evo_plot_group_box.setLayout(res_evo_plot_group_box_layout)
+        user_details_group_box.setLayout(user_details_group_box_layout)
+
+        ext_bar_group_box.layout().addWidget(self.ext_bar_checkbox)
+        comp_bar_group_box.layout().addWidget(self.comp_bar_checkbox)
+        vert_bar_group_box.layout().addWidget(self.vert_bar_checkbox)
+        res_evo_plot_group_box.layout().addWidget(self.res_evo_checkbox)
+        user_details_group_box.layout().addWidget(self.user_details_checkbox)
+
+        ext_bar_group_box.layout().addWidget(self.ext_bar_button)
+        comp_bar_group_box.layout().addWidget(self.comp_bar_button)
+        vert_bar_group_box.layout().addWidget(self.vert_bar_button)
+        res_evo_plot_group_box.layout().addWidget(self.res_evo_button)
+        user_details_group_box.layout().addWidget(self.user_details_button)
+
+        grid.layout().addWidget(ext_bar_group_box, 10, 0, 2, 1)
+        grid.layout().addWidget(comp_bar_group_box, 10, 1, 2, 1)
+        grid.layout().addWidget(vert_bar_group_box, 10, 2, 2, 1)
+        grid.layout().addWidget(res_evo_plot_group_box, 10, 3, 2, 1)
+        grid.layout().addWidget(user_details_group_box, 10, 4, 2, 1)
 
     def show_popup(self, popup):
         p = popup()

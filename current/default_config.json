@@ -7,19 +7,18 @@
           "chimera_att_select_format": ":",
           "fig_file_type": "pdf",
           "fig_dpi": 300
-    
   },
   
   "fitting_settings": {
-    "do1D": true,
-    "do2D": true, 
-    "do3D": true,
-    "expand_lost_yy": false,
-    "expand_lost_zz": false,
-    "perform_controls": true,
-    "perform_resevo_fitting": false,
-    "fit_line_color": "black",
-    "fit_line_width": 1
+          "do1D": true,
+          "do2D": true,
+          "do3D": true,
+          "expand_lost_yy": false,
+          "expand_lost_zz": false,
+          "perform_controls": true,
+          "perform_resevo_fitting": false,
+          "fit_line_color": "black",
+          "fit_line_width": 1
   },          
 
   "cs_settings": {
