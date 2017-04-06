@@ -89,10 +89,10 @@ def dimension_loop(titration_dict, sidechains=False):
                 
                 
                 # Loads theoretical PRE file only if analysing the third dimension.
-                if fsuv.apply_PRE_analysis and \
-                    titration_dict[dimension][dim2_pts][dim1_pts].tittype == 'titvar3':
-                        
-                    PRE_analysis(titration_dict[dimension][dim2_pts][dim1_pts], fsuv.spectra_path, dim2_pts)
+                
+                    
+                PRE_analysis(titration_dict[dimension][dim2_pts][dim1_pts], 
+                             spectra_path=fsuv.spectra_path)
                 
                 # EXPORTS AND PLOTS TITRATION DATA
                 plot_tit_data(titration_dict[dimension][dim2_pts][dim1_pts])
@@ -128,13 +128,56 @@ def perform_calcs(tit_panel):
     if fsuv.plots_Volume_ratio:
         tit_panel.calc_ratio(fsuv.calccol_name_Volume_ratio, 'Volume')
     
-def PRE_analysis(tit_panel, spectra_path, conditions):
+def PRE_analysis(tit_panel, spectra_path=None):
+    """
+    Performs dedicated PRE analysis on the titvar3 dimension and represents
+    the analysis when comparing data points for titvar3 (C3).
+    """
+    # if user do not want PRE analysis, do nothing
+    if not(fsuv.apply_PRE_analysis):
+        return
     
-    tit_panel.load_theoretical_PRE(spectra_path, conditions)
-    for sourcecol, targetcol in zip(fspar.param_settings.index[3:],\
-                                    ['H_DPRE', 'V_DPRE']):
-        tit_panel.calc_Delta_PRE(sourcecol, targetcol)
-    pass
+    # if analysing titvar3, performs calculations
+    if tit_panel.tittype == 'titvar3':
+        tit_panel.load_theoretical_PRE(spectra_path, tit_panel.dim2_pts)
+        for sourcecol, targetcol in zip(fspar.param_settings.index[3:],\
+                                        ['H_DPRE', 'V_DPRE']):
+            # only in the parameters allowed by the user
+            if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
+                tit_panel.calc_Delta_PRE(sourcecol, targetcol,
+                                         apply_smooth=fsuv.apply_smooth,
+                                         gaussian_stddev=fsuv.gaussian_stddev,
+                                         guass_x_size=fsuv.gauss_x_size)
+    
+    # plots the calculated analsysis for titvar3 and for comparison C3.
+    if tit_panel.tittype == 'titvar3' \
+            or (tit_panel.tittype == 'C3' and tit_panel.dim2_pts == 'para'):
+                
+        
+        for sourcecol, targetcol in zip(list(fspar.param_settings.index[3:])*2,
+                                        ['H_DPRE',
+                                         'V_DPRE',
+                                         'H_DPRE_smooth',
+                                         'V_DPRE_smooth']):
+            
+            # only for the parameters allowed by the user
+            if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
+                
+                tit_panel.write_table(targetcol)
+                tit_panel.plot_base(targetcol, 'exp', 'heat_map',
+                    fspar.heat_map_dict,
+                    par_ylims=\
+                    fspar.param_settings.loc[sourcecol,'plot_yy_axis_scale'],
+                    ylabel=\
+                    fspar.param_settings.loc[sourcecol,'plot_yy_axis_label'],
+                    cols_per_page=1,
+                    rows_per_page=fsuv.heat_map_rows,
+                    fig_height=fsuv.fig_height,
+                    fig_width=fsuv.fig_width,
+                    fig_file_type=fsuv.fig_file_type,
+                    fig_dpi=fsuv.fig_dpi)
+    
+    
 
 def perform_fits(tit_panel):
     """
@@ -284,7 +327,7 @@ def analyse_comparisons(tit_dict, reso_type='Backbone'):
                                   dim_comparison=tit_dim_keys[dimension][0],
                                   resonance_type=reso_type)
                     
-                    
+                    PRE_analysis(control)
                     plot_tit_data(control)
         else:
             

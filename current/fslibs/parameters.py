@@ -73,8 +73,11 @@ bar_ext_par_dict = {
     'mark_user_details':fsuv.ext_bar_mark_user_details,
     'mark_fs':fsuv.ext_bar_mark_fs,
     'theo_pre':fsuv.apply_PRE_analysis,
-    'pre_color':fsuv.ext_bar_pre_color,
-    'pre_lw':fsuv.ext_bar_pre_lw
+    'pre_color':fsuv.pre_color,
+    'pre_lw':fsuv.pre_lw,
+    'tag_color':fsuv.tag_color,
+    'tag_lw':fsuv.tag_lw,
+    'tag_ls':fsuv.tag_ls
     }
 
 comp_bar_par_dict = {
@@ -115,8 +118,11 @@ comp_bar_par_dict = {
     'unassigned_shade_color':fsuv.comp_bar_unassigned_shade_color,
     'unassigned_shade_alpha':fsuv.comp_bar_unassigned_shade_alpha,
     'theo_pre':fsuv.apply_PRE_analysis,
-    'pre_color':fsuv.comp_bar_pre_color,
-    'pre_lw':fsuv.comp_bar_pre_lw
+    'pre_color':fsuv.pre_color,
+    'pre_lw':fsuv.pre_lw,
+    'tag_color':fsuv.tag_color,
+    'tag_lw':fsuv.tag_lw,
+    'tag_ls':fsuv.tag_ls
     }
 
 bar_vert_par_dict = {
@@ -155,7 +161,13 @@ bar_vert_par_dict = {
     'mark_prolines':fsuv.vert_bar_mark_prolines,
     'proline_mark':fsuv.vert_bar_proline_mark,
     'mark_user_details':fsuv.vert_bar_mark_user_details,
-    'mark_fs':fsuv.vert_bar_mark_fs
+    'mark_fs':fsuv.vert_bar_mark_fs,
+    'theo_pre':fsuv.apply_PRE_analysis,
+    'pre_color':fsuv.pre_color,
+    'pre_lw':fsuv.pre_lw,
+    'tag_color':fsuv.tag_color,
+    'tag_lw':fsuv.tag_lw,
+    'tag_ls':fsuv.tag_ls
     }
 
 res_evo_par_dict = {
@@ -210,4 +222,23 @@ cs_scatter_par_dict = {
     'mk_edgecolors':fsuv.cs_scatter_mk_edgecolors,
     'mk_edge_lost':fsuv.cs_scatter_mk_edge_lost
     }
-                     
+
+heat_map_dict = {
+    'right_margin':fsuv.heat_map_right_margin,
+    'bottom_margin':fsuv.heat_map_bottom_margin,
+    'top_margin':fsuv.heat_map_top_margin,
+    'x_ticks_fs':fsuv.heat_map_x_ticks_fs,
+    'x_ticks_rot':fsuv.heat_map_x_ticks_rot,
+    'x_ticks_fn':fsuv.heat_map_x_ticks_fn,
+    'x_tick_pad':fsuv.heat_map_x_tick_pad,
+    'y_label_fs':fsuv.heat_map_y_label_fs,
+    'y_label_pad':fsuv.heat_map_y_label_pad,
+    'y_label_fn':fsuv.heat_map_y_label_fn,
+    'y_label_weight':fsuv.heat_map_y_label_weight,
+    'vmin':fsuv.heat_map_vmin,
+    'vmax':fsuv.heat_map_vmax,
+    'cbar_font_size':fsuv.heat_map_cbar_font_size,
+    'tag_color':fsuv.tag_color,
+    'tag_lw':fsuv.tag_lw,
+    'tag_ls':fsuv.tag_ls
+    }

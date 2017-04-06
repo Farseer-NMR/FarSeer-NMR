@@ -1,0 +1,12 @@
+2017/04/06 -*PRE Analysis - calculations and heatmap*-
+- loads theoretical PRE file from *.pre
+- loads tag position in *.pre - indicated with #<res> in first line
+- PRE Anlysis is calculated only in titvar3
+- calculates DELTA PRE
+- implemented gauss smooth calculation from DELTA PRE
+- heatmaps implemented with lateral vertical scale
+- parameters for heatmap control added to farseer_user_variables.py
+- added theo_pre_plot() in Titration.py
+-- theoretical PRE line implemented in extended, compact and vertical bar plots
+-- tag line implemented in extended, compact, vertical and heatmap plots
+- parameters for theoretical PRE plot configuration added to farseer_user_variables.py

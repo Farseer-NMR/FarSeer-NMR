@@ -125,9 +125,7 @@ class Titration(pd.Panel):
         fsut.write_log('*** Calculated {}\n'.format(calccol))
     
     def load_theoretical_PRE(self, spectra_path, dimpt):
-        """
-        Loads theoretical PRE values to represent in bar plots.
-        """
+        """ Loads theoretical PRE values to represent in bar plots."""
         
         #print(spectra_path)
         target_folder = '{}/para/{}/'.format(spectra_path.strip('/'), dimpt)
@@ -139,10 +137,21 @@ class Titration(pd.Panel):
         elif len(pre_file) < 1:
             raise ValueError('@@@ There is no .pre file in folder {}'.format(target_folder))
         
+        
+        
         #print(pre_paths)
-        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1], names=['Theo PRE'])
+        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1], names=['Theo PRE'], comment='#')
+        fsut.write_log('*** Added Theoretical PRE file {}\n'.format(pre_file[0]))
+        fsut.write_log('*** Theoretical PRE for diamagnetic set to 1 by default\n')
         self.loc[:,:,'Theo PRE'] = 1
         self.loc['para',:,'Theo PRE'] = self.predf.loc[:,'Theo PRE']
+        
+        tagf = open(pre_file[0], 'r')
+        tag = tagf.readline().strip().strip('#')
+        self.loc['para',:,'tag'] = ''
+        tagmask = self.loc['para',:,'Res#'] == tag
+        self.loc['para',tagmask,'tag'] = '*'
+        tagf.close()
         
         #print(self)
         #input()
@@ -150,9 +159,40 @@ class Titration(pd.Panel):
         
         #print(self.predf['M1'])
         
-    def calc_Delta_PRE(self, sourcecol, targetcol):
+    def calc_Delta_PRE(self, sourcecol, targetcol,
+                       apply_smooth=True,
+                       gaussian_stddev=1,
+                       guass_x_size=7):
+        
+        from astropy.convolution import Gaussian1DKernel, convolve
+        
+        # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
+        gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
         
         self.loc[:,:,targetcol] = self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])#, axis='index')
+        
+        fsut.write_log('*** Calculated DELTA PRE for source {} in target {}\n'.\
+            format(sourcecol, targetcol))
+        
+        for exp in self.items:
+            # converts to 0 negative values
+            negmask = self.loc[exp,:,targetcol] < 0
+            self.loc[exp,negmask,targetcol] = 0
+            
+            if apply_smooth:
+                # aplies convolution with a normalized 1D Gaussian kernel
+                smooth_col = '{}_smooth'.format(targetcol)
+                self.loc[exp,:,smooth_col] = convolve(np.array(self.loc[exp,:,targetcol]),
+                                                 gauss,
+                                                 boundary='extend',
+                                                 normalize_kernel=True)
+        
+        fsut.write_log(\
+        '*** Calculated DELTA PRE Smoothed for source {} in target {} with window {} and stdev {} \n'.\
+            format(sourcecol, targetcol, gaussian_stddev, guass_x_size))
+        
+        
+        
     
     def csp_willi(self, s):
         """
@@ -294,7 +334,43 @@ class Titration(pd.Panel):
                     hpos = hpos_sign(bar.get_width(), x0, yy_scale)
                     vpos = bar.get_y() - bar.get_height() / 2.5
                     ax.text(hpos, vpos, cond_mark, ha='center', va='bottom', fontsize=fs)
-
+    
+    def theo_pre_plot(self, axs, i, exp, y,
+                      bartype=None,
+                      pre_color='lightblue',
+                      pre_lw=1,
+                      tag_color='red',
+                      tag_ls='-',
+                      tag_lw=0.1
+                      ):
+        if ((self.tittype == 'titvar3' and exp == 'para') or self.tittype == 'C3'):
+            if bartype == 'v':
+                axs[i].plot(self.loc[exp,:,'Theo PRE'],
+                            zorder=9, color=pre_color, lw=pre_lw)
+            elif bartype == 'h':
+                axs[i].plot(self.loc[exp,:,'Theo PRE'],
+                            self.loc[exp,:,'Res#'].astype(float),
+                            zorder=9, color=pre_color, lw=pre_lw)
+            
+            xtagm = self.loc[exp,:,'tag']=='*'
+            xtag = self.loc[exp,xtagm,'Res#'].astype(float)
+            
+            if bartype == 'h':
+                axs[i].hlines(xtag, 0, y,
+                          colors=tag_color, linestyle=tag_ls,
+                          linewidth=tag_lw, zorder=10)                
+            elif bartype == 'hm':
+                axs[i].vlines(xtag-0.5, 0, y,
+                          colors=tag_color, linestyle=tag_ls,
+                          linewidth=tag_lw, zorder=10)                
+            else:
+                axs[i].vlines(xtag, 0, y,
+                          colors=tag_color, linestyle=tag_ls,
+                          linewidth=tag_lw, zorder=10)                
+            
+        else:
+            return
+    
     def plot_bar_extended(self, calccol, fig, axs, i, experiment,
     
                           apply_status_2_bar_color=True,
@@ -335,7 +411,10 @@ class Titration(pd.Panel):
                           mark_fs=3,
                           theo_pre=False,
                           pre_color='red',
-                          pre_lw=1):
+                          pre_lw=1,
+                          tag_color='red',
+                          tag_lw=0.1,
+                          tag_ls='-'):
         """
         :param: idx, calculated parameter, that is index to param_settings
         """
@@ -461,11 +540,15 @@ class Titration(pd.Panel):
                                  y_lims[1],
                                  fs=mark_fs)
         
-        if theo_pre and self.resonance_type == 'Backbone'\
-            and ((self.tittype == 'titvar3' and experiment == 'para')\
-            or self.tittype == 'C3'):
-            # do
-            axs[i].plot(self.loc[experiment,:,'Theo PRE'], zorder=10, color=pre_color, lw=pre_lw)
+        if theo_pre:
+            self.theo_pre_plot(axs, i, experiment, y_lims[1]*0.1,
+                          bartype='v',
+                          pre_color=pre_color,
+                          pre_lw=pre_lw,
+                          tag_color=tag_color,
+                          tag_ls=tag_ls,
+                          tag_lw=tag_lw
+                          )
     
     def plot_bar_vertical(self, calccol, fig, axs, i, experiment,
     
@@ -514,7 +597,13 @@ class Titration(pd.Panel):
                           mark_prolines=True,
                           proline_mark='P',
                           mark_user_details=True,
-                          mark_fs=3):
+                          mark_fs=3,
+                          theo_pre=False,
+                          pre_color='red',
+                          pre_lw=1,
+                          tag_color='red',
+                          tag_lw=0.1,
+                          tag_ls='-'):
         """
         :param: idx, calculated parameter, that is index to param_settings
         """
@@ -621,6 +710,16 @@ class Titration(pd.Panel):
                                  fs=mark_fs,
                                  orientation='vertical')
         
+        if theo_pre:
+            self.theo_pre_plot(axs, i, experiment, x_lims[1]*0.1,
+                          bartype='h',
+                          pre_color=pre_color,
+                          pre_lw=pre_lw,
+                          tag_color=tag_color,
+                          tag_ls=tag_ls,
+                          tag_lw=tag_lw
+                          )
+        
     
     def plot_bar_compacted(self, calccol, fig, axs, i, experiment,
     
@@ -664,7 +763,10 @@ class Titration(pd.Panel):
                           unassigned_shade_alpha=0.5,
                           theo_pre=False,
                           pre_color='red',
-                          pre_lw=1):
+                          pre_lw=1,
+                          tag_color='red',
+                          tag_lw=0.1,
+                          tag_ls='-'):
         """
         :param: idx, calculated parameter, that is index to param_settings
         """
@@ -785,8 +887,15 @@ class Titration(pd.Panel):
                                  y_lims[1],
                                  fs=mark_fs)
         
-        if theo_pre and ((self.tittype == 'titvar3' and experiment == 'para') or self.tittype == 'C3'):
-            axs[i].plot(self.loc[experiment,:,'Theo PRE'], zorder=10, color=pre_color, lw=pre_lw)
+        if theo_pre:
+            self.theo_pre_plot(axs, i, experiment, y_lims[1]*0.1,
+                          bartype='v',
+                          pre_color=pre_color,
+                          pre_lw=pre_lw,
+                          tag_color=tag_color,
+                          tag_ls=tag_ls,
+                          tag_lw=tag_lw
+                          )
     
     def plot_res_evo(self, calccol, fig, axs, i, row_number,
                      
@@ -1097,6 +1206,84 @@ class Titration(pd.Panel):
         # http://stackoverflow.com/questions/6682784/how-to-reduce-number-of-ticks-with-matplotlib
         axs[i].locator_params(axis='both', tight=True, nbins=4)
     
+    
+    def plot_DPRE_heatmap(self, calccol, fig, axs, i, experiment,
+                          y_lims=(0,1),
+                          vmin=0,
+                          vmax=1,
+                          ylabel='DELTA PRE',
+                          x_ticks_fs=6,
+                          x_ticks_rot=0,
+                          x_ticks_fn='Arial',
+                          x_tick_pad=1,
+                          y_label_fs=6,
+                          y_label_pad=2,
+                          y_label_fn='Arial',
+                          y_label_weight='bold',
+                          right_margin=0.1,
+                          bottom_margin=0.1,
+                          top_margin=0.1,
+                          cbar_font_size=4,
+                          tag_color='red',
+                          tag_lw=0.1,
+                          tag_ls='-'):
+        
+        Dcmap = np.array((self.loc[experiment,:,calccol].fillna(0),
+                         self.loc[experiment,:,calccol].fillna(0)))
+        cleg = axs[i].pcolor(Dcmap, cmap='binary', vmin=vmin, vmax=vmax)
+        
+        axs[i].tick_params(axis='y', left='off')
+        axs[i].tick_params(axis='x', bottom='off')
+        # http://stackoverflow.com/questions/2176424/hiding-axis-text-in-matplotlib-plots
+        axs[i].get_yaxis().set_ticks([])
+        axs[i].get_xaxis().set_visible(False)
+        
+        axs[i].set_ylabel(experiment,
+                          fontsize=y_label_fs,
+                          labelpad=y_label_pad,
+                          fontname=y_label_fn,
+                          weight=y_label_weight)
+        
+        axs[i].spines['bottom'].set_zorder(10)
+        axs[i].spines['top'].set_zorder(10)
+        
+        self.theo_pre_plot(axs, i, experiment, 2,
+                           bartype = 'hm',
+                           tag_color=tag_color,
+                           tag_ls=tag_ls,
+                           tag_lw=tag_lw
+                           )
+        
+        
+            
+            
+        
+        
+        if i == len(self.items)-1:
+            cbar = plt.colorbar(cleg, ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax], orientation='vertical',
+                                cax = fig.add_axes([right_margin+right_margin*0.05, 
+                                                    bottom_margin, 
+                                                    right_margin*0.05, 
+                                                    top_margin-bottom_margin]))
+            cbar.ax.tick_params(labelsize=cbar_font_size)
+            axs[i].get_xaxis().set_visible(True)
+            axs[i].tick_params(axis='x', bottom='on')
+            initialresidue = int(self.ix[0, 0, 'Res#'])
+            finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
+            first_tick = ceil(initialresidue/10)*10
+            axs[i].set_xticks(np.arange(first_tick-0.5, finalresidue+1, 10))
+            axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
+                               fontsize=x_ticks_fs,
+                               rotation=x_ticks_rot,
+                               fontname=x_ticks_fn)
+            axs[i].tick_params(axis='x', which='major', pad=x_tick_pad)
+            fig.subplots_adjust(right=right_margin,
+                                bottom=bottom_margin,
+                                top=top_margin,
+                                hspace=0)
+            
+        pass
+    
     def plot_base(self, calccol, plot_type, plot_style, param_dict,
                      par_ylims=(0,1),
                      ylabel='ppm or ratio',
@@ -1128,7 +1315,7 @@ class Titration(pd.Panel):
                                 figsize=(fig_width, real_fig_height))
         
         axs = axs.ravel()
-        
+        plt.tight_layout(rect=[0.01,0.01,0.995,0.995], h_pad=fig_height/rows_per_page)
         # Plots yy axis title
         # http://www.futurile.net/2016/03/01/text-handling-in-matplotlib/
         
@@ -1158,10 +1345,14 @@ class Titration(pd.Panel):
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(fig, axs, i, row_number, **param_dict)
         
-        elif plot_style == 'hit_map':
-            pass
+        elif plot_style == 'heat_map':
+            for i, experiment in enumerate(self):
+                self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment, y_lims=par_ylims, ylabel=ylabel, **param_dict)
+            #fig.colorbar()
+            
+            
         
-        plt.tight_layout(rect=[0.01,0.01,0.995,0.995], h_pad=fig_height/rows_per_page)
+        
         
         self.write_plot(fig, plot_style, calccol, fig_file_type, fig_dpi)
         plt.close('all')

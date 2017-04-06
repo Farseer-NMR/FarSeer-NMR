@@ -7,18 +7,18 @@ logfile_name = 'file.log' #  the name of the log file
 has_sidechains = False  # Are there sidechain entries in the peaklists?
 use_sidechains = False  # Do you want to analyse those sidechains?
 #
-perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
+perform_cs_correction = True  # Aligns peaklists to a specific residue in the reference spectra
 cs_correction_res_ref = 76  # To which residue?
 #
 expand_lost_yy = False  # Considers lost residue over yy references and xx reference
-expand_lost_zz = False  # Considers lost residue over zz references and xx reference
+expand_lost_zz = True  # Considers lost residue over zz references and xx reference
 #
 applyFASTA = True  # complete the sequence with a FASTA file?
 FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
-do_titvar1 = True  # Analyse data in the first titration condition (dimension)
-do_titvar2 = True  # Analyse data in the second titration condition (dimension)
-do_titvar3 = False  # Analyse data in the thrid titration condition (dimension)
+do_titvar1 = False  # Analyse data in the first titration condition (dimension)
+do_titvar2 = False  # Analyse data in the second titration condition (dimension)
+do_titvar3 = True  # Analyse data in the thrid titration condition (dimension)
 perform_comparisons = True  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
@@ -27,22 +27,30 @@ cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
-perform_resevo_fit = True  # Fit parameter evolution over titration experiment
+perform_resevo_fit = False  # Fit parameter evolution over titration experiment
 fit_x_values = [0, 250, 500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 # Perform PRE analysis
 apply_PRE_analysis = False
+apply_smooth=True
+gaussian_stddev=1
+pre_color='green'  # theoretical PRE line color
+pre_lw=1  # theoretical PRE line width
+gauss_x_size=7
+tag_color='red'
+tag_lw=0.3
+tag_ls='-'
 #
-plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
-plots_PosF2_delta = True # Plot nuclei 2 shift perturbation data
-plots_CSP = True  # Plot combined chemical shift perturbation data
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
+plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
+plots_CSP = False  # Plot combined chemical shift perturbation data
 plots_Height_ratio = True  # Plot Height ratio data
-plots_Volume_ratio = True  # Plot Volume ratio data
+plots_Volume_ratio = False  # Plot Volume ratio data
 #
 plots_extended_bar = True  # Represent data in Extended Bar Plot style
 plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
-plots_vertical_bar = True  # Represent data in Vertical Bar Plot style
-plots_residue_evolution = True  # Represent Data Evolution per Residue style
-plots_cs_scatter = True  # Represent chemical shift scatter data
+plots_vertical_bar = True # Represent data in Vertical Bar Plot style
+plots_residue_evolution = False  # Represent Data Evolution per Residue style
+plots_cs_scatter = False  # Represent chemical shift scatter data
 #
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
 yy_label_PosF2_delta = 'ppm'  # y axis label for nuclei 2
@@ -56,17 +64,28 @@ calccol_name_CSP = 'CSP'  # column name for combined chemical shift perturbation
 calccol_name_Height_ratio = 'Height_ratio'  # column name for Height Ratio data
 calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 #
-yy_scale_PosF1_delta = 0.06  # y axis sacle for nuclei 1
-yy_scale_PosF2_delta = 0.2  # y axis scale for nuclei 2
-yy_scale_CSP = 0.1  # y axis sacle for combined chemical shift
+yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
+yy_scale_PosF2_delta = 0.6  # y axis scale for nuclei 2
+yy_scale_CSP = 0.20  # y axis sacle for combined chemical shift
 yy_scale_Height_ratio = 1.05 # y axis scale for height ratio
 yy_scale_Volume_ratio = 1.05 # y axis scale for volume ratio
 #
 represent_user_marks = False  # draws user defined marks over bars in plots
 user_marks_dict = {
-    'foo': 'f',
-    'bar': 'b',
-    'zoo':'z'
+    'H0': 'V',
+    'V0': 'H',
+    'low':'L',
+    'p1':'1',
+    'p2':'2',
+    'p3':'3',
+    'p4':'4',
+    'p5':'5',
+    'p6':'6',
+    'p7':'7',
+    'p8':'8',
+    'p9':'9',
+    'p10':'10',
+    'z':'z'
 }  # keys: the string in 'Details' column in input data, value: the character to be drawn
 #
 # Extended Bar Plot
@@ -107,8 +126,6 @@ ext_bar_mark_prolines = True  # mark prolines
 ext_bar_proline_mark = 'P' # Proline marks
 ext_bar_mark_user_details = True  # mark user details
 ext_bar_mark_fs = 3  # mark font size
-ext_bar_pre_color='green'  # theoretical PRE line color
-ext_bar_pre_lw=1  # theoretical PRE line width
 #
 # Compacted Bar Plot
 # use a combination of cols_page and rows_page to achieve desired figure ratio
@@ -150,8 +167,6 @@ comp_bar_mark_fs=3  # mark font size
 comp_bar_unassigned_shade=True  # displays shade for unassigned residues
 comp_bar_unassigned_shade_color='grey'  # unassigned residues shade color
 comp_bar_unassigned_shade_alpha=0.5  # unassigned residues shade transparency.
-comp_bar_pre_color='blue'  # theoretical PRE line color
-comp_bar_pre_lw=1  # theoretical PRE line width
 #
 # Vertical Bar plot
 # use a combination of cols_page and rows_page to achieve desired figure ratio
@@ -254,6 +269,23 @@ cs_scatter_markers=['^','>','v','<','s','p','h','8','*','D']  # sequencial marke
 cs_scatter_mk_color='none'  # marker inside color for shape style
 cs_scatter_mk_edgecolors='black'  # marker edge color for shape style
 cs_scatter_mk_edge_lost='red'  # marker edge color for lost data points in shape style.
+#
+# DELTA PRE Heat Maps
+heat_map_rows = 20
+heat_map_vmin=0.0
+heat_map_vmax=1.0
+heat_map_x_ticks_fs=6
+heat_map_x_ticks_rot=0
+heat_map_x_ticks_fn='Arial'
+heat_map_x_tick_pad=1
+heat_map_y_label_fs=6
+heat_map_y_label_pad=2
+heat_map_y_label_fn='Arial'
+heat_map_y_label_weight='bold'
+heat_map_right_margin=0.2
+heat_map_bottom_margin=0.5
+heat_map_top_margin=0.9
+heat_map_cbar_font_size=4
 #
 # Figure Details
 fig_width = 8.69  # Figure width in inches
