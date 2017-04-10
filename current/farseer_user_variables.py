@@ -16,8 +16,8 @@ expand_lost_zz = True  # Considers lost residue over zz references and xx refere
 applyFASTA = True  # complete the sequence with a FASTA file?
 FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
-do_titvar1 = False  # Analyse data in the first titration condition (dimension)
-do_titvar2 = False  # Analyse data in the second titration condition (dimension)
+do_titvar1 = True  # Analyse data in the first titration condition (dimension)
+do_titvar2 = True  # Analyse data in the second titration condition (dimension)
 do_titvar3 = True  # Analyse data in the thrid titration condition (dimension)
 perform_comparisons = True  # Compares data obtained for condition experiment.
 #
@@ -27,30 +27,35 @@ cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
-perform_resevo_fit = False  # Fit parameter evolution over titration experiment
+perform_resevo_fit = True  # Fit parameter evolution over titration experiment
 fit_x_values = [0, 250, 500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 # Perform PRE analysis
-apply_PRE_analysis = False
+
+apply_PRE_analysis = True
 apply_smooth=True
 gaussian_stddev=1
+gauss_x_size=7
+d_pre_y_max = 1  # y axis max scale
+d_pre_y_label = r'$\Delta$PRE$_(rc-exp)$'
+d_pre_rows=10
 pre_color='green'  # theoretical PRE line color
 pre_lw=1  # theoretical PRE line width
-gauss_x_size=7
 tag_color='red'
 tag_lw=0.3
 tag_ls='-'
+
 #
-plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
-plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
-plots_CSP = False  # Plot combined chemical shift perturbation data
+plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
+plots_PosF2_delta = True # Plot nuclei 2 shift perturbation data
+plots_CSP = True  # Plot combined chemical shift perturbation data
 plots_Height_ratio = True  # Plot Height ratio data
-plots_Volume_ratio = False  # Plot Volume ratio data
+plots_Volume_ratio = True  # Plot Volume ratio data
 #
 plots_extended_bar = True  # Represent data in Extended Bar Plot style
 plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = True # Represent data in Vertical Bar Plot style
-plots_residue_evolution = False  # Represent Data Evolution per Residue style
-plots_cs_scatter = False  # Represent chemical shift scatter data
+plots_residue_evolution = True  # Represent Data Evolution per Residue style
+plots_cs_scatter = True  # Represent chemical shift scatter data
 #
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
 yy_label_PosF2_delta = 'ppm'  # y axis label for nuclei 2
@@ -212,7 +217,7 @@ vert_bar_mark_fs = 3  # mark font size
 # use a combination of cols_page and rows_page to achieve desired figure ratio
 res_evo_cols_page = 5  # number of columns of subplots per page
 res_evo_rows_page = 8  # number of rows of subplots per page
-res_evo_title_y=0.97  # subplot title pad
+res_evo_title_y=0.98  # subplot title pad
 res_evo_title_fn='Arial'  # subplot title font
 res_evo_title_fs=8  # subplot title font size
 res_evo_x_label='[Ligand]'  # x label
@@ -286,6 +291,32 @@ heat_map_right_margin=0.2
 heat_map_bottom_margin=0.5
 heat_map_top_margin=0.9
 heat_map_cbar_font_size=4
+#
+# DELTA PRE oscilations Plot
+dpre_osci_width=3  # scale factor for the width
+dpre_osci_title_y=1  # subplot title pad
+dpre_osci_title_fs=6  # subplot title font size
+dpre_osci_title_fn='Arial'  # subplot title font
+dpre_osci_dpre_ms=2  # DELTA_PRE circle marker size
+dpre_osci_dpre_alpha=0.5  # DELTA_PRE alpha
+dpre_osci_smooth_lw=1  # smooted DPRE line width
+dpre_osci_ref_color='black'  # color for the reference data
+dpre_osci_color_init='#ff00ff'  # initial color for data points color gradient
+dpre_osci_color_end='#0000ff'  # final color for data points color gradient
+dpre_osci_x_ticks_fs=5  # x ticks font size
+dpre_osci_x_ticks_fn='Arial'  # xticks font
+dpre_osci_y_label_fs=6  # y axis label font size
+dpre_osci_y_label_pad=1  # y axis label pad
+dpre_osci_y_label_fn='Arial'  # y axis label font
+dpre_osci_y_label_weight='normal'  # y axis label weight
+dpre_osci_y_ticks_len=1  # y ticks length
+dpre_osci_y_ticks_fs=4  # y ticks font size
+dpre_osci_y_ticks_pad=1  # y ticks pad
+dpre_osci_grid_color='grey'  # grid color
+dpre_osci_res_shade = True  # applies shade to highlight residues
+dpre_osci_res_highlight=[(24,1.5),(37,3),(3,1.5),(65,6)]  # residues to highlight (res, shade width)
+dpre_osci_rh_fs=4  # font size for residue highlight
+dpre_osci_rh_y=0.9  # y scaling for residue 1-letter representation
 #
 # Figure Details
 fig_width = 8.69  # Figure width in inches
