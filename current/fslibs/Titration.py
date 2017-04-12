@@ -37,7 +37,7 @@ class Titration(pd.Panel):
         csp_alpha4res[k] = v
     
     
-    def create_titration_attributes(self, tittype='titvar',
+    def create_titration_attributes(self, tittype='cond',
                                           owndim_pts=['foo'],
                                           dim1_pts='bar',
                                           dim2_pts='zoo',
@@ -53,7 +53,7 @@ class Titration(pd.Panel):
         self.res_info = self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
         
         
-        if tittype.startswith('titvar'):
+        if tittype.startswith('cond'):
             self.calc_path = '{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                      self.calc_folder,
                                                      self.tittype,
@@ -188,8 +188,8 @@ class Titration(pd.Panel):
                                                  normalize_kernel=True)
         
         fsut.write_log(\
-        '*** Calculated DELTA PRE Smoothed for source {} in target {} with window {} and stdev {} \n'.\
-            format(sourcecol, targetcol, gaussian_stddev, guass_x_size))
+        '*** Calculated DELTA PRE Smoothed for source {} in target {} with window size {} and stdev {} \n'.\
+            format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
         
         
         
@@ -239,7 +239,7 @@ class Titration(pd.Panel):
         fileout = open(file_path, 'w')
         
         
-        if self.tittype.startswith('titvar'):
+        if self.tittype.startswith('cond'):
             header = \
 """# Table for '{0}' resonances.
 # A titration results for variable '{1}'
@@ -250,7 +250,7 @@ class Titration(pd.Panel):
         elif self.tittype.startswith('C'):
             header = \
 """# Table for '{0}' resonances.
-# The comparison '{1}' of the results obtained for titrations 'titvar{7}'
+# The comparison '{1}': for the results obtained for titrations 'cond{7}'
 # across variable '{2}' which ranges datapoints '{3}', where:
 # conditions '{4}' and '{5}' are kept constants.
 # {6} data.
@@ -335,7 +335,7 @@ class Titration(pd.Panel):
                     vpos = bar.get_y() - bar.get_height() / 2.5
                     ax.text(hpos, vpos, cond_mark, ha='center', va='bottom', fontsize=fs)
     
-    def theo_pre_plot(self, axs, i, exp, y,
+    def theo_pre_plot(self, calccol, axs, i, exp, y,
                       bartype=None,
                       pre_color='lightblue',
                       pre_lw=1,
@@ -343,7 +343,12 @@ class Titration(pd.Panel):
                       tag_ls='-',
                       tag_lw=0.1
                       ):
-        if ((self.tittype == 'titvar3' and exp == 'para') or self.tittype == 'C3'):
+        if not(fspar.PRE_analysis \
+            and calccol in fspar.param_settings.index[3:]):
+            #do
+            return
+        
+        elif ((self.tittype == 'cond3' and exp == 'para') or self.tittype == 'C3'):
             if bartype == 'v':
                 axs[i].plot(self.loc[exp,:,'Theo PRE'],
                             zorder=9, color=pre_color, lw=pre_lw)
@@ -409,7 +414,6 @@ class Titration(pd.Panel):
                           proline_mark='P',
                           mark_user_details=True,
                           mark_fs=3,
-                          theo_pre=False,
                           pre_color='red',
                           pre_lw=1,
                           tag_color='red',
@@ -540,8 +544,7 @@ class Titration(pd.Panel):
                                  y_lims[1],
                                  fs=mark_fs)
         
-        if theo_pre:
-            self.theo_pre_plot(axs, i, experiment, y_lims[1]*0.1,
+        self.theo_pre_plot(calccol, axs, i, experiment, y_lims[1]*0.1,
                           bartype='v',
                           pre_color=pre_color,
                           pre_lw=pre_lw,
@@ -598,7 +601,6 @@ class Titration(pd.Panel):
                           proline_mark='P',
                           mark_user_details=True,
                           mark_fs=3,
-                          theo_pre=False,
                           pre_color='red',
                           pre_lw=1,
                           tag_color='red',
@@ -710,8 +712,7 @@ class Titration(pd.Panel):
                                  fs=mark_fs,
                                  orientation='vertical')
         
-        if theo_pre:
-            self.theo_pre_plot(axs, i, experiment, x_lims[1]*0.1,
+        self.theo_pre_plot(calccol, axs, i, experiment, x_lims[1]*0.1,
                           bartype='h',
                           pre_color=pre_color,
                           pre_lw=pre_lw,
@@ -761,7 +762,6 @@ class Titration(pd.Panel):
                           unassigned_shade=True,
                           unassigned_shade_color='grey',
                           unassigned_shade_alpha=0.5,
-                          theo_pre=False,
                           pre_color='red',
                           pre_lw=1,
                           tag_color='red',
@@ -887,8 +887,7 @@ class Titration(pd.Panel):
                                  y_lims[1],
                                  fs=mark_fs)
         
-        if theo_pre:
-            self.theo_pre_plot(axs, i, experiment, y_lims[1]*0.1,
+        self.theo_pre_plot(calccol, axs, i, experiment, y_lims[1]*0.1,
                           bartype='v',
                           pre_color=pre_color,
                           pre_lw=pre_lw,
@@ -939,13 +938,13 @@ class Titration(pd.Panel):
         
         # if the user wants to represent the condition in the x axis
         # for the first dimension
-        if set_x_values and (self.tittype == 'titvar1' or self.dim_comparison == 'titvar1'):
+        if set_x_values and (self.tittype == 'cond1' or self.dim_comparison == 'cond1'):
             x = np.array(tit_x_values)
             axs[i].set_xlim(0, tit_x_values[-1])
             #fit?
         
         # for 2D and 3D analysis this option is not available
-        elif (self.tittype in ['titvar2', 'titvar3']) or (self.dim_comparison in ['titvar2', 'titvar3']):
+        elif (self.tittype in ['cond2', 'cond3']) or (self.dim_comparison in ['cond2', 'cond3']):
             x = np.arange(0, len(y))
             axs[i].xaxis.set_ticks(x)
             axs[i].set_xticklabels(self.items, rotation=45)
@@ -990,7 +989,7 @@ class Titration(pd.Panel):
         mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'lost')
         
         if (len(mes_mask) != len(x)) or (len(mes_mask) != len(y)):
-            raise ValueError('> The fitting_x_values variable length in farseer_user_variables.py does not match the number of data points in titvar1')
+            raise ValueError('> The fitting_x_values variable length in farseer_user_variables.py does not match the number of data points in cond1')
         
         y = y[mes_mask]
         x = x[mes_mask]
@@ -1006,7 +1005,7 @@ class Titration(pd.Panel):
         if fill_between:
             axs[i].fill_between(x, 0, y, facecolor=fill_color, alpha=fill_alpha)
         
-        if fit_perform and self.tittype == 'titvar1'\
+        if fit_perform and self.tittype == 'cond1'\
                 and (calccol in fspar.param_settings.index[:3])\
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
             
@@ -1041,6 +1040,7 @@ class Titration(pd.Panel):
             txtkwargs = {'fontsize':4}
             #yhalfc = (tit_x_values[-1]*0.02, self.fitdf[calccol].ix[i, 'yhalf']+y_lims[1]*0.02)
             n_hillc = (tit_x_values[-1], y_lims[1]+y_lims[1]*0.015)
+            r_sq = (tit_x_values[0], y_lims[1]+y_lims[1]*0.015)
             
             # kd value label
             if tit_x_values[-1]/2 < self.fitdf[calccol].ix[i, 'kd'] < tit_x_values[-1]:
@@ -1072,6 +1072,9 @@ class Titration(pd.Panel):
             axs[i].text(n_hillc[0], n_hillc[1],
                         'n = {:.3f}'.format(self.fitdf[calccol].ix[i, 'n_hill']),
                         ha='right', **txtkwargs)
+            axs[i].text(r_sq[0], r_sq[1],
+                        'r**2 = {:.3f}'.format(self.fitdf[calccol].ix[i, 'r_sq']),
+                        ha='left', **txtkwargs)
             axs[i].text(*ymaxc,
                         **txtkwargs)
             axs[i].text(*kdc, ha='right', **txtkwargs)
@@ -1247,7 +1250,7 @@ class Titration(pd.Panel):
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
         
-        self.theo_pre_plot(axs, i, experiment, 2,
+        self.theo_pre_plot(calccol, axs, i, experiment, 2,
                            bartype = 'hm',
                            tag_color=tag_color,
                            tag_ls=tag_ls,
@@ -1283,6 +1286,128 @@ class Titration(pd.Panel):
                                 hspace=0)
             
         pass
+    
+    def plot_delta_osci(self, calccol, fig, axs, i ,experiment,
+                        y_lims=(0,1),
+                        ylabel='DPRE',
+                        title_y=1,
+                        title_fs=6,
+                        title_fn='Arial',
+                        dpre_ms=3,
+                        smooth_lw=2,
+                        dpre_alpha=0.5,
+                        ref_color='black',
+                        color='green',
+                        x_ticks_fs=5,
+                        x_ticks_fn='Arial',
+                        y_label_fs=6,
+                        y_label_pad=1,
+                        y_label_fn='Arial',
+                        y_label_weight='normal',
+                        y_ticks_len=1,
+                        y_ticks_fs=4,
+                        y_ticks_pad=1,
+                        grid_color='grey',
+                        color_init=None,
+                        color_end=None,
+                        res_shade=False,
+                        res_highlight=None,
+                        rh_fs=5,
+                        rh_y=0.9
+                        ):
+        """
+        Plots the Delta_PRE data in scatter points and the gaussian
+        smoothed curved, comparing the data point with the reference.
+        """
+        axs[i].set_title(experiment, y=title_y, fontsize=title_fs, fontname=title_fn)
+        
+        axs[i].spines['bottom'].set_zorder(10)
+        axs[i].spines['top'].set_zorder(10)
+        
+        # to solve .find Attribute Error
+        # http://stackoverflow.com/questions/29437305/how-to-fix-attributeerror-series-object-has-no-attribute-find
+        # plots dpre for first point in comparison
+        #pmaskr = self.ix[0,:,calccol] > 0
+        axs[i].plot(self.ix[0,:,'Res#'].astype(float),
+                    self.ix[0,:,calccol].astype(float),
+                    'o',
+                    markersize=dpre_ms,
+                    markeredgewidth=0.0,
+                    c=ref_color,
+                    alpha=dpre_alpha,
+                    zorder=10)
+        
+        # plots dpre for titration data point
+        #pmaskd = self.loc[experiment,:,calccol] > 0
+        axs[i].plot(self.loc[experiment,:,'Res#'].astype(float),
+                    self.loc[experiment,:,calccol].astype(float),
+                    'o',
+                    c=color,
+                    markersize=dpre_ms,
+                    markeredgewidth=0.0,
+                    alpha=dpre_alpha,
+                    zorder=10)
+        
+        
+        # plots dpre_smooth for first data point in comparison
+        #pmaskr = self.ix[0,:,calccol+'_smooth'] > 0
+        axs[i].plot(self.ix[0,:,'Res#'].astype(float),
+                    self.ix[0,:,calccol+'_smooth'].astype(float),
+                    ls='-',
+                    lw=smooth_lw,
+                    c=ref_color,
+                    zorder=10)
+        
+        # plots dpre_smooth for data point
+        #pmaskd = self.loc[experiment,:,calccol+'_smooth'] > 0
+        axs[i].plot(self.loc[experiment,:,'Res#'].astype(float),
+                    self.loc[experiment,:,calccol+'_smooth'].astype(float),
+                    ls='-',
+                    lw=smooth_lw,
+                    c=color,
+                    zorder=10)
+        
+        # Set x ticks
+        
+        initialresidue = int(self.ix[0, 0, 'Res#'])
+        finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
+        axs[i].set_xlim(initialresidue-1, finalresidue+1)
+        first_tick = ceil(initialresidue/10)*10
+        axs[i].set_xticks(np.arange(first_tick, finalresidue+1, 10))
+        # https://github.com/matplotlib/matplotlib/issues/6266
+        axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
+                               fontsize=x_ticks_fs,
+                               fontname=x_ticks_fn)
+        
+        
+        
+        # Set y lims
+        axs[i].set_ylim(y_lims[0], y_lims[1])
+        
+        axs[i].set_ylabel(ylabel,
+                          fontsize=y_label_fs,
+                          labelpad=y_label_pad,
+                          fontname=y_label_fn,
+                          weight=y_label_weight)
+        
+        axs[i].yaxis.set_tick_params(length=y_ticks_len, labelsize=y_ticks_fs, pad=y_ticks_pad, direction='out')
+        
+        axs[i].yaxis.grid(color=grid_color,zorder=0, linestyle=':', lw=0.5)
+        
+        if res_shade:
+            for rr, fill_margin in res_highlight:
+                
+                axs[i].axvline(x=rr,ls=':', lw=0.5,  color=grid_color)
+                axs[i].fill([rr-fill_margin,rr+fill_margin,
+                             rr+fill_margin, rr-fill_margin],
+                            [0,0,2,2], grid_color, alpha=0.2)
+                
+                l1mask = self.ix[0,:,'Res#'] == str(rr)
+                l1 = list(self.loc[experiment,l1mask,'1-letter'])
+                axs[i].text(rr, y_lims[1]*rh_y,
+                            l1[0],
+                            ha='center', va='center', fontsize=rh_fs)
+        
     
     def plot_base(self, calccol, plot_type, plot_style, param_dict,
                      par_ylims=(0,1),
@@ -1348,8 +1473,23 @@ class Titration(pd.Panel):
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
                 self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment, y_lims=par_ylims, ylabel=ylabel, **param_dict)
-            #fig.colorbar()
             
+        elif plot_style == 'delta_osci':
+            
+            dp_colors = fsut.linear_gradient(param_dict['color_init'],
+                                            param_dict['color_end'],
+                                            n=self.shape[0])
+            
+            print(param_dict.keys())
+            
+            dp_color = it.cycle(dp_colors['hex'])
+            
+            for i, experiment in enumerate(self):
+                self.plot_delta_osci(calccol, fig, axs, i, experiment,
+                                     y_lims=par_ylims,
+                                     ylabel=ylabel,
+                                     color=next(dp_color),
+                                     **param_dict)
             
         
         
@@ -1370,7 +1510,6 @@ class Titration(pd.Panel):
         
         fsut.write_log('*** Plot saved {}\n'.format(file_path))#('/'.join(file_path.split('/')[-2:])))
     
-    
     def perform_fit(self, calccol='CSP', x_values=None):
         """
         Controls the general fitting workflow.
@@ -1386,11 +1525,28 @@ class Titration(pd.Panel):
         def fitting_hill(L0, Vmax, n, K):
             return (Vmax*L0**n)/(K**n+L0**n)
         
-        def add_fit_results(a, b, c, d, e, f):
-            dfres = pd.DataFrame(data=[[a, b, c, d, e, f]],
+        #def add_fit_results(a, b, c, d, e, f):
+        # ['fit', 'ymax', 'yhalf','kd', 'n_hill', 'yfit']
+        def add_fit_results(param_list, name_list):
+            dfres = pd.DataFrame(data=[param_list],
                                      index=[row_number],
-                                     columns=['fit', 'ymax', 'yhalf','kd', 'n_hill', 'yfit'])
+                                     columns=name_list)
             self.fitdf[calccol] = self.fitdf[calccol].append(dfres)
+        
+        
+        def calc_r_squared(x, y , f, popt):
+            """
+            Calculates R**2
+            http://stackoverflow.com/questions/19189362/getting-the-r-squared-value-using-curve-fit
+            
+            returns [r_squared, ss_res, ss_tot]
+            """
+            residuals = y.sub(f(x, *popt))
+            ss_res = np.sum(residuals**2)
+            ss_tot = np.sum((y-np.mean(y))**2)
+            r_squared = 1 - (ss_res / ss_tot)
+            
+            return [r_squared, ss_res, ss_tot]
         
         def write_fit_failed(x, y, row_number, logf):
             str2write=\
@@ -1402,7 +1558,8 @@ ydata: {}
 **************************
 """.format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'], list(x), list(y))
             fsut.write_log(str2write, logfile_name=logf)
-            add_fit_results('Failed',np.NaN, np.NaN, np.NaN, np.NaN, np.NaN)
+            add_fit_results(['Failed'] + [np.NaN]*6,
+                            ['fit', 'ymax', 'yhalf','kd', 'n_hill', 'r_sq', 'yfit'])
             
         
         
@@ -1432,6 +1589,7 @@ fit performed: Hill Equation
             # minpack.error: Result from function call is not a proper array of floats.
             y = self.loc[lostmask,row_number,calccol].fillna(value=0.0)
             x = pd.Series(x_values)[lostmask]
+            x.index = y.index
             resnum = self.ix[0, row_number,'Res#']
             ###
             
@@ -1446,7 +1604,8 @@ ydata: {}
 **************************
 """.format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'], x, y)
                 fsut.write_log(str2write, logfile_name=logf)
-                add_fit_results('No Data',np.NaN, np.NaN, np.NaN, np.NaN, False)
+                add_fit_results(['No Data',np.nan, np.nan, np.nan, np.nan, np.nan, False],
+                                ['fit', 'ymax', 'yhalf','kd', 'n_hill', 'r_sq', 'yfit'])
                 continue
             ###
             
@@ -1461,12 +1620,17 @@ ydata: {}
                 
                 yfit = fitting_hill(self.xfit, *popt)
                 
+                rsq = calc_r_squared(x, y, fitting_hill, popt)
+                r_squared = rsq[0]
+                
                 ymax = popt[0]
                 n_hill = popt[1]
                 kd = popt[2]
                 yhalf = ymax/2
                 
-                add_fit_results('OK', ymax, yhalf, kd, n_hill, yfit)
+                add_fit_results(\
+                    ['OK', ymax, yhalf, kd, n_hill, r_squared, yfit],
+                    ['fit', 'ymax', 'yhalf','kd', 'n_hill', 'r_sq', 'yfit'])
                 
                 s2w=\
 """
@@ -1477,10 +1641,12 @@ ymax: {}
 yhalf: {}
 K0.5: {}
 n: {}
+r**2: {}
 popt: {}
 pcov: {}
+rsq: {}
 **************************
-""".format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'], list(x), list(y), ymax, yhalf, kd, n_hill, popt, pcov)
+""".format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'], list(x), list(y), ymax, yhalf, kd, n_hill, r_squared, popt, pcov, rsq)
                 fsut.write_log(s2w, logfile_name=logf)
             
             except:
@@ -1490,7 +1656,7 @@ pcov: {}
         
         self.fitdf[calccol] = pd.concat([self.res_info.iloc[0,:,:], self.fitdf[calccol]], axis=1)
         self.fitdf[calccol].iloc[:,0:9].to_csv('{0}/{1}/{1}_fit_data.csv'.format(self.tables_and_plots_folder, calccol), index=False, float_format='%.3f')
-        fsut.write_log('*** File Saved {}'.format('{0}/{1}/{1}_fit_data.csv'.format(self.tables_and_plots_folder, calccol)))
+        fsut.write_log('*** File Saved {}\n'.format('{0}/{1}/{1}_fit_data.csv'.format(self.tables_and_plots_folder, calccol)))
         #raise ValueError('9999')
     
     def write_Chimera_attributes(self, calccol, resformat=':',

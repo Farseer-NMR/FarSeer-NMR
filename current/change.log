@@ -1,3 +1,16 @@
+2017/04/12 -*1st revision pre-release*-
+- corrected read_FASTA() to accept '>' commented lines
+- correct representation of PRE analysis in C3/titvar2
+- corrected repesentation of delta_pre osci
+- changed 'titvar' to 'cond'
+- corrected theoretical PREs being displayed for other parameters than Hratio and Vratio.
+- corrected fit write_log info to file.log
+
+2017/04/10 -*PRE Analysis Implemented*-
+- finished Delta PRE heatmap representation
+- finished Delta PRE oscilation representation
+- added r**2 calculation in parameter evolution per residue fitting
+
 2017/04/06 -*PRE Analysis - calculations and heatmap*-
 - loads theoretical PRE file from *.pre
 - loads tag position in *.pre - indicated with #<res> in first line

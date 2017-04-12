@@ -5,13 +5,15 @@ import pandas as pd
 import farseer_user_variables as fsuv
 import fslibs.Titration as fsT
 import fslibs.utils as fsut
+from fslibs.parameters import p5d
 
 class FarseerSet:
     """
-    FarseerSet contains all the information regarding all the titration
-    experiments. The FarseerSet object contains several nested dictionaries
-    that have the same hierarchy of the spectra/ folder and store the information
-    on the .csv and .fasta files, which are loaded as pd.DataFrames.
+    FarseerSet contains the information regarding all the titration
+    experiments. The FarseerSet object contains several nested
+    dictionaries that have the same hierarchy of the spectra/ folder
+    and store the information on the .csv and .fasta files,
+    which are loaded as pd.DataFrames.
     
     There are three nested dictionaries:
         -allpeaklists - stores .csv peaklists regarding backbone peaks
@@ -140,10 +142,16 @@ class FarseerSet:
         # Opens the FASTA file, which is a string of capital letters
         # 1-letter residue code that can be split in several lines.
         FASTAfile = open(FASTApath, 'r')
-        FASTA = FASTAfile.readlines()
+        fl = FASTAfile.readlines()
         
         # Generates a single string from the FASTA file
-        FASTA = "".join(FASTA).replace(' ', '').replace('\n', '').upper()
+        FASTA = ''
+        for i in fl:
+            if i.startswith('>'):
+                continue
+            else:
+                FASTA += i.replace(' ', '').replace('\n', '').upper()
+        
         FASTAfile.close()
 
         # Res# is kept as str() to allow reindexing
@@ -252,9 +260,9 @@ class FarseerSet:
         
         # logs activity, which keys where found in each dimension
         str2write = \
-'''{}> 1st titration variables (titvar1): {}
-> 2nd titration variables (titvar2): {}
-> 3rd titration variables (titvar3): {}
+'''{}> 1st titration variables (cond1): {}
+> 2nd titration variables (cond2): {}
+> 3rd titration variables (cond3): {}
 {}
 '''.format(fsut.write_title('IDENTIFIED TITRATION VARIABLES', onlytitle=True),
            self.xxcoords, self.yycoords, self.zzcoords, fsut.titlesperator)
@@ -647,21 +655,21 @@ class FarseerSet:
         If there are sidechains, creates a Panel5D for the sidechains, which
         are treated separately from the backbone atoms.
         """
-        Panel5D = pd.core.panelnd.create_nd_panel_factory(klass_name='Panel5D',
-                                                  orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
-                                                  slices={'labels': 'labels',
-                                                          'items': 'items',
-                                                          'major_axis': 'major_axis',
-                                                          'minor_axis': 'minor_axis'},
-                                                  slicer=pd.Panel4D,
-                                                  aliases={'major': 'index', 'minor': 'minor_axis'},
-                                                  stat_axis=2)
+        #Panel5D = pd.core.panelnd.create_nd_panel_factory(klass_name='Panel5D',
+                                                  #orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
+                                                  #slices={'labels': 'labels',
+                                                          #'items': 'items',
+                                                          #'major_axis': 'major_axis',
+                                                          #'minor_axis': 'minor_axis'},
+                                                  #slicer=pd.Panel4D,
+                                                  #aliases={'major': 'index', 'minor': 'minor_axis'},
+                                                  #stat_axis=2)
 
         
-        self.peaklists_p5d = Panel5D(self.allpeaklists)
+        self.peaklists_p5d = p5d(self.allpeaklists)
         
         if use_sidechains:
-            self.sidechains_p5d = Panel5D(self.allsidechains)
+            self.sidechains_p5d = p5d(self.allsidechains)
             
         fsut.write_log('OK!')
     

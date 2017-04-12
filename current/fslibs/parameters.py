@@ -1,13 +1,6 @@
 import pandas as pd
 import farseer_user_variables as fsuv
 
-# calculated parameters
-#calcparam_name_PosF1_delta = 'PosF1_delta'
-#calcparam_name_PosF2_delta = 'PosF2_delta'
-#calcparam_name_CSP = 'CSP'
-#calcparam_name_Height_ratio = 'Height_ratio'
-#calcparam_name_Volume_ratio = 'Vol_ratio'
-
 calculated_params = [fsuv.calccol_name_PosF1_delta,
                      fsuv.calccol_name_PosF2_delta,
                      fsuv.calccol_name_CSP,
@@ -15,14 +8,7 @@ calculated_params = [fsuv.calccol_name_PosF1_delta,
                      fsuv.calccol_name_Volume_ratio
                     ]
 
-#calculated_params = [calcparam_name_PosF1_delta, 
-                     #calcparam_name_PosF2_delta,
-                     #calcparam_name_CSP,
-                     #calcparam_name_Height_ratio,
-                     #calcparam_name_Volume_ratio]
 
-
-#'calc_column_name':   [fsuv.calccol_name_PosF1_delta, fsuv.calccol_name_PosF2_delta, fsuv.calccol_name_CSP, fsuv.calccol_name_Height_ratio, fsuv.calccol_name_Volume_ratio],
 param_settings_d = {
 'plot_param_flag':    [fsuv.plots_PosF1_delta, fsuv.plots_PosF2_delta, fsuv.plots_CSP, fsuv.plots_Height_ratio, fsuv.plots_Volume_ratio],
 'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta, fsuv.yy_label_PosF2_delta, fsuv.yy_label_CSP, fsuv.yy_label_Height_ratio, fsuv.yy_label_Volume_ratio],
@@ -36,6 +22,19 @@ param_settings_d = {
 # An array of settings that are local for each parameter
 # the index of this dataframe are the calculated parameters.
 param_settings = pd.DataFrame(param_settings_d, index=calculated_params)
+
+p5d = pd.core.panelnd.create_nd_panel_factory(\
+            klass_name='Panel5D',
+            orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
+            slices={'labels': 'labels',
+                    'items': 'items',
+                    'major_axis': 'major_axis',
+                    'minor_axis': 'minor_axis'},
+            slicer=pd.Panel4D,
+            aliases={'major': 'index', 'minor': 'minor_axis'},
+            stat_axis=2)
+
+PRE_analysis = fsuv.apply_PRE_analysis
 
 bar_ext_par_dict = {
     'apply_status_2_bar_color':fsuv.ext_bar_apply_status_2_bar_color,
@@ -72,7 +71,6 @@ bar_ext_par_dict = {
     'proline_mark':fsuv.ext_bar_proline_mark,
     'mark_user_details':fsuv.ext_bar_mark_user_details,
     'mark_fs':fsuv.ext_bar_mark_fs,
-    'theo_pre':fsuv.apply_PRE_analysis,
     'pre_color':fsuv.pre_color,
     'pre_lw':fsuv.pre_lw,
     'tag_color':fsuv.tag_color,
@@ -117,7 +115,6 @@ comp_bar_par_dict = {
     'unassigned_shade':fsuv.comp_bar_unassigned_shade,
     'unassigned_shade_color':fsuv.comp_bar_unassigned_shade_color,
     'unassigned_shade_alpha':fsuv.comp_bar_unassigned_shade_alpha,
-    'theo_pre':fsuv.apply_PRE_analysis,
     'pre_color':fsuv.pre_color,
     'pre_lw':fsuv.pre_lw,
     'tag_color':fsuv.tag_color,
@@ -162,7 +159,6 @@ bar_vert_par_dict = {
     'proline_mark':fsuv.vert_bar_proline_mark,
     'mark_user_details':fsuv.vert_bar_mark_user_details,
     'mark_fs':fsuv.vert_bar_mark_fs,
-    'theo_pre':fsuv.apply_PRE_analysis,
     'pre_color':fsuv.pre_color,
     'pre_lw':fsuv.pre_lw,
     'tag_color':fsuv.tag_color,
@@ -242,3 +238,29 @@ heat_map_dict = {
     'tag_lw':fsuv.tag_lw,
     'tag_ls':fsuv.tag_ls
     }
+
+delta_osci_dict = {
+    'title_y':fsuv.dpre_osci_title_y,
+    'title_fs':fsuv.dpre_osci_title_fs,
+    'title_fn':fsuv.dpre_osci_title_fn,
+    'dpre_ms':fsuv.dpre_osci_dpre_ms,
+    'smooth_lw':fsuv.dpre_osci_smooth_lw,
+    'dpre_alpha':fsuv.dpre_osci_dpre_alpha,
+    'ref_color':fsuv.dpre_osci_ref_color,
+    'color_init':fsuv.dpre_osci_color_init,
+    'color_end':fsuv.dpre_osci_color_end,
+    'x_ticks_fs':fsuv.dpre_osci_x_ticks_fs,
+    'x_ticks_fn':fsuv.dpre_osci_x_ticks_fn,
+    'y_label_fs':fsuv.dpre_osci_y_label_fs,
+    'y_label_pad':fsuv.dpre_osci_y_label_pad,
+    'y_label_fn':fsuv.dpre_osci_y_label_fn,
+    'y_label_weight':fsuv.dpre_osci_y_label_weight,
+    'y_ticks_len':fsuv.dpre_osci_y_ticks_len,
+    'y_ticks_fs':fsuv.dpre_osci_y_ticks_fs,
+    'y_ticks_pad':fsuv.dpre_osci_y_ticks_pad,
+    'grid_color':fsuv.dpre_osci_grid_color,
+    'res_highlight':fsuv.dpre_osci_res_highlight,
+    'res_shade':fsuv.dpre_osci_res_shade,
+    'rh_fs':fsuv.dpre_osci_rh_fs,
+    'rh_y':fsuv.dpre_osci_rh_y
+}

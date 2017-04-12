@@ -7,18 +7,18 @@ logfile_name = 'file.log' #  the name of the log file
 has_sidechains = False  # Are there sidechain entries in the peaklists?
 use_sidechains = False  # Do you want to analyse those sidechains?
 #
-perform_cs_correction = True  # Aligns peaklists to a specific residue in the reference spectra
+perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
 cs_correction_res_ref = 76  # To which residue?
 #
 expand_lost_yy = False  # Considers lost residue over yy references and xx reference
-expand_lost_zz = True  # Considers lost residue over zz references and xx reference
+expand_lost_zz = False  # Considers lost residue over zz references and xx reference
 #
 applyFASTA = True  # complete the sequence with a FASTA file?
 FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
-do_titvar1 = True  # Analyse data in the first titration condition (dimension)
-do_titvar2 = True  # Analyse data in the second titration condition (dimension)
-do_titvar3 = True  # Analyse data in the thrid titration condition (dimension)
+do_cond1 = True  # Analyse data in the first titration condition (dimension)
+do_cond2 = True  # Analyse data in the second titration condition (dimension)
+do_cond3 = True  # Analyse data in the thrid titration condition (dimension)
 perform_comparisons = True  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
@@ -27,20 +27,20 @@ cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
-perform_resevo_fit = True  # Fit parameter evolution over titration experiment
+perform_resevo_fit = False  # Fit parameter evolution over titration experiment
 fit_x_values = [0, 250, 500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 # Perform PRE analysis
 
-apply_PRE_analysis = True
+apply_PRE_analysis = False
 apply_smooth=True
 gaussian_stddev=1
 gauss_x_size=7
 d_pre_y_max = 1  # y axis max scale
 d_pre_y_label = r'$\Delta$PRE$_(rc-exp)$'
 d_pre_rows=10
-pre_color='green'  # theoretical PRE line color
+pre_color='red'  # theoretical PRE line color
 pre_lw=1  # theoretical PRE line width
-tag_color='red'
+tag_color='blue'
 tag_lw=0.3
 tag_ls='-'
 
@@ -69,11 +69,11 @@ calccol_name_CSP = 'CSP'  # column name for combined chemical shift perturbation
 calccol_name_Height_ratio = 'Height_ratio'  # column name for Height Ratio data
 calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 #
-yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
-yy_scale_PosF2_delta = 0.6  # y axis scale for nuclei 2
-yy_scale_CSP = 0.20  # y axis sacle for combined chemical shift
-yy_scale_Height_ratio = 1.05 # y axis scale for height ratio
-yy_scale_Volume_ratio = 1.05 # y axis scale for volume ratio
+yy_scale_PosF1_delta = 0.1  # y axis sacle for nuclei 1
+yy_scale_PosF2_delta = 0.25  # y axis scale for nuclei 2
+yy_scale_CSP = 0.1  # y axis sacle for combined chemical shift
+yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
+yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
 #
 represent_user_marks = False  # draws user defined marks over bars in plots
 user_marks_dict = {
@@ -104,7 +104,7 @@ ext_bar_color_unassigned = 'grey'  # color of unassigned residues
 ext_bar_bar_width = 0.7  # bar width 
 ext_bar_bar_alpha = 1  # bar transparency. 0-1 (transparent-opaque)
 ext_bar_bar_linewidth = 0  # bar line width
-ext_bar_title_y = 1.05  # subplot title padding
+ext_bar_title_y = 1.01  # subplot title padding
 ext_bar_title_fn = 'Arial'  # subplot tittle font
 ext_bar_title_fs = 8  # subplot tittle font size
 ext_bar_plot_threshold = True  # applies stdev threshold
@@ -220,14 +220,14 @@ res_evo_rows_page = 8  # number of rows of subplots per page
 res_evo_title_y=0.98  # subplot title pad
 res_evo_title_fn='Arial'  # subplot title font
 res_evo_title_fs=8  # subplot title font size
-res_evo_x_label='[Ligand]'  # x label
+res_evo_x_label='[RNF125]'  # x label
 res_evo_set_x_values=True  # use user defined x values? Necessary for titration fitting.
 res_evo_x_label_fn='Arial'  # x label font
-res_evo_x_label_fs=6  # x label font size
+res_evo_x_label_fs=3  # x label font size
 res_evo_x_label_pad=2  # x label pad
 res_evo_x_label_weight='normal'  # x label weight
 res_evo_x_ticks_pad=1  # x ticks pad
-res_evo_x_ticks_fs=7  # x ticks font size
+res_evo_x_ticks_fs=5  # x ticks font size
 res_evo_y_label_fn='Arial'  # y label font
 res_evo_y_label_fs=6  # y label font size
 res_evo_y_label_pad=2  # y label pad
@@ -277,13 +277,13 @@ cs_scatter_mk_edge_lost='red'  # marker edge color for lost data points in shape
 #
 # DELTA PRE Heat Maps
 heat_map_rows = 20
-heat_map_vmin=0.0
-heat_map_vmax=1.0
+heat_map_vmin=0.2
+heat_map_vmax=0.7
 heat_map_x_ticks_fs=6
 heat_map_x_ticks_rot=0
 heat_map_x_ticks_fn='Arial'
 heat_map_x_tick_pad=1
-heat_map_y_label_fs=6
+heat_map_y_label_fs=3
 heat_map_y_label_pad=2
 heat_map_y_label_fn='Arial'
 heat_map_y_label_weight='bold'
@@ -313,7 +313,7 @@ dpre_osci_y_ticks_len=1  # y ticks length
 dpre_osci_y_ticks_fs=4  # y ticks font size
 dpre_osci_y_ticks_pad=1  # y ticks pad
 dpre_osci_grid_color='grey'  # grid color
-dpre_osci_res_shade = True  # applies shade to highlight residues
+dpre_osci_res_shade = False  # applies shade to highlight residues
 dpre_osci_res_highlight=[(24,1.5),(37,3),(3,1.5),(65,6)]  # residues to highlight (res, shade width)
 dpre_osci_rh_fs=4  # font size for residue highlight
 dpre_osci_rh_y=0.9  # y scaling for residue 1-letter representation
