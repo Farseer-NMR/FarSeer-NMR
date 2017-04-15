@@ -1,12 +1,13 @@
 import sys
 from functools import partial
-
+import json
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QGroupBox, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
 
+from gui.components.ColourBox import ColourBox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledSpinBox import LabelledSpinBox
@@ -17,6 +18,7 @@ from gui.popups.CompactBarPopup import CompactBarPopup
 from gui.popups.VerticalBar import VerticalBarPopup
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 from gui.popups.UserMarksPopup import UserMarksPopup
+from gui import gui_utils
 
 valuesDict = {
             'x': [],
@@ -35,6 +37,8 @@ class Main(QTabWidget):
         self.addTab(tab1, "Settings")
         self.addTab(tab2, "PeakList Selection")
         self.addTab(tab3, "Results")
+        self.setFixedHeight(850)
+        self.setFixedWidth(1300)
 
 
 class Settings(QWidget):
@@ -43,55 +47,80 @@ class Settings(QWidget):
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-
+        grid.setSpacing(3)
+        vars = json.load(open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json", 'r'))
         # label1 = QLabel("General Settings", self)
-        label2 = QLabel("Spectrum Path", self)
-        label3 = QLabel("Log file Path", self)
 
+
+        paths_group_box = QGroupBox()
+        paths_groupbox_layout = QVBoxLayout()
+        paths_groupbox_layout.setSpacing(5)
+        paths_group_box.setLayout(paths_groupbox_layout)
+
+        self.spectrum_path = LabelledLineEdit(self, "Spectrum Path")
+        self.logfile_path = LabelledLineEdit(self, "Log file Path")
+
+        paths_group_box.layout().addWidget(self.spectrum_path)
+        paths_group_box.layout().addWidget(self.logfile_path)
 
         self.ext_bar_checkbox = LabelledCheckbox(self, "Extended Bar")
         self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
         self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
         self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
         self.user_details_checkbox = LabelledCheckbox(self, "User Details")
+        self.scatter_checkbox = LabelledCheckbox(self, "CS Scatter")
+        self.dpre_checkbox = LabelledCheckbox(self, "DPre")
+        self.heat_map_checkbox = LabelledCheckbox(self, "PRE Heat Map")
 
         self.ext_bar_button = QPushButton("Settings", self)
-        self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup))
+        self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup, vars))
 
         self.comp_bar_button = QPushButton("Settings", self)
-        self.comp_bar_button.clicked.connect(partial(self.show_popup, CompactBarPopup))
+        self.comp_bar_button.clicked.connect(partial(self.show_popup, CompactBarPopup, vars))
         self.vert_bar_button = QPushButton("Settings", self)
-        self.vert_bar_button.clicked.connect(partial(self.show_popup, VerticalBarPopup))
+        self.vert_bar_button.clicked.connect(partial(self.show_popup, VerticalBarPopup, vars))
 
         self.res_evo_button = QPushButton("Settings", self)
-        self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup))
+        self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup, vars))
 
         self.user_details_button = QPushButton("Settings", self)
-        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup))
+        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars))
+
+        self.scatter_button = QPushButton("Settings", self)
+        self.scatter_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars))
+
+        self.heat_map_button = QPushButton("Settings", self)
+        self.heat_map_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars))
+
+        self.dpre_button = QPushButton("Settings", self)
+        self.dpre_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars))
 
 
-        self.spectra_path = QLineEdit()
-        self.logfile_path = QLineEdit()
+
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Sidechain Peaks?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_controls_checkbox = LabelledCheckbox(self, "Perform Controls?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
         self.fasta_start = LabelledSpinBox(self, "Fasta start")
 
-        self.res_evo_fitting = LabelledCheckbox(self, "Fit Parameter Evolution?")
-        self.res_evo_fit_line_colour = LabelledLineEdit(self, text="Fit Line Colour")
-        self.res_evo_fit_line_width = LabelledSpinBox(self, "Fit Line Width")
+        # self.res_evo_fitting = LabelledCheckbox(self, "Fit Parameter Evolution?")
+        # self.res_evo_fit_line_colour = ColourBox(self, text="Fit Line Colour")
+        # self.res_evo_fit_line_width = LabelledSpinBox(self, "Fit Line Width")
 
         self.expand_lost_yy = LabelledCheckbox(self, "Analyse Lost Y Residues?")
         self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
 
-        grid.layout().addWidget(label2, 1, 0)
-        grid.layout().addWidget(label3, 2, 0)
-        grid.layout().addWidget(self.spectra_path, 1, 1, 1, 4)
-        grid.layout().addWidget(self.logfile_path, 2, 1, 1, 4)
+        self.figure_width = LabelledDoubleSpinBox(self, "Figure Width")
+        self.figure_height = LabelledDoubleSpinBox(self, "Figure Height")
+        self.figure_dpi = LabelledDoubleSpinBox(self, "Figure DPI")
+        self.figure_format = LabelledCombobox(self, "Figure Format", items=['pdf', 'png', 'ps', 'svg'])
+
+        grid.layout().addWidget(paths_group_box, 0, 0, 4, 20)
+
 
         general_groupbox = QGroupBox()
         general_groupbox_layout = QHBoxLayout()
+        general_groupbox_layout.setSpacing(10)
         general_groupbox.setLayout(general_groupbox_layout)
 
         general_groupbox.layout().addWidget(self.has_sidechains_checkbox)
@@ -100,17 +129,29 @@ class Settings(QWidget):
         general_groupbox.layout().addWidget(self.expand_lost_yy)
         general_groupbox.layout().addWidget(self.expand_lost_zz)
 
-        grid.layout().addWidget(general_groupbox, 3, 0, 1, 5)
+        figure_groupbox = QGroupBox()
+        figure_groupbox_layout = QHBoxLayout()
+        figure_groupbox_layout.setSpacing(10)
+        figure_groupbox.setLayout(figure_groupbox_layout)
 
-        res_evo_groupbox = QGroupBox()
-        res_evo_groupbox_layout = QHBoxLayout()
-        res_evo_groupbox.setLayout(res_evo_groupbox_layout)
+        figure_groupbox.layout().addWidget(self.figure_width)
+        figure_groupbox.layout().addWidget(self.figure_height)
+        figure_groupbox.layout().addWidget(self.figure_dpi)
+        figure_groupbox.layout().addWidget(self.figure_format)
 
-        res_evo_groupbox.layout().addWidget(self.res_evo_fitting)
-        res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_colour)
-        res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_width)
 
-        grid.layout().addWidget(res_evo_groupbox, 4, 0, 1, 3)
+        grid.layout().addWidget(general_groupbox, 5, 0, 2, 20)
+        grid.layout().addWidget(figure_groupbox, 7, 0, 2, 20)
+
+        # res_evo_groupbox = QGroupBox()
+        # res_evo_groupbox_layout = QHBoxLayout()
+        # res_evo_groupbox.setLayout(res_evo_groupbox_layout)
+        #
+        # res_evo_groupbox.layout().addWidget(self.res_evo_fitting)
+        # res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_colour)
+        # res_evo_groupbox.layout().addWidget(self.res_evo_fit_line_width)
+
+        # grid.layout().addWidget(res_evo_groupbox, 4, 0, 1, 3)
 
         fasta_groupbox = QGroupBox()
         fasta_groupbox_layout = QHBoxLayout()
@@ -118,10 +159,11 @@ class Settings(QWidget):
 
         fasta_groupbox.layout().addWidget(self.apply_fasta_checkbox)
         fasta_groupbox.layout().addWidget(self.fasta_start)
-        grid.layout().addWidget(fasta_groupbox, 4, 3, 1, 2)
+        grid.layout().addWidget(fasta_groupbox, 9, 14, 2, 6)
 
 
-        self.cs_correction = LabelledCheckbox(self, "Perform CS Correction?")
+
+        self.cs_correction = LabelledCheckbox(self, "CS Correction?")
         self.cs_correction_res_ref = LabelledLineEdit(self, text="Correction Residue")
         self.csp_alpha = LabelledLineEdit(self, text="CSP Alpha")
         self.csp_lost = LabelledCombobox(self, text="CSP Lost Mode", items=['prev', 'full'])
@@ -138,7 +180,7 @@ class Settings(QWidget):
         cs_groupbox.layout().addWidget(self.csp_lost)
         cs_groupbox.layout().addWidget(self.csp_exceptions)
 
-        grid.layout().addWidget(cs_groupbox, 5, 0, 1, 5)
+        grid.layout().addWidget(cs_groupbox, 9, 0, 2, 14)
 
         self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
         self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
@@ -182,6 +224,12 @@ class Settings(QWidget):
         plot_height_group_box.setLayout(plot_height_layout)
         plot_volume_group_box.setLayout(plot_volume_layout)
 
+        plot_F1_layout.setSpacing(5)
+        plot_F2_layout.setSpacing(5)
+        plot_csp_layout.setSpacing(5)
+        plot_height_layout.setSpacing(5)
+        plot_volume_layout.setSpacing(5)
+
 
         plot_F1_group_box.layout().addWidget(self.plot_F1_data)
         plot_F1_group_box.layout().addWidget(self.plot_F1_y_label)
@@ -208,52 +256,104 @@ class Settings(QWidget):
         plot_volume_group_box.layout().addWidget(self.plot_volume_calccol)
         plot_volume_group_box.layout().addWidget(self.plot_volume_y_scale)
 
-        grid.layout().addWidget(plot_F1_group_box, 6, 0, 4, 1)
-        grid.layout().addWidget(plot_F2_group_box, 6, 1, 4, 1)
-        grid.layout().addWidget(plot_csp_group_box, 6, 2, 4, 1)
-        grid.layout().addWidget(plot_height_group_box, 6, 3, 4, 1)
-        grid.layout().addWidget(plot_volume_group_box, 6, 4, 4, 1)
+        # plots_widget = QWidget()
+        # plot_layout = QGridLayout()
+        # plots_widget.setLayout(plot_layout)
+
+        grid.layout().addWidget(plot_F1_group_box, 11, 0, 5, 4)
+        grid.layout().addWidget(plot_F2_group_box, 11, 4, 5, 4)
+        grid.layout().addWidget(plot_csp_group_box, 11, 8, 5, 4)
+        grid.layout().addWidget(plot_height_group_box, 11, 12, 5, 4)
+        grid.layout().addWidget(plot_volume_group_box, 11, 16, 5, 4)
+
+        # grid.layout().addWidget(plots_widget, 6, 0, 3, 5)
 
         ext_bar_group_box = QGroupBox(self)
         comp_bar_group_box = QGroupBox(self)
         vert_bar_group_box = QGroupBox(self)
         res_evo_plot_group_box = QGroupBox(self)
         user_details_group_box = QGroupBox(self)
+        heat_map_group_box = QGroupBox(self)
+        scatter_group_box = QGroupBox(self)
+        dpre_group_box = QGroupBox(self)
 
-        ext_bar_group_box_layout = QVBoxLayout()
-        comp_bar_group_box_layout = QVBoxLayout()
-        vert_bar_group_box_layout = QVBoxLayout()
-        res_evo_plot_group_box_layout = QVBoxLayout()
-        user_details_group_box_layout = QVBoxLayout()
+        ext_bar_group_box_layout = QHBoxLayout()
+        comp_bar_group_box_layout = QHBoxLayout()
+        vert_bar_group_box_layout = QHBoxLayout()
+        res_evo_plot_group_box_layout = QHBoxLayout()
+        user_details_group_box_layout = QHBoxLayout()
+        heat_map_group_box_layout = QHBoxLayout()
+        scatter_group_box_layout = QHBoxLayout()
+        dpre_group_box_layout = QHBoxLayout()
 
         ext_bar_group_box.setLayout(ext_bar_group_box_layout)
         comp_bar_group_box.setLayout(comp_bar_group_box_layout)
         vert_bar_group_box.setLayout(vert_bar_group_box_layout)
         res_evo_plot_group_box.setLayout(res_evo_plot_group_box_layout)
         user_details_group_box.setLayout(user_details_group_box_layout)
+        heat_map_group_box.setLayout(heat_map_group_box_layout)
+        scatter_group_box.setLayout(scatter_group_box_layout)
+        dpre_group_box.setLayout(dpre_group_box_layout)
 
         ext_bar_group_box.layout().addWidget(self.ext_bar_checkbox)
         comp_bar_group_box.layout().addWidget(self.comp_bar_checkbox)
         vert_bar_group_box.layout().addWidget(self.vert_bar_checkbox)
         res_evo_plot_group_box.layout().addWidget(self.res_evo_checkbox)
         user_details_group_box.layout().addWidget(self.user_details_checkbox)
+        heat_map_group_box.layout().addWidget(self.heat_map_checkbox)
+        scatter_group_box.layout().addWidget(self.scatter_checkbox)
+        dpre_group_box.layout().addWidget(self.dpre_checkbox)
 
         ext_bar_group_box.layout().addWidget(self.ext_bar_button)
         comp_bar_group_box.layout().addWidget(self.comp_bar_button)
         vert_bar_group_box.layout().addWidget(self.vert_bar_button)
         res_evo_plot_group_box.layout().addWidget(self.res_evo_button)
         user_details_group_box.layout().addWidget(self.user_details_button)
+        heat_map_group_box.layout().addWidget(self.heat_map_button)
+        scatter_group_box.layout().addWidget(self.scatter_button)
+        dpre_group_box.layout().addWidget(self.dpre_button)
 
-        grid.layout().addWidget(ext_bar_group_box, 10, 0, 2, 1)
-        grid.layout().addWidget(comp_bar_group_box, 10, 1, 2, 1)
-        grid.layout().addWidget(vert_bar_group_box, 10, 2, 2, 1)
-        grid.layout().addWidget(res_evo_plot_group_box, 10, 3, 2, 1)
-        grid.layout().addWidget(user_details_group_box, 10, 4, 2, 1)
+        grid.layout().addWidget(ext_bar_group_box, 16, 0, 2, 5)
+        grid.layout().addWidget(comp_bar_group_box, 16, 5, 2, 5)
+        grid.layout().addWidget(vert_bar_group_box, 16, 10, 2, 5)
+        grid.layout().addWidget(res_evo_plot_group_box, 16, 15, 2, 5)
+        grid.layout().addWidget(scatter_group_box, 18, 0, 2, 5)
+        grid.layout().addWidget(heat_map_group_box, 18, 5, 2, 5)
+        grid.layout().addWidget(dpre_group_box, 18, 10, 2, 5)
+        grid.layout().addWidget(user_details_group_box, 18, 15, 2, 5)
 
-    def show_popup(self, popup):
-        p = popup()
+        buttons_groupbox = QGroupBox()
+        buttons_groupbox_layout = QHBoxLayout()
+        buttons_groupbox.setLayout(buttons_groupbox_layout)
+
+        self.load_config_button = QPushButton("Load Configuration", self)
+        self.save_config_button = QPushButton("Save Configuration", self)
+        self.run_farseer_button = QPushButton("Run FarSeer-NMR", self)
+        buttons_groupbox.layout().addWidget(self.load_config_button)
+        buttons_groupbox.layout().addWidget(self.save_config_button)
+        buttons_groupbox.layout().addWidget(self.run_farseer_button)
+
+        grid.layout().addWidget(buttons_groupbox, 20, 0, 1, 20)
+
+
+    def set_variables(self, vars):
+        vars["general"]["spectrum_path"] = self.spectra_path.text()
+        vars["general"]["logfile_name"] = self.logfile_path.text()
+        vars["general"]["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
+        vars["general"]["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
+
+
+    def load_config(self, vars):
+        pass
+
+    def save_config(self, vars):
+        pass
+
+    def show_popup(self, popup, vars):
+        p = popup(vars=vars)
         p.exec()
         p.raise_()
+        print(vars["compact_bar_settings"])
 
 
     def show_compact_bar_popup(self):

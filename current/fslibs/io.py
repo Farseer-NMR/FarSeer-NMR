@@ -8,7 +8,7 @@ def fsuv_to_json(fsuv):
 def json_to_fsuv(json_file):
 
     js = json.load(json_file)
-    fout = open("test_user_variables.py", 'w')
+    fout = open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/farseer_user_variables.py", 'w')
     gen = js["general_settings"]
     fit = js["fitting_settings"]
     cs = js["cs_settings"]
@@ -618,4 +618,5 @@ import farseermain""".format(
     fout.write(fsuv2)
     fout.close()
 
-json_to_fsuv(open("current/default_config.json", 'r'))
+json_to_fsuv(open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json", 'r'))
+

@@ -7,12 +7,12 @@ class LabelledCheckbox(QWidget):
         QWidget.__init__(self, parent)
         grid = QGridLayout()
         self.setLayout(grid)
-        checkBox = QCheckBox()
-        checkBox.setFixedWidth(20)
+        self.checkBox = QCheckBox()
+        self.checkBox.setFixedWidth(20)
 
         label = QLabel(text, self)
 
-        self.layout().addWidget(checkBox, 0, 0)
+        self.layout().addWidget(self.checkBox, 0, 0)
         self.layout().addWidget(label, 0, 1)
         if fixed:
             self.setFixedWidth(50)
@@ -24,3 +24,6 @@ class LabelledCheckbox(QWidget):
 
     def setCallback(self, callback):
         self.connect(self, QtCore.SIGNAL('clicked()'), callback)
+
+    def isChecked(self):
+        return self.checkBox.isChecked()
