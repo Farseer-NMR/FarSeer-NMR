@@ -1,15 +1,21 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QSpinBox, QLineEdit, QCheckBox, QDoubleSpinBox, QDialogButtonBox
 
+import json
+from current.default_config import defaults
 
 class ExtendedBarPopup(QDialog):
 
-    def __init__(self, parent=None, **kw):
+    def __init__(self, parent=None, vars=None, **kw):
         super(ExtendedBarPopup, self).__init__(parent)
         self.setWindowTitle("Extended Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
+
+        self.vars = vars
+        self.defaults = defaults["extended_bar_settings"]
+
 
         bar_cols_label = QLabel("Columns Per Page", self)
         bar_rows_label = QLabel("Rows Per Page", self)
@@ -113,39 +119,65 @@ class ExtendedBarPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(self.setValues)
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.set_defaults)
 
         self.layout().addWidget(self.buttonBox, 24, 0, 1, 2)
-
-        # self.set_defaults()
+        if vars:
+            self.get_values()
 
     def set_defaults(self):
-        self.bar_cols.setValue(1)
-        self.bar_rows.setValue(6)
-        self.apply_status.setChecked(True)
-        self.meas_bar_colour.setText('k')
-        self.lost_bar_colour.setText('red')
-        self.unassigned_bar_colour.setText('grey')
-        self.bar_width.setValue(0.7)
-        self.bar_alpha.setValue(1)
-        self.bar_linewidth.setValue(10)
-        self.bar_title_y.setValue(1.05)
-        self.bar_title_font.setText('Arial')
-        self.bar_title_font_size.setValue(10)
-        self.bar_threshold.setChecked(True)
-        self.bar_threshold_colour.setText('red')
-        self.bar_threshold_linewidth.setValue(1)
-        self.x_tick_rotation.setValue(90)
-        self.x_tick_font_size.setValue(6)
-        self.x_tick_font.setText('monospace')
-        self.x_tick_padding.setValue(0.1)
-        self.y_tick_font_size.setValue(9)
-        self.y_grid_colour.setText('grey')
-        self.markProlines.setChecked(True)
-        self.proline_marker.setText('P')
-        self.user_details.setChecked(True)
+        self.bar_cols.setValue(self.defaults["ext_bar_cols_page"])
+        self.bar_rows.setValue(self.defaults["ext_bar_rows_page"])
+        self.apply_status.setChecked(self.defaults["ext_bar_apply_status_2_bar_color"])
+        self.meas_bar_colour.setText(self.defaults["ext_bar_color_measured"])
+        self.lost_bar_colour.setText(self.defaults["ext_bar_color_lost"])
+        self.unassigned_bar_colour.setText(self.defaults["ext_bar_color_unassigned"])
+        self.bar_width.setValue(self.defaults["ext_bar_bar_width"])
+        self.bar_alpha.setValue(self.defaults["ext_bar_bar_alpha"])
+        self.bar_linewidth.setValue(self.defaults["ext_bar_bar_linewidth"])
+        self.bar_title_y.setValue(self.defaults["ext_bar_title_y"])
+        self.bar_title_font.setText(self.defaults["ext_bar_title_fn"])
+        self.bar_title_font_size.setValue(self.defaults["ext_bar_title_fs"])
+        self.bar_threshold.setChecked(self.defaults["ext_bar_plot_threshold"])
+        self.bar_threshold_colour.setText(self.defaults["ext_bar_plot_threshold_color"])
+        self.bar_threshold_linewidth.setValue(self.defaults["ext_bar_plot_threshold_lw"])
+        self.x_tick_rotation.setValue(self.defaults["ext_bar_x_ticks_rot"])
+        self.x_tick_font_size.setValue(self.defaults["ext_bar_y_label_fs"])
+        self.x_tick_font.setText(self.defaults["ext_bar_x_ticks_fn"])
+        self.x_tick_padding.setValue(self.defaults["ext_bar_x_ticks_pad"])
+        self.y_tick_font_size.setValue(self.defaults["ext_bar_y_ticks_fs"])
+        self.y_grid_colour.setText(self.defaults["ext_bar_y_grid_color"])
+        self.markProlines.setChecked(self.defaults["ext_bar_mark_prolines"])
+        self.proline_marker.setText(self.defaults["ext_bar_proline_mark"])
+        self.user_details.setChecked(self.defaults["ext_bar_mark_user_details"])
 
-    def setValues(self):
+    def get_values(self):
+        self.bar_cols.setValue(self.vars["ext_bar_cols_page"])
+        self.bar_rows.setValue(self.vars["ext_bar_rows_page"])
+        self.apply_status.setChecked(self.vars["ext_bar_apply_status_2_bar_color"])
+        self.meas_bar_colour.setText(self.vars["ext_bar_color_measured"])
+        self.lost_bar_colour.setText(self.vars["ext_bar_color_lost"])
+        self.unassigned_bar_colour.setText(self.vars["ext_bar_color_unassigned"])
+        self.bar_width.setValue(self.vars["ext_bar_bar_width"])
+        self.bar_alpha.setValue(self.vars["ext_bar_bar_alpha"])
+        self.bar_linewidth.setValue(self.vars["ext_bar_bar_linewidth"])
+        self.bar_title_y.setValue(self.vars["ext_bar_title_y"])
+        self.bar_title_font.setText(self.vars["ext_bar_title_fn"])
+        self.bar_title_font_size.setValue(self.vars["ext_bar_title_fs"])
+        self.bar_threshold.setChecked(self.vars["ext_bar_plot_threshold"])
+        self.bar_threshold_colour.setText(self.vars["ext_bar_plot_threshold_color"])
+        self.bar_threshold_linewidth.setValue(self.vars["ext_bar_plot_threshold_lw"])
+        self.x_tick_rotation.setValue(self.vars["ext_bar_x_ticks_rot"])
+        self.x_tick_font_size.setValue(self.vars["ext_bar_y_label_fs"])
+        self.x_tick_font.setText(self.vars["ext_bar_x_ticks_fn"])
+        self.x_tick_padding.setValue(self.vars["ext_bar_x_ticks_pad"])
+        self.y_tick_font_size.setValue(self.vars["ext_bar_y_ticks_fs"])
+        self.y_grid_colour.setText(self.vars["ext_bar_y_grid_color"])
+        self.markProlines.setChecked(self.vars["ext_bar_mark_prolines"])
+        self.proline_marker.setText(self.vars["ext_bar_proline_mark"])
+        self.user_details.setChecked(self.vars["ext_bar_mark_user_details"])
+
+    def set_values(self):
         self.accept()

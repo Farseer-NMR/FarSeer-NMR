@@ -1,9 +1,9 @@
-{
+defaults = {
   "general_settings": {
           "spectrum_path": "sys.argv[1]",
           "logfile_name": "file.log",
-          "has_sidechains": true,
-          "use_sidechains": true,
+          "has_sidechains": False,
+          "use_sidechains": False,
           "chimera_att_select_format": ":",
           "fig_file_type": "pdf",
           "fig_dpi": 300,
@@ -12,21 +12,21 @@
   },
   
   "fitting_settings": {
-          "do_titvar1": true,
-          "do_titvar2": true,
-          "do_titvar3": true,
-          "expand_lost_yy": false,
-          "expand_lost_zz": false,
-          "perform_controls": true,
-          "perform_comparisons": true,
-          "perform_resevo_fitting": false,
+          "do_titvar1": True,
+          "do_titvar2": True,
+          "do_titvar3": True,
+          "expand_lost_yy": False,
+          "expand_lost_zz": False,
+          "perform_controls": True,
+          "perform_comparisons": True,
+          "perform_resevo_fitting": False,
           "fit_line_color": "black",
           "fit_line_width": 1,
-          "include_user_annotations": false
+          "include_user_annotations": False
   },          
 
   "cs_settings": {
-          "perform_cs_correction": false,
+          "perform_cs_correction": False,
           "cs_correction_res_ref": 76
   },
 
@@ -37,12 +37,12 @@
   },
 
   "fasta_settings": {
-          "applyFASTA": true,
+          "applyFASTA": True,
           "FASTAstart": 1
   },
   "pre_settings": {
-          "apply_PRE_analysis": false,
-          "apply_smooth": true,
+          "apply_PRE_analysis": False,
+          "apply_smooth": True,
           "gaussian_stdev": 1,
           "gauss_x_size": 7,
           "d_pre_y_max": 1,
@@ -56,20 +56,20 @@
     
   },
   "extended_bar_settings": {
-          "do_ext_bar": true,
-          "ext_bar_cols_page": 1,
-          "ext_bar_rows_page": 6,
-          "ext_bar_color_measured": "k",
-          "ext_bar_apply_status_2_bar_color": true,
-          "ext_bar_color_lost": "red",
-          "ext_bar_color_unassigned": "grey",
-          "ext_bar_bar_width": 0.7,
-          "ext_bar_bar_alpha": 1,
-          "ext_bar_bar_linewidth": 0,
+          "do_ext_bar": True,
+          "ext_bar_cols_page": 5,
+          "ext_bar_rows_page": 10,
+          "ext_bar_color_measured": "blue",
+          "ext_bar_apply_status_2_bar_color": False,
+          "ext_bar_color_lost": "orange",
+          "ext_bar_color_unassigned": "red",
+          "ext_bar_bar_width": 0.8,
+          "ext_bar_bar_alpha": 15,
+          "ext_bar_bar_linewidth": 0.4,
           "ext_bar_title_y": 1.01,
           "ext_bar_title_fn": "Arial",
           "ext_bar_title_fs": 8,
-          "ext_bar_plot_threshold": true,
+          "ext_bar_plot_threshold": True,
           "ext_bar_plot_threshold_color": "red",
           "ext_bar_plot_threshold_lw": 0.5,
           "ext_bar_x_label_fn": "Arial",
@@ -89,18 +89,18 @@
           "ext_bar_y_ticks_pad": 3,
           "ext_bar_y_ticks_len": 2,
           "ext_bar_y_grid_color": "lightgrey",
-          "ext_bar_mark_prolines": true,
+          "ext_bar_mark_prolines": True,
           "ext_bar_proline_mark": "P",
-          "ext_bar_mark_user_details": true,
+          "ext_bar_mark_user_details": True,
           "ext_bar_mark_fs": 3
   },
   
   "compact_bar_settings": {
-          "do_comp_bar": true,
+          "do_comp_bar": True,
           "comp_bar_cols_page": 3,
           "comp_bar_rows_page": 5,
           "comp_bar_color_measured": "k",
-          "comp_bar_apply_status_2_bar_color": true,
+          "comp_bar_apply_status_2_bar_color": True,
           "comp_bar_color_lost": "red",
           "comp_bar_color_unassigned": "grey",
           "comp_bar_bar_width": 0.7,
@@ -109,7 +109,7 @@
           "comp_bar_title_y": 1.01,
           "comp_bar_title_fn": "Arial",
           "comp_bar_title_fs": 8,
-          "comp_bar_plot_threshold": true,
+          "comp_bar_plot_threshold": True,
           "comp_bar_plot_threshold_color": "red",
           "comp_bar_plot_threshold_lw": 1,
           "comp_bar_x_label_fn": "Arial",
@@ -128,22 +128,22 @@
           "comp_bar_y_ticks_pad": 3,
           "comp_bar_y_ticks_len": 2,
           "comp_bar_y_grid_color": "grey",
-          "comp_bar_mark_prolines": true,
+          "comp_bar_mark_prolines": True,
           "comp_bar_proline_mark": "P",
-          "comp_bar_mark_user_details": true,
+          "comp_bar_mark_user_details": True,
           "comp_bar_mark_fs": 3,
-          "comp_bar_unassigned_shade": true,
+          "comp_bar_unassigned_shade": True,
           "comp_bar_unassigned_shade_color": "grey",
           "comp_bar_unassigned_shade_alpha": 0.5
   },
   
   
   "vert_bar_settings": {
-          "do_vert_bar": true,
+          "do_vert_bar": True,
           "vert_bar_cols_page": 5,
           "vert_bar_rows_page": 2,
           "vert_bar_color_measured": "k",
-          "vert_bar_apply_status_2_bar_color": true,
+          "vert_bar_apply_status_2_bar_color": True,
           "vert_bar_color_lost": "red",
           "vert_bar_color_unassigned": "grey",
           "vert_bar_bar_width": 0.7,
@@ -152,7 +152,7 @@
           "vert_bar_title_y": 1.01,
           "vert_bar_title_fn": "Arial",
           "vert_bar_title_fs": 8,
-          "vert_bar_plot_threshold": true,
+          "vert_bar_plot_threshold": True,
           "vert_bar_plot_threshold_color": "red",
           "vert_bar_plot_threshold_lw": 1,
           "vert_bar_x_label_fn": "Arial",
@@ -173,56 +173,56 @@
           "vert_bar_y_ticks_pad": 1,
           "vert_bar_y_ticks_rot": 0,
           "vert_bar_x_grid_color": "lightgrey",
-          "vert_bar_mark_prolines": true,
+          "vert_bar_mark_prolines": True,
           "vert_bar_proline_mark": "P",
-          "vert_bar_mark_user_details": true,
+          "vert_bar_mark_user_details": True,
           "vert_bar_mark_fs": 3
   },
   
   "plots_PosF1_settings":{
-          "plots_PosF1_delta": true,
+          "plots_PosF1_delta": True,
           "yy_label_PosF1_delta": "ppm",
           "calccol_name_PosF1_delta": "H1_delta",
           "yy_scale_PosF1_delta": 0.1
   },
   
   "plots_PosF2_settings":{
-          "plots_PosF2_delta": true,
+          "plots_PosF2_delta": True,
           "yy_label_PosF2_delta": "ppm",
           "calccol_name_PosF2_delta": "N15_delta",
           "yy_scale_PosF2_delta": 0.25
   },
   
   "plots_CSP_settings":{
-           "plots_CSP": true,
+           "plots_CSP": True,
            "yy_label_CSP": "CSPs (ppm)",
            "calccol_name_CSP": "CSP",
            "yy_scale_CSP": 0.1
   },
   
   "plots_Height_ratio_settings":{
-            "plots_Height_ratio": true,
+            "plots_Height_ratio": True,
             "yy_label_Height_ratio": "Hi/H0",
             "calccol_name_Height_ratio": "Height_ratio",
             "yy_scale_Height_ratio": 1.5
   },
   
   "plots_Volume_ratio_settings": {
-            "plots_Volume_ratio": true,
+            "plots_Volume_ratio": True,
             "yy_label_Volume_ratio": "Vi/V0",
             "calccol_name_Volume_ratio": "Vol_ratio",
             "yy_scale_Volume_ratio": 1.5
   },
 
   "res_evo_settings": {
-          "do_res_evo": true,
+          "do_res_evo": True,
           "res_evo_cols_page":  5,
           "res_evo_rows_page":  8,
           "res_evo_title_y": 0.98,
           "res_evo_title_fn": "Arial",
           "res_evo_title_fs": 8,
           "res_evo_x_label": "[RNF125]",
-          "res_evo_set_x_values": true,
+          "res_evo_set_x_values": True,
           "res_evo_x_label_fn": "Arial",
           "res_evo_x_label_fs": 3,
           "res_evo_x_label_pad": 2,
@@ -241,7 +241,7 @@
           "res_evo_marker_color": "darkred",
           "res_evo_marker_size": 3,
           "res_evo_line_width": 1,
-          "res_evo_fill_between": true,
+          "res_evo_fill_between": True,
           "res_evo_fill_color": "pink",
           "res_evo_fill_alpha": 0.5,
           "res_evo_fit_line_color":  "black",
@@ -266,7 +266,7 @@
   },
 
   "cs_scatter_settings": {
-          "do_cs_scatter": true,
+          "do_cs_scatter": True,
           "cs_scatter_cols_page": 5,
           "cs_scatter_rows_page": 7,
           "cs_scatter_title_y": 0.97,
@@ -308,7 +308,7 @@
   },
 
   "heat_map_settings": {
-          "do_heat_map": true,
+          "do_heat_map": True,
           "heat_map_rows": 20,
           "heat_map_vmin": 0.2,
           "heat_map_vmax": 0.7,
@@ -327,7 +327,7 @@
   },
 
   "dpre_osci_settings": {
-          "do_dpre": true,
+          "do_dpre": True,
           "dpre_osci_width": 3,
           "dpre_osci_title_y": 1,
           "dpre_osci_title_fs": 6,
@@ -348,7 +348,7 @@
           "dpre_osci_y_ticks_fs": 4,
           "dpre_osci_y_ticks_pad": 1,
           "dpre_osci_grid_color": "grey",
-          "dpre_osci_res_shade": false,
+          "dpre_osci_res_shade": False,
           "dpre_osci_res_highlight": [
             [
               24,
