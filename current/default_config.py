@@ -302,7 +302,7 @@ defaults = {
             "*",
             "D"
           ],
-          "cs_scatter_mk_color": "none",
+          "cs_scatter_mk_color": "grey",
           "cs_scatter_mk_edgecolors": "black",
           "cs_scatter_mk_edge_lost": "red"
   },

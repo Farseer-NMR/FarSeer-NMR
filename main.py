@@ -17,6 +17,10 @@ from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
 from gui.popups.VerticalBar import VerticalBarPopup
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
+from gui.popups.ScatterPlotPopup import ScatterPlotPopup
+from gui.popups.HeatMapPopup import HeatMapPopup
+from gui.popups.DPrePopup import DPrePopup
+
 from gui.popups.UserMarksPopup import UserMarksPopup
 from gui import gui_utils
 
@@ -29,7 +33,7 @@ valuesDict = {
 
 class Main(QTabWidget):
 
-    def __init__(self):
+    def __init__(self, app_dims):
         QTabWidget.__init__(self, parent=None)
         tab1 = Settings()
         tab2 = Interface()
@@ -37,8 +41,9 @@ class Main(QTabWidget):
         self.addTab(tab1, "Settings")
         self.addTab(tab2, "PeakList Selection")
         self.addTab(tab3, "Results")
-        self.setFixedHeight(850)
-        self.setFixedWidth(1300)
+
+        self.setFixedSize(app_dims)
+        # self.setFixedWidth(app_dims[0])
 
 
 class Settings(QWidget):
@@ -48,8 +53,9 @@ class Settings(QWidget):
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         grid.setSpacing(3)
-        # vars = json.load(open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json", 'r'))
-
+        from current.default_config import defaults
+        # self.vars = defaults
+        self.vars = None
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
@@ -71,39 +77,34 @@ class Settings(QWidget):
         self.heat_map_checkbox = LabelledCheckbox(self, "PRE Heat Map")
 
         self.ext_bar_button = QPushButton("Settings", self)
-        self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup, vars["extended_bar_settings"]))
+        self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup, self.vars))
 
         self.comp_bar_button = QPushButton("Settings", self)
-        self.comp_bar_button.clicked.connect(partial(self.show_popup, CompactBarPopup, vars["compact_bar_settings"]))
+        self.comp_bar_button.clicked.connect(partial(self.show_popup, CompactBarPopup, self.vars))
+
         self.vert_bar_button = QPushButton("Settings", self)
-        self.vert_bar_button.clicked.connect(partial(self.show_popup, VerticalBarPopup, vars["vert_bar_settings"]))
+        self.vert_bar_button.clicked.connect(partial(self.show_popup, VerticalBarPopup, self.vars))
 
         self.res_evo_button = QPushButton("Settings", self)
-        self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup, vars["res_evo_settings"]))
+        self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup, self.vars))
 
         self.user_details_button = QPushButton("Settings", self)
-        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars["user_mark_settings"]))
+        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup, self.vars))
 
         self.scatter_button = QPushButton("Settings", self)
-        self.scatter_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars["cs_scatter_settings"]))
+        self.scatter_button.clicked.connect(partial(self.show_popup, ScatterPlotPopup, self.vars))
 
         self.heat_map_button = QPushButton("Settings", self)
-        self.heat_map_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars["heat_map_settings"]))
+        self.heat_map_button.clicked.connect(partial(self.show_popup, HeatMapPopup, self.vars))
 
         self.dpre_button = QPushButton("Settings", self)
-        self.dpre_button.clicked.connect(partial(self.show_popup, UserMarksPopup, vars["dpre_osci_settings"]))
-
-
+        self.dpre_button.clicked.connect(partial(self.show_popup, DPrePopup, self.vars))
 
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Sidechain Peaks?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
-        self.perform_controls_checkbox = LabelledCheckbox(self, "Perform Controls?")
+        self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
         self.fasta_start = LabelledSpinBox(self, "Fasta start")
-
-        # self.res_evo_fitting = LabelledCheckbox(self, "Fit Parameter Evolution?")
-        # self.res_evo_fit_line_colour = ColourBox(self, text="Fit Line Colour")
-        # self.res_evo_fit_line_width = LabelledSpinBox(self, "Fit Line Width")
 
         self.expand_lost_yy = LabelledCheckbox(self, "Analyse Lost Y Residues?")
         self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
@@ -123,7 +124,7 @@ class Settings(QWidget):
 
         general_groupbox.layout().addWidget(self.has_sidechains_checkbox)
         general_groupbox.layout().addWidget(self.use_sidechains_checkbox)
-        general_groupbox.layout().addWidget(self.perform_controls_checkbox)
+        general_groupbox.layout().addWidget(self.perform_comparisons_checkbox)
         general_groupbox.layout().addWidget(self.expand_lost_yy)
         general_groupbox.layout().addWidget(self.expand_lost_zz)
 
@@ -166,17 +167,22 @@ class Settings(QWidget):
         self.csp_alpha = LabelledDoubleSpinBox(self, text="CSP Alpha")
         self.csp_lost = LabelledCombobox(self, text="CSP Lost Mode", items=['prev', 'full'])
         self.csp_exceptions = QPushButton("CSP Exceptions", self)
+        self.do_pre = LabelledCheckbox(self, "PRE Analysis")
+        self.pre_settings = QPushButton("PRE Settings", self)
 
         cs_groupbox = QGroupBox()
         cs_groupbox_layout = QHBoxLayout()
         cs_groupbox.setLayout(cs_groupbox_layout)
 
 
+        cs_groupbox.layout().addWidget(self.do_pre)
+        cs_groupbox.layout().addWidget(self.pre_settings)
         cs_groupbox.layout().addWidget(self.cs_correction)
         cs_groupbox.layout().addWidget(self.cs_correction_res_ref)
         cs_groupbox.layout().addWidget(self.csp_alpha)
         cs_groupbox.layout().addWidget(self.csp_lost)
         cs_groupbox.layout().addWidget(self.csp_exceptions)
+
 
         grid.layout().addWidget(cs_groupbox, 9, 0, 2, 14)
 
@@ -335,18 +341,18 @@ class Settings(QWidget):
         grid.layout().addWidget(buttons_groupbox, 20, 0, 1, 20)
 
 
-    def load_variables(self, vars):
+    def load_variables(self):
 
-        general = vars["general_settings"]
-        fitting = vars["fitting_settings"]
-        cs = vars["cs_settings"]
-        csp = vars["csp_settings"]
-        fasta = vars["fasta_settings"]
-        plots_f1 = vars["plots_PosF1_settings"]
-        plots_f2 = vars["plots_PosF2_settings"]
-        plots_csp = vars["plots_CSP_settings"]
-        plots_height = vars["plots_Height_ratio_settings"]
-        plots_volume = vars["plots_Volume_ratio_settings"]
+        general = self.vars["general_settings"]
+        fitting = self.vars["fitting_settings"]
+        cs = self.vars["cs_settings"]
+        csp = self.vars["csp_settings"]
+        fasta = self.vars["fasta_settings"]
+        plots_f1 = self.vars["plots_PosF1_settings"]
+        plots_f2 = self.vars["plots_PosF2_settings"]
+        plots_csp = self.vars["plots_CSP_settings"]
+        plots_height = self.vars["plots_Height_ratio_settings"]
+        plots_volume = self.vars["plots_Volume_ratio_settings"]
 
         # General Settings
         self.spectrum_path.field.setText(general["spectrum_path"])
@@ -361,7 +367,7 @@ class Settings(QWidget):
         # Fitting Settings
         self.expand_lost_yy.checkBox.setChecked(fitting["expand_lost_yy"])
         self.expand_lost_zz.checkBox.setChecked(fitting["expand_lost_zz"])
-        self.perform_controls_checkbox.checkBox.setChecked(fitting["perform_controls"])
+        self.perform_comparisons_checkbox.checkBox.setChecked(fitting["perform_comparisons"])
 
         # CS Settings
         self.cs_correction.checkBox.setChecked(cs["perform_cs_correction"])
@@ -406,25 +412,24 @@ class Settings(QWidget):
         self.plot_volume_calccol.field.setText(plots_volume["calccol_name_Volume_ratio"])
 
         # Plot Booleans
-        self.ext_bar_checkbox.checkBox.setChecked(vars["extended_bar_settings"]["do_ext_bar"])
-        self.comp_bar_checkbox.checkBox.setChecked(vars["compact_bar_settings"]["do_comp_bar"])
-        self.vert_bar_checkbox.checkBox.setChecked(vars["vert_bar_settings"]["do_vert_bar"])
-        self.res_evo_checkbox.checkBox.setChecked(vars["res_evo_settings"]["do_res_evo"])
-        self.scatter_checkbox.checkBox.setChecked(vars["cs_scatter_settings"]["do_cs_scatter"])
-        self.heat_map_checkbox.checkBox.setChecked(vars["heat_map_settings"]["do_heat_map"])
-        self.dpre_checkbox.checkBox.setChecked(vars["dpre_osci_settings"]["do_dpre"])
+        self.ext_bar_checkbox.checkBox.setChecked(self.vars["extended_bar_settings"]["do_ext_bar"])
+        self.comp_bar_checkbox.checkBox.setChecked(self.vars["compact_bar_settings"]["do_comp_bar"])
+        self.vert_bar_checkbox.checkBox.setChecked(self.vars["vert_bar_settings"]["do_vert_bar"])
+        self.res_evo_checkbox.checkBox.setChecked(self.vars["res_evo_settings"]["do_res_evo"])
+        self.scatter_checkbox.checkBox.setChecked(self.vars["cs_scatter_settings"]["do_cs_scatter"])
+        self.heat_map_checkbox.checkBox.setChecked(self.vars["heat_map_settings"]["do_heat_map"])
+        self.dpre_checkbox.checkBox.setChecked(self.vars["dpre_osci_settings"]["do_dpre"])
         self.user_details_checkbox.checkBox.setChecked(fitting["include_user_annotations"])
 
 
     def load_config(self):
         import os
-        vars = None
         fname = QFileDialog.getOpenFileName(self, 'Load Configuration', os.getcwd())
         if fname[0]:
-            vars = json.load(open(fname[0], 'r'))
+            self.vars = json.load(open(fname[0], 'r'))
 
         if vars:
-            self.load_variables(vars)
+            self.load_variables()
 
 
     def save_config(self, vars):
@@ -434,13 +439,8 @@ class Settings(QWidget):
         p = popup(vars=vars)
         p.exec()
         p.raise_()
-        print(vars)
-
-
-    def show_compact_bar_popup(self):
-        popup = CompactBarPopup()
-        popup.exec()
-        popup.raise_()
+        import pprint
+        pprint.pprint(vars)
 
 
 class Interface(QWidget):
@@ -537,7 +537,12 @@ class Interface(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Main()
+    screen_resolution = app.desktop().screenGeometry()
+    if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
+        app_dims = screen_resolution.size()
+    else:
+        app_dims = (1300, 850)
+    ex = Main(app_dims)
     ex.show()
     ex.raise_()
     sys.exit(app.exec_())

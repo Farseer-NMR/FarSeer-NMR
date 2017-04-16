@@ -17,7 +17,6 @@
           "do_titvar3": true,
           "expand_lost_yy": false,
           "expand_lost_zz": false,
-          "perform_controls": true,
           "perform_comparisons": true,
           "perform_resevo_fitting": false,
           "fit_line_color": "black",
