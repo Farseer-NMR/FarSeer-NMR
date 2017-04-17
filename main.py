@@ -3,12 +3,11 @@ from functools import partial
 import json
 import os
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
 
-from gui.components.ColourBox import ColourBox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledSpinBox import LabelledSpinBox
@@ -23,7 +22,6 @@ from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.DPrePopup import DPrePopup
 
 from gui.popups.UserMarksPopup import UserMarksPopup
-from gui import gui_utils
 
 valuesDict = {
             'x': [],
@@ -72,7 +70,7 @@ class Settings(QWidget):
         grid.setSpacing(3)
         from current.default_config import defaults
         self.vars = None
-        self.blank_vars = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
+        # self.blank_vars = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
@@ -484,10 +482,15 @@ class Interface(QWidget):
         self.widget2.layout().addWidget(self.x_checkbox, 3, 0)
         self.widget2.layout().addWidget(self.y_checkbox, 2, 0)
         self.widget2.layout().addWidget(self.z_checkbox, 1, 0)
+        self.widget3 = QWidget(self)
+        widget3_layout = QGridLayout()
+        self.widget3.setLayout(widget3_layout)
 
         self.sideBar = SideBar(self)
+        self.h_splitter = QSplitter(QtCore.Qt.Horizontal)
+        self.h_splitter.addWidget(self.sideBar)
 
-        self.layout().addWidget(self.sideBar, 0, 0, 4, 1)
+        self.layout().addWidget(self.h_splitter)
 
         num_points_label = QLabel("Number of Points", self)
 
@@ -513,14 +516,16 @@ class Interface(QWidget):
         self.y_combobox.setValue(1)
         self.x_combobox.setValue(1)
 
-        self.layout().addWidget(self.widget2, 1, 1)
+        self.widget3.layout().addWidget(self.widget2, 1, 1)
 
         self.showTreeButton = QPushButton('Show Parameter Tree', self)
+        self.showTreeButton.setMaximumWidth(1150)
 
-        self.layout().addWidget(self.showTreeButton, 2, 1, 1, 3)
-        self.layout().addWidget(self.peakListArea, 3, 1, 1, 3)
+        self.widget3.layout().addWidget(self.showTreeButton, 2, 1, 1, 3)
+        self.widget3.layout().addWidget(self.peakListArea, 3, 1, 1, 3)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         # self.peakListArea.hide()
+        self.h_splitter.addWidget(self.widget3)
         
 
 
@@ -553,7 +558,7 @@ if __name__ == '__main__':
     if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
         app_dims = screen_resolution.size()
     else:
-        app_dims = (1300, 850)
+        app_dims = QtCore.QSize(1300, 850)
     ex = Main(app_dims)
     ex.show()
     ex.raise_()

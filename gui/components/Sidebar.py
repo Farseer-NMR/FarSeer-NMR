@@ -13,14 +13,15 @@ class SideBar(QTreeWidget):
         self.setDragDropMode(self.InternalMove)
         self.acceptDrops()
         self.setMinimumWidth(200)
+        self.setMaximumWidth(320)
         self.addLists()
 
     def addLists(self):
         self.clear()
-        # for i in range(1, 13):
-        #     self.projectItem = QTreeWidgetItem(self)
-        #     self.projectItem.setFlags(self.projectItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
-        #     self.projectItem.setText(0, "peaklist%s" % str(i))
+        for i in range(1, 100):
+            self.projectItem = QTreeWidgetItem(self)
+            self.projectItem.setFlags(self.projectItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
+            self.projectItem.setText(0, "peaklist_condition_298K_4%s" % str(i))
 
     def dragEnterEvent(self, event):
         event.accept()
