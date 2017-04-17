@@ -1,6 +1,7 @@
 import sys
 from functools import partial
 import json
+import os
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QLineEdit, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QComboBox
 from gui.components.PeakListArea import PeakListArea
@@ -35,9 +36,9 @@ class Main(QTabWidget):
 
     def __init__(self, app_dims):
         QTabWidget.__init__(self, parent=None)
-        tab1 = Settings()
-        tab2 = Interface()
-        tab3 = QWidget()
+        tab1 = Settings(self)
+        tab2 = Interface(self)
+        tab3 = QWidget(self)
         self.addTab(tab1, "Settings")
         self.addTab(tab2, "PeakList Selection")
         self.addTab(tab3, "Results")
@@ -46,16 +47,32 @@ class Main(QTabWidget):
         # self.setFixedWidth(app_dims[0])
 
 
+    def load_config(self):
+        import os
+        fname = QFileDialog.getOpenFileName(self, 'Load Configuration', os.getcwd())
+        if fname[0]:
+            vars = json.load(open(fname[0], 'r'))
+            return vars
+        return None
+
+    def save_config(self, vars):
+
+        fname = QFileDialog.getSaveFileName(self, 'Save Configuration')
+        with open(fname[0], 'w') as outfile:
+            json.dump(vars, outfile, indent=4, sort_keys=True)
+
+
+
 class Settings(QWidget):
-    def __init__(self):
-        QWidget.__init__(self, parent=None)
+    def __init__(self, parent):
+        QWidget.__init__(self, parent=parent)
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         grid.setSpacing(3)
         from current.default_config import defaults
-        # self.vars = defaults
         self.vars = None
+        self.blank_vars = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
@@ -335,10 +352,19 @@ class Settings(QWidget):
         self.run_farseer_button = QPushButton("Run FarSeer-NMR", self)
         buttons_groupbox.layout().addWidget(self.load_config_button)
         self.load_config_button.clicked.connect(self.load_config)
+        self.save_config_button.clicked.connect(self.save_config)
         buttons_groupbox.layout().addWidget(self.save_config_button)
         buttons_groupbox.layout().addWidget(self.run_farseer_button)
 
         grid.layout().addWidget(buttons_groupbox, 20, 0, 1, 20)
+
+
+    def load_config(self):
+        self.vars = self.parent().parent().load_config()
+        self.load_variables()
+
+    def save_config(self):
+        self.parent().parent().save_config(self.vars)
 
 
     def load_variables(self):
@@ -421,20 +447,6 @@ class Settings(QWidget):
         self.dpre_checkbox.checkBox.setChecked(self.vars["dpre_osci_settings"]["do_dpre"])
         self.user_details_checkbox.checkBox.setChecked(fitting["include_user_annotations"])
 
-
-    def load_config(self):
-        import os
-        fname = QFileDialog.getOpenFileName(self, 'Load Configuration', os.getcwd())
-        if fname[0]:
-            self.vars = json.load(open(fname[0], 'r'))
-
-        if vars:
-            self.load_variables()
-
-
-    def save_config(self, vars):
-        pass
-
     def show_popup(self, popup, vars):
         p = popup(vars=vars)
         p.exec()
@@ -445,8 +457,8 @@ class Settings(QWidget):
 
 class Interface(QWidget):
  
-    def __init__(self):
-        QWidget.__init__(self, parent=None)
+    def __init__(self, parent):
+        QWidget.__init__(self, parent=parent)
 
         self.initUI()
 
