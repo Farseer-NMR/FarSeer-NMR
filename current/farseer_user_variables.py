@@ -54,7 +54,7 @@ plots_Volume_ratio = True  # Plot Volume ratio data
 plots_extended_bar = True  # Represent data in Extended Bar Plot style
 plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = True  # Represent data in Vertical Bar Plot style
-plots_residue_evolution = False  # Represent Data Evolution per Residue style
+plots_residue_evolution = True  # Represent Data Evolution per Residue style
 plots_cs_scatter = True  # Represent chemical shift scatter data
 #
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
@@ -76,8 +76,22 @@ yy_scale_Height_ratio = 1.5  # y axis scale for height ratio
 yy_scale_Volume_ratio = 1.5  # y axis scale for volume ratio
 #
 represent_user_marks = False  # draws user defined marks over bars in plots
-user_marks_dict = {'p3': '3', 'p6': '6', 'p8': '8', 'p7': '7', 'p4': '4', 'low': 'L', 'p10': '10', 'V0': 'H', 'p5': '5', 'z': 'z', 'p9': '9', 'H0': 'V', 'p1': '1', 'p2': '2'}
-# keys: the string in 'Details' column in input data, value: the character to be drawn
+user_marks_dict = {
+    'H0': 'V',
+    'V0': 'H',
+    'low':'L',
+    'p1':'1',
+    'p2':'2',
+    'p3':'3',
+    'p4':'4',
+    'p5':'5',
+    'p6':'6',
+    'p7':'7',
+    'p8':'8',
+    'p9':'9',
+    'p10':'10',
+    'z':'z'
+}  # keys: the string in 'Details' column in input data, value: the character to be drawn
 #
 # Extended Bar Plot
 # use a combination of cols_page and rows_page to achieve desired figure ratio
@@ -278,7 +292,7 @@ heat_map_bottom_margin = 0.5
 heat_map_top_margin = 0.9
 heat_map_cbar_font_size = 4
 #
-    
+
 # DELTA PRE oscilations Plot
 dpre_osci_width = 3  # scale factor for the width
 dpre_osci_title_y = 1  # subplot title pad
@@ -301,7 +315,7 @@ dpre_osci_y_ticks_fs = 4  # y ticks font size
 dpre_osci_y_ticks_pad = 1  # y ticks pad
 dpre_osci_grid_color = 'grey'  # grid color
 dpre_osci_res_shade = False  # applies shade to highlight residues
-dpre_osci_res_highlight = [[24, 1.5], [37, 3], [3, 1.5], [65, 6]]  # residues to highlight (res, shade width)
+dpre_osci_res_highlight = [(24, 1.5) ,(37, 3) ,(3, 1.5) ,(65, 6)]  # residues to highlight (res, shade width)
 dpre_osci_rh_fs = 4  # font size for residue highlight
 dpre_osci_rh_y = 0.9  # y scaling for residue 1-letter representation
 #
