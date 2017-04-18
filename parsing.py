@@ -1,5 +1,5 @@
 from current.fslibs.Peak import Peak
-
+import platform
 import re, os
 
 ANSIG_PATTERN = re.compile(r'^\s*ANSIG\s.+crosspeak')
@@ -358,7 +358,7 @@ def parseSparkyPeakList(peaklist_file):
     return peakList
 
 def fixpath(path):
-    if path.startswith('/'):
+    if path.startswith('/') and  platform.system() == "Windows":
         path = os.path.normpath(path[1:])
     else:
         path = os.path.normpath(os.path.expanduser(path))

@@ -2,12 +2,11 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5 import QtCore
 from parsing import read_peaklist
 
-peakLists = {}
 
 class SideBar(QTreeWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, peakLists=None):
         QTreeWidget.__init__(self, parent)
-        # self.header().hide()
+        self.header().hide()
         self.setDragEnabled(True)
         self.setExpandsOnDoubleClick(False)
         self.setDragDropMode(self.InternalMove)
@@ -15,13 +14,10 @@ class SideBar(QTreeWidget):
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
         self.addLists()
+        self.peakLists = peakLists
 
     def addLists(self):
-        self.clear()
-        for i in range(1, 100):
-            self.projectItem = QTreeWidgetItem(self)
-            self.projectItem.setFlags(self.projectItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
-            self.projectItem.setText(0, "peaklist_condition_298K_4%s" % str(i))
+        pass
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -38,11 +34,10 @@ class SideBar(QTreeWidget):
             for filePath in filePaths:
                 peaklist = read_peaklist(filePath)
                 if peaklist:
-                    print(peaklist[0], filePath)
+                    item = self.addItem(filePath.split('/')[-1].split('.')[0])
+                    self.peakLists[item.text(0)] = peaklist
                 else:
-                    print(peaklist, filePath)
-                item = self.addItem(filePath.split('/')[-1].split('.')[0])
-                peakLists[item.text(0)] = peaklist
+                    print("Invalid file")
 
 
     def addItem(self, name):

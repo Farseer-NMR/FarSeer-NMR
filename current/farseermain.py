@@ -471,9 +471,9 @@ ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, ttt.split_res_info)
 # i.e. applies an internal reference
 if fsuv.perform_cs_correction:
     fsut.write_title('CORRECTS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK')
-    ttt.tricicle(ttt.zzcoords, 
-                 ttt.yycoords, 
-                 ttt.xxcoords, 
+    ttt.tricicle(ttt.zzcoords,
+                 ttt.yycoords,
+                 ttt.xxcoords,
                  ttt.correct_shifts,
                  kwargs={'ref_res':str(fsuv.cs_correction_res_ref)})
 
@@ -491,7 +491,7 @@ fillnalost = {
 # yy(cond2) dimension.
 if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
     fsut.write_title('EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
-    
+
     # expands to yy (cond2) condition
     if fsuv.expand_lost_yy:
         for z in ttt.zzcoords:
@@ -500,10 +500,10 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                 fsut.write_log(fsut.dim_sperator(y, 'own'))
                 refscoords = {'z': z, 'y': ttt.yyref}
                 ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists, 
+                               ttt.allpeaklists,
                                ttt.allpeaklists,
                                fillnalost, refscoords=refscoords)
-    
+
     # expands to zz (cond3) condition
     if fsuv.expand_lost_zz:
         for y in ttt.yycoords:
@@ -512,15 +512,15 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                 fsut.write_log(fsut.dim_sperator(z, 'own'))
                 refscoords = {'z': ttt.zzref, 'y': y}
                 ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists, 
+                               ttt.allpeaklists,
                                ttt.allpeaklists,
                                fillnalost, refscoords=refscoords)
-    
+
     # if there are sidechains to be used
     if ttt.has_sidechains and fsuv.use_sidechains:
         fsut.write_title('SIDECHAINS: \
                          EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
-        
+
         if fsuv.expand_lost_yy:
             for z in ttt.zzcoords:
                 fsut.write_log(fsut.dim_sperator(z, 'top'))
@@ -528,10 +528,10 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                     fsut.write_log(fsut.dim_sperator(y, 'own'))
                     refscoords = {'z': z, 'y': ttt.yyref}
                     ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains, 
+                                   ttt.allsidechains,
                                    ttt.allsidechains,
                                    fillnalost, refscoords=refscoords)
-            
+
         if fsuv.expand_lost_zz:
             for y in ttt.yycoords:
                 fsut.write_log(fsut.dim_sperator(y, 'top'))
@@ -539,13 +539,13 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                     fsut.write_log(fsut.dim_sperator(z, 'own'))
                     refscoords = {'z': ttt.zzref, 'y': y}
                     ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains, 
+                                   ttt.allsidechains,
                                    ttt.allsidechains,
                                    fillnalost, refscoords=refscoords)
 
 ## Identifies lost residues across the titration
 fsut.write_title('ADDS LOST RESIDUES BASED ON THE REFERENCE LIST')
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
+ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
              ttt.seq_expand,
              [ttt.allpeaklists, ttt.allpeaklists, fillnalost])
 
@@ -554,8 +554,8 @@ if ttt.has_sidechains and fsuv.use_sidechains:
     # Identifies lost residues across the titration
     fsut.write_title(\
         'ADDS LOST SIDE CHAIN RESIDUES BASED ON THE REFERENCE LIST')
-    
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
+
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
                  ttt.seq_expand,
                  args=[ttt.allsidechains, ttt.allsidechains, fillnalost])
 
@@ -563,29 +563,29 @@ if ttt.has_sidechains and fsuv.use_sidechains:
 if fsuv.applyFASTA:
 
     fsut.write_title('ADDS UNASSIGNED RESIDUES BASED ON THE FASTA FILE')
-        
+
     fillnaunassigned = {
     'Peak Status': 'unassigned',
     'Merit': 0,
     'Details': 'None'}
-    
-    
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
+
+
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
                  ttt.seq_expand,
                  args=[ttt.allFASTA, ttt.allpeaklists, fillnaunassigned])
 
 # organizes peaklists dataframe columns
 fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER")
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
+ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
              ttt.column_organizor,
              args=[ttt.allpeaklists],
              kwargs={'performed_cs_correction':fsuv.perform_cs_correction})
 
 ## writes the parsed peaklists corresponding to the sidechains information
 if ttt.has_sidechains and fsuv.use_sidechains:
-    
+
     fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER FOR SIDECHAINS")
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
                  ttt.column_organizor, args=[ttt.allsidechains],
                  kwargs={'sidechains':True})
 
@@ -628,14 +628,14 @@ if ttt.has_sidechains and fsuv.use_sidechains:
 # Representing the results comparisons
 if fsuv.perform_comparisons:
     fsut.write_title('WRITES TITRATION COMPARISONS')
-    
+
     # analyses comparisons.
     analyse_comparisons(Farseer_titrations_dict, fspar.p5d)
-    
+
     if ttt.has_sidechains and fsuv.use_sidechains:
         fsut.write_title('WRITES TITRATION COMPARISONS FOR SIDECHAINS')
         analyse_comparisons(Farseer_SD_titrations_dict,
-                            fspar.p5d, 
+                            fspar.p5d,
                             reso_type='Sidechains')
 
 fsut.write_title('LOG ENDED')

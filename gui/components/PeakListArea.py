@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem
 from PyQt5 import QtCore
+import pickle
 
 width = 1100
 height = 420
@@ -32,6 +33,7 @@ class PeakListArea(QWidget):
 
 
     def updateTree(self):
+        self.peak_list_objects = []
         self.show()
         self.parent().parent().parent().sideBar.addLists()
         self.scene.clear()
@@ -57,37 +59,34 @@ class PeakListArea(QWidget):
                 for j, y in enumerate(y_conds):
                     x_markers = []
                     for k, x in enumerate(x_conds):
-                        x = ConditionLabel(str(x), [xx_pos, xx_vertical])
-                        self.scene.addItem(x)
+                        xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
+                        self.scene.addItem(xx)
                         # self._addConnectingLine(y, x)
-                        pl = PeakListLabel('Drop peaklist here', self.scene, [pl_pos, xx_vertical])
+                        pl = PeakListLabel('Drop peaklist here', self.scene, [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
+                        self.peak_list_objects.append(pl)
                         self.scene.addItem(pl)
-                        self._addConnectingLine(x, pl)
-                        x_markers.append(x)
+                        self._addConnectingLine(xx, pl)
+                        x_markers.append(xx)
                         num+=1
                         xx_vertical += x_spacing
                     if len(x_markers) % 2 == 1:
                         yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()
                     else:
                         yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()-(x_spacing/2)
-                    y = ConditionLabel(str(y), [yy_pos, yy_vertical])
-                    y_markers.append(y)
-                    self.scene.addItem(y)
+                    yy = ConditionLabel(str(y), [yy_pos, yy_vertical])
+                    y_markers.append(yy)
+                    self.scene.addItem(yy)
                     for x_marker in x_markers:
-                        self._addConnectingLine(y, x_marker)
+                        self._addConnectingLine(yy, x_marker)
                 if len(y_markers) % 2 == 1:
                     zz_vertical = y_markers[int(math.ceil(len(y_markers))/2)].y()
                 else:
                     zz_vertical = (y_markers[0].y()+y_markers[-1].y())/2
-                z = ConditionLabel(str(z), [zz_pos, zz_vertical])
+                zz = ConditionLabel(str(z), [zz_pos, zz_vertical])
                 # y_markers.append(y)
-                self.scene.addItem(z)
+                self.scene.addItem(zz)
                 for x_marker in y_markers:
-                        self._addConnectingLine(z, x_marker)
-
-
-
-
+                    self._addConnectingLine(zz, x_marker)
 
 
     def _addConnectingLine(self, atom1, atom2):
@@ -129,13 +128,16 @@ class ConditionLabel(QGraphicsTextItem):
 
 class PeakListLabel(QGraphicsTextItem):
 
-  def __init__(self, text, scene, pos=None):
+  def __init__(self, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
       QGraphicsTextItem.__init__(self)
       self.setPlainText(text)
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
       self.setAcceptDrops(True)
       self.scene = scene
-
+      self.x_cond = x_cond
+      self.y_cond = y_cond
+      self.z_cond = z_cond
+      self.peak_list = None
 
   def dragEnterEvent(self, event):
     event.accept()
@@ -147,5 +149,6 @@ class PeakListLabel(QGraphicsTextItem):
 
     mimeData = event.mimeData()
     self.setPlainText(mimeData.text())
+    self.peak_list = mimeData.text()
     event.accept()
 

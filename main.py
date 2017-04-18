@@ -29,17 +29,18 @@ valuesDict = {
             'z': []
         }
 
+peakLists = {}
 
 class Main(QTabWidget):
 
     def __init__(self, app_dims):
         QTabWidget.__init__(self, parent=None)
-        tab1 = Settings(self)
-        tab2 = Interface(self)
-        tab3 = QWidget(self)
-        self.addTab(tab1, "Settings")
-        self.addTab(tab2, "PeakList Selection")
-        self.addTab(tab3, "Results")
+        self.tab1 = Settings(self)
+        self.tab2 = Interface(self)
+        self.tab3 = QWidget(self)
+        self.addTab(self.tab2, "PeakList Selection")
+        self.addTab(self.tab1, "Settings")
+        self.addTab(self.tab3, "Results")
 
         self.setFixedSize(app_dims)
         # self.setFixedWidth(app_dims[0])
@@ -58,6 +59,15 @@ class Main(QTabWidget):
         fname = QFileDialog.getSaveFileName(self, 'Save Configuration')
         with open(fname[0], 'w') as outfile:
             json.dump(vars, outfile, indent=4, sort_keys=True)
+
+    def run_farseer(self):
+        from current.setup_farseer_calculation import create_directory_structure
+        import pprint
+        pprint.pprint(valuesDict)
+        peak_list_objects = self.tab2.peakListArea.peak_list_objects
+        # print(peak_list_objects, peakLists)
+        create_directory_structure(valuesDict, peak_list_objects, peakLists)
+
 
 
 
@@ -351,6 +361,7 @@ class Settings(QWidget):
         buttons_groupbox.layout().addWidget(self.load_config_button)
         self.load_config_button.clicked.connect(self.load_config)
         self.save_config_button.clicked.connect(self.save_config)
+        self.run_farseer_button.clicked.connect(self.run_farseer)
         buttons_groupbox.layout().addWidget(self.save_config_button)
         buttons_groupbox.layout().addWidget(self.run_farseer_button)
 
@@ -364,6 +375,8 @@ class Settings(QWidget):
     def save_config(self):
         self.parent().parent().save_config(self.vars)
 
+    def run_farseer(self):
+        self.parent().parent().run_farseer()
 
     def load_variables(self):
 
@@ -486,7 +499,7 @@ class Interface(QWidget):
         widget3_layout = QGridLayout()
         self.widget3.setLayout(widget3_layout)
 
-        self.sideBar = SideBar(self)
+        self.sideBar = SideBar(self, peakLists)
         self.h_splitter = QSplitter(QtCore.Qt.Horizontal)
         self.h_splitter.addWidget(self.sideBar)
 
@@ -558,7 +571,7 @@ if __name__ == '__main__':
     if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
         app_dims = screen_resolution.size()
     else:
-        app_dims = QtCore.QSize(1300, 850)
+        app_dims = QtCore.QSize(1600, 850)
     ex = Main(app_dims)
     ex.show()
     ex.raise_()
