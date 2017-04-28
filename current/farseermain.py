@@ -94,7 +94,7 @@ def dimension_loop(titration_dict, sidechains=False):
                     and titration_dict[cond][dim2_pt][dim1_pt].\
                         tittype == 'cond1':
                     # do
-                    if len(fsuv.fit_x_values) != \
+                    if len(fsuv.titration_x_values) != \
                         titration_dict[cond][dim2_pt][dim1_pt].shape[0]:
                         raise ValueError(\
 '!!! Values given for x axis in fitting (fitting_x_values) do not match length\
@@ -205,11 +205,11 @@ def PRE_analysis(tit_panel, spectra_path=None):
                                          ['H_DPRE', 'V_DPRE']):
             if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
                 tit_panel.plot_base(targetcols, 'exp', 'delta_osci',
-                    fspar.delta_osci_dict,
-                    par_ylims=(0,fsuv.d_pre_y_max),
-                    ylabel=fsuv.d_pre_y_label,
+                    {**fspar.tplot_general_dict,**fspar.delta_osci_dict},
+                    par_ylims=(0,fsuv.dpre_osci_ymax),
+                    ylabel=fsuv.dpre_osci_y_label,
                     cols_per_page=1,
-                    rows_per_page=fsuv.d_pre_rows,
+                    rows_per_page=fsuv.dpre_osci_rows,
                     fig_height=fsuv.fig_height,
                     fig_width=fsuv.fig_width/fsuv.dpre_osci_width,
                     fig_file_type=fsuv.fig_file_type,
@@ -222,7 +222,7 @@ def perform_fits(tit_panel):
         
         if fspar.param_settings.loc[calculated_parameter, 'plot_param_flag']:
             tit_panel.perform_fit(calccol = calculated_parameter,
-                                  x_values=fsuv.fit_x_values)
+                                  x_values=fsuv.titration_x_values)
 
 def plot_tit_data(tit_panel):
     '''
@@ -248,13 +248,16 @@ def plot_tit_data(tit_panel):
                 if fsuv.plots_extended_bar:
                     tit_panel.plot_base(
                         calculated_parameter, 'exp', 'bar_extended',
-                        fspar.bar_ext_par_dict,
+                        {   **fspar.tplot_general_dict,
+                            **fspar.bar_plot_general_dict,
+                            **fspar.bar_ext_par_dict    },
                         par_ylims=\
                         fspar.param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
                         ylabel=\
                         fspar.param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_label'],
+                        hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.ext_bar_cols_page,
                         rows_per_page=fsuv.ext_bar_rows_page,
                         fig_height=fsuv.fig_height,
@@ -266,13 +269,14 @@ def plot_tit_data(tit_panel):
                 if fsuv.plots_compacted_bar:
                     tit_panel.plot_base(\
                         calculated_parameter, 'exp', 'bar_compacted',
-                        fspar.comp_bar_par_dict,
+                        {**fspar.tplot_general_dict,**fspar.bar_plot_general_dict,**fspar.comp_bar_par_dict},
                         par_ylims=\
                         fspar.param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
                         ylabel=\
                         fspar.param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_label'],
+                        hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.comp_bar_cols_page,
                         rows_per_page=fsuv.comp_bar_rows_page,
                         fig_height=fsuv.fig_height,
@@ -284,7 +288,8 @@ def plot_tit_data(tit_panel):
                 if fsuv.plots_vertical_bar:
                     tit_panel.plot_base(
                         calculated_parameter, 'exp', 'bar_vertical',
-                        fspar.bar_vert_par_dict,
+                        {   **fspar.tplot_general_dict, **fspar.bar_plot_general_dict,
+                            **fspar.bar_ext_par_dict    },
                         par_ylims=\
                         fspar.param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
@@ -304,13 +309,15 @@ def plot_tit_data(tit_panel):
                 #do - dedicated single plot for sidechains
                 tit_panel.plot_base(
                     calculated_parameter, 'exp', 'bar_extended',
-                    fspar.bar_ext_par_dict,
+                    {   **fspar.tplot_general_dict,**fspar.bar_plot_general_dict,
+                        **fspar.bar_ext_par_dict    },
                     par_ylims=\
                     fspar.param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_scale'],
                     ylabel=\
                     fspar.param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_label'],
+                    hspace=fsuv.tplot_vspace,
                     cols_per_page=fsuv.ext_bar_cols_page,
                     rows_per_page=fsuv.ext_bar_rows_page,
                     fig_height=fsuv.fig_height,
@@ -322,7 +329,7 @@ def plot_tit_data(tit_panel):
             if fsuv.plots_residue_evolution:
                 tit_panel.plot_base(\
                     calculated_parameter, 'res', 'res_evo',
-                    fspar.res_evo_par_dict,
+                    {**fspar.revo_plot_general_dict,**fspar.res_evo_par_dict},
                     par_ylims=  
                     fspar.param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_scale'],
@@ -336,15 +343,18 @@ def plot_tit_data(tit_panel):
                     fig_file_type=fsuv.fig_file_type,
                     fig_dpi=fsuv.fig_dpi)
             
-    if fsuv.plots_cs_scatter:
+    if fsuv.plots_cs_scatter \
+        and (fsuv.plots_PosF1_delta and fsuv.plots_PosF2_delta):
         tit_panel.plot_base('15N_vs_1H', 'res', 'cs_scatter',
-                            fspar.cs_scatter_par_dict,
+                            {**fspar.revo_plot_general_dict,**fspar.cs_scatter_par_dict},
                             cols_per_page=fsuv.cs_scatter_cols_page,
                             rows_per_page=fsuv.cs_scatter_rows_page,
                             fig_height=fsuv.fig_height,
                             fig_width=fsuv.fig_width,
                             fig_file_type=fsuv.fig_file_type,
                             fig_dpi=fsuv.fig_dpi)
+    else:
+        fsut.write_log('*** Not performing cs_scatter plot. Check plotting flags in farseer_user_variables.py')
 
 def analyse_comparisons(tit_dict, p5d, reso_type='Backbone'):
     """Algorythm to perform data comparisons over titration conditions."""
@@ -471,9 +481,9 @@ ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, ttt.split_res_info)
 # i.e. applies an internal reference
 if fsuv.perform_cs_correction:
     fsut.write_title('CORRECTS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK')
-    ttt.tricicle(ttt.zzcoords,
-                 ttt.yycoords,
-                 ttt.xxcoords,
+    ttt.tricicle(ttt.zzcoords, 
+                 ttt.yycoords, 
+                 ttt.xxcoords, 
                  ttt.correct_shifts,
                  kwargs={'ref_res':str(fsuv.cs_correction_res_ref)})
 
@@ -491,7 +501,7 @@ fillnalost = {
 # yy(cond2) dimension.
 if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
     fsut.write_title('EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
-
+    
     # expands to yy (cond2) condition
     if fsuv.expand_lost_yy:
         for z in ttt.zzcoords:
@@ -500,10 +510,10 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                 fsut.write_log(fsut.dim_sperator(y, 'own'))
                 refscoords = {'z': z, 'y': ttt.yyref}
                 ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists,
+                               ttt.allpeaklists, 
                                ttt.allpeaklists,
                                fillnalost, refscoords=refscoords)
-
+    
     # expands to zz (cond3) condition
     if fsuv.expand_lost_zz:
         for y in ttt.yycoords:
@@ -512,15 +522,15 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                 fsut.write_log(fsut.dim_sperator(z, 'own'))
                 refscoords = {'z': ttt.zzref, 'y': y}
                 ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists,
+                               ttt.allpeaklists, 
                                ttt.allpeaklists,
                                fillnalost, refscoords=refscoords)
-
+    
     # if there are sidechains to be used
     if ttt.has_sidechains and fsuv.use_sidechains:
         fsut.write_title('SIDECHAINS: \
                          EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
-
+        
         if fsuv.expand_lost_yy:
             for z in ttt.zzcoords:
                 fsut.write_log(fsut.dim_sperator(z, 'top'))
@@ -528,10 +538,10 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                     fsut.write_log(fsut.dim_sperator(y, 'own'))
                     refscoords = {'z': z, 'y': ttt.yyref}
                     ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains,
+                                   ttt.allsidechains, 
                                    ttt.allsidechains,
                                    fillnalost, refscoords=refscoords)
-
+            
         if fsuv.expand_lost_zz:
             for y in ttt.yycoords:
                 fsut.write_log(fsut.dim_sperator(y, 'top'))
@@ -539,13 +549,13 @@ if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
                     fsut.write_log(fsut.dim_sperator(z, 'own'))
                     refscoords = {'z': ttt.zzref, 'y': y}
                     ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains,
+                                   ttt.allsidechains, 
                                    ttt.allsidechains,
                                    fillnalost, refscoords=refscoords)
 
 ## Identifies lost residues across the titration
 fsut.write_title('ADDS LOST RESIDUES BASED ON THE REFERENCE LIST')
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
+ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
              ttt.seq_expand,
              [ttt.allpeaklists, ttt.allpeaklists, fillnalost])
 
@@ -554,8 +564,8 @@ if ttt.has_sidechains and fsuv.use_sidechains:
     # Identifies lost residues across the titration
     fsut.write_title(\
         'ADDS LOST SIDE CHAIN RESIDUES BASED ON THE REFERENCE LIST')
-
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
+    
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
                  ttt.seq_expand,
                  args=[ttt.allsidechains, ttt.allsidechains, fillnalost])
 
@@ -563,29 +573,29 @@ if ttt.has_sidechains and fsuv.use_sidechains:
 if fsuv.applyFASTA:
 
     fsut.write_title('ADDS UNASSIGNED RESIDUES BASED ON THE FASTA FILE')
-
+        
     fillnaunassigned = {
     'Peak Status': 'unassigned',
     'Merit': 0,
     'Details': 'None'}
-
-
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
+    
+    
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
                  ttt.seq_expand,
                  args=[ttt.allFASTA, ttt.allpeaklists, fillnaunassigned])
 
 # organizes peaklists dataframe columns
 fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER")
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
+ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
              ttt.column_organizor,
              args=[ttt.allpeaklists],
              kwargs={'performed_cs_correction':fsuv.perform_cs_correction})
 
 ## writes the parsed peaklists corresponding to the sidechains information
 if ttt.has_sidechains and fsuv.use_sidechains:
-
+    
     fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER FOR SIDECHAINS")
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords,
+    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
                  ttt.column_organizor, args=[ttt.allsidechains],
                  kwargs={'sidechains':True})
 
@@ -628,14 +638,14 @@ if ttt.has_sidechains and fsuv.use_sidechains:
 # Representing the results comparisons
 if fsuv.perform_comparisons:
     fsut.write_title('WRITES TITRATION COMPARISONS')
-
+    
     # analyses comparisons.
     analyse_comparisons(Farseer_titrations_dict, fspar.p5d)
-
+    
     if ttt.has_sidechains and fsuv.use_sidechains:
         fsut.write_title('WRITES TITRATION COMPARISONS FOR SIDECHAINS')
         analyse_comparisons(Farseer_SD_titrations_dict,
-                            fspar.p5d,
+                            fspar.p5d, 
                             reso_type='Sidechains')
 
 fsut.write_title('LOG ENDED')

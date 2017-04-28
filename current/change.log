@@ -1,3 +1,30 @@
+2017/04/27 -*major changes in user_varibles plotting parameters*-
+- plotting parameters organized in different hierarchical dictionaries. Affects
+farseer_user_variables.py, parameters.py and Titration.py.
+-- titration series plot
+--- bar plots
+---- the different bar plots
+---- DPRE oscilation plots
+-- residue evolution
+---parameter evolution
+---chemical shift scatter
+--DPRE Heatmap.
+- concatenation of plot_bar_compacted() and plot_bar_extended() in plot_bar_horizontal().
+- vertical_bar_plot() receives parameters from extended_bar_dict.
+- bug correction and code improvement in plotting functions.
+-- organization of functions
+--- set_item_colors()
+--- text_marker()
+--- plot_threshold()
+--- theo_pre_plot()
+- added nice tag display in bar plots in paramagnetic data.
+
+2017/04/20 -*2nd revision pre-rease*-
+- bug correction
+- added user details represented as bar colors
+-- created user_detail_bar_color() in Titration.py
+- added variables to farseer_user_variables.py
+
 2017/04/12 -*1st revision pre-release*-
 - corrected read_FASTA() to accept '>' commented lines
 - correct representation of PRE analysis in C3/titvar2
@@ -23,3 +50,5 @@
 -- theoretical PRE line implemented in extended, compact and vertical bar plots
 -- tag line implemented in extended, compact, vertical and heatmap plots
 - parameters for theoretical PRE plot configuration added to farseer_user_variables.py
+
+
