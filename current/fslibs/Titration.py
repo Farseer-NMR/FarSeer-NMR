@@ -18,24 +18,29 @@ import fslibs.utils as fsut
 class Titration(pd.Panel):
     """
     The titration object inherits a pd.Panel.
-    Is a panel where each item is an experiment, and the progression along Items
-    is the evolution of the titration.
+    Is a panel where each item is an experiment,
+    and the progression along Items is the evolution of the titration.
     """
-    
+    # how to represent lost values
     cs_lost = fsuv.cs_lost
     calc_parameters_list = 0
-    calc_folder = 'Calculations'
-    comparison_folder = 'Comparisons'
+    # folder to store titration calculations
+    calc_folder = 'Calculations'  
+    # folder to store comparisons among calculations
+    comparison_folder = 'Comparisons'  
+    # subfolder to store tables and plots
     tables_and_plots_folder = 'TablesAndPlots'
+    # subfolder to store ChimeraAttributeFiles
     chimera_att_folder = 'ChimeraAttributeFiles'
+    # subfolder to store full formatted peaklists
     export_tit_folder = 'FullPeaklists'
+    # dictionary to store dataframes with information on fitting results
     fitdf = {}
-    #predf = {}
-    
+    # prepares dictionary that stores alpha values to use in CSPs calculations
+    # to correct 15N dimension
     csp_alpha4res = {key:fsuv.csp_alpha4res for key in 'ARNDCEQGHILKMFPSTWYV'}
     for k, v in fsuv.csp_res_exceptions.items():
         csp_alpha4res[k] = v
-    
     
     def create_titration_attributes(self, tittype='cond',
                                           owndim_pts=['foo'],
@@ -43,22 +48,28 @@ class Titration(pd.Panel):
                                           dim2_pts='zoo',
                                           dim_comparison='not applied',
                                           resonance_type='Backbone'):
-        #for item in 
+        # I think I created this function because I couldn't initialise all
+        # these parameters with the init()
+        
+        # variables that store characteristics of the titration.
         self.tittype = tittype
         self.att_dict = owndim_pts
         self.dim1_pts = dim1_pts
         self.dim2_pts = dim2_pts
         self.dim_comparison = dim_comparison
         self.resonance_type = resonance_type
-        self.res_info = self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
+        self.res_info = \
+            self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
         
-        
+        # defines the path to store the calculations
+        # if stores the result of a calculation
         if tittype.startswith('cond'):
             self.calc_path = '{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                      self.calc_folder,
                                                      self.tittype,
                                                      self.dim2_pts,
                                                      self.dim1_pts)
+        # if stores comparisons among calculations
         elif tittype.startswith('C'):
             self.calc_path = '{}/{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                         self.comparison_folder,
@@ -67,29 +78,32 @@ class Titration(pd.Panel):
                                                         self.dim2_pts,
                                                         self.dim1_pts)
         
+        # Create all the folder necessary to store the data.
+        # folders are created here when generating the object to avoind having
+        # os.makedirs spread over the code, in this way all the folders created
+        # are here summarized
         if not(os.path.exists(self.calc_path)):
             os.makedirs(self.calc_path)
         
-        self.chimera_att_folder = '{}/{}'.format(self.calc_path, self.chimera_att_folder)
+        self.chimera_att_folder = '{}/{}'.format(self.calc_path,
+                                                 self.chimera_att_folder)
         if not(os.path.exists(self.chimera_att_folder)):
             os.makedirs(self.chimera_att_folder)
         
-        
-        self.tables_and_plots_folder = '{}/{}'.format(self.calc_path, self.tables_and_plots_folder)
+        self.tables_and_plots_folder = \
+            '{}/{}'.format(self.calc_path, self.tables_and_plots_folder)
         if not(os.path.exists(self.tables_and_plots_folder)):
             os.makedirs(self.tables_and_plots_folder)
         
-        self.export_tit_folder = '{}/{}'.format(self.calc_path, self.export_tit_folder)
+        self.export_tit_folder = '{}/{}'.format(self.calc_path,
+                                                self.export_tit_folder)
         if not(os.path.exists(self.export_tit_folder)):
             os.makedirs(self.export_tit_folder)
         
     @property
     def _constructor(self):
+        # because Titration inherits a pd.Panel.
         return Titration
-    #@property
-    #def _constructor_sliced(self):
-        #return SpectrumData
-        
     
     def calc_cs_diffs(self, calccol, sourcecol):
         '''
@@ -99,8 +113,10 @@ class Titration(pd.Panel):
         
         Calculation result is stored in a new column of each DataFrame.
         '''
-        self.loc[:,:,calccol] = self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
         
+        # sets lost peaks results according to the fsuv.cs_lost
         if self.cs_lost == 'full':
             for item in self.items:
                 mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
@@ -109,7 +125,8 @@ class Titration(pd.Panel):
         elif self.cs_lost == 'prev':
             for iitem in range(1, len(self.items)):
                 mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = self.ix[iitem-1,mask_lost,calccol]
+                self.ix[iitem,mask_lost,calccol] = \
+                    self.ix[iitem-1,mask_lost,calccol]
         
         fsut.write_log('*** Calculated {}\n'.format(calccol))
     
@@ -121,31 +138,44 @@ class Titration(pd.Panel):
         
         Calculation result is stored in a new column of each DataFrame.
         '''
-        self.loc[:,:,calccol] = self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
         fsut.write_log('*** Calculated {}\n'.format(calccol))
     
     def load_theoretical_PRE(self, spectra_path, dimpt):
-        """ Loads theoretical PRE values to represent in bar plots."""
+        """
+        Loads theoretical PRE values to represent in bar plots.
+        Theorital PRE files (*.pre) should be stored in a 'para' folder
+        at the cond3 hierarchy level.
         
-        #print(spectra_path)
+        Reads information on the tag position which should be inpu in the
+        *.pre file as an header comment, for example, '#40'.
+        
+        """
+        
         target_folder = '{}/para/{}/'.format(spectra_path.strip('/'), dimpt)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
-        #print(pre_file)
         
         if len(pre_file) > 1:
-            raise ValueError('@@@ There are more than one .pre file in the folder {}'.format(target_folder))
+            raise ValueError(   
+                '@@@ There are more than one .pre file in the folder {}'.\
+                format(target_folder))
         elif len(pre_file) < 1:
-            raise ValueError('@@@ There is no .pre file in folder {}'.format(target_folder))
+            raise ValueError('@@@ There is no .pre file in folder {}'.\
+                format(target_folder))
         
-        
-        
-        #print(pre_paths)
-        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1], names=['Theo PRE'], comment='#')
-        fsut.write_log('*** Added Theoretical PRE file {}\n'.format(pre_file[0]))
-        fsut.write_log('*** Theoretical PRE for diamagnetic set to 1 by default\n')
+        # loads theoretical PRE data to 'Theo PRE' new column
+        # sets 1 to the diamagnetic Item.
+        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1],
+                                 names=['Theo PRE'], comment='#')
+        fsut.write_log(\
+            '*** Added Theoretical PRE file {}\n'.format(pre_file[0]))
+        fsut.write_log(\
+            '*** Theoretical PRE for diamagnetic set to 1 by default\n')
         self.loc[:,:,'Theo PRE'] = 1
         self.loc['para',:,'Theo PRE'] = self.predf.loc[:,'Theo PRE']
         
+        # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
         self.loc['para',:,'tag'] = ''
@@ -153,25 +183,23 @@ class Titration(pd.Panel):
         self.loc['para',tagmask,'tag'] = '*'
         tagf.close()
         
-        #print(self)
-        #input()
-        #self.predf = pd.concat([self.res_info.iloc[0,:,:], self.predf], axis=1)
-        
-        #print(self.predf['M1'])
         
     def calc_Delta_PRE(self, sourcecol, targetcol,
                        apply_smooth=True,
                        gaussian_stddev=1,
                        guass_x_size=7):
         
+        # astropy is imported to avoind demanding import when not necessary
         from astropy.convolution import Gaussian1DKernel, convolve
         
         # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
         gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
         
-        self.loc[:,:,targetcol] = self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])#, axis='index')
+        self.loc[:,:,targetcol] = \
+            self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
         
-        fsut.write_log('*** Calculated DELTA PRE for source {} in target {}\n'.\
+        fsut.write_log(\
+            '*** Calculated DELTA PRE for source {} in target {}\n'.\
             format(sourcecol, targetcol))
         
         for exp in self.items:
@@ -182,17 +210,16 @@ class Titration(pd.Panel):
             if apply_smooth:
                 # aplies convolution with a normalized 1D Gaussian kernel
                 smooth_col = '{}_smooth'.format(targetcol)
-                self.loc[exp,:,smooth_col] = convolve(np.array(self.loc[exp,:,targetcol]),
-                                                 gauss,
-                                                 boundary='extend',
-                                                 normalize_kernel=True)
+                self.loc[exp,:,smooth_col] = \
+                    convolve(np.array(self.loc[exp,:,targetcol]),
+                             gauss,
+                             boundary='extend',
+                             normalize_kernel=True)
         
         fsut.write_log(\
-        '*** Calculated DELTA PRE Smoothed for source {} in target {} with window size {} and stdev {} \n'.\
+        '*** Calculated DELTA PRE Smoothed for source {} in target {} \
+with window size {} and stdev {} \n'.\
             format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
-        
-        
-        
     
     def csp_willi(self, s):
         """
@@ -208,19 +235,20 @@ class Titration(pd.Panel):
         characterise ligand binding. Prog. Nuc. Magn. Res. Spect.
         73, 1–16 (2013). SEE CORRIGENDUM
         """
-        return np.sqrt(0.5 * (s[1] ** 2 + (self.csp_alpha4res[s[0]] * s[2] ** 2)))
+        return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2]**2)))
     
     def calc_csp(self, calccol='CSP',
                        pos1='PosF1_delta',
                        pos2='PosF2_delta'):
         """
-        Calculates the Chemical Shift Perturbation (CSP) values based on a formula.
+        Calculates the Chemical Shift Perturbation (CSP) values
+        based on a formula.
         """
         
-        self.loc[:,:,calccol] = self.loc[:,:,['1-letter',pos1,pos2]].apply(lambda x: self.csp_willi(x), axis=2)
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,['1-letter',pos1,pos2]].\
+                apply(lambda x: self.csp_willi(x), axis=2)
         fsut.write_log('*** Calculated {}\n'.format(calccol))
-    
-
     
     def write_table(self, tablecol):
         '''
@@ -230,14 +258,14 @@ class Titration(pd.Panel):
         # concatenates the values of the table with the residues numbers
         table = pd.concat([self.res_info.iloc[0,:,[0]], self.loc[:,:,tablecol].astype(float)], axis=1)
         
-        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder, tablecol))):
+        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
+                                             tablecol))):
             os.makedirs('{}/{}'.format(self.tables_and_plots_folder, tablecol))
         
         file_path = '{0}/{1}/{1}.tsv'.format(self.tables_and_plots_folder,
                                                  tablecol)
         
         fileout = open(file_path, 'w')
-        
         
         if self.tittype.startswith('cond'):
             header = \
@@ -246,7 +274,9 @@ class Titration(pd.Panel):
 # ranging datapoints '{2}', where:
 # conditions '{3}' and '{4}' are kept constants.
 # {5} data.
-""".format(self.resonance_type, self.tittype, list(self.att_dict), self.dim2_pts, self.dim1_pts, tablecol)
+""".format(self.resonance_type, self.tittype, list(self.att_dict),
+           self.dim2_pts, self.dim1_pts, tablecol)
+        
         elif self.tittype.startswith('C'):
             header = \
 """# Table for '{0}' resonances.
@@ -254,40 +284,56 @@ class Titration(pd.Panel):
 # across variable '{2}' which ranges datapoints '{3}', where:
 # conditions '{4}' and '{5}' are kept constants.
 # {6} data.
-""".format(self.resonance_type, self.tittype, self.dim_comparison, list(self.att_dict), self.dim2_pts, self.dim1_pts, tablecol, self.tittype[-1])
+""".format(self.resonance_type, self.tittype, self.dim_comparison,
+           list(self.att_dict), self.dim2_pts, self.dim1_pts, tablecol,
+           self.tittype[-1])
         
         fileout.write(header)
-        fileout.write(table.to_csv(sep='\t', index=False, na_rep='NaN', float_format='%.4f'))
+        fileout.write(table.to_csv(sep='\t', index=False,
+                      na_rep='NaN', float_format='%.4f'))
         fileout.close()
-        fsut.write_log('*** File saved {}\n'.format(file_path))#('/'.join(file_path.split('/')[-2:])))
+        fsut.write_log('*** File saved {}\n'.format(file_path))
     
     def export_titration(self):
         """
-        Exports the titration experiments (measured and calculated data) to .tsv
-        files. These files are stored in the folder 'full_peaklists'.
+        Exports the titration experiments (measured and
+        calculated data) to .tsv files. These files are stored
+        in the folder 'full_peaklists'.
         """
         for item in self.items:
             file_path = '{}/{}.tsv'.format(self.export_tit_folder, item)
             fileout = open(file_path, 'w')
-            fileout.write(self.loc[item].to_csv(sep='\t', index=False, na_rep='NaN', float_format='%.4f'))
+            fileout.write(self.loc[item].to_csv(sep='\t',
+                                                index=False,
+                                                na_rep='NaN',
+                                                float_format='%.4f'))
             fileout.close()
-            fsut.write_log('*** File saved {}\n'.format(file_path))#('/'.join(file_path.split('/')[-2:])))
+            fsut.write_log('*** File saved {}\n'.format(file_path))
     
     def set_item_colors(self, items, series, d):
+        """
+        Creates a list of colors based on a series of items and a
+        dictionary to translate the series keys to a value.
+        """
         for i, it in enumerate(items):
             if series[i] in d.keys():
                 it.set_color(d[series[i]])
             else:
                 continue
     
-    def text_marker(self, ax, axbar, series, d, yy_scale, fs=3, orientation='horizontal'):
+    def text_marker(self, ax, axbar, series, d, yy_scale,
+                          fs=3,
+                          orientation='horizontal'):
+        """Places a text mark over the bars of a Bar Plot."""
         def vpos_sign(x, y):
+            """Scales to the vertical position positive and negative."""
             if y>=0:
                 return x
             else:
                 return (x*-1)-(yy_scale/20)
         
         def hpos_sign(x, y):
+            """Scales to the horizontal position positive and negative."""
             if y >= 0:
                 return x+(yy_scale/20)
             else:
@@ -302,12 +348,10 @@ class Titration(pd.Panel):
                 elif orientation == 'horizontal':
                     vpos = vpos_sign(bar.get_height(), y0)
                     hpos = bar.get_x() + bar.get_width() / 2.5
-                ax.text(hpos, vpos, d[series[i]], ha='center', va='bottom', fontsize=fs)
+                ax.text(hpos, vpos, d[series[i]],
+                        ha='center', va='bottom', fontsize=fs)
             else:
                 continue
-        else:
-            return
-        ##########
     
     def plot_threshold(self, ax, series, color, lw, alpha,
                        orientation = 'horizontal'):
