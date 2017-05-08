@@ -10,8 +10,18 @@ calculated_params = [fsuv.calccol_name_PosF1_delta,
 
 
 param_settings_d = {
-'plot_param_flag':    [fsuv.plots_PosF1_delta, fsuv.plots_PosF2_delta, fsuv.plots_CSP, fsuv.plots_Height_ratio, fsuv.plots_Volume_ratio],
-'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta, fsuv.yy_label_PosF2_delta, fsuv.yy_label_CSP, fsuv.yy_label_Height_ratio, fsuv.yy_label_Volume_ratio],
+'plot_param_flag':    [fsuv.plots_PosF1_delta,
+                       fsuv.plots_PosF2_delta,
+                       fsuv.plots_CSP,
+                       fsuv.plots_Height_ratio,
+                       fsuv.plots_Volume_ratio],
+                       
+'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta,
+                       fsuv.yy_label_PosF2_delta,
+                       fsuv.yy_label_CSP,
+                       fsuv.yy_label_Height_ratio,
+                       fsuv.yy_label_Volume_ratio],
+                       
 'plot_yy_axis_scale': [(-fsuv.yy_scale_PosF1_delta, fsuv.yy_scale_PosF1_delta),
                        (-fsuv.yy_scale_PosF2_delta, fsuv.yy_scale_PosF2_delta),
                        (0, fsuv.yy_scale_CSP),

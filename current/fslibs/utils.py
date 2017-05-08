@@ -3,10 +3,11 @@ import farseer_user_variables as fsuv
 def write_title(title, onlytitle=False):
     '''
     :param onlytitle: False to identify is is only to generate title
-                or to print to log
+                      or to print to log
     '''
     
-    str2write = '\n\n\n{}\n{:^80}\n{}\n'.format(titlesperator, title, titlesperator)
+    str2write = '\n\n\n{}\n{:^80}\n{}\n'.format(titlesperator,
+                                                title, titlesperator)
     
     if onlytitle:
         return str2write

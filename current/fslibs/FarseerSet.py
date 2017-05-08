@@ -29,13 +29,16 @@ class FarseerSet:
         Initiates the object,
         
         :spectra_path: the path where the spectra (.csv files) are located.
-                       spectra/ folder has to have the titration logical hirarchy
-        :has_sidechains: bool whether the .csv contain information on sidechains residues
-        :applyFASTA: bool whether to complete the sequence according to a FASTA file
+                       spectra/ folder has to have the titration logical
+                       hirarchy
+        :has_sidechains: bool whether the .csv contain information on
+                         sidechains residues
+        :applyFASTA: bool whether to complete the sequence according to
+                     a FASTA file
         :FASTAstart: the number of the first residue in the FASTA file
         """
         
-        # Decomposed the spectra/ path
+        # Decomposing the spectra/ path
         # self.paths will be used in load_experiments()
         # http://stackoverflow.com/questions/14798220/how-can-i-search-sub-folders-using-glob-glob-module-in-python
         self.paths = sorted([os.path.join(dirpath, f) \
@@ -63,8 +66,10 @@ class FarseerSet:
         self.yycoords = None
         self.xxcoords = None
         
-        # Flags if there are more than 1 data point in each axis (a.k.a. titration condition)
-        # if no more than 1 data point is found, there is no activity on that dimension
+        # Flags if there are more than 1 data point in each axis
+        # (a.k.a. titration condition)
+        # if no more than 1 data point is found,
+        # there is no activity on that dimension
         self.haszz = False
         self.hasyy = False
         self.hasxx = False
@@ -119,7 +124,8 @@ class FarseerSet:
             elif parts[-1].lower().endswith('.pre'):
                 pass
             else:
-                raise ValueError('@@@ There is a file in spectra with other extension than .csv, .fasta or .pre')
+                raise ValueError('@@@ There is a file in spectra\
+ with other extension than .csv, .fasta or .pre')
         
         fsut.write_log(fsut.titlesperator)
     
@@ -128,14 +134,16 @@ class FarseerSet:
          str -> pd.DataFrame
 
         :param FASTApath: the FASTA file path
-        :param start: the residue number of the first residue in the FASTA file
+        :param start: the residue number of the first residue in the
+                      FASTA file
         :param logfilename: the log file name
-        :return: pd.DataFrame containing the information in the FASTA file
+        :return: pd.DataFrame containing the information in
+                 the FASTA file
 
         PROCEDURE:
 
-        Reads the FASTA file and generates a 5 column DataFrame with the
-        information on the FASTA file ready to be incorporated in the peaklists
+        Reads the FASTA file and generates a 5 column DataFrame
+        with the information ready to be incorporated in the peaklists
         dataframes.
 
         """
@@ -185,10 +193,10 @@ class FarseerSet:
     
     def coordinates_list(self):
         """
-        Identifies the points in each dimension of the titration. In othe words:
-        How many conditions must be analysed.
+        Identifies the points in each dimension of the titration.
+        In othe words: How many conditions must be analysed.
         
-        It is a necessary condition that the names of the data points for
+        It is necessary that the names of the data points for
         one dimension (condition) are the same in the other dimensions.
         
         Example of a seq file mandatory hierarchy:
@@ -253,7 +261,8 @@ class FarseerSet:
             self.hasyy = True
         
         # keys for all the conditions in the 1st dimension - lowest level
-        self.xxcoords = sorted(self.allpeaklists[self.zzcoords[0]][self.yycoords[0]])
+        self.xxcoords = \
+            sorted(self.allpeaklists[self.zzcoords[0]][self.yycoords[0]])
         self.xxref = self.xxcoords[0]
         if len(self.xxcoords) > 1:
             self.hasxx = True
@@ -271,9 +280,10 @@ class FarseerSet:
     
     def tricicle(self, zz, yy, xx, exec_func, args=[], kwargs={}):
         """
-        Executes a function over the nested dictionary. FarseerSet() functions
-        operate on each pd.DataFrame (loaded .csv), therefore tricicle() is a
-        way to perform an action over all the DataFrames (spectra).
+        Executes a function over the nested dictionary.
+        FarseerSet() functions operate on each pd.DataFrame,
+        therefore tricicle() is a way to perform an action over
+        all the DataFrames (spectra).
         
         :zz, yy, xx: the lists of dimension points
         :exec_func: the name of the function to executed
@@ -296,15 +306,16 @@ class FarseerSet:
                     # tmp_vars is a helper variable that is useful for
                     # some functions
                     #
-                    #The exec_func operated on the pd.DataFrame, therefore, x, y and x are
-                    #passed to the function so that the pd.DataFrame can be indexed in the
-                    #dictionary.
+                    #The exec_func that operates on the pd.DataFrame,
+                    #therefore, x, y and x are
+                    #passed to the function so that the pd.DataFrame
+                    # can be indexed in the dictionary.
                     tmp_vars = exec_func(z, y, x, tmp_vars, *args, **kwargs)
 
 
     def split_res_info(self, z, y ,x, tmp_vars):
         """
-        This function receives a DataFrame with the original information
+        Receives a DataFrame with the original information
         of the peaklist and adds four columns to this DataFrame:
 
         ['Res#', '1-letter', '3-letter', 'Peak Status']
@@ -334,8 +345,8 @@ class FarseerSet:
         'measured'.
         
         4. Sorts the peaklist according to 'Res#' just in case the original
-        .CSV file was not sorted. For correct sorting 'Res#' as to be set astype
-        int and returned back to str.
+        .CSV file was not sorted. For correct sorting 'Res#' as to be set
+        astype int and returned back to str.
 
         (conditional). If sidechains are present in the peaklist:
         identifies the sidechains entries (rows) and counts the number of
@@ -352,14 +363,15 @@ class FarseerSet:
 
         # Step 2)
         # generates 1-letter code column
-        resInfo.loc[:,'1-letter'] = resInfo.loc[:,"3-letter"].map(fsut.aal3tol1.get)
+        resInfo.loc[:,'1-letter'] = \
+            resInfo.loc[:,"3-letter"].map(fsut.aal3tol1.get)
         
         # Step 3)
         # concatenates the original peaklist DataFrame and the new
         # generated dataframe contained the information
         # ['Res#', '1-letter', '3-letter']
-        self.allpeaklists[z][y][x] = pd.concat([self.allpeaklists[z][y][x],\
-                                                resInfo], axis=1)
+        self.allpeaklists[z][y][x] = \
+            pd.concat([self.allpeaklists[z][y][x], resInfo], axis=1)
         
         # Adds the 'Peak Status' Column. All the peaks in the peaklist
         # at this stage are peaks that have been measured and are
@@ -385,7 +397,8 @@ class FarseerSet:
         # sidechains entries always end with an 'a' or 'b' in the AssignF1
         # use of regex: http://www.regular-expressions.info/tutorial.html
         # identify the sidechain rows
-        sidechains_bool = self.allpeaklists[z][y][x].loc[:,'Assign F1'].str.match('\w+[ab]$')
+        sidechains_bool = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F1'].str.match('\w+[ab]$')
         
         # initiates SD counter
         sd_count = {True:0}
@@ -400,13 +413,9 @@ class FarseerSet:
             self.allsidechains[z][y][x] = \
                 self.allpeaklists[z][y][x].loc[sidechains_bool,:]
             
-            # sorts
-            #self.allsidechains[z][y][x].sort_values(by='Assign F1', inplace=True)
-            
             # adds 'a' or 'b'
             self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                 self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
-            
             
             # creates backbone peaklist without sidechains
             self.allpeaklists[z][y][x] = \
@@ -417,10 +426,16 @@ class FarseerSet:
            issubset(self.allpeaklists[z][y][x].columns):
             columns_OK = 'OK'
         
-        # the script does not correct for the fact that the user set no sidechains
-        # but that actually are sidechains, though the log file register such occurrence.
-        str2write = '*** new columns inserted:  {}  *** sidechains user setting: {} ** sidechains identified: {} ** SD count: {}.\n'.\
-            format(columns_OK, self.has_sidechains, (True in sidechains_bool.value_counts()), sd_count[True])
+        # the script does not correct for the fact that the user sets
+        # no sidechains but that actually are sidechains, 
+        # though the log file register such occurrence.
+        str2write = '*** new columns inserted:  {}  \
+*** sidechains user setting: {} \
+** sidechains identified: {} ** SD count: {}.\n'.\
+            format(columns_OK,
+            self.has_sidechains,
+            (True in sidechains_bool.value_counts()),
+            sd_count[True])
         fsut.write_log(str2write)
     
     def correct_shifts(self, z, y, x, ref_data, ref_res='1'):
@@ -451,7 +466,7 @@ class FarseerSet:
             self.allpeaklists[z][y][x].loc[:,'Position F1 original'] =\
                 self.allpeaklists[z][y][x].loc[:,'Position F1']
         
-        # calculates the difference between the reference chemical shift and the
+        # calculates the difference between the reference chemical shift the
         # chemical shift of the reference residue in the present spectrum
         # in case we are analysing the refence spectrum this operation shoul
         # return 0.
@@ -491,8 +506,8 @@ class FarseerSet:
                    fillna_dict, refscoords=None):
         """
         Expands the 'Res#' columns of a target peaklist (seq)
-        according to a reference peaklist (seq). Usually, the reference peaklist
-        is the reference experiment.
+        according to a reference peaklist (seq).
+        Usually, the reference peaklist is the reference experiment.
         
         This function is used to identify the lost residues. That is, residues
         that are in the reference peaklists but not in the target peaklist.
@@ -508,7 +523,6 @@ class FarseerSet:
         else:
             refcz = z
             refcy = y
-            
         
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
@@ -530,10 +544,13 @@ class FarseerSet:
         
         target_seq_dict[z][y][x].loc[:,'Assign F1'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'Assign F1']
-            
+        
         str2write = \
-""" > Template Length[{}|{}|{}] :: {} | Target Initial Length[{}|{}|{}] :: {} | Target final length :: {}
-""".format(refcz, refcy, ref_key, length_ind, z, y, x, length_target_init, length_target_final)
+""" > Template Length[{}|{}|{}] :: {} \
+| Target Initial Length[{}|{}|{}] :: {} \
+| Target final length :: {}
+""".format(refcz, refcy, ref_key, length_ind, z, y, x,
+           length_target_init, length_target_final)
     
         fsut.write_log(str2write)
     
@@ -543,7 +560,8 @@ class FarseerSet:
         """
         pd.DataFrame -> pd.DataFrame(ordered columns):
 
-        Receives a pd.dataframe and organizes the columns for better visualization.
+        Receives a pd.dataframe and
+        organizes the columns for better visualization.
 
         Returns the organized dataframe.
         """
@@ -648,23 +666,14 @@ class FarseerSet:
     
     def gen_Farseer_cube(self, use_sidechains=False):
         """
-        Creates a pd.Panel5D with the information of all the parsed peaklists
-        From this panel, the information will be accessed and used to create the
-        titration objects, upon each the calculations will be performed.
+        Creates a pd.Panel5D with the information of all
+        the parsed peaklists from this panel, the information will
+        be accessed and used to create the titration objects,
+        upon each the calculations will be performed.
         
         If there are sidechains, creates a Panel5D for the sidechains, which
         are treated separately from the backbone atoms.
         """
-        #Panel5D = pd.core.panelnd.create_nd_panel_factory(klass_name='Panel5D',
-                                                  #orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
-                                                  #slices={'labels': 'labels',
-                                                          #'items': 'items',
-                                                          #'major_axis': 'major_axis',
-                                                          #'minor_axis': 'minor_axis'},
-                                                  #slicer=pd.Panel4D,
-                                                  #aliases={'major': 'index', 'minor': 'minor_axis'},
-                                                  #stat_axis=2)
-
         
         self.peaklists_p5d = p5d(self.allpeaklists)
         
@@ -673,7 +682,8 @@ class FarseerSet:
             
         fsut.write_log('OK!')
     
-    def write_parsed_pkl(self, z, y, x, tmp_vars, peaklists, tsv_path='Backbone/parsed_peaklists'):
+    def write_parsed_pkl(self, z, y, x, tmp_vars, peaklists,
+                         tsv_path='Backbone/parsed_peaklists'):
         """
         Writes the parsed peaklists to .tsv files.
         """
@@ -686,10 +696,10 @@ class FarseerSet:
         tsv_output = open(tsv_file, 'w')
         
         tsv_output.write(\
-            peaklists[z][y][x].to_csv(sep="\t", na_rep='NaN', float_format='%.4f', index=False))
+            peaklists[z][y][x].to_csv(sep="\t", na_rep='NaN',
+                                      float_format='%.4f', index=False))
         
         fsut.write_log('> writen: {}\n'.format(tsv_file))
-                
         tsv_output.close()
     
     def gen_titration(self, titpanel, D_attributes):
@@ -703,14 +713,16 @@ class FarseerSet:
              
         # activates the titration attibutes
         tmp.create_titration_attributes(**D_attributes)
-        #tmp.resonance_type = res_type
         return tmp
     
-    def gen_titration_dict(self, panelT, tittype, owndim_pts, nextdims1, nextdims2, reso_type):
+    def gen_titration_dict(self, panelT, tittype, owndim_pts,
+                           nextdims1, nextdims2, reso_type):
         '''
-        :panelT: the pd.Panel5D storing all the information of the titration set
-                 transposed so that the items are the observed dimension.
-        :tittype: defines whether we are analysing the first, the 2nd o the 3rd dim/condition.
+        :panelT: the pd.Panel5D storing all the information of the
+                 titration set transposed so that the items are the
+                 observed dimension.
+        :tittype: defines whether we are analysing the first,
+                  the 2nd o the 3rd dim/condition.
         :owndim_pts: the points in the titype dimension.
         :nextdims1: the points in the next dimension of the titype.
         :nextdims2: the points in the 2nd next dimension.
@@ -718,9 +730,9 @@ class FarseerSet:
         
         
         Generates a dictionary that stores the titrations corresponding to the
-        analysis of a given condition (1D, 2D or 3D). The generated dictionary
-        has main key equal to the 2nd next dimension, subkey equal to the next dimension
-        and stores a Titration object fsT.
+        analysis of a given condition (1D, 2D or 3D).
+        The generated dictionary has main key equal to the 2nd next dimension,
+        subkey equal to the next dimension and stores a Titration object fsT.
         
         Therefore the dictionary[1D] stores all the experiments along the first
         dimension/condition.
@@ -735,7 +747,6 @@ class FarseerSet:
         D_attributes['tittype'] = tittype
         D_attributes['owndim_pts'] = owndim_pts
         
-        
         for dim2_pts in nextdims2:
             fsut.write_log(fsut.dim_sperator(dim2_pts, 'top'))
             D.setdefault(dim2_pts, {})
@@ -749,7 +760,6 @@ class FarseerSet:
                 
                 fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         return D
-    
     
 
 if __name__ == '__main__':
