@@ -11,8 +11,8 @@ FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
 cs_correction_res_ref = 76  # To which residue?
 #
-has_sidechains = True  # Are there sidechain entries in the peaklists?
-use_sidechains = True  # Do you want to analyse those sidechains?
+has_sidechains = False  # Are there sidechain entries in the peaklists?
+use_sidechains = False  # Do you want to analyse those sidechains?
 #
 expand_lost_yy = False  # Considers lost residue over yy references and xx reference
 expand_lost_zz = False  # Considers lost residue over zz references and xx reference
@@ -29,9 +29,9 @@ csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
 cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
-perform_resevo_fit = False  # Fit parameter evolution over titration experiment
+perform_resevo_fit = True  # Fit parameter evolution over titration experiment
 #
-titration_x_values = [0,12.5, 25, 37.5, 50, 75, 100, 150, 300] # values for the x axis in the fitting procedure (ex. Ligand concentration)
+titration_x_values = [0, 125, 250, 500, 1000, 2000, 2500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 #
 ## Perform PRE analysis
 apply_PRE_analysis = False
@@ -51,18 +51,18 @@ tag_ls='-'
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restrains to Plot:
-plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
 plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
-plots_CSP = False  # Plot combined chemical shift perturbation data
+plots_CSP = True  # Plot combined chemical shift perturbation data
 plots_Height_ratio = False  # Plot Height ratio data
 plots_Volume_ratio = False  # Plot Volume ratio data
 #
 # Ploting Templates
-plots_extended_bar = True  # Represent data in Extended Bar Plot style
+plots_extended_bar = False  # Represent data in Extended Bar Plot style
 plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
-plots_vertical_bar = True # Represent data in Vertical Bar Plot style
-plots_residue_evolution = True  # Represent Data Evolution per Residue style
-plots_cs_scatter = True  # Represent chemical shift scatter data
+plots_vertical_bar = False # Represent data in Vertical Bar Plot style
+plots_residue_evolution = False  # Represent Data Evolution per Residue style
+plots_cs_scatter = False  # Represent chemical shift scatter data
 #
 # Y Axis Label for each restraint
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
@@ -261,8 +261,8 @@ cs_scatter_mk_type='color' # 'color' or 'shape'
 cs_scatter_mk_start_color='#cdcdcd' # start color for gradient [in hex notation] - color style
 cs_scatter_mk_end_color='#000000' # end color for gradient [in hex notation] - color style
 cs_scatter_markers=['^','>','v','<','s','p','h','8','*','D']  # sequencial markers
-cs_scatter_mk_color='none'  # marker inside color for shape style
-cs_scatter_mk_edgecolors='black'  # marker edge color for shape style
+cs_scatter_mk_color=['none']  # marker inside color for shape style - SHOULD BE LIST
+cs_scatter_mk_edgecolors=['black']  # marker edge color for shape style - SHOULD BE LIST
 cs_scatter_mk_lost_color='red'  # color for lost data points - color style
 #
 ### DELTA PRE Heat Maps

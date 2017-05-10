@@ -1213,7 +1213,7 @@ farseer_user_variables.py does not match the number of data points for cond1')
                      mk_start_color='#cdcdcd',
                      mk_end_color='#000000',
                      markers=['^','>','v','<','s','p','h','8','*','D'],
-                     mk_color='none',
+                     mk_color=['none'],
                      mk_edgecolors='black',
                      mk_lost_color='red'):
         """
@@ -1268,6 +1268,8 @@ farseer_user_variables.py does not match the number of data points for cond1')
                           fontname=y_label_fn,
                           weight=y_label_weight)
         
+        
+        
         # check assignment
         # if residue is unassigned, identifies in the subplot
         if self.ix[0,row_number,'Peak Status'] == 'unassigned':
@@ -1291,22 +1293,23 @@ farseer_user_variables.py does not match the number of data points for cond1')
         if mk_type == 'shape':
             # represents the points in different shapes
             mcycle = it.cycle(markers)
-            
-            for j in self.items:
+            mk_color = mk_color * len(self.items)
+            mk_edgecolors = mk_edgecolors * len(self.items)
+            for k, j in enumerate(self.items):
                 if self.ix[j,i,'Peak Status'] == 'lost':
                     axs[i].scatter(self.ix[j,i,'H1_delta'],
                                    self.ix[j,i,'N15_delta'],
                                    marker=next(mcycle),
                                    s=mksize,
-                                   color=mk_color,
-                                   edgecolors=mk_edge_lost)
+                                   color=mk_color[k],
+                                   edgecolors=mk_lost_color)
                 
                 else:
                     axs[i].scatter(self.ix[j,i,'H1_delta'],
                                    self.ix[j,i,'N15_delta'],
                                    marker=next(mcycle),
-                                   s=mksize, color=mk_color,
-                                   edgecolors=mk_edgecolors)
+                                   s=mksize, color=mk_color[k],
+                                   edgecolors=mk_edgecolors[k])
         
         elif mk_type == 'color':
             # represents the points as circles with a gradient of color
@@ -1350,6 +1353,10 @@ farseer_user_variables.py does not match the number of data points for cond1')
         axs[i].set_xlim(xlimmin, xlimmax)
         axs[i].set_ylim(ylimmin, ylimmax)
         
+        ## Invert axes for representation as in a spectrum
+        axs[i].invert_xaxis()
+        axs[i].invert_yaxis()
+        
         set_tick_labels()
         
         # draws axis 0 dotted line
@@ -1363,6 +1370,7 @@ farseer_user_variables.py does not match the number of data points for cond1')
                       linestyles='-', linewidth=1)
         axs[i].vlines(0,-scale,scale, colors='darkblue',
                       linestyles='-', linewidth=1)
+        
     
     def plot_DPRE_heatmap(self, calccol, fig, axs, i, experiment,
                           y_lims=(0,1),
