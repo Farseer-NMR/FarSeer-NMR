@@ -1,6 +1,6 @@
 # How to read the results
 
-## Where are results stored?
+## Where are the results stored?
 
 Results are stored in the *Spectrum Path* defined in the *Settings Tab*.
 
