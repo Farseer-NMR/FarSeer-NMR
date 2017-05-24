@@ -7,59 +7,54 @@ def init_data_frame(protein_len=140):
     Generates a data frame with the characteristics of a CCPNMRv2
     peaklist.
     """
-    pklcolumns = ['Position F1',
-                'Position F2',
-                'Height',
-                'Volume',
-                'Line Width F1 (Hz)',
-                'Line Width F2 (Hz)',
-                'Fit Method',
-                'Vol. Method',
-                'Assign F1',
-                'Assign F2',
-                'Merit',
-                'Details',
-                '#',
-                'index']
+    pklcolumns = ['#',
+                 'index',
+                 'Position F1',
+                 'Position F2',
+                 'Height',
+                 'Volume',
+                 'Line Width F1 (Hz)',
+                 'Line Width F2 (Hz)',
+                 'Fit Method',
+                 'Vol. Method',
+                 'Assign F1',
+                 'Assign F2',
+                 'Merit',
+                 'Details'
+                  ]
     resindex = range(protein_len)
-
-    df = pd.DataFrame(columns=pklcolumns, index=resindex)
-    df.loc[:,'Position F1'] = \
-        np.random.random_integers(6000, high=10000, size=protein_len)/1000
-    df.loc[:,'Position F2'] = \
-        np.random.random_integers(100000, high=135000, size=protein_len)/1000
-
+    
+    # creates a random protein
     random_protein = gen_random_protein(protein_len)
-    df.loc[:,'Assign F1'] = \
-        np.array(\
-            assign_nomenclature(\
-                random_protein,
-                atom_type='H')
-                )
-
-    df.loc[:,'Assign F2'] = \
-        np.array(\
-            assign_nomenclature(\
-                random_protein,
-                atom_type='N')
-                )
-
-    df.loc[:,'Merit'] = '1.0'
-    df.loc[:,'Details'] = 'None'
-    df.loc[:,'#'] = np.arange(protein_len)
-    df.loc[:,'index'] = np.arange(protein_len)
-    df.loc[:,'Fit Method'] = 'parabolic'
-    df.loc[:,'Vol. Method'] = 'box sum'
-
-    df.loc[:,'Line Width F1 (Hz)'] = \
-        np.random.random_integers(10000, high=50000, size=protein_len)/1000
-    df.loc[:,'Line Width F2 (Hz)'] = \
-        np.random.random_integers(10000, high=50000, size=protein_len)/1000
-
-    df.loc[:,'Height'] = \
-        np.random.random_integers(9000, high=10000, size=protein_len)
-    df.loc[:,'Volume'] = \
-        np.random.random_integers(9000, high=10000, size=protein_len)
+    
+    dfdict = {
+        '#':np.arange(protein_len),
+        'index':np.arange(protein_len),
+        'Position F1': \
+            np.random.random_integers(6000, high=10000, size=protein_len)/1000,
+        'Position F2': \
+            np.random.random_integers(100000, high=135000, size=protein_len)/1000,
+        'Assign F1': \
+            np.array(assign_nomenclature(random_protein,atom_type='H')),
+        'Assign F2': \
+            np.array(assign_nomenclature(random_protein,atom_type='N')),
+        'Line Width F1 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=protein_len)/1000,
+        'Line Width F2 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=protein_len)/1000,
+        'Height': \
+            np.random.random_integers(9000, high=10000, size=protein_len),
+        'Volume': \
+            np.random.random_integers(9000, high=10000, size=protein_len),
+        'Merit': '1.0',
+        'Details':'None',
+        'Fit Method':'parabolic',
+        'Vol. Method':'box sum'
+            }
+            
+    
+    df = pd.DataFrame(dfdict)
+    
     return df
 
 def assign_nomenclature(protein, atom_type='H'):
@@ -90,16 +85,19 @@ def assign_nomenclature(protein, atom_type='H'):
                     "V": "Val"}
 
     list_of_residues = \
-        ["{}{}{}".format(i,
-                         aal1tol3[random.choice(protein)],
+        ["{}{}{}".format(i+1,
+                         aal1tol3[res],
                          atom_type)
-        for i in range(1, len(protein)+1)]
-
+        for i, res in enumerate(protein)]
+    
+    print(list_of_residues)
     return list_of_residues
 
 def gen_random_protein(length=140):
     aminoacids = 'ARNDCEQGHILKMFPSTWYV'
-    protein = [random.choice(aminoacids) for i in range(1, length+1)]
+    protein =['M']
+    protein += [random.choice(aminoacids) for i in range(1, length)]
+    print(protein)
     return protein
 
 def add_noise(pkl, range=0.1, where='Position F1'):
@@ -175,6 +173,10 @@ if __name__ == '__main__':
 
     list_of_cond3_datapoints = ['dia', 'para']
 
+    ref = init_data_frame(protein_len)
+    ref.to_csv('reference.csv', index=False)
+
+
     # # initiates absolute reference peaklists
     # absolute_reference = init_data_frame(protein_len)
     #
@@ -189,14 +191,14 @@ if __name__ == '__main__':
 
 
 
-    ligand1 = {'0_ref': init_data_frame(protein_len)}
-    ligand2 = {'0_ref': ligand1['0_ref'].copy()}
-    ligand3 = {'0_ref': ligand1['0_ref'].copy()}
-
-    # generates titrations
-    ligand1 = gen_titration(ligand1, list_of_cond1_datapoints)
-    ligand2 = gen_titration(ligand2, list_of_cond1_datapoints)
-    ligand3 = gen_titration(ligand3, list_of_cond1_datapoints)
+    # ligand1 = {'0_ref': init_data_frame(protein_len)}
+    # ligand2 = {'0_ref': ligand1['0_ref'].copy()}
+    # ligand3 = {'0_ref': ligand1['0_ref'].copy()}
+    #
+    # # generates titrations
+    # ligand1 = gen_titration(ligand1, list_of_cond1_datapoints)
+    # ligand2 = gen_titration(ligand2, list_of_cond1_datapoints)
+    # ligand3 = gen_titration(ligand3, list_of_cond1_datapoints)
 
 
 
