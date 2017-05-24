@@ -481,6 +481,7 @@ FASTA starting residue: {}
             self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                 self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
             
+            
             self.allsidechains[z][y][x].reset_index(inplace=True)
             
             # creates backbone peaklist without sidechains
@@ -667,6 +668,7 @@ FASTA starting residue: {}
 
         Returns the organized dataframe.
         """
+        print(peaklist[z][y][x].columns)
         if performed_cs_correction and not(sidechains):
             col_order = ['Res#',
                          '1-letter',
@@ -685,6 +687,7 @@ FASTA starting residue: {}
                          'Assign F2',
                          'Details',
                          '#',
+                         'Number',
                          'index',
                          'Position F1 original',
                          'Position F2 original',
@@ -710,6 +713,7 @@ FASTA starting residue: {}
                          'Assign F2',
                          'Details',
                          '#',
+                         'Number',
                          'index',
                          'Position F1 original',
                          'Position F2 original',
@@ -733,6 +737,7 @@ FASTA starting residue: {}
                          'Assign F1',
                          'Assign F2',
                          'Details',
+                         'Number',
                          '#',
                          'index']
         
@@ -754,6 +759,7 @@ FASTA starting residue: {}
                          'Assign F1',
                          'Assign F2',
                          'Details',
+                         'Number',
                          '#',
                          'index']
         
