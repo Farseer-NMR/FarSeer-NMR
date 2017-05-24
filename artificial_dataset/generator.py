@@ -28,8 +28,6 @@ def init_data_frame(protein_len=140):
     random_protein = gen_random_protein(protein_len)
     
     dfdict = {
-        '#':np.arange(protein_len),
-        'index':np.arange(protein_len),
         'Position F1': \
             np.random.random_integers(6000, high=10000, size=protein_len)/1000,
         'Position F2': \
@@ -45,17 +43,80 @@ def init_data_frame(protein_len=140):
         'Height': \
             np.random.random_integers(9000, high=10000, size=protein_len),
         'Volume': \
-            np.random.random_integers(9000, high=10000, size=protein_len),
-        'Merit': '1.0',
-        'Details':'None',
-        'Fit Method':'parabolic',
-        'Vol. Method':'box sum'
+            np.random.random_integers(9000, high=10000, size=protein_len)
             }
-            
     
-    df = pd.DataFrame(dfdict)
     
-    return df
+    
+    dfbb = pd.DataFrame(dfdict)
+    
+    # prepare sidechains
+    
+    sd_mask = dfbb.loc[:,'Assign F1'].str[-4:].isin(['AsnH','GlnH', 'TrpH'])
+    sdbase = dfbb.loc[sd_mask,:]
+    sdsize = sdbase.shape[0]
+    print(sdbase)
+    
+    dfsddict = {
+        'Position F1': \
+            np.random.random_integers(6000, high=7500, size=sdsize)/1000,
+        'Position F2': \
+            np.random.random_integers(100000, high=115000, size=sdsize)/1000,
+        'Assign F1': \
+            np.array(assign_nomenclature_sd(sdbase.loc[:,'Assign F1'])),
+        'Assign F2': \
+            np.array(assign_nomenclature_sd(sdbase.loc[:,'Assign F1'])),
+        'Line Width F1 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=sdsize)/1000,
+        'Line Width F2 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=sdsize)/1000,
+        'Height': \
+            np.random.random_integers(9000, high=10000, size=sdsize),
+        'Volume': \
+            np.random.random_integers(9000, high=10000, size=sdsize)
+            }
+    
+    sdbase = pd.DataFrame(dfsddict)
+    
+    
+    sd_mask = dfbb.loc[:,'Assign F1'].str[-4:].isin(['AsnH','GlnH'])
+    sdbase2 = dfbb.loc[sd_mask,:]
+    sdsize2 = dfbb.loc[sd_mask,:].shape[0]
+    
+    dfsddict2 = {
+        'Position F1': \
+            np.random.random_integers(6000, high=7500, size=sdsize2)/1000,
+        'Position F2': \
+            np.random.random_integers(100000, high=115000, size=sdsize2)/1000,
+        'Assign F1': \
+            np.array(assign_nomenclature_sd(sdbase2.loc[:,'Assign F1'], atom='b')),
+        'Assign F2': \
+            np.array(assign_nomenclature_sd(sdbase2.loc[:,'Assign F1'], atom='b')),
+        'Line Width F1 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=sdsize2)/1000,
+        'Line Width F2 (Hz)': \
+            np.random.random_integers(10000, high=50000, size=sdsize2)/1000,
+        'Height': \
+            np.random.random_integers(9000, high=10000, size=sdsize2),
+        'Volume': \
+            np.random.random_integers(9000, high=10000, size=sdsize2)
+            }
+    sdbase2 = pd.DataFrame(dfsddict2)
+    
+    pkl = pd.concat((dfbb, sdbase, sdbase2), axis=0, ignore_index=True, copy=True)
+    #print(pkl)
+    #
+    pkl.sort_values('Assign F1', inplace=True)
+    
+    pkl.loc[:,'Merit'] = '1.0'
+    pkl.loc[:,'Detail'] = 'None'
+    pkl.loc[:,'Volume'] = 'box sum'
+    pkl.loc[:,'Fit. Method'] = 'parabolic'
+    pkl.loc[:,'#'] = np.arange(pkl.shape[0])
+    pkl.loc[:,'Number'] = np.arange(pkl.shape[0])
+    
+    #print(dfsd)
+    return pkl
 
 def assign_nomenclature(protein, atom_type='H'):
     """
@@ -92,6 +153,23 @@ def assign_nomenclature(protein, atom_type='H'):
     
     print(list_of_residues)
     return list_of_residues
+
+def assign_nomenclature_sd(listofres, atom='a'):
+    
+    sddict = {
+        'Asn':'d',
+        'Gln':'e',
+        'Trp':'e'
+             }
+    def addsd(s):
+        if s[:-1][-3:] in ['Asn', 'Gln']:
+            return s + sddict[s[:-1][-3:]] + '2' + atom
+        elif s[:-1][-3:] == 'Trp': 
+            return s+sddict['Trp']+'1' + atom
+    
+    listofsd = [addsd(res) for res in listofres]
+    
+    return listofsd
 
 def gen_random_protein(length=140):
     aminoacids = 'ARNDCEQGHILKMFPSTWYV'
