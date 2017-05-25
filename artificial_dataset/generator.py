@@ -17,13 +17,13 @@ def gen_random_protein(length=140):
     # the protein sequence in a list
     protein += [random.choice(aminoacids) for i in range(1, length)]
     # the protein sequence in a string
-    protein_fasta = "".join(protein)
+    protein = "".join(protein)
     # breaking the protein sequence
     ## ++++++++++++++
-    chunks, chunk_size = len(protein_fasta), len(protein_fasta)//4
+    chunks, chunk_size = len(protein), len(protein)//4
     # generating a string with the broke protein sequence
     protein_fasta = '\n'.join(\
-        [protein_fasta[i:i+chunk_size] for i in range(0, chunks, chunk_size)])
+        [protein[i:i+chunk_size] for i in range(0, chunks, chunk_size)])
     ## ++++++++++++++
     
     # the string of the fasta file with the most difficult case
@@ -38,7 +38,7 @@ def gen_random_protein(length=140):
     with open('seq.fasta', 'w') as ff:
         ff.write(protein_fasta)
     
-    return protein_fasta
+    return protein
     
 def gen_assign(pseq, atom_type='H'):
     """
@@ -84,7 +84,7 @@ def gen_numbers(inf, sup, size, decimal=1000):
                                         )/decimal
     return numbers
 
-def gen_str_values(pkl,
+def gen_str_values(plen,
                    merit='1.0',
                    details='None',
                    fit='parabolic',
@@ -92,48 +92,143 @@ def gen_str_values(pkl,
     """
     Generates string values for information columns in peaklist
     
+    :plen: int, the length of the protein.
+    
     returns
         :d: a dictionary
     """
     d = {
-        '#':np.arange(pkl.shape[0]),
-        'Number':np.arange(pkl.shape[0]),
+        '#':np.arange(plen),
+        'Number':np.arange(plen),
         'Merit':merit,
         'Details':details,
-        'Fit Method':parabolic,
-        'Vol. Method':vbox
+        'Fit Method':fit,
+        'Vol. Method':vol
         }
     
     return d
 
-def gen_init_values(plen):
+def gen_data_values(protein):
     """
     Generates the initial values of a peaklist.
+    
+    :protein: str, protein sequence 'MGLW...'
     
     return
         :d: a dictionary
     """
     
+    plen = len(protein)
+    
     # generates initial values
     d = {
-    'Assign F1':gen_assign(protein, atom_type='H')
-    'Assign F2':gen_assign(protein, atom_type='N')
-    pos1 = gen_numbers(6, 10, plen)
-    pos2 = gen_numbers(105, 135, plen)
-    hig = gen_numbers(1, 100, plen, decimal=100000)
-    vol = gen_numbers(1, 100, plen, decimal=100000)
-    lw1 = gen_numbers(5, 50, plen, decimal=1000)
-    lw2 = gen_numbers(5, 50, plen, decimal=1000)
+    'Assign F1':gen_assign(protein, atom_type='H'),
+    'Assign F2':gen_assign(protein, atom_type='N'),
+    'Position F1':gen_numbers(6, 10, plen),
+    'Position F2':gen_numbers(105, 135, plen),
+    'Height':gen_numbers(1, 100, plen, decimal=100000),
+    'Volume':gen_numbers(1, 100, plen, decimal=100000),
+    'Line Width F1 (Hz)':gen_numbers(5, 50, plen, decimal=1000),
+    'Line Width F2 (Hz)':gen_numbers(5, 50, plen, decimal=1000)
+    }
     
+    return d
+
+def add_sidechains(pkl):
+    """
+    Identifies all residues with NH sidechains and generates the
+    sidechains entries in the dataframe
     
+    according to nomenclature
+    
+    AsnH2a, AsnH2b, GlnH2a, GlnH2b, TrpH2a
+    AsnN2a, AsnN2b, GlnN2a, GlnN2b, TrpN2a
+    
+    :pkl: pd.Dataframe, a peaklist without sidechains
+    
+    returns
+        :pkl: pd.Dataframe, with added sidechains rows
+    """
+    # two types of side chains, Asn and Gln have two signals
+    # Trp has only one
+    maskAG = pkl.loc[:,'Assign F1'].str[-4:].isin(['AsnH','GlnH'])
+    maskW = pkl.loc[:,'Assign F1'].str[-4:].isin(['TrpH'])
+    
+    # temporary dataframes
+    sd_df_2a = pkl.loc[maskAG,:]
+    sd_df_2b = pkl.loc[maskAG,:]
+    sd_df_1a = pkl.loc[maskW,:]
+    
+    # add the additional strings that identify the sidechain
+    sd_df_2a.loc[:,'Assign F1'] += '2a'
+    sd_df_2a.loc[:,'Assign F2'] += '2a'
+    sd_df_2b.loc[:,'Assign F1'] += '2b'
+    sd_df_2b.loc[:,'Assign F2'] += '2b'
+    sd_df_1a.loc[:,'Assign F1'] += '1a'
+    sd_df_1a.loc[:,'Assign F2'] += '1a'
+    
+    # nitrogen chemical shift is the same of 'a' and 'b'
+    nitrogen = gen_numbers(105, 115, sd_df_2a.shape[0])
+    sd_df_2a.loc[:,'Position F1'] = gen_numbers(6, 8, sd_df_2a.shape[0])
+    sd_df_2a.loc[:,'Position F2'] = nitrogen
+    sd_df_2b.loc[:,'Position F1'] = gen_numbers(6, 8, sd_df_2b.shape[0])
+    sd_df_2b.loc[:,'Position F2'] = nitrogen
+    sd_df_1a.loc[:,'Position F1'] = gen_numbers(9, 10, sd_df_1a.shape[0])
+    sd_df_1a.loc[:,'Position F2'] = gen_numbers(130, 135, sd_df_1a.shape[0])
+    
+    # concatenates the tmp dataframes
+    sd_df = pd.concat([sd_df_2a, sd_df_2b, sd_df_1a], ignore_index=True)
+    
+    # adds new values for the other parameters
+    sdlen = sd_df.shape[0]  # number of rows
+    sd_df.loc[:,'Height'] = gen_numbers(1, 100, sdlen, decimal=100000)
+    sd_df.loc[:,'Volume'] = gen_numbers(1, 100, sdlen, decimal=100000)
+    sd_df.loc[:,'Line Width F1 (Hz)'] = gen_numbers(5, 50, sdlen, decimal=1000)
+    sd_df.loc[:,'Line Width F2 (Hz)'] = gen_numbers(5, 50, sdlen, decimal=1000)
+    
+    pkl = pd.concat([pkl, sd_df], ignore_index=True)
+    pkl.sort_values('Assign F1', inplace=True)
     
     return pkl
 
 
-
 if __name__ == '__main__':
-    # generates protein sequence
-    protein = gen_random_protein(length=int(sys.argv[1]))
+    # generates random protein sequence
+    if len(sys.argv) == 2:
+        protein = gen_random_protein(length=int(sys.argv[1]))
+    
+        # generates the reference peaklist
+        refpkl = pd.DataFrame({**gen_data_values(protein),
+                               **gen_str_values(len(protein))})
+        
+        refpkl = add_sidechains(refpkl)
+        
+        col_list=['Number',
+             '#',
+             'Position F1',
+             'Position F2',
+             'Assign F1',
+             'Assign F2',
+             'Height',
+             'Volume',
+             'Line Width F1 (Hz)',
+             'Line Width F2 (Hz)',
+             'Merit',
+             'Details',
+             'Fit Method',
+             'Vol. Method'
+            ]
+        
+        refpkl.to_csv('reference.csv',
+                      index=False,
+                      index_label=False,
+                      columns=col_list)
+    
+    elif len(sys.argv) == 3:
+        
+        refpkl = pd.read_csv(sys.argv[2])
+    
+    
     
     
 
