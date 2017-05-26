@@ -24,8 +24,7 @@ class VerticalBarPopup(QDialog):
             self.vars = vars["vert_bar_settings"]
         self.defaults = defaults["vert_bar_settings"]
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page")
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page")
+
         self.apply_status = LabelledCheckbox(self, text="Apply Status")
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
         self.lost_bar_colour = ColourBox(self, text="Missing Bar Colour")
@@ -40,6 +39,7 @@ class VerticalBarPopup(QDialog):
         self.proline_marker = LabelledLineEdit(self, text="Proline Marker")
         self.user_details = LabelledCheckbox(self, "Mark User Details")
         self.user_mark_font_size = LabelledSpinBox(self, "User Mark Font Size")
+        self.colour_user_details = LabelledCheckbox(self, "Colour User Details")
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)
