@@ -122,6 +122,7 @@ def gen_data_values(protein):
     
     # generates initial values
     d = {
+    'Res#':range(1, len(protein)+1),
     'Assign F1':gen_assign(protein, atom_type='H'),
     'Assign F2':gen_assign(protein, atom_type='N'),
     'Position F1':gen_numbers(6, 10, plen),
@@ -207,6 +208,14 @@ def add_noise(series, p=0.1):
         - data_percent/2
     
     return series + noise
+    
+def add_signal(series, maxc=0.3):
+    factor = random.uniform(0.1,5)
+    s = np.random.exponential(factor, size=len(series))
+    s.sort()
+    s = s/s[-1]
+    series = series + maxc * s
+    return series
 
 if __name__ == '__main__':
     
@@ -262,12 +271,28 @@ if __name__ == '__main__':
     
     tp = pd.Panel(ddf)
     
+    # add noise
     tp.loc[:,:,'Position F1'] = tp.loc[:,:,'Position F1'].apply(lambda x: add_noise(x, p=0.1), axis=0)
     tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: add_noise(x, p=0.02), axis=0)
     tp.loc[:,:,'Height'] = tp.loc[:,:,'Height'].apply(lambda x: add_noise(x, p=10), axis=0)
     tp.loc[:,:,'Volume'] = tp.loc[:,:,'Volume'].apply(lambda x: add_noise(x, p=10), axis=0)
     tp.loc[:,:,'Line Width F1 (Hz)'] = tp.loc[:,:,'Line Width F1 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
     tp.loc[:,:,'Line Width F2 (Hz)'] = tp.loc[:,:,'Line Width F2 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
+    
+    # add chemical shift changes
+    rmin = 15
+    rmax = 35
+    mask_cs = refpkl.loc[:,'Res#'].isin(range(rmin, rmax +1))
+    tp.loc[:,mask_cs,'Position F1'] = \
+        tp.loc[:,mask_cs,'Position F1'].\
+            apply(lambda x: add_signal(x, maxc=0.2), axis=1)
+    
+    tp.loc[:,mask_cs,'Position F2'] = \
+        tp.loc[:,mask_cs,'Position F2'].\
+            apply(lambda x: add_signal(x, maxc=1), axis=1)
+    
+    
+    #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: hill(x, p=0.02), axis=1)
     
     for df in tp.items:
         tp.loc[df,:,:].to_csv('{}/{}.csv'.format(spectra_folder, df),

@@ -1,4 +1,4 @@
-****** LOG STARTED ** 2017/05/26 - 12:51:59
+****** LOG STARTED ** 2017/05/26 - 14:41:51
 
 
 *******************************************************************************
@@ -52,13 +52,13 @@ FASTA starting residue: 1
              IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN             
 *******************************************************************************
 
-[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][1_0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][2_0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][3_0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][4_1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][5_2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
-[298][L1][6_4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][1_0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][2_0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][3_0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][4_1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][5_2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
+[298][L1][6_4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 18
 
 
 *******************************************************************************
@@ -160,4 +160,4 @@ Generated titration [298][L1] | with points ['0_ref', '1_0125', '2_0250', '3_050
 ** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/Vol_ratio/Vol_ratio_bar_extended.pdf
 
 
-****** LOG ENDED ** 2017/05/26 - 12:52:13
+****** LOG ENDED ** 2017/05/26 - 14:42:04
