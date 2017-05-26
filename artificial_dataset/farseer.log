@@ -1,0 +1,113 @@
+****** LOG STARTED ** 2017/05/26 - 10:32:59
+
+
+*******************************************************************************
+                             Initiates Farseer Set                             
+*******************************************************************************
+
+
+path: /home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra
+side chains: True
+FASTA starting residue: 1
+
+
+
+*******************************************************************************
+                          READING INPUT FILES *.csv*                           
+*******************************************************************************
+
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/0_ref.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_pkl.csv
+
+
+*******************************************************************************
+                          READING INPUT FILES *.csv*                           
+*******************************************************************************
+
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/0_ref.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_pkl.csv
+
+
+*******************************************************************************
+                        IDENTIFIED TITRATION VARIABLES                         
+*******************************************************************************
+
+> 1st titration variables (cond1): ['0_ref', '1_pkl']
+> 2nd titration variables (cond2): ['L1']
+> 3rd titration variables (cond3): ['298']
+
+
+
+*******************************************************************************
+             IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN             
+*******************************************************************************
+
+[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 9
+[298][L1][1_pkl] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 9
+
+
+*******************************************************************************
+                   ADDS LOST RESIDUES BASED ON THE REFERENCE                   
+*******************************************************************************
+
+[298][L1][0_ref] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][1_pkl] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+
+
+*******************************************************************************
+                      ORGANIZING PEAKLIST COLUMNS' ORDER                       
+*******************************************************************************
+
+[298][L1][0_ref] | Columns organized :: OK
+[298][L1][1_pkl] | Columns organized :: OK
+
+
+*******************************************************************************
+                            INITIATING FARSEER CUBE                            
+*******************************************************************************
+
+** Created cube for all the backbone peaklists
+
+
+*******************************************************************************
+                 GENERATING DICTIONARY OF TITRATIONS FOR cond1                 
+*******************************************************************************
+
+Generated titration [298][L1] | with points ['0_ref', '1_pkl']
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/298/L1
+** Calculated H1_delta
+** Calculated N15_delta
+** Calculated CSP
+** Calculated Height_ratio
+** Calculated Vol_ratio
+** Exported peaklists in Backbone/Calculations/cond1/298/L1/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/0_ref_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/1_pkl_H1_delta.att
+** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/N15_delta/N15_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/0_ref_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/1_pkl_N15_delta.att
+** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/CSP/CSP.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/0_ref_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/1_pkl_CSP.att
+** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/Height_ratio/Height_ratio.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/0_ref_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/1_pkl_Height_ratio.att
+** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/Vol_ratio/Vol_ratio.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/0_ref_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/1_pkl_Vol_ratio.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot bar_extended for N15_delta...
+** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/N15_delta/N15_delta_bar_extended.pdf
+** Starting plot bar_extended for CSP...
+** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/CSP/CSP_bar_extended.pdf
+** Starting plot bar_extended for Height_ratio...
+** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/Height_ratio/Height_ratio_bar_extended.pdf
+** Starting plot bar_extended for Vol_ratio...
+** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/Vol_ratio/Vol_ratio_bar_extended.pdf
+
+
+****** LOG ENDED ** 2017/05/26 - 10:33:03

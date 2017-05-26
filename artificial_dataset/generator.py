@@ -191,8 +191,77 @@ def add_sidechains(pkl):
     
     return pkl
 
+def add_noise(series, percent=0.1):
+    """Generates noise vector"""
+    
+    # a given percent of the mean of the input data.    
+    data_percent = series.mean() * percent / 100
+    
+    # Three-by-two array of random numbers from [-5, 0):
+    # >>> 5 * np.random.random_sample((3, 2)) - 5
+    # noise [-data_percent/2, data_percent/2)
+    noise = \
+        data_percent \
+        * np.random.random_sample(size=(series.size,))\
+        - data_percent/2
+    
+    return noise
+    
+def add_noise_macro(pkl):
+    """
+    Adds noise to the type float columns.
+    """
+    # a loop was not created to avoid messing with dicitonary kwargs to pass
+    # different percents for each column... :-P
+    pkl.loc[:,'Position F1'] = \
+        pkl.loc[:,'Position F1'].add(\
+            add_noise(pkl.loc[:,'Position F1'], percent=0.1))
+    
+    pkl.loc[:,'Position F2'] = \
+        pkl.loc[:,'Position F2'].add(\
+            add_noise(pkl.loc[:,'Position F2'], percent=0.1))
+            
+    pkl.loc[:,'Height'] = \
+        pkl.loc[:,'Height'].add(\
+            add_noise(pkl.loc[:,'Height'], percent=10))
+    
+    pkl.loc[:,'Volume'] = \
+        pkl.loc[:,'Volume'].add(\
+            add_noise(pkl.loc[:,'Volume'], percent=10))
+    
+    pkl.loc[:,'Line Width F1 (Hz)'] = \
+        pkl.loc[:,'Line Width F1 (Hz)'].add(\
+            add_noise(pkl.loc[:,'Line Width F1 (Hz)'], percent=1))
+    
+    
+    pkl.loc[:,'Line Width F2 (Hz)'] = \
+        pkl.loc[:,'Line Width F2 (Hz)'].add(\
+            add_noise(pkl.loc[:,'Line Width F2 (Hz)'], percent=1))
+    
+    return pkl
 
 if __name__ == '__main__':
+    
+    
+    col_list=['Number',
+             '#',
+             'Assign F1',
+             'Assign F2',
+             'Position F1',
+             'Position F2',
+             'Height',
+             'Volume',
+             'Line Width F1 (Hz)',
+             'Line Width F2 (Hz)',
+             'Merit',
+             'Details',
+             'Fit Method',
+             'Vol. Method'
+            ]
+    
+    
+    spectra_folder = 'spectra/298/L1'
+    
     # generates random protein sequence
     if len(sys.argv) == 2:
         protein = gen_random_protein(length=int(sys.argv[1]))
@@ -203,23 +272,9 @@ if __name__ == '__main__':
         
         refpkl = add_sidechains(refpkl)
         
-        col_list=['Number',
-             '#',
-             'Position F1',
-             'Position F2',
-             'Assign F1',
-             'Assign F2',
-             'Height',
-             'Volume',
-             'Line Width F1 (Hz)',
-             'Line Width F2 (Hz)',
-             'Merit',
-             'Details',
-             'Fit Method',
-             'Vol. Method'
-            ]
         
-        refpkl.to_csv('reference.csv',
+        
+        refpkl.to_csv('{}/0_ref.csv'.format(spectra_folder),
                       index=False,
                       index_label=False,
                       columns=col_list)
@@ -228,9 +283,14 @@ if __name__ == '__main__':
         
         refpkl = pd.read_csv(sys.argv[2])
     
+    ### create titration sequence
+    # generate peaklists from refpkl adding noise to the data.
+    pkl1 = add_noise_macro(refpkl)
     
-    
-    
+    pkl1.to_csv('{}/1_pkl.csv'.format(spectra_folder),
+                      index=False,
+                      index_label=False,
+                      columns=col_list)
 
 
 
