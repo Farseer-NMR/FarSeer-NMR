@@ -188,14 +188,15 @@ def add_sidechains(pkl):
     
     pkl = pd.concat([pkl, sd_df], ignore_index=True)
     pkl.sort_values('Assign F1', inplace=True)
+    pkl.reset_index(inplace=True)
     
     return pkl
 
-def add_noise(series, percent=0.1):
+def add_noise(series, p=0.1):
     """Generates noise vector"""
     
     # a given percent of the mean of the input data.    
-    data_percent = series.mean() * percent / 100
+    data_percent = series.mean() * p / 100
     
     # Three-by-two array of random numbers from [-5, 0):
     # >>> 5 * np.random.random_sample((3, 2)) - 5
@@ -205,40 +206,7 @@ def add_noise(series, percent=0.1):
         * np.random.random_sample(size=(series.size,))\
         - data_percent/2
     
-    return noise
-    
-def add_noise_macro(pkl):
-    """
-    Adds noise to the type float columns.
-    """
-    # a loop was not created to avoid messing with dicitonary kwargs to pass
-    # different percents for each column... :-P
-    pkl.loc[:,'Position F1'] = \
-        pkl.loc[:,'Position F1'].add(\
-            add_noise(pkl.loc[:,'Position F1'], percent=0.1))
-    
-    pkl.loc[:,'Position F2'] = \
-        pkl.loc[:,'Position F2'].add(\
-            add_noise(pkl.loc[:,'Position F2'], percent=0.1))
-            
-    pkl.loc[:,'Height'] = \
-        pkl.loc[:,'Height'].add(\
-            add_noise(pkl.loc[:,'Height'], percent=10))
-    
-    pkl.loc[:,'Volume'] = \
-        pkl.loc[:,'Volume'].add(\
-            add_noise(pkl.loc[:,'Volume'], percent=10))
-    
-    pkl.loc[:,'Line Width F1 (Hz)'] = \
-        pkl.loc[:,'Line Width F1 (Hz)'].add(\
-            add_noise(pkl.loc[:,'Line Width F1 (Hz)'], percent=1))
-    
-    
-    pkl.loc[:,'Line Width F2 (Hz)'] = \
-        pkl.loc[:,'Line Width F2 (Hz)'].add(\
-            add_noise(pkl.loc[:,'Line Width F2 (Hz)'], percent=1))
-    
-    return pkl
+    return series + noise
 
 if __name__ == '__main__':
     
@@ -262,6 +230,8 @@ if __name__ == '__main__':
     
     spectra_folder = 'spectra/298/L1'
     
+    data_points = ['1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
+    
     # generates random protein sequence
     if len(sys.argv) == 2:
         protein = gen_random_protein(length=int(sys.argv[1]))
@@ -274,10 +244,10 @@ if __name__ == '__main__':
         
         
         
-        refpkl.to_csv('{}/0_ref.csv'.format(spectra_folder),
-                      index=False,
-                      index_label=False,
-                      columns=col_list)
+        #refpkl.to_csv('{}/0_ref.csv'.format(spectra_folder),
+                      #index=False,
+                      #index_label=False,
+                      #columns=col_list)
     
     elif len(sys.argv) == 3:
         
@@ -285,12 +255,36 @@ if __name__ == '__main__':
     
     ### create titration sequence
     # generate peaklists from refpkl adding noise to the data.
-    pkl1 = add_noise_macro(refpkl)
     
-    pkl1.to_csv('{}/1_pkl.csv'.format(spectra_folder),
-                      index=False,
-                      index_label=False,
-                      columns=col_list)
+    ddf = {'0_ref':refpkl}
+    for k in data_points:
+        ddf.setdefault(k, refpkl)
+    
+    tp = pd.Panel(ddf)
+    
+    tp.loc[:,:,'Position F1'] = tp.loc[:,:,'Position F1'].apply(lambda x: add_noise(x, p=0.1), axis=0)
+    tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: add_noise(x, p=0.02), axis=0)
+    tp.loc[:,:,'Height'] = tp.loc[:,:,'Height'].apply(lambda x: add_noise(x, p=10), axis=0)
+    tp.loc[:,:,'Volume'] = tp.loc[:,:,'Volume'].apply(lambda x: add_noise(x, p=10), axis=0)
+    tp.loc[:,:,'Line Width F1 (Hz)'] = tp.loc[:,:,'Line Width F1 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
+    tp.loc[:,:,'Line Width F2 (Hz)'] = tp.loc[:,:,'Line Width F2 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
+    
+    for df in tp.items:
+        tp.loc[df,:,:].to_csv('{}/{}.csv'.format(spectra_folder, df),
+                              index=False,
+                              index_label=False,
+                              columns=col_list)
+    
+    #apply(lambda x: self.csp_willi(x), axis=2)
+    
+    #pkl1 = add_noise_macro(refpkl)
+    
+    
+    
+    #pkl1.to_csv('{}/1_pkl.csv'.format(spectra_folder),
+                      #index=False,
+                      #index_label=False,
+                      #columns=col_list)
 
 
 

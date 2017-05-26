@@ -1,4 +1,4 @@
-****** LOG STARTED ** 2017/05/26 - 10:32:59
+****** LOG STARTED ** 2017/05/26 - 12:51:59
 
 
 *******************************************************************************
@@ -17,7 +17,12 @@ FASTA starting residue: 1
 *******************************************************************************
 
 /home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/0_ref.csv
-/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_pkl.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/2_0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/3_0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/4_1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/5_2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/6_4000.csv
 
 
 *******************************************************************************
@@ -25,14 +30,19 @@ FASTA starting residue: 1
 *******************************************************************************
 
 /home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/0_ref.csv
-/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_pkl.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/1_0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/2_0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/3_0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/4_1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/5_2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/6_4000.csv
 
 
 *******************************************************************************
                         IDENTIFIED TITRATION VARIABLES                         
 *******************************************************************************
 
-> 1st titration variables (cond1): ['0_ref', '1_pkl']
+> 1st titration variables (cond1): ['0_ref', '1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
 > 2nd titration variables (cond2): ['L1']
 > 3rd titration variables (cond3): ['298']
 
@@ -42,8 +52,13 @@ FASTA starting residue: 1
              IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN             
 *******************************************************************************
 
-[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 9
-[298][L1][1_pkl] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 9
+[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][1_0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][2_0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][3_0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][4_1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][5_2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
+[298][L1][6_4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 7
 
 
 *******************************************************************************
@@ -51,7 +66,12 @@ FASTA starting residue: 1
 *******************************************************************************
 
 [298][L1][0_ref] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
-[298][L1][1_pkl] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][1_0125] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][2_0250] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][3_0500] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][4_1000] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][5_2000] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
+[298][L1][6_4000] vs. [298][L1][0_ref] | Target Initial Length :: 50 * Template Length :: 50 * Target final length :: 50
 
 
 *******************************************************************************
@@ -59,7 +79,12 @@ FASTA starting residue: 1
 *******************************************************************************
 
 [298][L1][0_ref] | Columns organized :: OK
-[298][L1][1_pkl] | Columns organized :: OK
+[298][L1][1_0125] | Columns organized :: OK
+[298][L1][2_0250] | Columns organized :: OK
+[298][L1][3_0500] | Columns organized :: OK
+[298][L1][4_1000] | Columns organized :: OK
+[298][L1][5_2000] | Columns organized :: OK
+[298][L1][6_4000] | Columns organized :: OK
 
 
 *******************************************************************************
@@ -73,7 +98,7 @@ FASTA starting residue: 1
                  GENERATING DICTIONARY OF TITRATIONS FOR cond1                 
 *******************************************************************************
 
-Generated titration [298][L1] | with points ['0_ref', '1_pkl']
+Generated titration [298][L1] | with points ['0_ref', '1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
 
 
 ***** ANALYZING...  Backbone/Calculations/cond1/298/L1
@@ -85,19 +110,44 @@ Generated titration [298][L1] | with points ['0_ref', '1_pkl']
 ** Exported peaklists in Backbone/Calculations/cond1/298/L1/FullPeaklists
 ** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/H1_delta/H1_delta.tsv
 ** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/0_ref_H1_delta.att
-** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/1_pkl_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/1_0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/2_0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/3_0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/4_1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/5_2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/H1_delta/6_4000_H1_delta.att
 ** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/N15_delta/N15_delta.tsv
 ** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/0_ref_N15_delta.att
-** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/1_pkl_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/1_0125_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/2_0250_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/3_0500_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/4_1000_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/5_2000_N15_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/N15_delta/6_4000_N15_delta.att
 ** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/CSP/CSP.tsv
 ** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/0_ref_CSP.att
-** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/1_pkl_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/1_0125_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/2_0250_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/3_0500_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/4_1000_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/5_2000_CSP.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/CSP/6_4000_CSP.att
 ** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/Height_ratio/Height_ratio.tsv
 ** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/0_ref_Height_ratio.att
-** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/1_pkl_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/1_0125_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/2_0250_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/3_0500_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/4_1000_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/5_2000_Height_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Height_ratio/6_4000_Height_ratio.att
 ** Data table saved: Backbone/Calculations/cond1/298/L1/TablesAndPlots/Vol_ratio/Vol_ratio.tsv
 ** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/0_ref_Vol_ratio.att
-** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/1_pkl_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/1_0125_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/2_0250_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/3_0500_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/4_1000_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/5_2000_Vol_ratio.att
+** Chimera Att file saved: Backbone/Calculations/cond1/298/L1/ChimeraAttributeFiles/Vol_ratio/6_4000_Vol_ratio.att
 ** Starting plot bar_extended for H1_delta...
 ** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
 ** Starting plot bar_extended for N15_delta...
@@ -110,4 +160,4 @@ Generated titration [298][L1] | with points ['0_ref', '1_pkl']
 ** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/Vol_ratio/Vol_ratio_bar_extended.pdf
 
 
-****** LOG ENDED ** 2017/05/26 - 10:33:03
+****** LOG ENDED ** 2017/05/26 - 12:52:13
