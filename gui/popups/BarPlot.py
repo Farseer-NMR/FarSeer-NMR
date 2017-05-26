@@ -41,50 +41,21 @@ class VerticalBarPopup(QDialog):
         self.user_mark_font_size = LabelledSpinBox(self, "User Mark Font Size")
         self.colour_user_details = LabelledCheckbox(self, "Colour User Details")
 
-
-        self.layout().addWidget(self.bar_cols, 0, 0)
-        self.layout().addWidget(self.bar_rows, 1, 0)
-        self.layout().addWidget(self.apply_status, 2, 0)
-        self.layout().addWidget(self.meas_bar_colour, 3, 0)
-        self.layout().addWidget(self.lost_bar_colour, 4, 0)
-        self.layout().addWidget(self.unassigned_bar_colour, 5, 0)
-        self.layout().addWidget(self.bar_width, 6, 0)
-        self.layout().addWidget(self.bar_alpha, 7, 0)
-        self.layout().addWidget(self.bar_linewidth, 8, 0)
-        self.layout().addWidget(self.bar_title_y, 9, 0)
-        self.layout().addWidget(self.bar_title_font_size, 10, 0)
-        self.layout().addWidget(self.bar_title_font, 11, 0)
-        self.layout().addWidget(self.bar_threshold, 12, 0)
-
-        self.layout().addWidget(self.bar_threshold_linewidth, 0, 1)
-        self.layout().addWidget(self.bar_threshold_colour, 1, 1)
-        self.layout().addWidget(self.x_label_font, 2, 1)
-        self.layout().addWidget(self.x_label_font_size, 3, 1)
-        self.layout().addWidget(self.x_label_font_weight, 4, 1)
-        self.layout().addWidget(self.x_label_padding, 5, 1)
-        self.layout().addWidget(self.x_tick_font_size, 6, 1)
-        self.layout().addWidget(self.x_tick_font, 7, 1)
-        self.layout().addWidget(self.x_tick_padding, 8, 1)
-        self.layout().addWidget(self.x_tick_length, 9, 1)
-
-        self.layout().addWidget(self.y_label_font, 10, 1)
-        self.layout().addWidget(self.y_label_font_size, 11, 1)
-        self.layout().addWidget(self.y_label_font_weight, 12, 1)
-        self.layout().addWidget(self.y_label_rotation, 13, 1)
-
-
-        self.layout().addWidget(self.y_label_padding, 0, 2)
-        self.layout().addWidget(self.y_tick_font_size, 1, 2)
-        self.layout().addWidget(self.y_tick_font, 2, 2)
-        self.layout().addWidget(self.y_tick_padding, 3, 2)
-        self.layout().addWidget(self.y_tick_rotation, 4, 2)
-        self.layout().addWidget(self.x_grid_colour, 5, 2)
-        self.layout().addWidget(self.markProlines, 6, 2)
-        self.layout().addWidget(self.proline_marker, 7, 2)
-        self.layout().addWidget(self.user_details, 8, 2)
-        self.layout().addWidget(self.user_mark_font_size, 9, 2)
-
-
+        self.layout().addWidget(self.apply_status, 0, 0)
+        self.layout().addWidget(self.meas_bar_colour, 1, 0)
+        self.layout().addWidget(self.lost_bar_colour, 2, 0)
+        self.layout().addWidget(self.unassigned_bar_colour, 3, 0)
+        self.layout().addWidget(self.bar_width, 4, 0)
+        self.layout().addWidget(self.bar_alpha, 5, 0)
+        self.layout().addWidget(self.bar_linewidth, 6, 0)
+        self.layout().addWidget(self.bar_threshold, 0, 1)
+        self.layout().addWidget(self.bar_threshold_linewidth, 1, 1)
+        self.layout().addWidget(self.bar_threshold_colour, 2, 1)
+        self.layout().addWidget(self.markProlines, 3, 1)
+        self.layout().addWidget(self.proline_marker, 4, 1)
+        self.layout().addWidget(self.user_details, 5, 1)
+        self.layout().addWidget(self.user_mark_font_size, 6, 1)
+        self.layout().addWidget(self.colour_user_details, 7, 1)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
@@ -92,7 +63,7 @@ class VerticalBarPopup(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 15, 2, 1, 2)
+        self.layout().addWidget(self.buttonBox, 8, 2, 1, 2)
 
         if vars:
             self.get_values()
