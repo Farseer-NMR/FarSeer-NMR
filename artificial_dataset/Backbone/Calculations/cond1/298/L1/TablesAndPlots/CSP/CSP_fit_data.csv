@@ -1,0 +1,21 @@
+Res#,1-letter,3-letter,Peak Status,fit,ymax,yhalf,kd,n_hill
+1,M,Met,measured,OK,0.167,0.083,2629.022,0.824
+2,R,Arg,measured,OK,0.100,0.050,10151.358,0.923
+3,T,Thr,measured,Failed,,,,
+4,T,Thr,measured,OK,0.139,0.070,9165.602,1.351
+5,T,Thr,measured,OK,0.154,0.077,3911.752,1.349
+6,W,Trp,measured,OK,0.195,0.098,3385.392,3.032
+7,R,Arg,measured,OK,0.306,0.153,6204.644,1.905
+8,Y,Tyr,measured,Failed,,,,
+9,Y,Tyr,measured,Failed,,,,
+10,S,Ser,measured,Failed,,,,
+11,K,Lys,measured,OK,0.282,0.141,182.631,4.625
+12,I,Ile,measured,OK,0.267,0.133,370.079,2.625
+13,Q,Gln,measured,OK,0.023,0.012,490.511,1.921
+14,T,Thr,measured,OK,0.155,0.078,1115.942,1.556
+15,L,Leu,measured,OK,0.061,0.030,1172.692,0.576
+16,V,Val,measured,OK,0.160,0.080,1454.090,3.748
+17,A,Ala,measured,OK,0.045,0.022,761.682,0.599
+18,K,Lys,measured,OK,0.106,0.053,2094.280,2.124
+19,T,Thr,measured,OK,0.290,0.145,2589.788,0.790
+20,S,Ser,measured,OK,0.221,0.111,2306.640,2.471

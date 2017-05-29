@@ -5,7 +5,7 @@ logfile_name = 'farseer.log' #  the name of the log file
 ####################################
 
 ### Input Data Setup
-applyFASTA = False  # complete the sequence with a FASTA file?
+applyFASTA = True  # complete the sequence with a FASTA file?
 FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
 perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
@@ -29,7 +29,7 @@ csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
 cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
-perform_resevo_fit = False  # Fit parameter evolution over titration experiment
+perform_resevo_fit = True  # Fit parameter evolution over titration experiment
 #
 titration_x_values = [0, 125, 250, 500, 1000, 2000, 4000] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 #
@@ -54,14 +54,14 @@ chimera_att_select_format = ':'  # format to select residues in Chimera
 plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
 plots_PosF2_delta = True # Plot nuclei 2 shift perturbation data
 plots_CSP = True  # Plot combined chemical shift perturbation data
-plots_Height_ratio = True  # Plot Height ratio data
-plots_Volume_ratio = True  # Plot Volume ratio data
+plots_Height_ratio = False  # Plot Height ratio data
+plots_Volume_ratio = False  # Plot Volume ratio data
 #
 # Ploting Templates
-plots_extended_bar = True  # Represent data in Extended Bar Plot style
-plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
+plots_extended_bar = False  # Represent data in Extended Bar Plot style
+plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
-plots_residue_evolution = False  # Represent Data Evolution per Residue style
+plots_residue_evolution = True  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
 plots_cs_scatter_flower = False
 #

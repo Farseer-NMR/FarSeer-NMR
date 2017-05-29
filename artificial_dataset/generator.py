@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import sys
 
-def gen_random_protein(length=140):
+def gen_random_protein(length=140, path='spectra/298/L1'):
     """
     Generates a random protein FASTA file of length :length:
     
@@ -35,7 +35,7 @@ def gen_random_protein(length=140):
     print(protein_fasta)
     
     # writes the fasta
-    with open('seq.fasta', 'w') as ff:
+    with open('{}/seq.fasta'.format(path), 'w') as ff:
         ff.write(protein_fasta)
     
     return protein
@@ -209,13 +209,21 @@ def add_noise(series, p=0.1):
     
     return series + noise
     
-def add_signal(series, maxc=0.3):
-    factor = random.uniform(0.1,5)
-    s = np.random.exponential(factor, size=len(series))
-    s.sort()
-    s = s/s[-1]
-    series = series + maxc * s
-    return series
+#def add_signal(series, maxc=0.3):
+    #factor = random.uniform(0.1,5)
+    #s = np.random.exponential(factor, size=len(series))
+    #s = s * np.random.choice([-1,1])
+    #s.sort()
+    #s = s/s[-1]
+    #series = series + maxc * s
+    #return series
+
+def add_signal(series, signal):
+    print(signal)
+    return series + signal
+    
+def signal_hill(L0, Vmax=1, Kd=1, n=1):
+    return (Vmax*L0**n)/(Kd**n+L0**n)
 
 if __name__ == '__main__':
     
@@ -240,15 +248,19 @@ if __name__ == '__main__':
     spectra_folder = 'spectra/298/L1'
     
     data_points = ['1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
+    t_x_v = np.array([0, 125, 250, 500, 1000, 2000, 4000])
     
     # generates random protein sequence
     if len(sys.argv) == 2:
-        protein = gen_random_protein(length=int(sys.argv[1]))
+        protein = gen_random_protein(length=int(sys.argv[1]),
+                                     path=spectra_folder)
     
         # generates the reference peaklist
         refpkl = pd.DataFrame({**gen_data_values(protein),
                                **gen_str_values(len(protein))})
         
+        mask_pro = refpkl.loc[:,'Assign F1'].str[-4:] != 'ProH'
+        refpkl = refpkl.loc[mask_pro,:]
         refpkl = add_sidechains(refpkl)
         
         
@@ -279,17 +291,52 @@ if __name__ == '__main__':
     tp.loc[:,:,'Line Width F1 (Hz)'] = tp.loc[:,:,'Line Width F1 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
     tp.loc[:,:,'Line Width F2 (Hz)'] = tp.loc[:,:,'Line Width F2 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
     
-    # add chemical shift changes
-    rmin = 15
-    rmax = 35
-    mask_cs = refpkl.loc[:,'Res#'].isin(range(rmin, rmax +1))
-    tp.loc[:,mask_cs,'Position F1'] = \
-        tp.loc[:,mask_cs,'Position F1'].\
-            apply(lambda x: add_signal(x, maxc=0.2), axis=1)
+    # add chemical shift changes based on Hill equation
+    # generates vmax between -0.3 and 0.3
+    vmaxh = 0.4 * np.random.random_sample(size=len(refpkl.index)) - 0.2
+    vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
+    # generates Kds
+    kd = np.linspace(t_x_v[0], t_x_v[-1],
+                     num = len(refpkl.index))
+    # generates n between 0 and 5
+    n = 5 * np.random.random_sample(size=len(refpkl.index))
     
-    tp.loc[:,mask_cs,'Position F2'] = \
-        tp.loc[:,mask_cs,'Position F2'].\
-            apply(lambda x: add_signal(x, maxc=1), axis=1)
+    tp.loc[:,:,'Position F1'] = \
+        tp.loc[:,:,'Position F1'].\
+            apply(lambda x: add_signal(x, signal_hill(t_x_v,
+                                                Vmax=vmaxh[x.name],
+                                                Kd=kd[x.name],
+                                                n=n[x.name])),
+                            axis=1)
+    
+    tp.loc[:,:,'Position F2'] = \
+        tp.loc[:,:,'Position F2'].\
+            apply(lambda x: add_signal(x, signal_hill(t_x_v,
+                                                Vmax=vmaxn[x.name],
+                                                Kd=kd[x.name],
+                                                n=n[x.name])),
+                            axis=1)
+    
+    
+    
+    
+    #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: add_noise(x, p=0.02), axis=0)
+    
+    
+    
+    
+    #rmin = 15
+    #rmax = 35
+    #mask_cs = refpkl.loc[:,'Res#'].isin(range(rmin, rmax +1))
+    #tp.loc[:,mask_cs,'Position F1'] = \
+        #tp.loc[:,mask_cs,'Position F1'].\
+            #apply(lambda x: add_signal(x, maxc=0.2), axis=1)
+    
+    #tp.loc[:,mask_cs,'Position F2'] = \
+        #tp.loc[:,mask_cs,'Position F2'].\
+            #apply(lambda x: add_signal(x, maxc=1), axis=1)
+    
+    
     
     
     #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: hill(x, p=0.02), axis=1)
