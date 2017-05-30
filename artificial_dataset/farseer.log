@@ -1,4 +1,4 @@
-****** LOG STARTED ** 2017/05/29 - 20:40:51
+****** LOG STARTED ** 2017/05/30 - 14:06:15
 
 
 *******************************************************************************
@@ -30,7 +30,7 @@ FASTA starting residue: 1
 *******************************************************************************
 
 /home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/298/L1/seq.fasta
-1-MRTTTWRYYSKIQTLVAKTS-20
+1-MSTKCMPTLANESHMVIMFPPQYMYLRRPLNTIRSRTTIHFVTIMWHWRAIGVNVITFESWMCDQRLQSWERIQYVNQEITSLRDNTDSQTTFLDLKMHA-100
 
 
 *******************************************************************************
@@ -60,39 +60,39 @@ FASTA starting residue: 1
              IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN             
 *******************************************************************************
 
-[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][1_0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][2_0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][3_0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][4_1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][5_2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
-[298][L1][6_4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 3
+[298][L1][0_ref] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][1_0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][2_0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][3_0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][4_1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][5_2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
+[298][L1][6_4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 26
 
 
 *******************************************************************************
                    ADDS LOST RESIDUES BASED ON THE REFERENCE                   
 *******************************************************************************
 
-[298][L1][0_ref] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][1_0125] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][2_0250] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][3_0500] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][4_1000] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][5_2000] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][6_4000] vs. [298][L1][0_ref] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
+[298][L1][0_ref] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][1_0125] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][2_0250] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][3_0500] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][4_1000] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][5_2000] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
+[298][L1][6_4000] vs. [298][L1][0_ref] | Target Initial Length :: 96 * Template Length :: 96 * Target final length :: 96
 
 
 *******************************************************************************
                      ADDS LOST RESIDUES BASED ON THE FASTA                     
 *******************************************************************************
 
-[298][L1][0_ref] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][1_0125] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][2_0250] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][3_0500] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][4_1000] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][5_2000] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
-[298][L1][6_4000] vs. [298][L1][seq] | Target Initial Length :: 20 * Template Length :: 20 * Target final length :: 20
+[298][L1][0_ref] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][1_0125] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][2_0250] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][3_0500] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][4_1000] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][5_2000] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
+[298][L1][6_4000] vs. [298][L1][seq] | Target Initial Length :: 96 * Template Length :: 100 * Target final length :: 100
 
 
 *******************************************************************************
@@ -174,4 +174,4 @@ Generated titration [298][L1] | with points ['0_ref', '1_0125', '2_0250', '3_050
 ** Plot Saved Backbone/Calculations/cond1/298/L1/TablesAndPlots/CSP/CSP_res_evo.pdf
 
 
-****** LOG ENDED ** 2017/05/29 - 20:41:06
+****** LOG ENDED ** 2017/05/30 - 14:07:45

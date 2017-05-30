@@ -219,7 +219,7 @@ def add_noise(series, p=0.1):
     #return series
 
 def add_signal(series, signal):
-    print(signal)
+    #print(signal)
     return series + signal
     
 def signal_hill(L0, Vmax=1, Kd=1, n=1):
@@ -291,31 +291,112 @@ if __name__ == '__main__':
     tp.loc[:,:,'Line Width F1 (Hz)'] = tp.loc[:,:,'Line Width F1 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
     tp.loc[:,:,'Line Width F2 (Hz)'] = tp.loc[:,:,'Line Width F2 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
     
-    # add chemical shift changes based on Hill equation
-    # generates vmax between -0.3 and 0.3
-    vmaxh = 0.4 * np.random.random_sample(size=len(refpkl.index)) - 0.2
-    vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
-    # generates Kds
-    kd = np.linspace(t_x_v[0], t_x_v[-1],
-                     num = len(refpkl.index))
-    # generates n between 0 and 5
-    n = 5 * np.random.random_sample(size=len(refpkl.index))
+    ## ADD SIGNAL
     
+    # define regions of interactions
+    
+    r1s = len(refpkl.index)//10
+    r1e = len(refpkl.index)//5
+    
+    r2s = len(refpkl.index)//3
+    r2e = len(refpkl.index) - len(refpkl.index)//2
+    
+    r3s = len(refpkl.index) - len(refpkl.index)//5
+    r3e = len(refpkl.index) - len(refpkl.index)//10
+    
+    r1 = len(refpkl.index[r1s:r1e])
+    r2 = len(refpkl.index[r2s:r2e])
+    r3 = len(refpkl.index[r3s:r3e])
+    
+    # add chemical shift signal
+    # vmax has to be positive or negative because peaks can move either side
+    vmaxbase = 0.05 * np.random.random_sample(size=len(refpkl.index))\
+               - 0.05/2
+    
+    # a random number among the range of x values
+    kdbase = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
+    
+    # n is set to 1 by default
+    nbase = np.ones(len(refpkl.index))
+    
+    # add chemical shift changes based on Hill equation
+    
+    # values for R1, 0.2<vmax<0.3 high, kd low, 2<n<4
+    vmax_r1 = (0.1 * np.random.random_sample(size=r1) + 0.2)\
+              * np.random.choice(np.array([-1,1]), size=(r1,))
+    kd_r1 = t_x_v[-2] * np.random.random_sample(size=r1)
+    n_r1 = 2 * np.random.random_sample(size=r1) + 2
+   
+    vmaxbase[r1s:r1e] = vmax_r1
+    kdbase[r1s:r1e] = kd_r1
+    nbase[r1s:r1e] = n_r1
+
+    # values for R2, 0.1<vmax<0.2, kd high, n = 2
+    vmax_r2 = (0.1 * np.random.random_sample(size=r2) + 0.1)\
+              * np.random.choice(np.array([-1,1]), size=(r2,))
+    kd_r2 = t_x_v[4] * np.random.random_sample(size=r2)
+    n_r2 = np.empty(shape=r2)
+    n_r2.fill(2)
+    
+    vmaxbase[r2s:r2e] = vmax_r2
+    kdbase[r2s:r2e] = kd_r2
+    nbase[r2s:r2e] = n_r2
+    
+    # values for R3, 0.0<vmax<0.1, kd high, n < 2
+    vmax_r3 = (0.1 * np.random.random_sample(size=r3))\
+              * np.random.choice(np.array([-1,1]), size=(r3,))
+    kd_r3 = t_x_v[4] * np.random.random_sample(size=r3)
+    n_r3 = 2 * np.random.random_sample(size=r3)
+    
+    vmaxbase[r3s:r3e] = vmax_r3
+    kdbase[r3s:r3e] = kd_r3
+    nbase[r3s:r3e] = n_r3
+    
+    
+    ## add signal for region 1
     tp.loc[:,:,'Position F1'] = \
         tp.loc[:,:,'Position F1'].\
             apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                Vmax=vmaxh[x.name],
-                                                Kd=kd[x.name],
-                                                n=n[x.name])),
+                                                Vmax=vmaxbase[x.name],
+                                                Kd=kdbase[x.name],
+                                                n=nbase[x.name])),
                             axis=1)
     
+    vmaxbasen = vmaxbase * 5
     tp.loc[:,:,'Position F2'] = \
         tp.loc[:,:,'Position F2'].\
             apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                Vmax=vmaxn[x.name],
-                                                Kd=kd[x.name],
-                                                n=n[x.name])),
+                                                Vmax=vmaxbasen[x.name],
+                                                Kd=kdbase[x.name],
+                                                n=nbase[x.name])),
                             axis=1)
+    
+    ##print(region1, region2, region3, region4)
+    ##print(vmax)
+    ##vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
+    ### generates Kds
+    #kd = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
+    #kd = np.linspace(t_x_v[0], t_x_v[-1],
+                     #num = len(refpkl.index))
+    
+    ### generates n between 0 and 5
+    #n = 5 * np.random.random_sample(size=len(refpkl.index))
+    
+    #tp.loc[:,:,'Position F1'] = \
+        #tp.loc[:,:,'Position F1'].\
+            #apply(lambda x: add_signal(x, signal_hill(t_x_v,
+                                                #Vmax=vmax[x.name],
+                                                #Kd=kd[x.name],
+                                                #n=n[x.name])),
+                            #axis=1)
+    
+    ##tp.loc[:,:,'Position F2'] = \
+        ##tp.loc[:,:,'Position F2'].\
+            ##apply(lambda x: add_signal(x, signal_hill(t_x_v,
+                                                ##Vmax=vmaxn[x.name],
+                                                ##Kd=kd[x.name],
+                                                ##n=n[x.name])),
+                            ##axis=1)
     
     
     
