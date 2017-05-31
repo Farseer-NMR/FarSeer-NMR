@@ -19,6 +19,14 @@ def gen_random_protein(length=140, path='spectra/298/L1'):
     # the protein sequence in a string
     protein = "".join(protein)
     # breaking the protein sequence
+    
+    
+    return protein
+
+def write_protein_fasta(protein, zfolders, yfolders):
+    """
+    :protein: str with the protein sequence
+    """
     ## ++++++++++++++
     chunks, chunk_size = len(protein), len(protein)//4
     # generating a string with the broke protein sequence
@@ -34,12 +42,13 @@ def gen_random_protein(length=140, path='spectra/298/L1'):
     
     print(protein_fasta)
     
-    # writes the fasta
-    with open('{}/seq.fasta'.format(path), 'w') as ff:
-        ff.write(protein_fasta)
-    
-    return protein
-    
+    for zf in zfolders:
+        for yf in yfolders:
+            path = '{}/{}/{}/protein.fasta'.format(spectra_folder, zf, yf)
+            with open(path, 'w') as ff:
+                ff.write(protein_fasta)
+    return
+
 def gen_assign(pseq, atom_type='H'):
     """
     :pseq: string with protein sequence
@@ -318,6 +327,10 @@ def init_Hill_signal(aalen=100,
     kd = np.random.choice(np.array(kdrange), size=(vlen,))
     n = np.random.choice(np.array(nrange), size=(vlen,))
     
+    vmax = np.sort(vmax) * np.random.choice([-1, 1], size=(vlen,))
+    kd = np.sort(kd)
+    n = np.sort(n)
+    
     return vmax, kd, n
 
 def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
@@ -325,7 +338,7 @@ def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
     
     def hill_eq(L0, Vmax=1, Kd=1, n=1):
         y = (Vmax*L0**n)/(Kd**n+L0**n)
-        #print(list(y))
+        print(list(y)[-1])
         return y
     
     tp.loc[:,:,col] = \
@@ -336,7 +349,7 @@ def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
                                                    Kd=kd[x.name],
                                                    n=n[x.name])),
                     axis=1)
-    
+    print('#################')
     return tp
 
 def add_signal_macro(tp, protein, txv):
@@ -354,40 +367,53 @@ def add_signal_macro(tp, protein, txv):
              'r3':(aarange//5*4, aarange)
             }
     
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # a ditionary of bool arrays
+    # sets a bool arrays that define the regions where the signal will be 
+    # added. Sidechains are included.
     region_bool_masks = {}
     for k in sorted(rlist.keys()):
     # define the region
         region_bool_masks[k] = def_signal_region(tp.iloc[0,:,:],
                                                  first=rlist[k][0],
                                                  last=rlist[k][1])
-    
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # a dictionary of tuples of list of floats
+    # sets which signal will be added to which region
     exp_values = \
-            {'r1':(np.linspace(-0.1, 0.1,
+            {'r1':(np.linspace(0.01, 0.2,
                                num=region_bool_masks['r1'].value_counts()[1]), 
                    txv[3], [1]),
-             'r2':(np.array((np.array([0.1]*region_bool_masks['r2'].value_counts()[1])\
-                   *np.random.choice([-1, 1], size=(region_bool_masks['r2'].value_counts()[1]),))),
+            
+            
+             'r2':(np.array([0.1]*region_bool_masks['r2'].value_counts()[1]),
                    np.linspace(txv[1], txv[-1],
                                num=region_bool_masks['r2'].value_counts()[1]),
                    [1]),
-             'r3':(np.array((np.array([0.1]*region_bool_masks['r3'].value_counts()[1])\
-                   *np.random.choice([-1, 1], size=(region_bool_masks['r3'].value_counts()[1]),))),
+            
+            
+             'r3':(np.array([0.1]*region_bool_masks['r3'].value_counts()[1]),
                    txv[3],
                    np.linspace(0.1,3,
                                num=region_bool_masks['r3'].value_counts()[1]))
             }
-    
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # defines the base arrays of signal. Noise signal
     aalen=tp.iloc[0,:,0].size
     vmax_base = pd.Series(np.array([0.01]*aalen)\
                           *np.random.choice([-1, 1], size=(aalen,)))
     kd_base = pd.Series(np.array([txv[-1]]*aalen))
     n_base = pd.Series(np.array([1]*aalen))
-    
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # prepares the arrays with the singal
     for k in sorted(exp_values.keys()):
-        
+        # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         vmax, kd, n = \
             init_Hill_signal(vlen=region_bool_masks[k].value_counts()[1],
                              vmaxrange=exp_values[k][0],
@@ -397,17 +423,35 @@ def add_signal_macro(tp, protein, txv):
         vmax_base.loc[region_bool_masks[k]] = vmax
         kd_base.loc[region_bool_masks[k]] = kd
         n_base.loc[region_bool_masks[k]] = n
-        
-        tp = acquire_signal_Hill(tp, 'Position F1', vmax_base, kd_base, n_base, txv)
-        vmax_baseN = vmax_base*5
-        tp = acquire_signal_Hill(tp, 'Position F2', vmax_baseN, kd_base, n_base, txv)
+        # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # adds the signal
+    tp = acquire_signal_Hill(tp, 'Position F1', vmax_base, kd_base, n_base, txv)
+    vmax_baseN = vmax_base*5
+    tp = acquire_signal_Hill(tp, 'Position F2', vmax_baseN, kd_base, n_base, txv)
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    return tp
+
+def creates_titration(protein, refpkl, datapoints, txv):
+    ### create titration sequence
+    # generate peaklists from refpkl adding noise to the data.
+    tp = gen_t_dict(refpkl, data_points)
+    
+    # add noise
+    tp = add_noise_macro(tp)
+    
+    # add signal
+    tp = add_signal_macro(tp, protein, txv)
     
     return tp
 
 if __name__ == '__main__':
     
-    
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # general set up
     col_list=['Merit',
                          'Position F1',
                          'Position F2',
@@ -424,110 +468,39 @@ if __name__ == '__main__':
                          'Number',
             ]
     
-    spectra_folder = 'spectra/298/L1'
+    spectra_folder = 'spectra/'
+    
+    zfolder = ['298']
+    yfolder = ['L1']
+    
+    ## writes folders +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    for zf in zfolders:
+        for yf in yfolders:
+            folder = '{}/{}/{}'.format(spectra_folder, zf, yf)
+            if not(os.exists(folder)):
+                os.makedirs(folder)
     
     data_points = ['1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
-    t_x_v = np.array([0, 125, 250, 500, 1000, 2000, 4000])
+    txv = np.array([0, 125, 250, 500, 1000, 2000, 4000])
     
+    
+    
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # generates random protein sequence
-    if len(sys.argv) == 2:
-        protein = gen_random_protein(length=int(sys.argv[1]),
-                                     path=spectra_folder)
-    
-        # generates the reference peaklist
-        refpkl = gen_refpkl_macro(protein)
-        
-    elif len(sys.argv) == 3:
-        
-        refpkl = pd.read_csv(sys.argv[2])
-    
-    ### create titration sequence
-    # generate peaklists from refpkl adding noise to the data.
-    tp = gen_t_dict(refpkl, data_points)
-    
-    # add noise
-    tp = add_noise_macro(tp)
-    
-    # add signal
-    
-    tp = add_signal_macro(tp, protein, t_x_v)
-    
-    print(tp)
-    for df in tp.items:
-        pkl_path = '{}/{}.csv'.format(spectra_folder, df)
-        print(pkl_path)
-        tp.loc[df,:,:].to_csv(pkl_path,
-                              index=False,
-                              index_label=False,
-                              columns=col_list)
-    ## add chemical shift signal
-    ## vmax has to be positive or negative because peaks can move either side
-    #vmaxbase = 0.05 * np.random.random_sample(size=len(refpkl.index))\
-               #- 0.05/2
-    
-    ## a random number among the range of x values
-    #kdbase = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
-    
-    ## n is set to 1 by default
-    #nbase = np.ones(len(refpkl.index))
-    
-    ## add chemical shift changes based on Hill equation
-    
-    #print(r1mask.value_counts()[1])
-    
-    ## values for R1, fixed Kd and n, range Vmax -0.3 and 0.3
-    #vmax_r1 = 0.3 * np.random.random_sample(size=r1mask.value_counts()[1])\
-              #* np.random.choice(np.array([-1,1]), size=(r1mask.value_counts()[1],))
-    #kd_r1 = np.ones(shape=r1mask.value_counts()[1])
-    #kd_r1.fill(t_x_v[-3])
-    #n_r1 = np.ones(shape=r1mask.value_counts()[1])
-   
-    #vmaxbase[r1mask] = vmax_r1
-    #kdbase[r1mask] = kd_r1
-    #nbase[r1mask] = n_r1
+    protein = gen_random_protein(length=int(sys.argv[1]), path=spectra_folder)
 
-    ## values for R2, fixed Vmax and n, range Kd.
-    #vmax_r2 = 0.3 * np.random.choice(np.array([-1,1]), size=(r2mask.value_counts()[1],))
-    #kd_r2 = t_x_v[-1] * np.random.random_sample(size=r2mask.value_counts()[1])
-    #n_r2 = np.ones(shape=r2mask.value_counts()[1])
-    #n_r2.fill(2)
+    # generates the reference peaklist
+    refpkl = gen_refpkl_macro(protein)
     
-    #vmaxbase[r2mask] = vmax_r2
-    #kdbase[r2mask] = kd_r2
-    #nbase[r2mask] = n_r2
+    for zf in zfolders:
+        for yf in yfolders:
+        tp = creates_titration(protein, refpkl, datapoints, txv)
     
-    ## values for R3, fixed Vmax and kd, range n.
-    #vmax_r3 = 0.3 * np.random.choice(np.array([-1,1]), size=(r3mask.value_counts()[1],))
-    #kd_r3 = np.ones(shape=r3mask.value_counts()[1])
-    #kd_r3.fill(t_x_v[-3])
-    #n_r3 = 2 * np.random.random_sample(size=r3mask.value_counts()[1])
-    
-    #vmaxbase[r3mask] = vmax_r3
-    #kdbase[r3mask] = kd_r3
-    #nbase[r3mask] = n_r3
-    
-    
-    #
-    
-    ###print(region1, region2, region3, region4)
-    ###print(vmax)
-    ###vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
-    #### generates Kds
-    ##kd = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
-    ##kd = np.linspace(t_x_v[0], t_x_v[-1],
-                     ##num = len(refpkl.index))
-    
-    #### generates n between 0 and 5
-    ##n = 5 * np.random.random_sample(size=len(refpkl.index))
-    
-    
-
-    
-    
-    
-    
-    
-    
-    #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: hill(x, p=0.02), axis=1)
-    
-
+        for df in tp.items:
+            pkl_path = '{}/{}.csv'.format(spectra_folder, df)
+            print(pkl_path)
+            tp.loc[df,:,:].to_csv(pkl_path,
+                                  index=False,
+                                  index_label=False,
+                                  columns=col_list)
+ 

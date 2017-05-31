@@ -80,9 +80,9 @@ calccol_name_Height_ratio = 'Height_ratio'  # column name for Height Ratio data
 calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 #
 # Y axis scale for each calculated restraint
-yy_scale_PosF1_delta = 0.3  # y axis sacle for nuclei 1
+yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
 yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
-yy_scale_CSP = 0.5  # y axis sacle for combined chemical shift
+yy_scale_CSP = 0.3  # y axis sacle for combined chemical shift
 yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
 yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
 yy_scale_nbins=5  # adjusted number of ticks
