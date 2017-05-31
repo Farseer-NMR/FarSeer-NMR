@@ -2,7 +2,7 @@
 #
 # lost peaks :Series([],)
 #
-# unassigned peaks :7,20,21,29
+# unassigned peaks :7,73
 #
 attribute: csp
 match mode: 1-to-1
@@ -25,6 +25,8 @@ recipient: residues
 	:17	0
 	:18	0
 	:19	0
+	:20	0
+	:21	0
 	:22	0
 	:23	0
 	:24	0
@@ -32,6 +34,7 @@ recipient: residues
 	:26	0
 	:27	0
 	:28	0
+	:29	0
 	:30	0
 	:31	0
 	:32	0
@@ -75,7 +78,6 @@ recipient: residues
 	:70	0
 	:71	0
 	:72	0
-	:73	0
 	:74	0
 	:75	0
 	:76	0

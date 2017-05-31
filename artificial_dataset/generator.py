@@ -188,12 +188,45 @@ def add_sidechains(pkl):
     sd_df.loc[:,'Line Width F2 (Hz)'] = gen_numbers(5, 50, sdlen, decimal=1000)
     
     pkl = pd.concat([pkl, sd_df], ignore_index=True)
+    
+    pkl.loc[:,'Res#'] = pkl.loc[:,'Assign F1'].str.extract('([ab])?(\d+)', expand=False)[1]
+    pkl.loc[:,'Res#'] = pkl.loc[:,'Res#'].astype(int)
+    
     pkl.sort_values('Assign F1', inplace=True)
     pkl.reset_index(inplace=True)
     
+    
+    
     return pkl
 
-def add_noise(series, p=0.1):
+def gen_refpkl_macro(protein):
+    """ Generates reference pkl"""
+    refpkl = pd.DataFrame({**gen_data_values(protein),
+                           **gen_str_values(len(protein))})
+    
+    # remove prolines
+    mask_no_pro = refpkl.loc[:,'Assign F1'].str[-4:] != 'ProH'
+    
+    refpkl = refpkl.loc[mask_no_pro,:]
+    refpkl = add_sidechains(refpkl)
+    
+    return refpkl
+
+def gen_t_dict(refpkl, data_points):
+    """
+    Generates a titration series in a pd.Panel that is a copy of the 
+    reference peaklist.
+    """
+    
+    ddf = {'0_ref':refpkl}
+    
+    for k in data_points:
+        ddf.setdefault(k, refpkl)
+    
+    tp = pd.Panel(ddf)
+    return tp
+
+def noise(series, p=0.1):
     """Generates noise vector"""
     
     # a given percent of the mean of the input data.    
@@ -208,42 +241,188 @@ def add_noise(series, p=0.1):
         - data_percent/2
     
     return series + noise
+
+def add_noise(tp, col, percent):
+    """
+    Add noise to a column.
     
-#def add_signal(series, maxc=0.3):
-    #factor = random.uniform(0.1,5)
-    #s = np.random.exponential(factor, size=len(series))
-    #s = s * np.random.choice([-1,1])
-    #s.sort()
-    #s = s/s[-1]
-    #series = series + maxc * s
-    #return series
+    cs p = 0.02
+    intensity = 10
+    lw = 1
+    """
+    
+    tp.loc[:,:,col] = \
+        tp.loc[:,:,col].apply(lambda x: noise(x, p=percent), axis=0)
+        
+    return tp
+
+def add_noise_macro(tp):
+    """
+    Macro that adds noise to a given set of columns,
+    along a titration Panel.
+    """
+    
+    col_noise_dict = {'Position F1':0.02,
+                      'Position F2':0.02,
+                      'Height':10,
+                      'Volume':10,
+                      'Line Width F1 (Hz)':1,
+                      'Line Width F2 (Hz)':1}
+    
+    for k, v in col_noise_dict.items():
+        tp = add_noise(tp, k, v)
+    
+    return tp
 
 def add_signal(series, signal):
-    #print(signal)
+    
     return series + signal
     
-def signal_hill(L0, Vmax=1, Kd=1, n=1):
-    return (Vmax*L0**n)/(Kd**n+L0**n)
+
+def def_signal_region(refpkl, first=1, last=10):
+    """
+    Defines the regions of signal.
+    returns:
+        bool vectors (masks)
+    """
+    
+    reg = range(first, last)
+    regmask = refpkl.loc[:,'Res#'].isin(list(reg))
+    
+    print("""******
+range: {} :: {}
+region: {}
+region len: {}
+bool mask:
+{}""".format(first, last, list(refpkl.loc[regmask,'Res#']),
+                        len(refpkl.loc[regmask,'Res#']),
+                        regmask.value_counts()))
+    
+    return regmask
+
+def init_Hill_signal(aalen=100,
+                     vlen=20,
+                     vmaxrange=[0.3],
+                     kdrange=[1],
+                     nrange=[1]):
+    """
+    Creates an array of values for vmax, kd and n to be passed
+    to the Hill Equation for signal generation.
+    """
+    # a vector with base values with the length of the full peaklist
+    # including sidechains
+    
+    
+    # values for R1, fixed Kd and n, range Vmax -0.3 and 0.3
+    vmax = np.random.choice(np.array(vmaxrange), size=(vlen,))
+    kd = np.random.choice(np.array(kdrange), size=(vlen,))
+    n = np.random.choice(np.array(nrange), size=(vlen,))
+    
+    return vmax, kd, n
+
+def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
+    """Adds the different signals to the different columns"""
+    
+    def hill_eq(L0, Vmax=1, Kd=1, n=1):
+        y = (Vmax*L0**n)/(Kd**n+L0**n)
+        #print(list(y))
+        return y
+    
+    tp.loc[:,:,col] = \
+        tp.loc[:,:,col].\
+            apply(lambda x: add_signal(x,
+                                       hill_eq(txv,
+                                                   Vmax=vmax[x.name],
+                                                   Kd=kd[x.name],
+                                                   n=n[x.name])),
+                    axis=1)
+    
+    return tp
+
+def add_signal_macro(tp, protein, txv):
+    """
+    Macro that adds signal to the titration panel.
+    """
+    
+    collist = ['Position F1']
+    
+    aarange = len(protein)
+    
+    # a dictionary of tuples of int values
+    rlist = {'r1':(aarange//10, aarange//5),
+             'r2':(aarange//3, aarange//3*2),
+             'r3':(aarange//5*4, aarange)
+            }
+    
+    # a ditionary of bool arrays
+    region_bool_masks = {}
+    for k in sorted(rlist.keys()):
+    # define the region
+        region_bool_masks[k] = def_signal_region(tp.iloc[0,:,:],
+                                                 first=rlist[k][0],
+                                                 last=rlist[k][1])
+    
+    # a dictionary of tuples of list of floats
+    exp_values = \
+            {'r1':(np.linspace(-0.1, 0.1,
+                               num=region_bool_masks['r1'].value_counts()[1]), 
+                   txv[3], [1]),
+             'r2':(np.array((np.array([0.1]*region_bool_masks['r2'].value_counts()[1])\
+                   *np.random.choice([-1, 1], size=(region_bool_masks['r2'].value_counts()[1]),))),
+                   np.linspace(txv[1], txv[-1],
+                               num=region_bool_masks['r2'].value_counts()[1]),
+                   [1]),
+             'r3':(np.array((np.array([0.1]*region_bool_masks['r3'].value_counts()[1])\
+                   *np.random.choice([-1, 1], size=(region_bool_masks['r3'].value_counts()[1]),))),
+                   txv[3],
+                   np.linspace(0.1,3,
+                               num=region_bool_masks['r3'].value_counts()[1]))
+            }
+    
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    aalen=tp.iloc[0,:,0].size
+    vmax_base = pd.Series(np.array([0.01]*aalen)\
+                          *np.random.choice([-1, 1], size=(aalen,)))
+    kd_base = pd.Series(np.array([txv[-1]]*aalen))
+    n_base = pd.Series(np.array([1]*aalen))
+    
+    for k in sorted(exp_values.keys()):
+        
+        vmax, kd, n = \
+            init_Hill_signal(vlen=region_bool_masks[k].value_counts()[1],
+                             vmaxrange=exp_values[k][0],
+                             kdrange=exp_values[k][1],
+                             nrange=exp_values[k][2])
+        
+        vmax_base.loc[region_bool_masks[k]] = vmax
+        kd_base.loc[region_bool_masks[k]] = kd
+        n_base.loc[region_bool_masks[k]] = n
+        
+        tp = acquire_signal_Hill(tp, 'Position F1', vmax_base, kd_base, n_base, txv)
+        vmax_baseN = vmax_base*5
+        tp = acquire_signal_Hill(tp, 'Position F2', vmax_baseN, kd_base, n_base, txv)
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    return tp
 
 if __name__ == '__main__':
     
     
-    col_list=['Number',
-             '#',
-             'Assign F1',
-             'Assign F2',
-             'Position F1',
-             'Position F2',
-             'Height',
-             'Volume',
-             'Line Width F1 (Hz)',
-             'Line Width F2 (Hz)',
-             'Merit',
-             'Details',
-             'Fit Method',
-             'Vol. Method'
+    col_list=['Merit',
+                         'Position F1',
+                         'Position F2',
+                         'Height',
+                         'Volume',
+                         'Line Width F1 (Hz)',
+                         'Line Width F2 (Hz)',
+                         'Fit Method',
+                         'Vol. Method',
+                         'Assign F1',
+                         'Assign F2',
+                         'Details',
+                         '#',
+                         'Number',
             ]
-    
     
     spectra_folder = 'spectra/298/L1'
     
@@ -256,461 +435,99 @@ if __name__ == '__main__':
                                      path=spectra_folder)
     
         # generates the reference peaklist
-        refpkl = pd.DataFrame({**gen_data_values(protein),
-                               **gen_str_values(len(protein))})
+        refpkl = gen_refpkl_macro(protein)
         
-        mask_pro = refpkl.loc[:,'Assign F1'].str[-4:] != 'ProH'
-        refpkl = refpkl.loc[mask_pro,:]
-        refpkl = add_sidechains(refpkl)
-        
-        
-        
-        #refpkl.to_csv('{}/0_ref.csv'.format(spectra_folder),
-                      #index=False,
-                      #index_label=False,
-                      #columns=col_list)
-    
     elif len(sys.argv) == 3:
         
         refpkl = pd.read_csv(sys.argv[2])
     
     ### create titration sequence
     # generate peaklists from refpkl adding noise to the data.
-    
-    ddf = {'0_ref':refpkl}
-    for k in data_points:
-        ddf.setdefault(k, refpkl)
-    
-    tp = pd.Panel(ddf)
+    tp = gen_t_dict(refpkl, data_points)
     
     # add noise
-    tp.loc[:,:,'Position F1'] = tp.loc[:,:,'Position F1'].apply(lambda x: add_noise(x, p=0.1), axis=0)
-    tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: add_noise(x, p=0.02), axis=0)
-    tp.loc[:,:,'Height'] = tp.loc[:,:,'Height'].apply(lambda x: add_noise(x, p=10), axis=0)
-    tp.loc[:,:,'Volume'] = tp.loc[:,:,'Volume'].apply(lambda x: add_noise(x, p=10), axis=0)
-    tp.loc[:,:,'Line Width F1 (Hz)'] = tp.loc[:,:,'Line Width F1 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
-    tp.loc[:,:,'Line Width F2 (Hz)'] = tp.loc[:,:,'Line Width F2 (Hz)'].apply(lambda x: add_noise(x, p=1), axis=0)
+    tp = add_noise_macro(tp)
     
-    ## ADD SIGNAL
+    # add signal
     
-    # define regions of interactions
+    tp = add_signal_macro(tp, protein, t_x_v)
     
-    r1s = len(refpkl.index)//10
-    r1e = len(refpkl.index)//5
+    print(tp)
+    for df in tp.items:
+        pkl_path = '{}/{}.csv'.format(spectra_folder, df)
+        print(pkl_path)
+        tp.loc[df,:,:].to_csv(pkl_path,
+                              index=False,
+                              index_label=False,
+                              columns=col_list)
+    ## add chemical shift signal
+    ## vmax has to be positive or negative because peaks can move either side
+    #vmaxbase = 0.05 * np.random.random_sample(size=len(refpkl.index))\
+               #- 0.05/2
     
-    r2s = len(refpkl.index)//3
-    r2e = len(refpkl.index) - len(refpkl.index)//2
+    ## a random number among the range of x values
+    #kdbase = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
     
-    r3s = len(refpkl.index) - len(refpkl.index)//5
-    r3e = len(refpkl.index) - len(refpkl.index)//10
+    ## n is set to 1 by default
+    #nbase = np.ones(len(refpkl.index))
     
-    r1 = len(refpkl.index[r1s:r1e])
-    r2 = len(refpkl.index[r2s:r2e])
-    r3 = len(refpkl.index[r3s:r3e])
+    ## add chemical shift changes based on Hill equation
     
-    # add chemical shift signal
-    # vmax has to be positive or negative because peaks can move either side
-    vmaxbase = 0.05 * np.random.random_sample(size=len(refpkl.index))\
-               - 0.05/2
+    #print(r1mask.value_counts()[1])
     
-    # a random number among the range of x values
-    kdbase = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
-    
-    # n is set to 1 by default
-    nbase = np.ones(len(refpkl.index))
-    
-    # add chemical shift changes based on Hill equation
-    
-    # values for R1, 0.2<vmax<0.3 high, kd low, 2<n<4
-    vmax_r1 = (0.1 * np.random.random_sample(size=r1) + 0.2)\
-              * np.random.choice(np.array([-1,1]), size=(r1,))
-    kd_r1 = t_x_v[-2] * np.random.random_sample(size=r1)
-    n_r1 = 2 * np.random.random_sample(size=r1) + 2
+    ## values for R1, fixed Kd and n, range Vmax -0.3 and 0.3
+    #vmax_r1 = 0.3 * np.random.random_sample(size=r1mask.value_counts()[1])\
+              #* np.random.choice(np.array([-1,1]), size=(r1mask.value_counts()[1],))
+    #kd_r1 = np.ones(shape=r1mask.value_counts()[1])
+    #kd_r1.fill(t_x_v[-3])
+    #n_r1 = np.ones(shape=r1mask.value_counts()[1])
    
-    vmaxbase[r1s:r1e] = vmax_r1
-    kdbase[r1s:r1e] = kd_r1
-    nbase[r1s:r1e] = n_r1
+    #vmaxbase[r1mask] = vmax_r1
+    #kdbase[r1mask] = kd_r1
+    #nbase[r1mask] = n_r1
 
-    # values for R2, 0.1<vmax<0.2, kd high, n = 2
-    vmax_r2 = (0.1 * np.random.random_sample(size=r2) + 0.1)\
-              * np.random.choice(np.array([-1,1]), size=(r2,))
-    kd_r2 = t_x_v[4] * np.random.random_sample(size=r2)
-    n_r2 = np.empty(shape=r2)
-    n_r2.fill(2)
+    ## values for R2, fixed Vmax and n, range Kd.
+    #vmax_r2 = 0.3 * np.random.choice(np.array([-1,1]), size=(r2mask.value_counts()[1],))
+    #kd_r2 = t_x_v[-1] * np.random.random_sample(size=r2mask.value_counts()[1])
+    #n_r2 = np.ones(shape=r2mask.value_counts()[1])
+    #n_r2.fill(2)
     
-    vmaxbase[r2s:r2e] = vmax_r2
-    kdbase[r2s:r2e] = kd_r2
-    nbase[r2s:r2e] = n_r2
+    #vmaxbase[r2mask] = vmax_r2
+    #kdbase[r2mask] = kd_r2
+    #nbase[r2mask] = n_r2
     
-    # values for R3, 0.0<vmax<0.1, kd high, n < 2
-    vmax_r3 = (0.1 * np.random.random_sample(size=r3))\
-              * np.random.choice(np.array([-1,1]), size=(r3,))
-    kd_r3 = t_x_v[4] * np.random.random_sample(size=r3)
-    n_r3 = 2 * np.random.random_sample(size=r3)
+    ## values for R3, fixed Vmax and kd, range n.
+    #vmax_r3 = 0.3 * np.random.choice(np.array([-1,1]), size=(r3mask.value_counts()[1],))
+    #kd_r3 = np.ones(shape=r3mask.value_counts()[1])
+    #kd_r3.fill(t_x_v[-3])
+    #n_r3 = 2 * np.random.random_sample(size=r3mask.value_counts()[1])
     
-    vmaxbase[r3s:r3e] = vmax_r3
-    kdbase[r3s:r3e] = kd_r3
-    nbase[r3s:r3e] = n_r3
-    
-    
-    ## add signal for region 1
-    tp.loc[:,:,'Position F1'] = \
-        tp.loc[:,:,'Position F1'].\
-            apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                Vmax=vmaxbase[x.name],
-                                                Kd=kdbase[x.name],
-                                                n=nbase[x.name])),
-                            axis=1)
-    
-    vmaxbasen = vmaxbase * 5
-    tp.loc[:,:,'Position F2'] = \
-        tp.loc[:,:,'Position F2'].\
-            apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                Vmax=vmaxbasen[x.name],
-                                                Kd=kdbase[x.name],
-                                                n=nbase[x.name])),
-                            axis=1)
-    
-    ##print(region1, region2, region3, region4)
-    ##print(vmax)
-    ##vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
-    ### generates Kds
-    #kd = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
-    #kd = np.linspace(t_x_v[0], t_x_v[-1],
-                     #num = len(refpkl.index))
-    
-    ### generates n between 0 and 5
-    #n = 5 * np.random.random_sample(size=len(refpkl.index))
-    
-    #tp.loc[:,:,'Position F1'] = \
-        #tp.loc[:,:,'Position F1'].\
-            #apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                #Vmax=vmax[x.name],
-                                                #Kd=kd[x.name],
-                                                #n=n[x.name])),
-                            #axis=1)
-    
-    ##tp.loc[:,:,'Position F2'] = \
-        ##tp.loc[:,:,'Position F2'].\
-            ##apply(lambda x: add_signal(x, signal_hill(t_x_v,
-                                                ##Vmax=vmaxn[x.name],
-                                                ##Kd=kd[x.name],
-                                                ##n=n[x.name])),
-                            ##axis=1)
+    #vmaxbase[r3mask] = vmax_r3
+    #kdbase[r3mask] = kd_r3
+    #nbase[r3mask] = n_r3
     
     
+    #
+    
+    ###print(region1, region2, region3, region4)
+    ###print(vmax)
+    ###vmaxn = vmaxh*5*np.random.choice(np.array([-1,1]), size=len(refpkl.index))
+    #### generates Kds
+    ##kd = t_x_v[-1] * np.random.random_sample(size=len(refpkl.index))
+    ##kd = np.linspace(t_x_v[0], t_x_v[-1],
+                     ##num = len(refpkl.index))
+    
+    #### generates n between 0 and 5
+    ##n = 5 * np.random.random_sample(size=len(refpkl.index))
     
     
-    #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: add_noise(x, p=0.02), axis=0)
+
     
     
-    
-    
-    #rmin = 15
-    #rmax = 35
-    #mask_cs = refpkl.loc[:,'Res#'].isin(range(rmin, rmax +1))
-    #tp.loc[:,mask_cs,'Position F1'] = \
-        #tp.loc[:,mask_cs,'Position F1'].\
-            #apply(lambda x: add_signal(x, maxc=0.2), axis=1)
-    
-    #tp.loc[:,mask_cs,'Position F2'] = \
-        #tp.loc[:,mask_cs,'Position F2'].\
-            #apply(lambda x: add_signal(x, maxc=1), axis=1)
     
     
     
     
     #tp.loc[:,:,'Position F2'] = tp.loc[:,:,'Position F2'].apply(lambda x: hill(x, p=0.02), axis=1)
     
-    for df in tp.items:
-        tp.loc[df,:,:].to_csv('{}/{}.csv'.format(spectra_folder, df),
-                              index=False,
-                              index_label=False,
-                              columns=col_list)
-    
-    #apply(lambda x: self.csp_willi(x), axis=2)
-    
-    #pkl1 = add_noise_macro(refpkl)
-    
-    
-    
-    #pkl1.to_csv('{}/1_pkl.csv'.format(spectra_folder),
-                      #index=False,
-                      #index_label=False,
-                      #columns=col_list)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#def init_data_frame(protein_len=140):
-    #"""
-    #Generates a data frame with the characteristics of a CCPNMRv2
-    #peaklist.
-    #"""
-    #resindex = range(protein_len)
-    
-    ## creates a random protein
-    #random_protein = gen_random_protein(protein_len)
-    
-    #dfdict = {
-        #'Position F1': \
-            #np.random.random_integers(6000, high=10000, size=protein_len)/1000,
-        #'Position F2': \
-            #np.random.random_integers(100000, high=135000, size=protein_len)/1000,
-        #'Assign F1': \
-            #np.array(assign_nomenclature(random_protein,atom_type='H')),
-        #'Assign F2': \
-            #np.array(assign_nomenclature(random_protein,atom_type='N')),
-        #'Line Width F1 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=protein_len)/1000,
-        #'Line Width F2 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=protein_len)/1000,
-        #'Height': \
-            #np.random.random_integers(9000, high=10000, size=protein_len),
-        #'Volume': \
-            #np.random.random_integers(9000, high=10000, size=protein_len)
-            #}
-    
-    
-    
-    #dfbb = pd.DataFrame(dfdict)
-    
-    ## prepare sidechains
-    
-    #sd_mask = dfbb.loc[:,'Assign F1'].str[-4:].isin(['AsnH','GlnH', 'TrpH'])
-    #sdbase = dfbb.loc[sd_mask,:]
-    #sdsize = sdbase.shape[0]
-    #print(sdbase)
-    
-    #dfsddict = {
-        #'Position F1': \
-            #np.random.random_integers(6000, high=7500, size=sdsize)/1000,
-        #'Position F2': \
-            #np.random.random_integers(100000, high=115000, size=sdsize)/1000,
-        #'Assign F1': \
-            #np.array(assign_nomenclature_sd(sdbase.loc[:,'Assign F1'])),
-        #'Assign F2': \
-            #np.array(assign_nomenclature_sd(sdbase.loc[:,'Assign F1'])),
-        #'Line Width F1 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=sdsize)/1000,
-        #'Line Width F2 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=sdsize)/1000,
-        #'Height': \
-            #np.random.random_integers(9000, high=10000, size=sdsize),
-        #'Volume': \
-            #np.random.random_integers(9000, high=10000, size=sdsize)
-            #}
-    
-    #sdbase = pd.DataFrame(dfsddict)
-    
-    
-    #sd_mask = dfbb.loc[:,'Assign F1'].str[-4:].isin(['AsnH','GlnH'])
-    #sdbase2 = dfbb.loc[sd_mask,:]
-    #sdsize2 = dfbb.loc[sd_mask,:].shape[0]
-    
-    #dfsddict2 = {
-        #'Position F1': \
-            #np.random.random_integers(6000, high=7500, size=sdsize2)/1000,
-        #'Position F2': \
-            #np.random.random_integers(100000, high=115000, size=sdsize2)/1000,
-        #'Assign F1': \
-            #np.array(assign_nomenclature_sd(sdbase2.loc[:,'Assign F1'], atom='b')),
-        #'Assign F2': \
-            #np.array(assign_nomenclature_sd(sdbase2.loc[:,'Assign F1'], atom='b')),
-        #'Line Width F1 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=sdsize2)/1000,
-        #'Line Width F2 (Hz)': \
-            #np.random.random_integers(10000, high=50000, size=sdsize2)/1000,
-        #'Height': \
-            #np.random.random_integers(9000, high=10000, size=sdsize2),
-        #'Volume': \
-            #np.random.random_integers(9000, high=10000, size=sdsize2)
-            #}
-    #sdbase2 = pd.DataFrame(dfsddict2)
-    
-    #pkl = pd.concat((dfbb, sdbase, sdbase2), axis=0, ignore_index=True, copy=True)
-    ##print(pkl)
-    ##
-    #pkl.sort_values('Assign F1', inplace=True)
-    
-    #pkl.loc[:,'Merit'] = '1.0'
-    #pkl.loc[:,'Details'] = 'None'
-    #pkl.loc[:,'Vol. Method'] = 'box sum'
-    #pkl.loc[:,'Fit Method'] = 'parabolic'
-    #pkl.loc[:,'#'] = np.arange(pkl.shape[0])
-    #pkl.loc[:,'Number'] = np.arange(pkl.shape[0])
-    
-    #pkl.reset_index(inplace=True)
-    #print(pkl)
-    ##print(dfsd)
-    #return pkl
-
-#def assign_nomenclature(protein, atom_type='H'):
-    #"""
-    #Generates a list of artifical assignments.
-    #"""
-
-    #
-
-#def assign_nomenclature_sd(listofres, atom='a'):
-    
-    #sddict = {
-        #'Asn':'d',
-        #'Gln':'e',
-        #'Trp':'e'
-             #}
-    #def addsd(s):
-        #if s[:-1][-3:] in ['Asn', 'Gln']:
-            #return s + sddict[s[:-1][-3:]] + '2' + atom
-        #elif s[:-1][-3:] == 'Trp': 
-            #return s+sddict['Trp']+'1' + atom
-    
-    #listofsd = [addsd(res) for res in listofres]
-    
-    #return listofsd
-
-
-#def add_noise(pkl, range=0.1, where='Position F1'):
-    #"""Adds noise to a column of the peaklists"""
-    #noise = \
-        #range * np.random.random_sample(size=(pkl.iloc[:,0].size,)) - range/2
-
-    #pkl.loc[:,where] = pkl.loc[:,where].add(noise)
-    #return pkl
-
-#def change_details(pkl, n=5):
-    #"""
-    #Simple function to change the Details columns based
-    #on a list of options.
-    #"""
-
-    #details = ['overlapped',
-               #'review assignment',
-               #'low intensity']
-
-
-    #for i in range(n):
-        #row = random.choice(list(pkl.index))
-        #pkl.loc[row,'Details'] = random.choice(details)
-
-    #return pkl
-
-#def gen_titration(pkls_dict, dplist):
-    #"""
-    #Generates a titration based on a list of points
-    #by modifying the reference peaklists
-    #according to a set of standard functions, which include:
-    
-    #* remove some residues randomly,
-    #* add noise to the type float columns
-    #* change details simmulating user notes
-    #"""
-    #dpprev = list(pkls_dict.keys())[0]
-    #for dp in dplist:
-        ##do
-        ## copies the previous peaklist
-        #pkls_dict[dp] = pkls_dict[dpprev].copy()
-        
-        ## drops some residues (they were lost)
-        #for i in range(3):
-            #pkls_dict[dp].drop(random.choice(list(pkls_dict[dp].index)),
-                               #axis=0,
-                               #inplace=True)
-        
-        ## adds 5% of noise
-        #for col in ['Position F1',
-                    #'Position F2']:
-            ##do
-            #pkls_dict[dp] = add_noise(\
-                            #pkls_dict[dp],
-                            #range=pkls_dict[dp].loc[:,col].astype(float).max()/2000,
-                            #where=col)
-
-            ##done
-
-        ## affects details
-        #pkls_dict[dp] = change_details(pkls_dict[dp])
-        #dpprev = dp
-        ##done
-
-    #return pkls_dict
-
-
-#def nested_dict(d):
-  #for k, v in d.items():
-    #if isinstance(v, dict):
-      #nested_dict(v)
-    #else:
-      #d[k].setdefault(v, {})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ## list of data points for condition 1
-    ## this is, ligand:protein ranges
-    ## number_ is to order alphabetically
-    #list_of_cond1_datapoints = ['1_0125',
-                                #'2_025',
-                                #'3_05',
-                                #'4_1',
-                                #'5_2',
-                                #'6_4']
-
-    #list_of_cond2_datapoints = ['ligand1', 'ligand2', 'ligand3']
-
-    #list_of_cond3_datapoints = ['dia', 'para']
-
-    #if len(sys.argv) == 2:
-        #refpkl = init_data_frame(protein_len)
-    #elif len(sys.argv) > 2:
-        #refpkl = pd.read_csv(sys.argv[2])
-    
-    #pkls_dict = {'0_ref':refpkl}
-    
-    #pkls_dict = gen_titration(pkls_dict, list_of_cond1_datapoints)
-    
-    #columnslist=['Number',
-             #'#',
-             #'Position F1',
-             #'Position F2',
-             #'Assign F1',
-             #'Assign F2',
-             #'Height',
-             #'Volume',
-             #'Line Width F1 (Hz)',
-             #'Line Width F2 (Hz)',
-             #'Merit',
-             #'Details',
-             #'Fit Method',
-             #'Vol. Method'
-             #]
-    #for k, v in pkls_dict.items():
-        #v.to_csv('{}.csv'.format(k),
-                 #columns=columnslist, index=False, index_label=False)
-    
-    
-    
