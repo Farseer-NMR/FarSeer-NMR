@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import random
 import sys
+import os
 
 def gen_random_protein(length=140, path='spectra/298/L1'):
     """
@@ -23,7 +24,7 @@ def gen_random_protein(length=140, path='spectra/298/L1'):
     
     return protein
 
-def write_protein_fasta(protein, zfolders, yfolders):
+def write_protein_fasta(protein, path):
     """
     :protein: str with the protein sequence
     """
@@ -42,11 +43,8 @@ def write_protein_fasta(protein, zfolders, yfolders):
     
     print(protein_fasta)
     
-    for zf in zfolders:
-        for yf in yfolders:
-            path = '{}/{}/{}/protein.fasta'.format(spectra_folder, zf, yf)
-            with open(path, 'w') as ff:
-                ff.write(protein_fasta)
+    with open(path, 'w') as ff:
+        ff.write(protein_fasta)
     return
 
 def gen_assign(pseq, atom_type='H'):
@@ -434,7 +432,7 @@ def add_signal_macro(tp, protein, txv):
     
     return tp
 
-def creates_titration(protein, refpkl, datapoints, txv):
+def creates_titration(protein, refpkl, data_points, txv):
     ### create titration sequence
     # generate peaklists from refpkl adding noise to the data.
     tp = gen_t_dict(refpkl, data_points)
@@ -468,16 +466,16 @@ if __name__ == '__main__':
                          'Number',
             ]
     
-    spectra_folder = 'spectra/'
+    spectra_folder = 'spectra'
     
-    zfolder = ['298']
-    yfolder = ['L1']
+    zfolders = ['298']
+    yfolders = ['L1']
     
     ## writes folders +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     for zf in zfolders:
         for yf in yfolders:
             folder = '{}/{}/{}'.format(spectra_folder, zf, yf)
-            if not(os.exists(folder)):
+            if not(os.path.exists(folder)):
                 os.makedirs(folder)
     
     data_points = ['1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
@@ -494,13 +492,14 @@ if __name__ == '__main__':
     
     for zf in zfolders:
         for yf in yfolders:
-        tp = creates_titration(protein, refpkl, datapoints, txv)
+            tp = creates_titration(protein, refpkl, data_points, txv)
     
-        for df in tp.items:
-            pkl_path = '{}/{}.csv'.format(spectra_folder, df)
-            print(pkl_path)
-            tp.loc[df,:,:].to_csv(pkl_path,
-                                  index=False,
-                                  index_label=False,
-                                  columns=col_list)
+            for df in tp.items:
+                path = '{}/{}/{}'.format(spectra_folder, zf, yf)
+                print(path)
+                write_protein_fasta(protein, '{}/protein.fasta'.format(path))
+                tp.loc[df,:,:].to_csv('{}/{}.csv'.format(path, df),
+                                    index=False,
+                                    index_label=False,
+                                    columns=col_list)
  
