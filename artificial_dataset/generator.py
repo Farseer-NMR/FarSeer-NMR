@@ -3,8 +3,65 @@ import pandas as pd
 import random
 import sys
 import os
+import json
 
-def gen_random_protein(length=140, path='spectra/298/L1'):
+def read_params(pfile):
+    """
+    Reads parameters defined in artificial_params file.
+    
+    return:
+        the list of z points
+        the list of y points
+        the list of x points - data points
+        the list of x values
+        a dictionary of lists containing the regions where signal
+            will be applied: r1, r2, r3.
+    """
+    with open(pfile) as data_file:    
+        data = json.load(data_file)
+    regs = {}
+    
+    print(data)
+    input('a')
+    
+    return data
+    #for line in fin:
+        #line = line[:line.find('#')]
+        #if not(line):
+            #continue
+        
+        #ll = line.strip().split(',')
+        #if line.startswith('p'):
+            #plen = int(ll[-1])
+        #elif line.startswith('z'):
+            #zf = ll[1:]
+        #elif line.startswith('y'):
+            #yf = ll[1:]
+        #elif line.startswith('x'):
+            #dp, txv = [], [0]
+            #counter = 1
+            #for i in ll[1:]:
+                #txv.append(int(i))
+                #dp.append('{}_{}'.format(counter, i))
+                #counter += 1
+        #elif ll[0] in ['r1','r2', 'r3']:
+            #regs.setdefault(ll[0], [int(ll[-2]), int(ll[-1])])
+        
+        
+    #return plen, zf, yf, dp, txv, regs
+    
+def writes_spectra_folders(sp, zf, yf):
+    for zf in zfolders:
+        for yf in yfolders:
+            folder = '{}/{}/{}'.format(spectra_folder, zf, yf)
+            if not(os.path.exists(folder)):
+                os.makedirs(folder)
+                print('*** created folder {}'.format(folder))
+            else:
+                print('*** folder exists OK {}'.format(folder))
+    return
+
+def gen_random_protein(length=140):
     """
     Generates a random protein FASTA file of length :length:
     
@@ -20,7 +77,6 @@ def gen_random_protein(length=140, path='spectra/298/L1'):
     # the protein sequence in a string
     protein = "".join(protein)
     # breaking the protein sequence
-    
     
     return protein
 
@@ -196,7 +252,9 @@ def add_sidechains(pkl):
     
     pkl = pd.concat([pkl, sd_df], ignore_index=True)
     
-    pkl.loc[:,'Res#'] = pkl.loc[:,'Assign F1'].str.extract('([ab])?(\d+)', expand=False)[1]
+    pkl.loc[:,'Res#'] = \
+        pkl.loc[:,'Assign F1'].str.extract('([ab])?(\d+)', expand=False)[1]
+    
     pkl.loc[:,'Res#'] = pkl.loc[:,'Res#'].astype(int)
     
     pkl.sort_values('Assign F1', inplace=True)
@@ -207,7 +265,10 @@ def add_sidechains(pkl):
     return pkl
 
 def gen_refpkl_macro(protein):
-    """ Generates reference pkl"""
+    """
+    Generates reference pkl with random aminoacids and all the
+    sidechains.
+    """
     refpkl = pd.DataFrame({**gen_data_values(protein),
                            **gen_str_values(len(protein))})
     
@@ -336,7 +397,7 @@ def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
     
     def hill_eq(L0, Vmax=1, Kd=1, n=1):
         y = (Vmax*L0**n)/(Kd**n+L0**n)
-        print(list(y)[-1])
+        #print(list(y)[-1])
         return y
     
     tp.loc[:,:,col] = \
@@ -347,34 +408,24 @@ def acquire_signal_Hill(tp, col, vmax, kd, n, txv):
                                                    Kd=kd[x.name],
                                                    n=n[x.name])),
                     axis=1)
-    print('#################')
+    #print('#################')
     return tp
 
-def add_signal_macro(tp, protein, txv):
+def add_signal_macro(tp, protein, regs, txv):
     """
     Macro that adds signal to the titration panel.
     """
-    
-    collist = ['Position F1']
-    
-    aarange = len(protein)
-    
-    # a dictionary of tuples of int values
-    rlist = {'r1':(aarange//10, aarange//5),
-             'r2':(aarange//3, aarange//3*2),
-             'r3':(aarange//5*4, aarange)
-            }
     
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # a ditionary of bool arrays
     # sets a bool arrays that define the regions where the signal will be 
     # added. Sidechains are included.
     region_bool_masks = {}
-    for k in sorted(rlist.keys()):
+    for k in sorted(regs.keys()):
     # define the region
         region_bool_masks[k] = def_signal_region(tp.iloc[0,:,:],
-                                                 first=rlist[k][0],
-                                                 last=rlist[k][1])
+                                                 first=regs[k][0],
+                                                 last=regs[k][1])
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -432,7 +483,7 @@ def add_signal_macro(tp, protein, txv):
     
     return tp
 
-def creates_titration(protein, refpkl, data_points, txv):
+def creates_titration(protein, refpkl, data_points, regs, txv):
     ### create titration sequence
     # generate peaklists from refpkl adding noise to the data.
     tp = gen_t_dict(refpkl, data_points)
@@ -441,63 +492,45 @@ def creates_titration(protein, refpkl, data_points, txv):
     tp = add_noise_macro(tp)
     
     # add signal
-    tp = add_signal_macro(tp, protein, txv)
+    tp = add_signal_macro(tp, protein, regs, txv)
     
     return tp
+
+
+
+
 
 if __name__ == '__main__':
     
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # general set up
-    col_list=['Merit',
-                         'Position F1',
-                         'Position F2',
-                         'Height',
-                         'Volume',
-                         'Line Width F1 (Hz)',
-                         'Line Width F2 (Hz)',
-                         'Fit Method',
-                         'Vol. Method',
-                         'Assign F1',
-                         'Assign F2',
-                         'Details',
-                         '#',
-                         'Number',
-            ]
+    col_list=['Merit', 'Position F1', 'Position F2', 'Height', 'Volume', 
+              'Line Width F1 (Hz)', 'Line Width F2 (Hz)', 'Fit Method',
+              'Vol. Method', 'Assign F1', 'Assign F2', 'Details', '#',
+              'Number']
     
     spectra_folder = 'spectra'
     
-    zfolders = ['298']
-    yfolders = ['L1']
-    
+    # reads params ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #plen, zfolders, yfolders, data_points, txv, regs = read_params(sys.argv[1])
+    data = read_params(sys.argv[1])
     ## writes folders +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    for zf in zfolders:
-        for yf in yfolders:
-            folder = '{}/{}/{}'.format(spectra_folder, zf, yf)
-            if not(os.path.exists(folder)):
-                os.makedirs(folder)
+    writes_spectra_folders(spectra_folder, zfolders, yfolders)
     
-    data_points = ['1_0125', '2_0250', '3_0500', '4_1000', '5_2000', '6_4000']
-    txv = np.array([0, 125, 250, 500, 1000, 2000, 4000])
-    
-    
-    
-    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # generates random protein sequence
-    protein = gen_random_protein(length=int(sys.argv[1]), path=spectra_folder)
+    # generates random protein sequence +++++++++++++++++++++++++++++++++++++++
+    protein = gen_random_protein(length=plen)
 
-    # generates the reference peaklist
+    # generates the reference peaklist ++++++++++++++++++++++++++++++++++++++++
     refpkl = gen_refpkl_macro(protein)
     
     for zf in zfolders:
         for yf in yfolders:
-            tp = creates_titration(protein, refpkl, data_points, txv)
-    
+            tp = creates_titration(protein, refpkl, data_points, regs, txv)
+            path = '{}/{}/{}'.format(spectra_folder, zf, yf)
+            print(path)
+            write_protein_fasta(protein, '{}/protein.fasta'.format(path))
             for df in tp.items:
-                path = '{}/{}/{}'.format(spectra_folder, zf, yf)
-                print(path)
-                write_protein_fasta(protein, '{}/protein.fasta'.format(path))
                 tp.loc[df,:,:].to_csv('{}/{}.csv'.format(path, df),
                                     index=False,
                                     index_label=False,
