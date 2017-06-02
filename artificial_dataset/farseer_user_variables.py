@@ -51,15 +51,15 @@ tag_ls='-'
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restrains to Plot:
-plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
-plots_PosF2_delta = True # Plot nuclei 2 shift perturbation data
-plots_CSP = True  # Plot combined chemical shift perturbation data
-plots_Height_ratio = False  # Plot Height ratio data
-plots_Volume_ratio = False  # Plot Volume ratio data
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
+plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
+plots_CSP = False  # Plot combined chemical shift perturbation data
+plots_Height_ratio = True  # Plot Height ratio data
+plots_Volume_ratio = True  # Plot Volume ratio data
 #
 # Ploting Templates
-plots_extended_bar = False  # Represent data in Extended Bar Plot style
-plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
+plots_extended_bar = True  # Represent data in Extended Bar Plot style
+plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
 plots_residue_evolution = True  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
@@ -83,8 +83,8 @@ calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
 yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
 yy_scale_CSP = 0.3  # y axis sacle for combined chemical shift
-yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
-yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
+yy_scale_Height_ratio = 1.1 # y axis scale for height ratio
+yy_scale_Volume_ratio = 1.1 # y axis scale for volume ratio
 yy_scale_nbins=5  # adjusted number of ticks
 #####################################
 #

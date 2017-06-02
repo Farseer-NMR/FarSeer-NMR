@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 import random
+import scipy.signal as signal
 
 def prints_log(string):
     print(\
@@ -327,8 +328,16 @@ len {}""".format(len(vmax_base)))
     
     return vmax_base, kd_base, n_base
 
-def gen_cs_experimental_values(reg_dict, txv):
+def init_int_signal_vector(vlen):
     
+    intensities = pd.Series(np.random.choice(\
+                                np.linspace(3,5,num=12),
+                                size=vlen)
+                           )
+    
+    return intensities
+
+def count_trues(reg_dict):
     # this step is performed to avoid BREAK when the region
     # selected by the user is outside the protein length
     # that is, when True is not index of v.value_counts()
@@ -339,21 +348,29 @@ def gen_cs_experimental_values(reg_dict, txv):
             prints_log("Not a valid region {}".format(k))
         else:
             dcounts.setdefault(k, v.value_counts()[1])
+    return dcounts
+
+def gen_cs_experimental_values(reg_dict, txv):
+    
+    dcounts = count_trues(reg_dict)
     
     exp_values = \
-        {'r1':(np.linspace(0.01, 0.2, num=dcounts['r1']), 
+        {'r1':(np.linspace(0.01, 0.2, num=dcounts['r1']) \
+                * np.random.choice([-1, 1], size=(dcounts['r1'],)), 
                np.repeat(txv[3], dcounts['r1']),
                np.repeat(1, dcounts['r1'])
                ),
             
             
-         'r2':(np.repeat(0.1, dcounts['r2']),
+         'r2':(np.repeat(0.1, dcounts['r2']) \
+                * np.random.choice([-1, 1], size=(dcounts['r2'],)),
                np.linspace(txv[1], txv[-1], num=dcounts['r2']),
                np.repeat(1, dcounts['r2'])
                ),
             
             
-         'r3':(np.repeat(0.1, dcounts['r3']),
+         'r3':(np.repeat(0.1, dcounts['r3']) \
+                * np.random.choice([-1, 1], size=(dcounts['r3'],)),
                np.repeat(txv[3], dcounts['r3']),
                np.linspace(0.1, 3, num=dcounts['r3'])
                )
@@ -361,9 +378,32 @@ def gen_cs_experimental_values(reg_dict, txv):
     
     return exp_values
 
-def hill_eq(L0, Vmax=1, Kd=1, n=1):
-        y = (Vmax*L0**n)/(Kd**n+L0**n)
+def gen_int_experimental_values(reg_dict):
+    """
+    Generates the shape of the signal of a region.
+    A Gaussian function along the region
+    """
+    dcounts = count_trues(reg_dict)
+    
+    exp_values = \
+        {'r1':1-signal.gaussian(dcounts['r1'], std=dcounts['r1']//3)+0.7,
+         
+         'r2':1-signal.gaussian(dcounts['r2'], std=dcounts['r2']//3)+0.3,
+         
+         'r3':1-signal.gaussian(dcounts['r3'], std=dcounts['r3']//3)
+        }
+    
+    return exp_values
+
+def hill_eq(xvalues, Vmax=1, Kd=1, n=1):
+        y = (Vmax*xvalues**n)/(Kd**n+xvalues**n)
         return y
+
+def exp_decay(xvalues, vlen, tau):
+    
+    expdecay = signal.exponential(vlen, center=0, tau=vlen*tau, sym=False)
+    
+    return xvalues * expdecay
 
 def add_signal(series, signal):
     return series + signal
@@ -377,11 +417,14 @@ def apply_signal(tp, regs_param, txv):
     regs_bool = gen_signal_regs(tp, regs_param)
     
     # initiates signal vectors
-    vmax, kd, n = init_cs_signal_vectors(tp.iloc[0,:,0].size,
-                                      kd=txv[-1])
+    vmax, kd, n = init_cs_signal_vectors(tp.shape[1],
+                                         kd=txv[-1])
+    
+    intensity = init_int_signal_vector(tp.shape[1])
     
     # generates values for the different regions
     cs_exp_values = gen_cs_experimental_values(regs_bool, txv)
+    int_exp_values = gen_int_experimental_values(regs_bool)
     
     # merges signal vectors
     for k, v in cs_exp_values.items():
@@ -392,8 +435,13 @@ def apply_signal(tp, regs_param, txv):
         vmax.loc[regs_bool[k]] = v[0]
         kd.loc[regs_bool[k]] = v[1]
         n.loc[regs_bool[k]] = v[2]
+    
     # to the intensity
-    ## write code here
+    for k, v in int_exp_values.items():
+        if not(np.any(regs_bool[k])):
+            continue
+        
+        intensity[regs_bool[k]] = v
     
     
     # apply signal to chemical shifts
@@ -416,7 +464,17 @@ def apply_signal(tp, regs_param, txv):
                                                n=n[x.name])),
                     axis=1)
     
+    # apply signal to the intensities
     
+    tp.loc[:,:,'Height'] = \
+        tp.loc[:,:,'Height'].\
+            apply(lambda x: exp_decay(x, x.size, intensity[x.name]),
+                  axis=1)
+    
+    tp.loc[:,:,'Volume'] = \
+        tp.loc[:,:,'Volume'].\
+            apply(lambda x: exp_decay(x, x.size, intensity[x.name]),
+                  axis=1)
     
     return tp
 
