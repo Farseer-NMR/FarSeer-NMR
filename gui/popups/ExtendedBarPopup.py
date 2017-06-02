@@ -37,10 +37,9 @@ class ExtendedBarPopup(QDialog):
         self.layout().addWidget(self.bar_rows, 1, 0)
         self.layout().addWidget(self.x_tick_font_size, 2, 0)
         self.layout().addWidget(self.x_tick_font, 3, 0)
-        self.layout().addWidget(self.x_tick_padding, 4, 0)
-        self.layout().addWidget(self.x_tick_rotation, 5, 0)
-        self.layout().addWidget(self.x_tick_font_weight, 6, 0)
-        self.layout().addWidget(self.x_tick_colour, 7, 0)
+        self.layout().addWidget(self.x_tick_rotation, 4, 0)
+        self.layout().addWidget(self.x_tick_font_weight, 5, 0)
+        self.layout().addWidget(self.x_tick_colour, 6, 0)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
