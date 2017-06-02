@@ -30,7 +30,6 @@ class ExtendedBarPopup(QDialog):
         self.x_tick_font = FontComboBox(self, "X Tick Font")
         self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size")
         self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation")
-        self.x_tick_padding = LabelledDoubleSpinBox(self, "X Tick Padding")
         self.x_tick_font_weight = LabelledCombobox(self, "X Tick Font Weight", items=['normal', 'bold'])
         self.x_tick_colour = LabelledCheckbox(self, "Colour X Ticks?")
 
@@ -56,9 +55,9 @@ class ExtendedBarPopup(QDialog):
     def get_defaults(self):
         self.bar_cols.field.setValue(self.defaults["ext_bar_cols_page"])
         self.bar_rows.field.setValue(self.defaults["ext_bar_rows_page"])
-        self.x_tick_font_size.field.setValue(self.defaults["ext_bar_x_ticks_fs"])
         self.x_tick_font.select(self.defaults["ext_bar_x_ticks_fn"])
-        self.x_tick_padding.field.setValue(self.defaults["ext_bar_x_ticks_pad"])
+        self.x_tick_font_size.field.setValue(self.defaults["ext_bar_x_ticks_fs"])
+        self.x_tick_rotation.field.setValue(self.defaults["ext_bar_x_ticks_rot"])
         self.x_tick_font_weight.field.setValue(self.defaults["ext_bar_x_ticks_weight"])
         self.x_tick_colour.checkBox.setChecked()(self.defaults["ext_bar_x_ticks_colour"])
 
@@ -66,10 +65,11 @@ class ExtendedBarPopup(QDialog):
     def get_values(self):
         self.bar_cols.field.setValue(self.vars["ext_bar_cols_page"])
         self.bar_rows.field.setValue(self.vars["ext_bar_rows_page"])
-        self.x_tick_rotation.field.setValue(self.vars["ext_bar_x_ticks_rot"])
-        self.x_tick_font_size.field.setValue(self.vars["ext_bar_y_label_fs"])
         self.x_tick_font.select(self.vars["ext_bar_x_ticks_fn"])
-        self.x_tick_padding.field.setValue(self.vars["ext_bar_x_ticks_pad"])
+        self.x_tick_font_size.field.setValue(self.vars["ext_bar_x_ticks_fs"])
+        self.x_tick_rotation.field.setValue(self.vars["ext_bar_x_ticks_rot"])
+        self.x_tick_font_weight.field.setValue(self.vars["ext_bar_x_ticks_weight"])
+        self.x_tick_colour.checkBox.setChecked()(self.vars["ext_bar_x_ticks_colour"])
 
     def set_values(self):
         self.vars["ext_bar_cols_page"] = self.bar_cols.field.value()
@@ -77,8 +77,7 @@ class ExtendedBarPopup(QDialog):
         self.vars["ext_bar_x_ticks_fn"] = self.x_tick_font.fields.currentText()
         self.vars["ext_bar_x_ticks_fs"] = self.x_tick_font_size.field.value()
         self.vars["ext_bar_x_ticks_rot"] = self.x_tick_rotation.field.value()
-        self.vars["ext_bar_x_ticks_pad"] = self.x_tick_padding.field.value()
-        self.vars["ext_bar_x_ticks_pad"] = self.x_tick_padding.field.value()
-        self.vars["ext_bar_x_ticks_pad"] = self.x_tick_padding.field.value()
+        self.vars["ext_bar_x_ticks_weight"] = self.x_tick_font_weight.field.value()
+        self.vars["x_tick_colour"] = self.x_tick_colour.checkBox.isChecked()
         vars["extended_bar_settings"] = self.vars
         self.accept()
