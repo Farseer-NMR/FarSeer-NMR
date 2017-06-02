@@ -619,10 +619,6 @@ def eval_titrations(titration_dict,
             for dim1_pt in sorted(titration_dict[cond][dim2_pt].keys()):
                 titration_dict[cond][dim2_pt][dim1_pt].log_t('ANALYZING... ')
                 # DO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                #s2w += '** [{}][{}][{}] along [{}] data points: \n'.\
-                #    format(cond, dim2_pt, dim1_pt,
-                #           list(titration_dict[cond][dim2_pt][dim1_pt].items))
-                #print(s2w)
                 # performs the calculations
                 perform_calcs(titration_dict[cond][dim2_pt][dim1_pt],
                               fsuv)
@@ -1122,8 +1118,9 @@ def run_farseer(spectra_path, fsuv):
                        ref='REFERENCE FOR SIDECHAINS')
     
     # adds fasta
-    add_lost(exp, exp.allFASTA, exp.allpeaklists,
-             peak_status='unassigned', ref='FASTA')
+    if fsuv.applyFASTA:
+        add_lost(exp, exp.allFASTA, exp.allpeaklists,
+                 peak_status='unassigned', ref='FASTA')
     
     #organize peaklist columns
     organize_columns(exp, exp.allpeaklists,
@@ -1182,6 +1179,7 @@ def run_farseer(spectra_path, fsuv):
                                      rt='Sidechains',
                                      cp=calculated_params))
         
+        print(Farseer_SD_titrations_dict['cond1']['298']['ligand1'].iloc[0])
         eval_titrations(Farseer_SD_titrations_dict,
                         fsuv,
                         spectra_path=spectra_path,
