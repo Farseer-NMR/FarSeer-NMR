@@ -11,7 +11,7 @@ from gui.components.FontComboBox import FontComboBox
 import json
 from current.default_config import defaults
 
-class VerticalBarPopup(QDialog):
+class BarPlot(QDialog):
 
     def __init__(self, parent=None, vars=None, **kw):
         super(VerticalBarPopup, self).__init__(parent)
