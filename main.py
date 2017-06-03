@@ -85,8 +85,8 @@ class Settings(QWidget):
         self.setLayout(grid)
         grid.setSpacing(3)
         from current.default_config import defaults
-        self.vars = None
-        # self.blank_vars = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
+        # self.vars = None
+        self.vars = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
