@@ -267,8 +267,8 @@ cs_scatter_mk_edgecolors=['black']  # marker edge color for shape style - SHOULD
 cs_scatter_mk_lost_color='red'  # color for lost data points - color style
 cs_scatter_hide_lost=False
 #
-cs_scatter_x_label='1H (ppm)'
-cs_scatter_y_label='15N (ppm)'
+cs_scatter_flower_x_label='1H (ppm)'
+cs_scatter_flower_y_label='15N (ppm)'
 cs_scatter_flower_mksize=8  # marker size
 cs_scatter_flower_color_grad=True
 cs_scatter_flower_color_start="#e7e7e7"
