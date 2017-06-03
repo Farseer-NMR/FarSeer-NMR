@@ -7,7 +7,6 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 
-import json
 from current.default_config import defaults
 from functools import partial
 
