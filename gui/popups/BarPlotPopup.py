@@ -21,7 +21,7 @@ class BarPlotPopup(QDialog):
         self.vars = None
         if vars:
             self.vars = vars["bar_plot_settings"]
-        self.defaults = defaults["bar_plot_settings"]
+        # self.defaults = defaults["bar_plot_settings"]
 
 
         self.apply_status = LabelledCheckbox(self, text="Apply Status")

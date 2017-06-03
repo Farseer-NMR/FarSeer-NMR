@@ -13,13 +13,18 @@ from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
+
+from gui.popups.BarPlotPopup import BarPlotPopup
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
+from gui.popups.GeneralResidueEvolution import GeneralResidueEvolution
 from gui.popups.VerticalBar import VerticalBarPopup
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
+from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
 from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.DPrePopup import DPrePopup
+from gui.popups.TitrationPlotPopup import TitrationPlotPopup
 
 from gui.popups.UserMarksPopup import UserMarksPopup
 
@@ -96,10 +101,19 @@ class Settings(QWidget):
         self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
         self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
         self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
-        self.user_details_checkbox = LabelledCheckbox(self, "User Details")
         self.scatter_checkbox = LabelledCheckbox(self, "CS Scatter")
         self.dpre_checkbox = LabelledCheckbox(self, "DPre")
         self.heat_map_checkbox = LabelledCheckbox(self, "PRE Heat Map")
+        self.scatter_flower_checkbox = LabelledCheckbox(self, " CS Scatter Flower")
+
+        self.tplot_button = QPushButton("Titration Plot Settings", self)
+        self.tplot_button.clicked.connect(partial(self.show_popup, TitrationPlotPopup, self.vars))
+
+        self.revo_button = QPushButton("General Evolution Settings", self)
+        self.revo_button.clicked.connect(partial(self.show_popup, GeneralResidueEvolution, self.vars))
+
+        self.bar_button = QPushButton("Bar Plot Settings", self)
+        self.bar_button.clicked.connect(partial(self.show_popup, BarPlotPopup, self.vars))
 
         self.ext_bar_button = QPushButton("Settings", self)
         self.ext_bar_button.clicked.connect(partial(self.show_popup, ExtendedBarPopup, self.vars))
@@ -112,12 +126,15 @@ class Settings(QWidget):
 
         self.res_evo_button = QPushButton("Settings", self)
         self.res_evo_button.clicked.connect(partial(self.show_popup, ResidueEvolutionPopup, self.vars))
-
-        self.user_details_button = QPushButton("Settings", self)
-        self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup, self.vars))
+        #
+        # self.user_details_button = QPushButton("Settings", self)
+        # self.user_details_button.clicked.connect(partial(self.show_popup, UserMarksPopup, self.vars))
 
         self.scatter_button = QPushButton("Settings", self)
         self.scatter_button.clicked.connect(partial(self.show_popup, ScatterPlotPopup, self.vars))
+
+        self.scatter_flower_button = QPushButton("Settings", self)
+        self.scatter_flower_button.clicked.connect(partial(self.show_popup, ScatterFlowerPlotPopup, self.vars))
 
         self.heat_map_button = QPushButton("Settings", self)
         self.heat_map_button.clicked.connect(partial(self.show_popup, HeatMapPopup, self.vars))
@@ -297,59 +314,72 @@ class Settings(QWidget):
 
         # grid.layout().addWidget(plots_widget, 6, 0, 3, 5)
 
+        tplot_group_box = QGroupBox(self)
+
         ext_bar_group_box = QGroupBox(self)
         comp_bar_group_box = QGroupBox(self)
         vert_bar_group_box = QGroupBox(self)
         res_evo_plot_group_box = QGroupBox(self)
-        user_details_group_box = QGroupBox(self)
         heat_map_group_box = QGroupBox(self)
         scatter_group_box = QGroupBox(self)
+        scatter_flower_group_box = QGroupBox(self)
         dpre_group_box = QGroupBox(self)
+        revo_plot_group_box = QGroupBox(self)
 
+        tplot_group_box_layout = QVBoxLayout()
         ext_bar_group_box_layout = QHBoxLayout()
         comp_bar_group_box_layout = QHBoxLayout()
         vert_bar_group_box_layout = QHBoxLayout()
         res_evo_plot_group_box_layout = QHBoxLayout()
-        user_details_group_box_layout = QHBoxLayout()
         heat_map_group_box_layout = QHBoxLayout()
         scatter_group_box_layout = QHBoxLayout()
+        scatter_flower_group_box_layout = QHBoxLayout()
         dpre_group_box_layout = QHBoxLayout()
+        revo_plot_group_box_layout = QHBoxLayout()
 
+        tplot_group_box.setLayout(tplot_group_box_layout)
         ext_bar_group_box.setLayout(ext_bar_group_box_layout)
         comp_bar_group_box.setLayout(comp_bar_group_box_layout)
         vert_bar_group_box.setLayout(vert_bar_group_box_layout)
         res_evo_plot_group_box.setLayout(res_evo_plot_group_box_layout)
-        user_details_group_box.setLayout(user_details_group_box_layout)
         heat_map_group_box.setLayout(heat_map_group_box_layout)
         scatter_group_box.setLayout(scatter_group_box_layout)
+        scatter_flower_group_box.setLayout(scatter_flower_group_box_layout)
         dpre_group_box.setLayout(dpre_group_box_layout)
+        revo_plot_group_box.setLayout(revo_plot_group_box_layout)
 
+        tplot_group_box.layout().addWidget(self.tplot_button)
+        tplot_group_box.layout().addWidget(self.bar_button)
+        ext_bar_group_box.layout().addWidget(self.ext_bar_checkbox)
         ext_bar_group_box.layout().addWidget(self.ext_bar_checkbox)
         comp_bar_group_box.layout().addWidget(self.comp_bar_checkbox)
         vert_bar_group_box.layout().addWidget(self.vert_bar_checkbox)
         res_evo_plot_group_box.layout().addWidget(self.res_evo_checkbox)
-        user_details_group_box.layout().addWidget(self.user_details_checkbox)
         heat_map_group_box.layout().addWidget(self.heat_map_checkbox)
         scatter_group_box.layout().addWidget(self.scatter_checkbox)
+        scatter_flower_group_box.layout().addWidget(self.scatter_flower_checkbox)
         dpre_group_box.layout().addWidget(self.dpre_checkbox)
 
         ext_bar_group_box.layout().addWidget(self.ext_bar_button)
         comp_bar_group_box.layout().addWidget(self.comp_bar_button)
         vert_bar_group_box.layout().addWidget(self.vert_bar_button)
         res_evo_plot_group_box.layout().addWidget(self.res_evo_button)
-        user_details_group_box.layout().addWidget(self.user_details_button)
         heat_map_group_box.layout().addWidget(self.heat_map_button)
+        scatter_flower_group_box.layout().addWidget(self.scatter_flower_button)
         scatter_group_box.layout().addWidget(self.scatter_button)
         dpre_group_box.layout().addWidget(self.dpre_button)
+        revo_plot_group_box.layout().addWidget(self.revo_button)
 
-        grid.layout().addWidget(ext_bar_group_box, 16, 0, 2, 5)
-        grid.layout().addWidget(comp_bar_group_box, 16, 5, 2, 5)
-        grid.layout().addWidget(vert_bar_group_box, 16, 10, 2, 5)
-        grid.layout().addWidget(res_evo_plot_group_box, 16, 15, 2, 5)
-        grid.layout().addWidget(scatter_group_box, 18, 0, 2, 5)
-        grid.layout().addWidget(heat_map_group_box, 18, 5, 2, 5)
-        grid.layout().addWidget(dpre_group_box, 18, 10, 2, 5)
-        grid.layout().addWidget(user_details_group_box, 18, 15, 2, 5)
+        grid.layout().addWidget(tplot_group_box, 16, 0, 2, 4)
+        grid.layout().addWidget(ext_bar_group_box, 16, 4, 2, 4)
+        grid.layout().addWidget(comp_bar_group_box, 16, 8, 2, 4)
+        grid.layout().addWidget(vert_bar_group_box, 16, 12, 2, 4)
+        grid.layout().addWidget(dpre_group_box, 16, 16, 2, 4)
+        grid.layout().addWidget(revo_plot_group_box, 18, 0, 2, 4)
+        grid.layout().addWidget(res_evo_plot_group_box, 18, 4, 2, 4)
+        grid.layout().addWidget(scatter_group_box, 18, 8, 2, 4)
+        grid.layout().addWidget(scatter_flower_group_box, 18, 12, 2, 4)
+        grid.layout().addWidget(heat_map_group_box, 18, 16, 2, 4)
 
         buttons_groupbox = QGroupBox()
         buttons_groupbox_layout = QHBoxLayout()
@@ -539,7 +569,6 @@ class Interface(QWidget):
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         # self.peakListArea.hide()
         self.h_splitter.addWidget(self.widget3)
-        
 
 
     def update_condition_boxes(self, row, dim, value):
@@ -570,6 +599,8 @@ if __name__ == '__main__':
     screen_resolution = app.desktop().screenGeometry()
     if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
         app_dims = screen_resolution.size()
+    # elif (screen_resolution.height(), screen_resolution.width()) == (1440, 2560):
+    #     app_dims = QtCore.QSize(1800, 850)
     else:
         app_dims = QtCore.QSize(1600, 850)
     ex = Main(app_dims)

@@ -11,10 +11,10 @@ from gui.components.FontComboBox import FontComboBox
 import json
 from current.default_config import defaults
 
-class ScatterPlotPopup(QDialog):
+class TitrationPlotPopup(QDialog):
 
     def __init__(self, parent=None, vars=None, **kw):
-        super(ScatterPlotPopup, self).__init__(parent)
+        super(TitrationPlotPopup, self).__init__(parent)
         self.setWindowTitle("Residue Evolution Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
@@ -22,7 +22,7 @@ class ScatterPlotPopup(QDialog):
         self.vars = None
         if vars:
             self.vars = vars["tplot_settings"]
-        self.default = defaults["tplot_settings"]
+        # self.default = defaults["tplot_settings"]
 
         self.tplot_subtitle_fn = FontComboBox(self, "Subtitle Font")
         self.tplot_title_fs = LabelledSpinBox(self, "Subtitle Font Size")
