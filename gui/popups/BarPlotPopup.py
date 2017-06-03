@@ -9,18 +9,19 @@ from gui.components.ColourBox import ColourBox
 from gui.popups.UserMarksPopup import UserMarksPopup
 
 from current.default_config import defaults
+from functools import partial
 
 class BarPlotPopup(QDialog):
 
-    def __init__(self, parent=None, vars=None, **kw):
+    def __init__(self, parent=None, variables=None, **kw):
         super(BarPlotPopup, self).__init__(parent)
         self.setWindowTitle("Vertical Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-        self.vars = None
-        if vars:
-            self.vars = vars["bar_plot_settings"]
+        self.variables = None
+        if variables:
+            self.variables = variables["bar_plot_settings"]
         self.defaults = defaults["bar_plot_settings"]
 
 
@@ -61,13 +62,13 @@ class BarPlotPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(self.set_values)
+        self.buttonBox.accepted.connect(partial(self.set_values, variables))
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 8, 2, 1, 2)
 
-        if vars:
+        if variables:
             self.get_values()
 
         # self.set_defaults()
@@ -78,57 +79,57 @@ class BarPlotPopup(QDialog):
         popup.raise_()
 
     def get_defaults(self):
-        self.apply_status.checkBox.setChecked(self.defaults["bar_status_color_flag"])
+        self.apply_status.setChecked(self.defaults["bar_status_color_flag"])
         self.meas_bar_colour.select(self.defaults["bar_measured_color"])
         self.lost_bar_colour.select(self.defaults["bar_lost_color"])
         self.unassigned_bar_colour.select(self.defaults["bar_unassigned_color"])
-        self.bar_width.field.setValue(self.defaults["bar_width"])
-        self.bar_alpha.field.setValue(self.defaults["bar_alpha"])
-        self.bar_linewidth.field.setValue(self.defaults["bar_linewidth"])
-        self.bar_threshold.checkBox.setChecked(self.defaults["bar_threshold_flag"])
+        self.bar_width.setValue(self.defaults["bar_width"])
+        self.bar_alpha.setValue(self.defaults["bar_alpha"])
+        self.bar_linewidth.setValue(self.defaults["bar_linewidth"])
+        self.bar_threshold.setChecked(self.defaults["bar_threshold_flag"])
         self.bar_threshold_colour.select(self.defaults["bar_threshold_color"])
-        self.bar_threshold_linewidth.field.setValue(self.defaults["bar_threshold_linewidth"])
-        self.user_mark_font_size.field.setValue(self.defaults["bar_mark_fontsize"])
-        self.markProlines.checkBox.setChecked(self.defaults["bar_mark_prolines_flag"])
+        self.bar_threshold_linewidth.setValue(self.defaults["bar_threshold_linewidth"])
+        self.user_mark_font_size.setValue(self.defaults["bar_mark_fontsize"])
+        self.markProlines.setChecked(self.defaults["bar_mark_prolines_flag"])
         self.proline_marker.field.setText(self.defaults["bar_mark_prolines_symbol"])
-        self.user_details.checkBox.setChecked(self.defaults["bar_mark_user_details_flag"])
-        self.colour_user_details.checkBox.setChecked(self.defaults["bar_mark_user_details_flag"])
+        self.user_details.setChecked(self.defaults["bar_mark_user_details_flag"])
+        self.colour_user_details.setChecked(self.defaults["bar_mark_user_details_flag"])
 
 
     def get_values(self):
 
-        self.apply_status.checkBox.setChecked(self.vars["bar_status_color_flag"])
-        self.meas_bar_colour.select(self.vars["bar_measured_color"])
-        self.lost_bar_colour.select(self.vars["bar_lost_color"])
-        self.unassigned_bar_colour.select(self.vars["bar_unassigned_color"])
-        self.bar_width.field.setValue(self.vars["bar_width"])
-        self.bar_alpha.field.setValue(self.vars["bar_alpha"])
-        self.bar_linewidth.field.setValue(self.vars["bar_linewidth"])
-        self.bar_threshold.checkBox.setChecked(self.vars["bar_threshold_flag"])
-        self.bar_threshold_colour.select(self.vars["bar_threshold_color"])
-        self.bar_threshold_linewidth.field.setValue(self.vars["bar_threshold_linewidth"])
-        self.user_mark_font_size.field.setValue(self.vars["bar_mark_fontsize"])
-        self.markProlines.checkBox.setChecked(self.vars["bar_mark_prolines_flag"])
-        self.proline_marker.field.setText(self.vars["bar_mark_prolines_symbol"])
-        self.user_details.checkBox.setChecked(self.vars["bar_mark_user_details_flag"])
-        self.colour_user_details.checkBox.setChecked(self.vars["bar_mark_user_details_flag"])
+        self.apply_status.setChecked(self.variables["bar_status_color_flag"])
+        self.meas_bar_colour.select(self.variables["bar_measured_color"])
+        self.lost_bar_colour.select(self.variables["bar_lost_color"])
+        self.unassigned_bar_colour.select(self.variables["bar_unassigned_color"])
+        self.bar_width.setValue(self.variables["bar_width"])
+        self.bar_alpha.setValue(self.variables["bar_alpha"])
+        self.bar_linewidth.setValue(self.variables["bar_linewidth"])
+        self.bar_threshold.setChecked(self.variables["bar_threshold_flag"])
+        self.bar_threshold_colour.select(self.variables["bar_threshold_color"])
+        self.bar_threshold_linewidth.setValue(self.variables["bar_threshold_linewidth"])
+        self.user_mark_font_size.setValue(self.variables["bar_mark_fontsize"])
+        self.markProlines.setChecked(self.variables["bar_mark_prolines_flag"])
+        self.proline_marker.field.setText(self.variables["bar_mark_prolines_symbol"])
+        self.user_details.setChecked(self.variables["bar_mark_user_details_flag"])
+        self.colour_user_details.setChecked(self.variables["bar_mark_user_details_flag"])
 
-    def set_values(self):
+    def set_values(self, variables):
 
-        self.vars["bar_status_color_flag"] = self.apply_status.checkBox.isChecked()
-        self.vars["bar_measured_color"] = self.meas_bar_colour.fields.currentText()
-        self.vars["bar_lost_color"] = self.lost_bar_colour.fields.currentText()
-        self.vars["bar_unassigned_color"] = self.unassigned_bar_colour.fields.currentText()
-        self.vars["bar_width"] = self.bar_width.field.value()
-        self.vars["bar_alpha"] = self.bar_alpha.field.value()
-        self.vars["bar_linewidth"] = self.bar_linewidth.field.value()
-        self.vars["bar_threshold_flag"] = self.bar_threshold.checkBox.isChecked()
-        self.vars["bar_threshold_color"] = self.bar_threshold_colour.fields.currentText()
-        self.vars["bar_threshold_linewidth"] = self.bar_threshold_linewidth.field.value()
-        self.vars["bar_mark_fontsize"] = self.user_mark_font_size.field.value()
-        self.vars["bar_mark_prolines_flag"] = self.markProlines.checkBox.isChecked()
-        self.vars["bar_mark_prolines_symbol"] = self.proline_marker.field.text()
-        self.vars["bar_mark_user_details_flag"] = self.user_details.checkBox.isChecked()
-        self.vars["bar_mark_user_details_flag"] = self.colour_user_details.checkBox.isChecked()
-        vars["vert_bar_settings"] = self.vars
+        self.variables["bar_status_color_flag"] = self.apply_status.checkBox.isChecked()
+        self.variables["bar_measured_color"] = self.meas_bar_colour.fields.currentText()
+        self.variables["bar_lost_color"] = self.lost_bar_colour.fields.currentText()
+        self.variables["bar_unassigned_color"] = self.unassigned_bar_colour.fields.currentText()
+        self.variables["bar_width"] = self.bar_width.field.value()
+        self.variables["bar_alpha"] = self.bar_alpha.field.value()
+        self.variables["bar_linewidth"] = self.bar_linewidth.field.value()
+        self.variables["bar_threshold_flag"] = self.bar_threshold.checkBox.isChecked()
+        self.variables["bar_threshold_color"] = self.bar_threshold_colour.fields.currentText()
+        self.variables["bar_threshold_linewidth"] = self.bar_threshold_linewidth.field.value()
+        self.variables["bar_mark_fontsize"] = self.user_mark_font_size.field.value()
+        self.variables["bar_mark_prolines_flag"] = self.markProlines.checkBox.isChecked()
+        self.variables["bar_mark_prolines_symbol"] = self.proline_marker.field.text()
+        self.variables["bar_mark_user_details_flag"] = self.user_details.checkBox.isChecked()
+        self.variables["bar_mark_user_details_flag"] = self.colour_user_details.checkBox.isChecked()
+        variables["vert_bar_settings"] = self.variables
         self.accept()

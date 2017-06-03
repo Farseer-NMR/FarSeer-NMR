@@ -13,3 +13,9 @@ class LabelledDoubleSpinBox(QWidget):
 
         self.layout().addWidget(label)
         self.layout().addWidget(self.field)
+
+    def setValue(self, value):
+        if value:
+            self.field.setValue(value)
+        else:
+            self.field.setValue(0)

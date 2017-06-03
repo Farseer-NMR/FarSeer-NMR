@@ -124,6 +124,7 @@ defaults = {
           "comp_bar_x_ticks_fs": 8,
           "comp_bar_x_ticks_pad": 2,
           "comp_bar_x_ticks_rot": 0,
+          "comp_bar_x_ticks_weight": "normal",
           "comp_bar_unassigned_shade": True,
           "comp_bar_unassigned_shade_alpha": 0.5
   },
@@ -198,6 +199,7 @@ defaults = {
           "do_res_evo": True,
           "res_evo_cols_page":  5,
           "res_evo_rows_page":  8,
+          "res_evo_x_ticks_nbins": 5,
           "res_evo_x_label": "[RNF125]",
           "res_evo_set_x_values": True,
           "res_evo_line_style": "-",

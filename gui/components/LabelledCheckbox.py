@@ -27,3 +27,9 @@ class LabelledCheckbox(QWidget):
 
     def isChecked(self):
         return self.checkBox.isChecked()
+
+    def setChecked(self, value):
+        if value is not None:
+            self.checkBox.setChecked(value)
+        else:
+            self.checkBox.setChecked(False)

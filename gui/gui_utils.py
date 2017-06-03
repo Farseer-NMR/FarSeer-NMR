@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 colours = OrderedDict([('#ff0000','red'),
+                       ('#8b0000','dark red'),
                        ('#00ffff', 'cyan'),
                        ('#ff8000', 'orange'),
                        ('#0080ff', 'manganese blue'),
@@ -12,7 +13,7 @@ colours = OrderedDict([('#ff0000','red'),
                        ('#ff00ff', 'magenta'),
                        ('#00ff80', 'spring green'),
                        ('#ff0080', 'deep pink'),
-                       ('#666666', 'light grey'),
+                       ('#e7e7e7', 'light grey'),
                        ('#999999', 'grey'),
                        ('#000000', 'black')])
 
@@ -28,6 +29,8 @@ settings_1k = {'peaklistarea_height': 420,
                'app_width': 1300
                }
 settings_2k = {}
+
+font_weights = ["ultralight", "light", "normal", "regular", "book", "medium", "roman", "semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
 
 def deliver_settings(resolution):
     if resolution == (768, 1366):

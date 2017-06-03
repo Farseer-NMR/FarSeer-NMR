@@ -8,18 +8,22 @@ from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
 from current.default_config import defaults
+from gui.gui_utils import font_weights
+from functools import partial
+
+
 
 class TitrationPlotPopup(QDialog):
 
-    def __init__(self, parent=None, vars=None, **kw):
+    def __init__(self, parent=None, variables=None, **kw):
         super(TitrationPlotPopup, self).__init__(parent)
         self.setWindowTitle("Titration Plot Settings")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-        self.vars = None
-        if vars:
-            self.vars = vars["titration_plot_settings"]
+        self.variables = None
+        if variables:
+            self.variables = variables["titration_plot_settings"]
         self.default = defaults["titration_plot_settings"]
 
         self.tplot_subtitle_groupbox = QGroupBox()
@@ -29,7 +33,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_subtitle_fn = FontComboBox(self, "Subtitle Font")
         self.tplot_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size")
         self.tplot_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding")
-        self.tplot_subtitle_weight = LabelledCombobox(self, text="Subtitle Font Weight", items=['bold', 'italic', 'normal'])
+        self.tplot_subtitle_weight = LabelledCombobox(self, text="Subtitle Font Weight", items=font_weights)
 
         self.tplot_x_label_groupbox = QGroupBox()
         self.tplot_x_label_groupbox_layout = QVBoxLayout()
@@ -39,7 +43,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_x_label_fn = FontComboBox(self, "X Font Label")
         self.tplot_x_label_fs = LabelledSpinBox(self, "X Label Font Size")
         self.tplot_x_label_pad = LabelledSpinBox(self, "X Label Padding")
-        self.tplot_x_label_weight = LabelledCombobox(self, text="X Label Font Weight", items=['bold', 'normal'])
+        self.tplot_x_label_weight = LabelledCombobox(self, text="X Label Font Weight", items=font_weights)
 
         self.tplot_y_label_groupbox = QGroupBox()
         self.tplot_y_label_groupbox_layout = QVBoxLayout()
@@ -54,7 +58,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_label_fn = FontComboBox(self, "Y Label Font")
         self.tplot_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
         self.tplot_y_label_pad = LabelledSpinBox(self, "Y Label Padding")
-        self.tplot_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=['bold', 'normal'])
+        self.tplot_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
 
         self.tplot_x_ticks_pad = LabelledSpinBox(self, "X Tick Padding")
         self.tplot_x_ticks_len = LabelledSpinBox(self, "X Tick Length")
@@ -63,7 +67,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size")
         self.tplot_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation")
         self.tplot_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding")
-        self.tplot_y_ticks_weight = LabelledCombobox(self, text="Y Tick Font Weight", items=['bold', 'normal'])
+        self.tplot_y_ticks_weight = LabelledCombobox(self, text="Y Tick Font Weight", items=font_weights)
         self.tplot_y_ticks_len = LabelledDoubleSpinBox(self, "Y Tick Length")
         self.tplot_y_grid_flag = LabelledCheckbox(self, "Show Y Grid")
         self.tplot_y_grid_color = ColourBox(self, "Y Grid Colour")
@@ -125,101 +129,101 @@ class TitrationPlotPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(self.set_values)
+        self.buttonBox.accepted.connect(partial(self.set_values, variables))
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 8, 2, 1, 1)
 
-        if vars:
+        if variables:
             self.get_values()
 
     def get_defaults(self):
         self.tplot_subtitle_fn.select(self.default["tplot_subtitle_fn"])
-        self.tplot_subtitle_fs.field.setValue(self.default["tplot_subtitle_fs"])
+        self.tplot_subtitle_fs.setValue(self.default["tplot_subtitle_fs"])
         self.tplot_subtitle_weight.select(self.default["tplot_subtitle_weight"])
-        self.tplot_subtitle_pad.field.setValue(self.default["tplot_subtitle_pad"])
+        self.tplot_subtitle_pad.setValue(self.default["tplot_subtitle_pad"])
         self.tplot_x_label_fn.select(self.default["tplot_x_label_fn"])
-        self.tplot_x_label_fs.field.setValue(self.default["tplot_x_label_fs"])
-        self.tplot_x_label_pad.field.setValue(self.default["tplot_x_label_pad"])
+        self.tplot_x_label_fs.setValue(self.default["tplot_x_label_fs"])
+        self.tplot_x_label_pad.setValue(self.default["tplot_x_label_pad"])
         self.tplot_x_label_weight.select(self.default["tplot_x_label_weight"])
         self.tplot_y_label_fn.select(self.default["tplot_y_label_fn"])
-        self.tplot_y_label_fs.field.setValue(self.default["tplot_y_label_fs"])
-        self.tplot_y_label_pad.field.setValue(self.default["tplot_y_label_pad"])
+        self.tplot_y_label_fs.setValue(self.default["tplot_y_label_fs"])
+        self.tplot_y_label_pad.setValue(self.default["tplot_y_label_pad"])
         self.tplot_y_label_weight.select(self.default["tplot_y_label_weight"])
-        self.tplot_x_ticks_pad.field.setValue(self.default["tplot_x_ticks_pad"])
-        self.tplot_x_ticks_len.field.setValue(self.default["tplot_x_ticks_len"])
+        self.tplot_x_ticks_pad.setValue(self.default["tplot_x_ticks_pad"])
+        self.tplot_x_ticks_len.setValue(self.default["tplot_x_ticks_len"])
 
         self.tplot_y_ticks_fn.select(self.default["tplot_y_ticks_fn"])
-        self.tplot_y_ticks_fs.field.setValue(self.default["tplot_y_ticks_fs"])
-        self.tplot_y_ticks_rot.field.setValue(self.default["tplot_y_ticks_rot"])
-        self.tplot_y_ticks_pad.field.setValue(self.default["tplot_y_ticks_pad"])
+        self.tplot_y_ticks_fs.setValue(self.default["tplot_y_ticks_fs"])
+        self.tplot_y_ticks_rot.setValue(self.default["tplot_y_ticks_rot"])
+        self.tplot_y_ticks_pad.setValue(self.default["tplot_y_ticks_pad"])
         self.tplot_y_ticks_weight.select(self.default["tplot_y_ticks_weight"])
-        self.tplot_y_ticks_len.field.setValue(self.default["tplot_y_ticks_len"])
-        self.tplot_y_grid_flag.checkBox.setChecked(self.default["tplot_y_grid_flag"])
+        self.tplot_y_ticks_len.setValue(self.default["tplot_y_ticks_len"])
+        self.tplot_y_grid_flag.setChecked(self.default["tplot_y_grid_flag"])
         self.tplot_y_grid_color.select(self.default["tplot_y_grid_color"])
         self.tplot_y_grid_linestyle.select(self.default["tplot_y_grid_linestyle"])
-        self.tplot_y_grid_linewidth.field.setValue(self.default["tplot_y_grid_linewidth"])
-        self.tplot_y_grid_alpha.field.setValue(self.default["tplot_y_grid_alpha"])
+        self.tplot_y_grid_linewidth.setValue(self.default["tplot_y_grid_linewidth"])
+        self.tplot_y_grid_alpha.setValue(self.default["tplot_y_grid_alpha"])
 
 
-    def set_values(self):
-        self.vars["tplot_subtitle_fn"] = self.tplot_subtitle_fn.fields.currentText()
-        self.vars["tplot_title_fs"] = self.tplot_title_y.field.value()
-        self.vars["tplot_subtitle_pad"] = self.tplot_subtitle_pad.field.value()
-        self.vars["tplot_subtitle_weight"] = self.tplot_subtitle_weight.fields.currentText()
-        self.vars["tplot_x_label_fn"] = self.tplot_x_label_fn.fields.currentText()
-        self.vars["tplot_x_label_fs"] = self.tplot_x_label_fs.field.value()
-        self.vars["tplot_x_label_pad"] = self.tplot_x_label_pad.field.value()
-        self.vars["tplot_x_label_weight"] = self.tplot_x_label_weight.fields.currentText()
-        self.vars["tplot_y_label_fn"] = self.tplot_y_label_fn.fields.currentText()
-        self.vars["tplot_y_label_fs"] = self.tplot_y_label_fs.field.value()
-        self.vars["tplot_y_label_pad"] = self.tplot_y_label_pad.field.value()
-        self.vars["tplot_y_label_weight"] = self.tplot_y_label_weight.fields.currentText()
+    def set_values(self, variables):
+        self.variables["tplot_subtitle_fn"] = self.tplot_subtitle_fn.fields.currentText()
+        self.variables["tplot_subtitle_fs"] = self.tplot_subtitle_fs.field.value()
+        self.variables["tplot_subtitle_pad"] = self.tplot_subtitle_pad.field.value()
+        self.variables["tplot_subtitle_weight"] = self.tplot_subtitle_weight.fields.currentText()
+        self.variables["tplot_x_label_fn"] = self.tplot_x_label_fn.fields.currentText()
+        self.variables["tplot_x_label_fs"] = self.tplot_x_label_fs.field.value()
+        self.variables["tplot_x_label_pad"] = self.tplot_x_label_pad.field.value()
+        self.variables["tplot_x_label_weight"] = self.tplot_x_label_weight.fields.currentText()
+        self.variables["tplot_y_label_fn"] = self.tplot_y_label_fn.fields.currentText()
+        self.variables["tplot_y_label_fs"] = self.tplot_y_label_fs.field.value()
+        self.variables["tplot_y_label_pad"] = self.tplot_y_label_pad.field.value()
+        self.variables["tplot_y_label_weight"] = self.tplot_y_label_weight.fields.currentText()
 
-        self.vars["tplot_x_ticks_pad"] = self.tplot_x_ticks_pad.field.value()
-        self.vars["tplot_x_ticks_len"] = self.tplot_x_ticks_len.field.value()
+        self.variables["tplot_x_ticks_pad"] = self.tplot_x_ticks_pad.field.value()
+        self.variables["tplot_x_ticks_len"] = self.tplot_x_ticks_len.field.value()
 
-        self.vars["tplot_y_ticks_fn"] = self.tplot_y_ticks_pad.fields.currentText()
-        self.vars["tplot_y_ticks_fs"] = self.tplot_y_ticks_fs.field.value()
-        self.vars["tplot_y_ticks_rot"] = self.tplot_y_ticks_rot.field.value()
-        self.vars["tplot_y_ticks_pad"] = self.tplot_y_ticks_pad.field.value()
+        self.variables["tplot_y_ticks_fn"] = self.tplot_y_ticks_fn.fields.currentText()
+        self.variables["tplot_y_ticks_fs"] = self.tplot_y_ticks_fs.field.value()
+        self.variables["tplot_y_ticks_rot"] = self.tplot_y_ticks_rot.field.value()
+        self.variables["tplot_y_ticks_pad"] = self.tplot_y_ticks_pad.field.value()
 
-        self.vars["tplot_y_ticks_weight"] = self.tplot_y_ticks_weight.fields.currentText()
-        self.vars["tplot_y_ticks_len"] = self.tplot_y_ticks_len.field.value()
-        self.vars["tplot_y_grid_flag"] = self.tplot_y_grid_flag.checkBox.isChecked()
-        self.vars["tplot_y_grid_color"] = self.tplot_y_grid_color.fields.currentText()
-        self.vars["tplot_y_grid_linestyle"] = self.tplot_y_grid_linestyle.fields.currentText()
-        self.vars["tplot_y_grid_linewidth"] = self.tplot_y_grid_linewidth.field.value()
-        self.vars["tplot_y_grid_alpha"] = self.tplot_y_grid_alpha.field.value()
+        self.variables["tplot_y_ticks_weight"] = self.tplot_y_ticks_weight.fields.currentText()
+        self.variables["tplot_y_ticks_len"] = self.tplot_y_ticks_len.field.value()
+        self.variables["tplot_y_grid_flag"] = self.tplot_y_grid_flag.checkBox.isChecked()
+        self.variables["tplot_y_grid_color"] = self.tplot_y_grid_color.fields.currentText()
+        self.variables["tplot_y_grid_linestyle"] = self.tplot_y_grid_linestyle.fields.currentText()
+        self.variables["tplot_y_grid_linewidth"] = self.tplot_y_grid_linewidth.field.value()
+        self.variables["tplot_y_grid_alpha"] = self.tplot_y_grid_alpha.field.value()
 
-        vars["tplot_settings"] = self.vars
+        variables["tplot_settings"] = self.variables
         self.accept()
 
     def get_values(self):
-        self.tplot_subtitle_fn.field.select(self.vars["tplot_subtitle_fn"])
-        self.tplot_title_fs.field.setValue(self.vars["tplot_title_fs"])
-        self.tplot_subtitle_pad.field.setValue(self.vars["tplot_title_y"])
-        self.tplot_subtitle_weight.select(self.vars["tplot_title_fn"])
-        self.tplot_x_label_fn.select(self.vars["tplot_x_label_fn"])
-        self.tplot_x_label_fs.field.setValue(self.vars["tplot_x_label_fs"])
-        self.tplot_x_label_pad.field.setValue(self.vars["tplot_x_label_pad"])
-        self.tplot_x_label_weight.select(self.vars["tplot_x_label_weight"])
-        self.tplot_y_label_fn.select(self.vars["tplot_y_label_fn"])
-        self.tplot_y_label_fs.field.setValue(self.vars["tplot_y_label_fs"])
-        self.tplot_y_label_pad.field.setValue(self.vars["tplot_y_label_pad"])
-        self.tplot_y_label_weight.select(self.vars["tplot_y_label_weight"])
-        self.tplot_x_ticks_pad.field.setValue(self.vars["tplot_x_ticks_pad"])
-        self.tplot_x_ticks_len.field.setValue(self.vars["tplot_x_ticks_fs"])
+        self.tplot_subtitle_fn.select(self.variables["tplot_subtitle_fn"])
+        self.tplot_subtitle_fs.setValue(self.variables["tplot_subtitle_fs"])
+        self.tplot_subtitle_weight.select(self.variables["tplot_subtitle_weight"])
+        self.tplot_subtitle_pad.setValue(self.variables["tplot_subtitle_pad"])
+        self.tplot_x_label_fn.select(self.variables["tplot_x_label_fn"])
+        self.tplot_x_label_fs.setValue(self.variables["tplot_x_label_fs"])
+        self.tplot_x_label_pad.setValue(self.variables["tplot_x_label_pad"])
+        self.tplot_x_label_weight.select(self.variables["tplot_x_label_weight"])
+        self.tplot_y_label_fn.select(self.variables["tplot_y_label_fn"])
+        self.tplot_y_label_fs.setValue(self.variables["tplot_y_label_fs"])
+        self.tplot_y_label_pad.setValue(self.variables["tplot_y_label_pad"])
+        self.tplot_y_label_weight.select(self.variables["tplot_y_label_weight"])
+        self.tplot_x_ticks_pad.setValue(self.variables["tplot_x_ticks_pad"])
+        self.tplot_x_ticks_len.setValue(self.variables["tplot_x_ticks_len"])
 
-        self.tplot_y_ticks_fn.field.select(self.vars["tplot_y_ticks_fn"])
-        self.tplot_y_ticks_fs.field.setValue(self.vars["tplot_y_ticks_fs"])
-        self.tplot_y_ticks_rot.field.setValue(self.vars["tplot_y_ticks_rot"])
-        self.tplot_y_ticks_pad.field.setValue(self.vars["tplot_y_ticks_pad"])
-        self.tplot_y_ticks_weight.select(self.vars["tplot_y_ticks_weight"])
-        self.tplot_y_ticks_len.field.setValue(self.vars["tplot_y_ticks_len"])
-        self.tplot_y_grid_flag.checkBox.setChecked(self.vars["tplot_y_grid_flag"])
-        self.tplot_y_grid_color.select(self.vars["tplot_y_grid_color"])
-        self.tplot_y_grid_linestyle.field.select(self.vars["tplot_y_grid_linestyle"])
-        self.tplot_y_grid_linewidth.field.setValue(self.vars["tplot_y_grid_linewidth"])
-        self.tplot_y_grid_alpha.field.setValue(self.vars["tplot_y_grid_alpha"])
+        self.tplot_y_ticks_fn.select(self.variables["tplot_y_ticks_fn"])
+        self.tplot_y_ticks_fs.setValue(self.variables["tplot_y_ticks_fs"])
+        self.tplot_y_ticks_rot.setValue(self.variables["tplot_y_ticks_rot"])
+        self.tplot_y_ticks_pad.setValue(self.variables["tplot_y_ticks_pad"])
+        self.tplot_y_ticks_weight.select(self.variables["tplot_y_ticks_weight"])
+        self.tplot_y_ticks_len.setValue(self.variables["tplot_y_ticks_len"])
+        self.tplot_y_grid_flag.setChecked(self.variables["tplot_y_grid_flag"])
+        self.tplot_y_grid_color.select(self.variables["tplot_y_grid_color"])
+        self.tplot_y_grid_linestyle.select(self.variables["tplot_y_grid_linestyle"])
+        self.tplot_y_grid_linewidth.setValue(self.variables["tplot_y_grid_linewidth"])
+        self.tplot_y_grid_alpha.setValue(self.variables["tplot_y_grid_alpha"])

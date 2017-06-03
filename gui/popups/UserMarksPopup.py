@@ -7,14 +7,14 @@ from current.default_config import defaults
 
 class UserMarksPopup(QDialog):
 
-    def __init__(self, parent=None, vars=None, **kw):
+    def __init__(self, parent=None, variables=None, **kw):
         super(UserMarksPopup, self).__init__(parent)
         self.setWindowTitle("Vertical Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-        if vars:
-            self.vars = vars["user_mark_settings"]
+        if variables:
+            self.variables = variables["user_mark_settings"]
         self.default = defaults["user_mark_settings"]
         self.h0 = LabelledLineEdit(self, text='H0')
         self.v0 = LabelledLineEdit(self, text='V0')
@@ -39,13 +39,13 @@ class UserMarksPopup(QDialog):
         self.layout().addWidget(self.p5, 6, 0, 1, 1)
 
         self.layout().addWidget(self.buttonBox, 7, 0, 1, 2)
-        print(vars)
-        if vars:
+        print(variables)
+        if variables:
             self.setValuesFromConfig()
 
 
     def setValuesFromConfig(self):
-        values = self.vars
+        values = self.variables
         self.h0.field.setText(values['h0'])
         self.v0.field.setText(values['v0'])
         self.p1.field.setText(values['p1'])

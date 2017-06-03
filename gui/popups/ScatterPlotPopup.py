@@ -10,18 +10,19 @@ from gui.components.FontComboBox import FontComboBox
 
 import json
 from current.default_config import defaults
+from functools import partial
 
 class ScatterPlotPopup(QDialog):
 
-    def __init__(self, parent=None, vars=None, **kw):
+    def __init__(self, parent=None, variables=None, **kw):
         super(ScatterPlotPopup, self).__init__(parent)
         self.setWindowTitle("Scatter Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-        self.vars = None
-        if vars:
-            self.vars = vars["cs_scatter_settings"]
+        self.variables = None
+        if variables:
+            self.variables = variables["cs_scatter_settings"]
         self.default = defaults["cs_scatter_settings"]
 
         self.cs_scatter_cols_page = LabelledSpinBox(self, "Columns Per Page")
@@ -58,22 +59,22 @@ class ScatterPlotPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(self.set_values)
+        self.buttonBox.accepted.connect(partial(self.set_values, variables))
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 7, 0, 1, 2)
 
-        if vars:
+        if variables:
             self.get_values()
 
     def get_defaults(self):
-        self.cs_scatter_cols_page.field.setValue(self.default["cs_scatter_cols_page"])
-        self.cs_scatter_rows_page.field.setValue(self.default["cs_scatter_rows_page"])
+        self.cs_scatter_cols_page.setValue(self.default["cs_scatter_cols_page"])
+        self.cs_scatter_rows_page.setValue(self.default["cs_scatter_rows_page"])
         self.cs_scatter_x_label.field.setText(self.default["cs_scatter_x_label"])
         self.cs_scatter_y_label.field.setText(self.default["cs_scatter_y_label"])
-        self.cs_scatter_mksize.field.setValue(self.default["cs_scatter_mksize"])
-        self.cs_scatter_scale.field.setValue(self.default["cs_scatter_scale"])
+        self.cs_scatter_mksize.setValue(self.default["cs_scatter_mksize"])
+        self.cs_scatter_scale.setValue(self.default["cs_scatter_scale"])
         self.cs_scatter_mk_type.select(self.default["cs_scatter_mk_type"])
 
         self.cs_scatter_mk_start_color.select(self.default["cs_scatter_mk_start_color"])
@@ -82,40 +83,40 @@ class ScatterPlotPopup(QDialog):
         self.cs_scatter_mk_color.select(self.default["cs_scatter_mk_color"])
         self.cs_scatter_mk_edgecolors.select(self.default["cs_scatter_mk_edgecolors"])
         self.cs_scatter_mk_lost_color.select(self.default["cs_scatter_mk_lost_color"])
-        self.cs_scatter_hide_lost.checkBox.setChecked(self.default["cs_scatter_hide_lost"])
+        self.cs_scatter_hide_lost.setChecked(self.default["cs_scatter_hide_lost"])
 
 
-    def set_values(self):
-        self.vars["cs_scatter_cols_page"] = self.cs_scatter_cols_page.field.value()
-        self.vars["cs_scatter_rows_page"] = self.cs_scatter_rows_page.field.value()
-        self.vars["cs_scatter_x_label"] = self.cs_scatter_x_label.field.text()
-        self.vars["cs_scatter_y_label"] = self.cs_scatter_y_label.field.text()
-        self.vars["cs_scatter_mksize"] = self.cs_scatter_mksize.field.value()
-        self.vars["cs_scatter_scale"] = self.cs_scatter_scale.field.value()
-        self.vars["cs_scatter_mk_type"] = self.cs_scatter_mk_type.fields.currentText()
-        self.vars["cs_scatter_mk_start_color"] = self.cs_scatter_mk_start_color.fields.currentText()
-        self.vars["cs_scatter_mk_end_color"] = self.cs_scatter_mk_end_color.fields.currentText()
-        self.vars["cs_scatter_markers"] = list(self.cs_scatter_markers.field.text())
-        self.vars["cs_scatter_mk_color"] = self.cs_scatter_mk_color.fields.currentText()
-        self.vars["cs_scatter_mk_edgecolors"] = self.cs_scatter_mk_edgecolors.fields.currentText()
-        self.vars["cs_scatter_mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
-        self.vars["cs_scatter_hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
-        vars["cs_scatter_settings"] = self.vars
+    def set_values(self, variables):
+        self.variables["cs_scatter_cols_page"] = self.cs_scatter_cols_page.field.value()
+        self.variables["cs_scatter_rows_page"] = self.cs_scatter_rows_page.field.value()
+        self.variables["cs_scatter_x_label"] = self.cs_scatter_x_label.field.text()
+        self.variables["cs_scatter_y_label"] = self.cs_scatter_y_label.field.text()
+        self.variables["cs_scatter_mksize"] = self.cs_scatter_mksize.field.value()
+        self.variables["cs_scatter_scale"] = self.cs_scatter_scale.field.value()
+        self.variables["cs_scatter_mk_type"] = self.cs_scatter_mk_type.fields.currentText()
+        self.variables["cs_scatter_mk_start_color"] = self.cs_scatter_mk_start_color.fields.currentText()
+        self.variables["cs_scatter_mk_end_color"] = self.cs_scatter_mk_end_color.fields.currentText()
+        self.variables["cs_scatter_markers"] = list(self.cs_scatter_markers.field.text())
+        self.variables["cs_scatter_mk_color"] = self.cs_scatter_mk_color.fields.currentText()
+        self.variables["cs_scatter_mk_edgecolors"] = self.cs_scatter_mk_edgecolors.fields.currentText()
+        self.variables["cs_scatter_mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
+        self.variables["cs_scatter_hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
+        variables["cs_scatter_settings"] = self.variables
         self.accept()
 
     def get_values(self):
-        self.cs_scatter_cols_page.field.setValue(self.vars["cs_scatter_cols_page"])
-        self.cs_scatter_rows_page.field.setValue(self.vars["cs_scatter_rows_page"])
-        self.cs_scatter_x_label.field.setText(self.vars["cs_scatter_x_label"])
-        self.cs_scatter_y_label.field.setText(self.vars["cs_scatter_y_label"])
-        self.cs_scatter_mksize.field.setValue(self.vars["cs_scatter_mksize"])
-        self.cs_scatter_scale.field.setValue(self.vars["cs_scatter_scale"])
-        self.cs_scatter_mk_type.select(self.vars["cs_scatter_mk_type"])
+        self.cs_scatter_cols_page.setValue(self.variables["cs_scatter_cols_page"])
+        self.cs_scatter_rows_page.setValue(self.variables["cs_scatter_rows_page"])
+        self.cs_scatter_x_label.field.setText(self.variables["cs_scatter_x_label"])
+        self.cs_scatter_y_label.field.setText(self.variables["cs_scatter_y_label"])
+        self.cs_scatter_mksize.setValue(self.variables["cs_scatter_mksize"])
+        self.cs_scatter_scale.setValue(self.variables["cs_scatter_scale"])
+        self.cs_scatter_mk_type.select(self.variables["cs_scatter_mk_type"])
 
-        self.cs_scatter_mk_start_color.select(self.vars["cs_scatter_mk_start_color"])
-        self.cs_scatter_mk_end_color.select(self.vars["cs_scatter_mk_end_color"])
-        self.cs_scatter_markers.field.setText(', '.join(self.vars["cs_scatter_markers"]))
-        self.cs_scatter_mk_color.select(self.vars["cs_scatter_mk_color"])
-        self.cs_scatter_mk_edgecolors.select(self.vars["cs_scatter_mk_edgecolors"])
-        self.cs_scatter_mk_lost_color.select(self.vars["cs_scatter_mk_lost_color"])
-        self.cs_scatter_hide_lost.checkBox.setChecked(self.vars["cs_scatter_hide_lost"])
+        self.cs_scatter_mk_start_color.select(self.variables["cs_scatter_mk_start_color"])
+        self.cs_scatter_mk_end_color.select(self.variables["cs_scatter_mk_end_color"])
+        self.cs_scatter_markers.field.setText(', '.join(self.variables["cs_scatter_markers"]))
+        self.cs_scatter_mk_color.select(self.variables["cs_scatter_mk_color"])
+        self.cs_scatter_mk_edgecolors.select(self.variables["cs_scatter_mk_edgecolors"])
+        self.cs_scatter_mk_lost_color.select(self.variables["cs_scatter_mk_lost_color"])
+        self.cs_scatter_hide_lost.setChecked(self.variables["cs_scatter_hide_lost"])

@@ -8,20 +8,21 @@ from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-import json
+from functools import partial
 from current.default_config import defaults
+from gui.gui_utils import font_weights
 
 class DPrePopup(QDialog):
 
-    def __init__(self, parent=None, vars=None, **kw):
+    def __init__(self, parent=None, variables=None, **kw):
         super(DPrePopup, self).__init__(parent)
-        self.setWindowTitle("Residue Evolution Plot")
+        self.setWindowTitle("DPre Oscillation Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
-        self.vars = None
-        if vars:
-            self.vars = vars["dpre_osci_settings"]
+        self.variables = None
+        if variables:
+            self.variables = variables["dpre_osci_settings"]
         self.default = defaults["dpre_osci_settings"]
 
         self.dpre_osci_width = LabelledSpinBox(self, "Scale Factor for Width")
@@ -39,7 +40,7 @@ class DPrePopup(QDialog):
         self.dpre_osci_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
         self.dpre_osci_y_label_pad = LabelledSpinBox(self, "Y Label Padding")
         self.dpre_osci_y_label_fn = FontComboBox(self, "Y Label Font")
-        self.dpre_osci_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=['bold', 'normal'])
+        self.dpre_osci_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
         self.dpre_osci_y_ticks_len = LabelledSpinBox(self, "Y Tick Length")
         self.dpre_osci_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size")
         self.dpre_osci_y_ticks_pad = LabelledSpinBox(self, "Y Tick Padding")
@@ -78,94 +79,94 @@ class DPrePopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(self.set_values)
+        self.buttonBox.accepted.connect(partial(self.set_values, variables))
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 12, 0, 1, 2)
 
-        if vars:
+        if variables:
             self.get_values()
 
     def get_defaults(self):
-        self.dpre_osci_width.field.setValue(self.default["dpre_osci_width"])
-        self.dpre_osci_title_y.field.setValue(self.default["dpre_osci_title_y"])
-        self.dpre_osci_title_fs.field.setValue(self.default["dpre_osci_title_fs"])
+        self.dpre_osci_width.setValue(self.default["dpre_osci_width"])
+        self.dpre_osci_title_y.setValue(self.default["dpre_osci_title_y"])
+        self.dpre_osci_title_fs.setValue(self.default["dpre_osci_title_fs"])
         self.dpre_osci_title_fn.select(self.default["dpre_osci_title_fn"])
-        self.dpre_osci_dpre_ms.field.setValue(self.default["dpre_osci_dpre_ms"])
-        self.dpre_osci_dpre_alpha.field.setValue(self.default["dpre_osci_dpre_alpha"])
-        self.dpre_osci_smooth_lw.field.setValue(self.default["dpre_osci_smooth_lw"])
+        self.dpre_osci_dpre_ms.setValue(self.default["dpre_osci_dpre_ms"])
+        self.dpre_osci_dpre_alpha.setValue(self.default["dpre_osci_dpre_alpha"])
+        self.dpre_osci_smooth_lw.setValue(self.default["dpre_osci_smooth_lw"])
         self.dpre_osci_ref_color.select(self.default["dpre_osci_ref_color"])
         self.dpre_osci_color_init.select(self.default["dpre_osci_color_init"])
         self.dpre_osci_color_end.select(self.default["dpre_osci_color_end"])
-        self.dpre_osci_x_ticks_fs.field.setValue(self.default["dpre_osci_x_ticks_fs"])
+        self.dpre_osci_x_ticks_fs.setValue(self.default["dpre_osci_x_ticks_fs"])
         self.dpre_osci_x_ticks_fn.select(self.default["dpre_osci_x_ticks_fn"])
-        self.dpre_osci_y_label_fs.field.setValue(self.default["dpre_osci_y_label_fs"])
-        self.dpre_osci_y_label_pad.field.setValue(self.default["dpre_osci_y_label_pad"])
+        self.dpre_osci_y_label_fs.setValue(self.default["dpre_osci_y_label_fs"])
+        self.dpre_osci_y_label_pad.setValue(self.default["dpre_osci_y_label_pad"])
         self.dpre_osci_y_label_fn.select(self.default["dpre_osci_y_label_fn"])
         self.dpre_osci_y_label_weight.select(self.default["dpre_osci_y_label_weight"])
-        self.dpre_osci_y_ticks_len.field.setValue(self.default["dpre_osci_y_ticks_len"])
-        self.dpre_osci_y_ticks_fs.field.setValue(self.default["dpre_osci_y_ticks_fs"])
-        self.dpre_osci_y_ticks_pad.field.setValue(self.default["dpre_osci_y_ticks_pad"])
+        self.dpre_osci_y_ticks_len.setValue(self.default["dpre_osci_y_ticks_len"])
+        self.dpre_osci_y_ticks_fs.setValue(self.default["dpre_osci_y_ticks_fs"])
+        self.dpre_osci_y_ticks_pad.setValue(self.default["dpre_osci_y_ticks_pad"])
         self.dpre_osci_grid_color.select(self.default["dpre_osci_grid_color"])
-        self.dpre_osci_res_shade.checkBox.setChecked(self.default["dpre_osci_res_shade"])
+        self.dpre_osci_res_shade.setChecked(self.default["dpre_osci_res_shade"])
         self.dpre_osci_res_highlight.field.setText(str(self.default["dpre_osci_res_highlight"]))
-        self.dpre_osci_rh_fs.field.setValue(self.default["dpre_osci_rh_fs"])
-        self.dpre_osci_rh_y.field.setValue(self.default["dpre_osci_rh_y"])
+        self.dpre_osci_rh_fs.setValue(self.default["dpre_osci_rh_fs"])
+        self.dpre_osci_rh_y.setValue(self.default["dpre_osci_rh_y"])
 
 
-    def set_values(self):
-        self.vars["dpre_osci_width"] = self.dpre_osci_width.field.value()
-        self.vars["dpre_osci_title_y"] = self.dpre_osci_title_y.field.value()
-        self.vars["dpre_osci_title_fs"] = self.dpre_osci_title_fs.field.value()
-        self.vars["dpre_osci_title_fn"] = self.dpre_osci_title_fn.fields.currentText()
-        self.vars["dpre_osci_dpre_ms"] = self.dpre_osci_dpre_ms.field.value()
-        self.vars["dpre_osci_dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
-        self.vars["dpre_osci_smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
-        self.vars["dpre_osci_ref_color"] = self.dpre_osci_ref_color.fields.currentText()
-        self.vars["dpre_osci_color_init"] = self.dpre_osci_color_init.fields.currentText()
-        self.vars["dpre_osci_color_end"] = self.dpre_osci_color_end.fields.currentText()
-        self.vars["dpre_osci_x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
-        self.vars["dpre_osci_x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
-        self.vars["dpre_osci_y_label_fs"] = self.dpre_osci_y_label_fs.field.value()
-        self.vars["dpre_osci_y_label_pad"] = self.dpre_osci_y_label_pad.field.value()
-        self.vars["dpre_osci_y_label_fn"] = self.dpre_osci_y_label_fn.fields.currentText()
-        self.vars["dpre_osci_y_label_weight"] = self.dpre_osci_y_label_weight.fields.currentText()
-        self.vars["dpre_osci_y_ticks_len"] = self.dpre_osci_y_ticks_len.field.value()
-        self.vars["dpre_osci_y_ticks_fs"] = self.dpre_osci_y_ticks_fs.field.value()
-        self.vars["dpre_osci_y_ticks_pad"] = self.dpre_osci_y_ticks_pad.field.value()
-        self.vars["dpre_osci_grid_color"] = self.dpre_osci_grid_color.fields.currentText()
-        self.vars["dpre_osci_res_shade"] = self.dpre_osci_res_shade.checkBox.isChecked()
-        self.vars["dpre_osci_res_highlight"] = self.dpre_osci_res_highlight.field.text()
-        self.vars["dpre_osci_rh_fs"] = self.dpre_osci_rh_fs.field.value()
-        self.vars["dpre_osci_rh_y"] = self.dpre_osci_rh_y.field.value()
-        vars["dpre_osci_settings"] = self.vars
+    def set_values(self, variables):
+        self.variables["dpre_osci_width"] = self.dpre_osci_width.field.value()
+        self.variables["dpre_osci_title_y"] = self.dpre_osci_title_y.field.value()
+        self.variables["dpre_osci_title_fs"] = self.dpre_osci_title_fs.field.value()
+        self.variables["dpre_osci_title_fn"] = self.dpre_osci_title_fn.fields.currentText()
+        self.variables["dpre_osci_dpre_ms"] = self.dpre_osci_dpre_ms.field.value()
+        self.variables["dpre_osci_dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
+        self.variables["dpre_osci_smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
+        self.variables["dpre_osci_ref_color"] = self.dpre_osci_ref_color.fields.currentText()
+        self.variables["dpre_osci_color_init"] = self.dpre_osci_color_init.fields.currentText()
+        self.variables["dpre_osci_color_end"] = self.dpre_osci_color_end.fields.currentText()
+        self.variables["dpre_osci_x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
+        self.variables["dpre_osci_x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
+        self.variables["dpre_osci_y_label_fs"] = self.dpre_osci_y_label_fs.field.value()
+        self.variables["dpre_osci_y_label_pad"] = self.dpre_osci_y_label_pad.field.value()
+        self.variables["dpre_osci_y_label_fn"] = self.dpre_osci_y_label_fn.fields.currentText()
+        self.variables["dpre_osci_y_label_weight"] = self.dpre_osci_y_label_weight.fields.currentText()
+        self.variables["dpre_osci_y_ticks_len"] = self.dpre_osci_y_ticks_len.field.value()
+        self.variables["dpre_osci_y_ticks_fs"] = self.dpre_osci_y_ticks_fs.field.value()
+        self.variables["dpre_osci_y_ticks_pad"] = self.dpre_osci_y_ticks_pad.field.value()
+        self.variables["dpre_osci_grid_color"] = self.dpre_osci_grid_color.fields.currentText()
+        self.variables["dpre_osci_res_shade"] = self.dpre_osci_res_shade.checkBox.isChecked()
+        self.variables["dpre_osci_res_highlight"] = self.dpre_osci_res_highlight.field.text()
+        self.variables["dpre_osci_rh_fs"] = self.dpre_osci_rh_fs.field.value()
+        self.variables["dpre_osci_rh_y"] = self.dpre_osci_rh_y.field.value()
+        variables["dpre_osci_settings"] = self.variables
         self.accept()
 
 
     def get_values(self):
-        self.dpre_osci_width.field.setValue(self.vars["dpre_osci_width"])
-        self.dpre_osci_title_y.field.setValue(self.vars["dpre_osci_title_y"])
-        self.dpre_osci_title_fs.field.setValue(self.vars["dpre_osci_title_fs"])
-        self.dpre_osci_title_fn.select(self.vars["dpre_osci_title_fn"])
-        self.dpre_osci_dpre_ms.field.setValue(self.vars["dpre_osci_dpre_ms"])
-        self.dpre_osci_dpre_alpha.field.setValue(self.vars["dpre_osci_dpre_alpha"])
-        self.dpre_osci_smooth_lw.field.setValue(self.vars["dpre_osci_smooth_lw"])
-        self.dpre_osci_ref_color.select(self.vars["dpre_osci_ref_color"])
-        self.dpre_osci_color_init.select(self.vars["dpre_osci_color_init"])
-        self.dpre_osci_color_end.select(self.vars["dpre_osci_color_end"])
-        self.dpre_osci_x_ticks_fs.field.setValue(self.vars["dpre_osci_x_ticks_fs"])
-        self.dpre_osci_x_ticks_fn.select(self.vars["dpre_osci_x_ticks_fn"])
-        self.dpre_osci_y_label_fs.field.setValue(self.vars["dpre_osci_y_label_fs"])
-        self.dpre_osci_y_label_pad.field.setValue(self.vars["dpre_osci_y_label_pad"])
-        self.dpre_osci_y_label_fn.select(self.vars["dpre_osci_y_label_fn"])
-        self.dpre_osci_y_label_weight.select(self.vars["dpre_osci_y_label_weight"])
-        self.dpre_osci_y_ticks_len.field.setValue(self.vars["dpre_osci_y_ticks_len"])
-        self.dpre_osci_y_ticks_fs.field.setValue(self.vars["dpre_osci_y_ticks_fs"])
-        self.dpre_osci_y_ticks_pad.field.setValue(self.vars["dpre_osci_y_ticks_pad"])
-        self.dpre_osci_grid_color.select(self.vars["dpre_osci_grid_color"])
-        self.dpre_osci_res_shade.checkBox.setChecked(self.vars["dpre_osci_res_shade"])
-        self.dpre_osci_res_highlight.field.setText(str(self.vars["dpre_osci_res_highlight"]))
-        self.dpre_osci_rh_fs.field.setValue(self.vars["dpre_osci_rh_fs"])
-        self.dpre_osci_rh_y.field.setValue(self.vars["dpre_osci_rh_y"])
+        self.dpre_osci_width.setValue(self.variables["dpre_osci_width"])
+        self.dpre_osci_title_y.setValue(self.variables["dpre_osci_title_y"])
+        self.dpre_osci_title_fs.setValue(self.variables["dpre_osci_title_fs"])
+        self.dpre_osci_title_fn.select(self.variables["dpre_osci_title_fn"])
+        self.dpre_osci_dpre_ms.setValue(self.variables["dpre_osci_dpre_ms"])
+        self.dpre_osci_dpre_alpha.setValue(self.variables["dpre_osci_dpre_alpha"])
+        self.dpre_osci_smooth_lw.setValue(self.variables["dpre_osci_smooth_lw"])
+        self.dpre_osci_ref_color.select(self.variables["dpre_osci_ref_color"])
+        self.dpre_osci_color_init.select(self.variables["dpre_osci_color_init"])
+        self.dpre_osci_color_end.select(self.variables["dpre_osci_color_end"])
+        self.dpre_osci_x_ticks_fs.setValue(self.variables["dpre_osci_x_ticks_fs"])
+        self.dpre_osci_x_ticks_fn.select(self.variables["dpre_osci_x_ticks_fn"])
+        self.dpre_osci_y_label_fs.setValue(self.variables["dpre_osci_y_label_fs"])
+        self.dpre_osci_y_label_pad.setValue(self.variables["dpre_osci_y_label_pad"])
+        self.dpre_osci_y_label_fn.select(self.variables["dpre_osci_y_label_fn"])
+        self.dpre_osci_y_label_weight.select(self.variables["dpre_osci_y_label_weight"])
+        self.dpre_osci_y_ticks_len.setValue(self.variables["dpre_osci_y_ticks_len"])
+        self.dpre_osci_y_ticks_fs.setValue(self.variables["dpre_osci_y_ticks_fs"])
+        self.dpre_osci_y_ticks_pad.setValue(self.variables["dpre_osci_y_ticks_pad"])
+        self.dpre_osci_grid_color.select(self.variables["dpre_osci_grid_color"])
+        self.dpre_osci_res_shade.setChecked(self.variables["dpre_osci_res_shade"])
+        self.dpre_osci_res_highlight.field.setText(str(self.variables["dpre_osci_res_highlight"]))
+        self.dpre_osci_rh_fs.setValue(self.variables["dpre_osci_rh_fs"])
+        self.dpre_osci_rh_y.setValue(self.variables["dpre_osci_rh_y"])
 
