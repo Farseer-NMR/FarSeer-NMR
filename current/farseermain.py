@@ -64,7 +64,7 @@ def gen_dim_tit_dict(farseer_set, data_hyper_cube, reso_type='Backbone'):
 
 def dimension_loop(titration_dict, sidechains=False):
     """
-    Executes a standard nested for loop cycle accross the three
+    Executes a standard nested for loop cycle across the three
     titration conditions.
     
     :titration_dict: the dictionary containing the information of all

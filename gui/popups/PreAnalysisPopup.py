@@ -1,20 +1,19 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QSpinBox, QLineEdit, QCheckBox, QDoubleSpinBox, QDialogButtonBox
+from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
-from gui.components.FontComboBox import FontComboBox
 
 import json
 from current.default_config import defaults
 
-class DPrePopup(QDialog):
+class PreAnalysisPopup(QDialog):
 
     def __init__(self, parent=None, vars=None, **kw):
-        super(DPrePopup, self).__init__(parent)
+        super(PreAnalysisPopup, self).__init__(parent)
         self.setWindowTitle("Residue Evolution Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)

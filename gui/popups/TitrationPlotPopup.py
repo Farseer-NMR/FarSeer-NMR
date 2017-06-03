@@ -21,8 +21,8 @@ class TitrationPlotPopup(QDialog):
         self.setLayout(grid)
         self.vars = None
         if vars:
-            self.vars = vars["tplot_settings"]
-        # self.default = defaults["tplot_settings"]
+            self.vars = vars["titration_plot_settings"]
+        self.default = defaults["titration_plot_settings"]
 
         self.tplot_subtitle_fn = FontComboBox(self, "Subtitle Font")
         self.tplot_title_fs = LabelledSpinBox(self, "Subtitle Font Size")

@@ -21,8 +21,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.setLayout(grid)
         self.vars = None
         if vars:
-            self.vars = vars["cs_scatter_settings"]
-        self.default = defaults["cs_scatter_settings"]
+            self.vars = vars["cs_scatter_flower_settings"]
+        self.default = defaults["cs_scatter_flower_settings"]
 
         self.cs_scatter_flower_x_label = LabelledLineEdit(self, "X Label")
         self.cs_scatter_flower_y_label = LabelledLineEdit(self, "Y Label")
@@ -58,10 +58,9 @@ class ScatterFlowerPlotPopup(QDialog):
         self.layout().addWidget(self.cs_scatter_flower_mksize, 2, 0)
         self.layout().addWidget(self.cs_scatter_flower_color_grad, 3, 0)
         self.layout().addWidget(self.cs_scatter_flower_color_start, 4, 0)
-        self.layout().addWidget(self.cs_scatter_scale, 5, 0)
-        self.layout().addWidget(self.cs_scatter_flower_color_end, 6, 0)
-        self.layout().addWidget(self.cs_scatter_flower_x_label_fn, 7, 0)
-        self.layout().addWidget(self.cs_scatter_flower_x_label_fs, 8, 0)
+        self.layout().addWidget(self.cs_scatter_flower_color_end, 5, 0)
+        self.layout().addWidget(self.cs_scatter_flower_x_label_fn, 6, 0)
+        self.layout().addWidget(self.cs_scatter_flower_x_label_fs, 7, 0)
 
 
         self.layout().addWidget(self.cs_scatter_flower_x_label_pad, 0, 1)

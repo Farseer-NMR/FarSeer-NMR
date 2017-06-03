@@ -33,7 +33,6 @@ class ScatterPlotPopup(QDialog):
         self.cs_scatter_mk_type = LabelledCombobox(self, text="Y Label Font Weight", items=['color', 'shape'])
         self.cs_scatter_mk_start_color = ColourBox(self, "Mark Start Colour")
         self.cs_scatter_mk_end_color = ColourBox(self, "Mark End Colour")
-        self.cs_scatter_mk_lost_color = ColourBox(self, "Mark Lost Colour")
         self.cs_scatter_markers = LabelledLineEdit(self, "Sequential Markers")
         self.cs_scatter_mk_color = ColourBox(self, "Mark Colour")
         self.cs_scatter_mk_lost_color = ColourBox(self, "Lost Mark Colour")

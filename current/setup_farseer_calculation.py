@@ -1,6 +1,6 @@
 import os, csv
 BASE_DIR = '/Users/fbssps/PycharmProjects/FarSeer-NMR/testing_space/'
-import pprint
+
 def create_directory_structure(values_dict, peak_list_objects, peakLists):
     for z_key in values_dict['z']:
         pls1 = [plo for plo in peak_list_objects if plo.z_cond == z_key]

@@ -19,6 +19,7 @@ from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
 from gui.popups.GeneralResidueEvolution import GeneralResidueEvolution
 from gui.popups.VerticalBar import VerticalBarPopup
+from gui.popups.PreAnalysisPopup import PreAnalysisPopup
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
@@ -211,6 +212,7 @@ class Settings(QWidget):
         self.csp_exceptions = QPushButton("CSP Exceptions", self)
         self.do_pre = LabelledCheckbox(self, "PRE Analysis")
         self.pre_settings = QPushButton("PRE Settings", self)
+        self.pre_settings.clicked.connect(partial(self.show_popup, PreAnalysisPopup, self.vars))
 
         cs_groupbox = QGroupBox()
         cs_groupbox_layout = QHBoxLayout()
