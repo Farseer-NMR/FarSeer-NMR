@@ -3,7 +3,9 @@ from functools import partial
 import json
 import os
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
+    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter
+
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
@@ -27,8 +29,6 @@ from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.DPrePopup import DPrePopup
 from gui.popups.TitrationPlotPopup import TitrationPlotPopup
 
-from gui.popups.UserMarksPopup import UserMarksPopup
-import pprint
 valuesDict = {
             'x': [],
             'y': [],
@@ -67,10 +67,13 @@ class Main(QTabWidget):
             json.dump(variables, outfile, indent=4, sort_keys=True)
 
     def run_farseer(self):
-        from current.setup_farseer_calculation import create_directory_structure
-        peak_list_objects = self.tab2.peakListArea.peak_list_objects
-        # print(peak_list_objects, peakLists)
-        create_directory_structure(valuesDict, peak_list_objects, peakLists)
+        # from current.setup_farseer_calculation import create_directory_structure
+        # peak_list_objects = self.tab2.peakListArea.peak_list_objects
+        # spectrum_dir = os.getcwd()
+        # create_directory_structure(spectrum_dir, valuesDict, peak_list_objects, peakLists)
+        from current06.farseermain import read_user_variables, run_farseer
+        fsuv, cwd = read_user_variables(self.tab1.spectrum_path.field.text())
+        run_farseer('{}/spectra'.format(cwd), fsuv)
 
 
 
@@ -84,7 +87,7 @@ class Settings(QWidget):
         grid.setSpacing(3)
         from current.default_config import defaults
         # self.variables = None
-        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current0.6', 'blank_config.json'), 'r'))
+        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current06', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
@@ -489,7 +492,7 @@ class Settings(QWidget):
         # self.user_details_checkbox.setChecked(fitting["include_user_annotations"])
 
     def show_popup(self, popup, variables):
-        p = popup(variables=variables)
+        p = popup(variables=self.variables)
         p.exec()
         p.raise_()
 

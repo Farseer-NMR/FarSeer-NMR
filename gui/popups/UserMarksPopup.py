@@ -14,8 +14,8 @@ class UserMarksPopup(QDialog):
         self.marker_rows = 0
         layout2 = QGridLayout()
         layout1 = QGridLayout()
-        self.mainWidget = QWidget()
-        self.buttonWidget = QWidget()
+        self.mainWidget = QWidget(self)
+        self.buttonWidget = QWidget(self)
         self.mainWidget.setLayout(layout1)
         self.buttonWidget.setLayout(layout2)
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
@@ -41,7 +41,6 @@ class UserMarksPopup(QDialog):
             addButton.setFixedWidth(50)
             removeButton.setFixedWidth(50)
             self.pairs = [[key, value, addButton, removeButton]]
-
 
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
@@ -82,15 +81,32 @@ class UserMarksPopup(QDialog):
             self.pairs.remove(index)
 
     def setValuesFromConfig(self):
-        values = self.variables
+        for i in range(self.marker_rows):
+            self.remove_row_to_popup(i)
+
+        self.marker_rows = 0
+
+        for key1, value1 in self.variables.items():
+
+            key = LabelledLineEdit(self, text='key')
+            key.field.setText(key1)
+            value = LabelledLineEdit(self, text='value')
+            value.field.setText(value1)
+            addButton = QPushButton("Add", self)
+            addButton.clicked.connect(self.add_row_to_popup)
+            removeButton = QPushButton("Remove", self)
+            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            addButton.setFixedWidth(50)
+            removeButton.setFixedWidth(50)
+            self.pairs.append([key, value, addButton, removeButton])
+            self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
+            self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.marker_rows += 1
 
 
     def set_defaults(self):
-
-        # if self.marker_rows == 1:
-        #     self.marker_rows -=1
-        #     self.remove_row_to_popup(1)
-
 
         for i in range(self.marker_rows):
             self.remove_row_to_popup(i)

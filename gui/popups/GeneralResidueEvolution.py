@@ -140,8 +140,8 @@ class GeneralResidueEvolution(QDialog):
         self.accept()
 
     def get_values(self):
-        self.revo_subtitle_fn.setValue(self.variables["revo_subtitle_fn"])
-        self.revo_subtitle_fs.select(self.variables["revo_subtitle_fs"])
+        self.revo_subtitle_fn.select(self.variables["revo_subtitle_fn"])
+        self.revo_subtitle_fs.setValue(self.variables["revo_subtitle_fs"])
         self.revo_subtitle_pad.setValue(self.variables["revo_subtitle_pad"])
         self.revo_subtitle_weight.select(self.variables["revo_subtitle_weight"])
         self.revo_x_label_fn.select(self.variables["revo_x_label_fn"])
@@ -152,12 +152,12 @@ class GeneralResidueEvolution(QDialog):
         self.revo_y_label_fs.setValue(self.variables["revo_y_label_fs"])
         self.revo_y_label_pad.setValue(self.variables["revo_y_label_pad"])
 
-        self.y_label_font_weight.select(self.variables["revo_y_label_weight"])
+        self.revo_y_label_weight.select(self.variables["revo_y_label_weight"])
         self.revo_x_ticks_fn.select(self.variables["revo_x_ticks_fn"])
         self.revo_x_ticks_fs.setValue(self.variables["revo_x_ticks_fs"])
         self.revo_x_ticks_pad.setValue(self.variables["revo_x_ticks_pad"])
         self.revo_x_ticks_weight.select(self.variables["revo_x_ticks_weight"])
-        self.revo_x_ticks_rotation.setValue(self.variables["revo_x_ticks_rotation"])
+        self.revo_x_ticks_rotation.setValue(self.variables["revo_x_ticks_rot"])
         self.revo_y_ticks_fn.select(self.variables["revo_y_ticks_fn"])
         self.revo_y_ticks_fs.setValue(self.variables["revo_y_ticks_fs"])
         self.revo_y_ticks_pad.setValue(self.variables["revo_y_ticks_pad"])

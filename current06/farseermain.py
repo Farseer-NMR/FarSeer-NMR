@@ -6,9 +6,9 @@ import shutil
 import datetime  # used to write the log file
 import pandas as pd
 #farseer_user_variables are imported in the if __main__ :
-import fslibs.FarseerSet as fset
-import fslibs.Titration as fst
-import fslibs.Comparisons as fsc
+from current06.fslibs import FarseerSet as fset
+from current06.fslibs import Titration as fst
+from current06.fslibs import Comparisons as fsc
 
 def read_user_variables(path):
     """
@@ -373,7 +373,7 @@ def init_farseer(path, has_sidechains=False, FASTAstart=1):
     
     return exp
 
-def reads_input(exp):
+def reads_input(exp, fsuv):
     """Loads the tree of peaklists."""
     
     exp.load_experiments(target=exp.allpeaklists)
@@ -1037,7 +1037,7 @@ def analyse_comparisons(exp, titration_dict, fsuv,
 
 def run_farseer(spectra_path, fsuv):
     """
-    Runs all the standard Farseer algorythm.
+    Runs all the standard Farseer algorithm.
     Function calls here should give all the inputs to the functions.
     Other functions should not rely on external variables besides those
     received in parameters.
@@ -1058,7 +1058,7 @@ def run_farseer(spectra_path, fsuv):
                        FASTAstart=fsuv.FASTAstart)
         
     # reads input
-    reads_input(exp)
+    reads_input(exp, fsuv)
     
     inits_conditions(exp)
     

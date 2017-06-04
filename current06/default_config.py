@@ -192,7 +192,7 @@ defaults = {
         "revo_y_ticks_fn": "Arial",
         "revo_y_ticks_fs": 5,
         "revo_y_ticks_pad": 1,
-        "revo_y_ticks_weight": 1,
+        "revo_y_ticks_weight": "normal",
         "revo_y_ticks_rot": 0
   },
   "res_evo_settings": {
