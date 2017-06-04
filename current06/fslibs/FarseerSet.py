@@ -476,7 +476,7 @@ FASTA starting residue: {}
             # DataFrame with side chains
             self.allsidechains[z][y][x] = \
                 self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-            
+
             # adds 'a' or 'b'
             self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                 self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]

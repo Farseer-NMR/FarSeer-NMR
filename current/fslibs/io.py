@@ -5,10 +5,15 @@ def fsuv_to_json(fsuv):
 
     pass
 
-def json_to_fsuv(json_file):
+def json_to_fsuv(fsuv_file_path, json_file=None, variables=None):
 
-    js = json.load(json_file)
-    fout = open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/farseer_user_variables.py", 'w')
+    if json_file:
+        js = json.load(json_file)
+    elif variables:
+        js = variables
+    else:
+        pass
+    fout = open(fsuv_file_path, 'w')
     gen = js["general_settings"]
     fit = js["fitting_settings"]
     cs = js["cs_settings"]
