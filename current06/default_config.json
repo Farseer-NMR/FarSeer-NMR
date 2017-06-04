@@ -31,6 +31,7 @@
         "do_comp_bar": true
     }, 
     "cs_scatter_flower_settings": {
+        "do_cs_flower": true,
         "cs_scatter_flower_color_end": "#000000", 
         "cs_scatter_flower_color_grad": true, 
         "cs_scatter_flower_color_list": [], 
