@@ -68,8 +68,6 @@ class Main(QTabWidget):
 
     def run_farseer(self):
         from current.setup_farseer_calculation import create_directory_structure
-        import pprint
-        pprint.pprint(valuesDict)
         peak_list_objects = self.tab2.peakListArea.peak_list_objects
         # print(peak_list_objects, peakLists)
         create_directory_structure(valuesDict, peak_list_objects, peakLists)
@@ -87,7 +85,6 @@ class Settings(QWidget):
         from current.default_config import defaults
         # self.variables = None
         self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current0.6', 'blank_config.json'), 'r'))
-        pprint.pprint(self.variables)
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)

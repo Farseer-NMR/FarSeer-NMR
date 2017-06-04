@@ -1,66 +1,120 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox, QPushButton, QWidget
 from gui.components.LabelledLineEdit import LabelledLineEdit
-
+from functools import partial
 from current.default_config import defaults
 
 class UserMarksPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
         super(UserMarksPopup, self).__init__(parent)
-        self.setWindowTitle("Vertical Bar Plot")
+        self.setWindowTitle("User Defined Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        if variables:
-            self.variables = variables["user_mark_settings"]
-        self.default = defaults["user_mark_settings"]
-        self.h0 = LabelledLineEdit(self, text='H0')
-        self.v0 = LabelledLineEdit(self, text='V0')
-        self.p1 = LabelledLineEdit(self, text='p1')
-        self.p2 = LabelledLineEdit(self, text='p2')
-        self.p3 = LabelledLineEdit(self, text='p3')
-        self.p4 = LabelledLineEdit(self, text='p4')
-        self.p5 = LabelledLineEdit(self, text='p5')
-
+        self.marker_rows = 0
+        layout2 = QGridLayout()
+        layout1 = QGridLayout()
+        self.mainWidget = QWidget()
+        self.buttonWidget = QWidget()
+        self.mainWidget.setLayout(layout1)
+        self.buttonWidget.setLayout(layout2)
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
         self.buttonBox.accepted.connect(self.setValues)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.set_defaults)
+        self.buttonWidget.layout().addWidget(self.buttonBox)
 
-        self.layout().addWidget(self.h0, 0, 0, 1, 1)
-        self.layout().addWidget(self.v0, 1, 0, 1, 1)
-        self.layout().addWidget(self.p1, 2, 0, 1, 1)
-        self.layout().addWidget(self.p2, 3, 0, 1, 1)
-        self.layout().addWidget(self.p3, 4, 0, 1, 1)
-        self.layout().addWidget(self.p4, 5, 0, 1, 1)
-        self.layout().addWidget(self.p5, 6, 0, 1, 1)
-
-        self.layout().addWidget(self.buttonBox, 7, 0, 1, 2)
-        print(variables)
+        self.setLayout(grid)
+        self.layout().addWidget(self.mainWidget, 0, 0)
+        self.layout().addWidget(self.buttonWidget, 1, 0)
         if variables:
+            self.variables = variables
             self.setValuesFromConfig()
+        else:
+            key = LabelledLineEdit(self, text='key')
+            value = LabelledLineEdit(self, text='value')
+            addButton = QPushButton("Add", self)
+            removeButton = QPushButton("Remove", self)
+            addButton.clicked.connect(self.add_row_to_popup)
+            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            addButton.setFixedWidth(50)
+            removeButton.setFixedWidth(50)
+            self.pairs = [[key, value, addButton, removeButton]]
 
+
+            self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
+            self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.marker_rows += 1
+            self.pairs.append([self.buttonBox])
+            self.marker_rows += 1
+
+
+    def add_row_to_popup(self):
+        key = LabelledLineEdit(self, text='key')
+        value = LabelledLineEdit(self, text='value')
+        addButton = QPushButton("Add", self)
+        addButton.clicked.connect(self.add_row_to_popup)
+        removeButton = QPushButton("Remove", self)
+        removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+        addButton.setFixedWidth(50)
+        removeButton.setFixedWidth(50)
+        self.pairs.append([key, value, addButton, removeButton])
+        self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
+        self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
+        self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
+        self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+        self.marker_rows += 1
+        print(self.pairs)
+
+    def remove_row_to_popup(self, index):
+        self.marker_rows -= 1
+        colCount = self.mainWidget.layout().columnCount()
+        for m in range(0, colCount):
+            item = self.mainWidget.layout().itemAtPosition(index, m)
+            if item:
+                if item.widget():
+                    item.widget().hide()
+            self.mainWidget.layout().removeItem(item)
+        if index in self.pairs:
+            self.pairs.remove(index)
 
     def setValuesFromConfig(self):
         values = self.variables
-        self.h0.field.setText(values['h0'])
-        self.v0.field.setText(values['v0'])
-        self.p1.field.setText(values['p1'])
-        self.p2.field.setText(values['p2'])
-        self.p3.field.setText(values['p3'])
-        self.p4.field.setText(values['p4'])
-        self.p5.field.setText(values['p5'])
+
 
     def set_defaults(self):
-        self.h0.field.setText('H')
-        self.v0.field.setText('V')
-        self.p1.field.setText('1')
-        self.p2.field.setText('2')
-        self.p3.field.setText('3')
-        self.p4.field.setText('4')
-        self.p5.field.setText('5')
+
+        # if self.marker_rows == 1:
+        #     self.marker_rows -=1
+        #     self.remove_row_to_popup(1)
+
+
+        for i in range(self.marker_rows):
+            self.remove_row_to_popup(i)
+
+        self.marker_rows = 0
+
+        for key1, value1 in defaults["user_mark_settings"].items():
+
+            key = LabelledLineEdit(self, text='key')
+            key.field.setText(key1)
+            value = LabelledLineEdit(self, text='value')
+            value.field.setText(value1)
+            addButton = QPushButton("Add", self)
+            addButton.clicked.connect(self.add_row_to_popup)
+            removeButton = QPushButton("Remove", self)
+            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            addButton.setFixedWidth(50)
+            removeButton.setFixedWidth(50)
+            self.pairs.append([key, value, addButton, removeButton])
+            self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
+            self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.marker_rows += 1
 
 
     def setValues(self):

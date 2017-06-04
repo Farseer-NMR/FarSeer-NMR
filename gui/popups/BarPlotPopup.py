@@ -22,6 +22,7 @@ class BarPlotPopup(QDialog):
         self.variables = None
         if variables:
             self.variables = variables["bar_plot_settings"]
+            self.user_variables = variables["user_mark_settings"]
         self.defaults = defaults["bar_plot_settings"]
 
 
@@ -51,14 +52,15 @@ class BarPlotPopup(QDialog):
         self.layout().addWidget(self.bar_width, 4, 0)
         self.layout().addWidget(self.bar_alpha, 5, 0)
         self.layout().addWidget(self.bar_linewidth, 6, 0)
-        self.layout().addWidget(self.bar_threshold, 0, 1)
-        self.layout().addWidget(self.bar_threshold_linewidth, 1, 1)
-        self.layout().addWidget(self.bar_threshold_colour, 2, 1)
-        self.layout().addWidget(self.markProlines, 3, 1)
-        self.layout().addWidget(self.proline_marker, 4, 1)
-        self.layout().addWidget(self.user_details, 5, 1)
-        self.layout().addWidget(self.user_mark_font_size, 6, 1)
-        self.layout().addWidget(self.colour_user_details, 7, 1)
+        self.layout().addWidget(self.bar_threshold, 7, 0)
+        self.layout().addWidget(self.bar_threshold_linewidth, 0, 1)
+        self.layout().addWidget(self.bar_threshold_colour, 1, 1)
+        self.layout().addWidget(self.markProlines, 2, 1)
+        self.layout().addWidget(self.proline_marker, 3, 1)
+        self.layout().addWidget(self.user_details, 4, 1)
+        self.layout().addWidget(self.user_mark_font_size, 5, 1)
+        self.layout().addWidget(self.colour_user_details, 6, 1)
+        self.layout().addWidget(self.user_markers_button, 7, 1)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
@@ -66,7 +68,7 @@ class BarPlotPopup(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 8, 2, 1, 2)
+        self.layout().addWidget(self.buttonBox, 8, 1, 1, 1)
 
         if variables:
             self.get_values()
@@ -74,7 +76,7 @@ class BarPlotPopup(QDialog):
         # self.set_defaults()
 
     def launch_user_marker_popup(self):
-        popup = UserMarksPopup()
+        popup = UserMarksPopup(variables=self.user_variables)
         popup.exec_()
         popup.raise_()
 
