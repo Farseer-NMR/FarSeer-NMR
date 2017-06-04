@@ -187,13 +187,14 @@ defaults = {
         "revo_x_ticks_fn": "Arial",
         "revo_x_ticks_fs": 5,
         "revo_x_ticks_pad": 1,
-        "revo_x_ticks_weight": 1,
+        "revo_x_ticks_weight": "normal",
         "revo_x_ticks_rot": 30,
         "revo_y_ticks_fn": "Arial",
         "revo_y_ticks_fs": 5,
         "revo_y_ticks_pad": 1,
-        "revo_y_ticks_weight": 1,
-        "revo_y_ticks_rot": 0
+        "revo_y_ticks_weight": "normal",
+        "revo_y_ticks_rot": 0,
+        "titration_x_values": [0, 125, 250, 500, 1000, 2000, 2500]
   },
   "res_evo_settings": {
           "do_res_evo": True,
@@ -281,12 +282,12 @@ defaults = {
         "cs_scatter_flower_x_ticks_fn": "Arial",
         "cs_scatter_flower_x_ticks_fs": 8,
         "cs_scatter_flower_x_ticks_pad": 1,
-        "cs_scatter_flower_x_ticks_weight": 1,
+        "cs_scatter_flower_x_ticks_weight": "normal",
         "cs_scatter_flower_x_ticks_rot": 0,
         "cs_scatter_flower_y_ticks_fn": "Arial",
         "cs_scatter_flower_y_ticks_fs": 8,
         "cs_scatter_flower_y_ticks_pad": 1,
-        "cs_scatter_flower_y_ticks_weight": 1,
+        "cs_scatter_flower_y_ticks_weight": "normal",
         "cs_scatter_flower_y_ticks_rot": 0
   },
 

@@ -66,14 +66,21 @@ class Main(QTabWidget):
         with open(fname[0], 'w') as outfile:
             json.dump(variables, outfile, indent=4, sort_keys=True)
 
-    def run_farseer(self):
+    def run_farseer_calculation(self):
         # from current.setup_farseer_calculation import create_directory_structure
         # peak_list_objects = self.tab2.peakListArea.peak_list_objects
         # spectrum_dir = os.getcwd()
         # create_directory_structure(spectrum_dir, valuesDict, peak_list_objects, peakLists)
+        spectrum_path = self.tab1.spectrum_path.field.text()
+        self.write_fsuv(spectrum_path)
         from current06.farseermain import read_user_variables, run_farseer
-        fsuv, cwd = read_user_variables(self.tab1.spectrum_path.field.text())
+        fsuv, cwd = read_user_variables(spectrum_path)
         run_farseer('{}/spectra'.format(cwd), fsuv)
+
+    def write_fsuv(self, file_path):
+        print(self.tab1.variables, 'varvar')
+        variables = self.tab1.variables
+
 
 
 
@@ -394,7 +401,7 @@ class Settings(QWidget):
         buttons_groupbox.layout().addWidget(self.load_config_button)
         self.load_config_button.clicked.connect(self.load_config)
         self.save_config_button.clicked.connect(self.save_config)
-        self.run_farseer_button.clicked.connect(self.run_farseer)
+        self.run_farseer_button.clicked.connect(self.run_farseer_calculation)
         buttons_groupbox.layout().addWidget(self.save_config_button)
         buttons_groupbox.layout().addWidget(self.run_farseer_button)
 
@@ -403,13 +410,14 @@ class Settings(QWidget):
 
     def load_config(self):
         self.variables = self.parent().parent().load_config()
-        self.load_variables()
+        if self.variables:
+            self.load_variables()
 
     def save_config(self):
         self.parent().parent().save_config(self.variables)
 
-    def run_farseer(self):
-        self.parent().parent().run_farseer()
+    def run_farseer_calculation(self):
+        self.parent().parent().run_farseer_calculation()
 
     def load_variables(self):
 

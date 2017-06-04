@@ -56,7 +56,7 @@ class ExtendedBarPopup(QDialog):
         self.x_tick_font_size.setValue(self.defaults["ext_bar_x_ticks_fs"])
         self.x_tick_rotation.setValue(self.defaults["ext_bar_x_ticks_rot"])
         self.x_tick_font_weight.select(self.defaults["ext_bar_x_ticks_weight"])
-        self.x_tick_colour.setChecked()(self.defaults["ext_bar_x_ticks_color_flag"])
+        self.x_tick_colour.setChecked(self.defaults["ext_bar_x_ticks_color_flag"])
 
 
     def get_values(self):

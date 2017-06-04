@@ -45,7 +45,7 @@
         "cs_scatter_flower_x_ticks_fs": 8, 
         "cs_scatter_flower_x_ticks_pad": 1, 
         "cs_scatter_flower_x_ticks_rot": 0, 
-        "cs_scatter_flower_x_ticks_weight": 1, 
+        "cs_scatter_flower_x_ticks_weight": "normal",
         "cs_scatter_flower_y_label": "15N (ppm)", 
         "cs_scatter_flower_y_label_fn": "Arial", 
         "cs_scatter_flower_y_label_fs": 10, 
@@ -55,7 +55,7 @@
         "cs_scatter_flower_y_ticks_fs": 8, 
         "cs_scatter_flower_y_ticks_pad": 1, 
         "cs_scatter_flower_y_ticks_rot": 0, 
-        "cs_scatter_flower_y_ticks_weight": 1
+        "cs_scatter_flower_y_ticks_weight": "normal"
     }, 
     "cs_scatter_settings": {
         "cs_scatter_cols_page": 5, 
@@ -273,7 +273,7 @@
         "revo_x_ticks_fs": 5, 
         "revo_x_ticks_pad": 1, 
         "revo_x_ticks_rot": 30, 
-        "revo_x_ticks_weight": 1, 
+        "revo_x_ticks_weight": "normal",
         "revo_y_label_fn": "Arial", 
         "revo_y_label_fs": 6, 
         "revo_y_label_pad": 2, 
@@ -282,7 +282,8 @@
         "revo_y_ticks_fs": 5, 
         "revo_y_ticks_pad": 1, 
         "revo_y_ticks_rot": 0, 
-        "revo_y_ticks_weight": 1
+        "revo_y_ticks_weight": "normal",
+        "titration_x_values": [0, 125, 250, 500, 1000, 2000, 2500]
     }, 
     "titration_plot_settings": {
         "tplot_subtitle_fn": "Arial", 

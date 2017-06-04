@@ -265,7 +265,9 @@
         "revo_y_ticks_fs": null, 
         "revo_y_ticks_pad": null, 
         "revo_y_ticks_rot": null, 
-        "revo_y_ticks_weight": null
+        "revo_y_ticks_weight": null,
+        "titration_x_values": []
+
     }, 
     "titration_plot_settings": {
         "tplot_subtitle_fn": null,

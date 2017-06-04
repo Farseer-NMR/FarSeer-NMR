@@ -652,7 +652,7 @@ of cond1 variables.')
                 
                 # EXPORTS CALCULATIONS
                 exports_data_tables(titration_dict[cond][dim2_pt][dim1_pt],
-                                    param_settings=param_settings)
+                                    param_settings=param_settings, fsuv=fsuv)
                 
                 # PLOTS TITRATION DATA
                 plots_data(titration_dict[cond][dim2_pt][dim1_pt],
@@ -800,7 +800,7 @@ def exports_titration(titration_panel):
     titration_panel.export_titration()
     return
 
-def exports_data_tables(titration_panel, param_settings=[]):
+def exports_data_tables(titration_panel, param_settings=[], fsuv=None):
     """Exports tables with calculated parameters."""
     
     for calculated_parameter in param_settings.index:
@@ -981,7 +981,7 @@ def analyse_comparisons(exp, titration_dict, fsuv,
         exports_titration(comp_panel)
     
         # EXPORTS CALCULATIONS
-        exports_data_tables(comp_panel, param_settings=ps)
+        exports_data_tables(comp_panel, param_settings=ps, fsuv=fsuv)
         
         # performs pre analysis
         PRE_analysis(comp_panel, fsuv, gpp[0], *ppp, param_settings=ps)

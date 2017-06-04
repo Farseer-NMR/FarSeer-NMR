@@ -35,7 +35,7 @@ def json_to_fsuv(fsuv_file_path, json_file=None, variables=None):
     dpre = js["dpre_osci_settings"]
 
 
-    fsuv1 = """import sys
+    fsuv_general = """import sys
 #
 spectra_path = {}  # where spectra peaklists .csv files are stored - relative path
 #
@@ -44,30 +44,55 @@ logfile_name = '{}'  # the name of the log file
 has_sidechains = {}  # Are there sidechain entries in the peaklists?
 use_sidechains = {}  # Do you want to analyse those sidechains?
 #
+chimera_att_select_format = ':'  # format to select residues in Chimera
+""".format(
+        gen["spectrum_path"],
+        gen["logfile_name"],
+        gen["has_sidechains"],
+        gen["use_sidechains"])
+    fsuv_cs = """
 perform_cs_correction = {}  # Aligns peaklists to a specific residue in the reference spectra
 cs_correction_res_ref = {}  # To which residue?
 #
+""".format(cs["perform_cs_correction"],
+        cs["cs_correction_res_ref"])
+
+    fsuv_fit="""
 expand_lost_yy = {}  # Considers lost residue over yy references and xx reference
 expand_lost_zz = {}  # Considers lost residue over zz references and xx reference
-#
-applyFASTA = {}  # complete the sequence with a FASTA file?
-FASTAstart = {}  # Residue number for the first residue in the FASTA file?
 #
 do_cond1 = {}  # Analyse data in the first titration condition (dimension)
 do_cond2 = {}  # Analyse data in the second titration condition (dimension)
 do_cond3 = {}  # Analyse data in the thrid titration condition (dimension)
 perform_comparisons = True  # Compares data obtained for condition experiment.
 #
+""".format(
+        fit["expand_lost_yy"],
+        fit["expand_lost_zz"],
+        fit["do_titvar1"],
+        fit["do_titvar2"],
+        fit["do_titvar3"]
+    )
+
+
+    fsuv_fasta = """
+applyFASTA = {}  # complete the sequence with a FASTA file?
+FASTAstart = {}  # Residue number for the first residue in the FASTA file?
+""".format(
+        fasta["applyFASTA"],
+        fasta["FASTAstart"])
+
+    fsuv_csp = """
 csp_alpha4res = {}  # General alpha normalization factor for CSP
 csp_res_exceptions = {}  # exceptions for the normalization factor
 cs_lost = {}  # how to represent the lost residues in CSPs [prev/full]
 #
-chimera_att_select_format = ':'  # format to select residues in Chimera
-#
-perform_resevo_fit = {}  # Fit parameter evolution over titration experiment
-fit_x_values = [0, 250, 500]  # values for the x axis in the fitting procedure (ex. Ligand concentration)
-# Perform PRE analysis
+""".format(csp["csp_res4alpha"],
+        csp["csp_res_exceptions"],
+        csp["cs_lost"])
 
+
+    fsuv_pre = """
 apply_PRE_analysis = {}
 apply_smooth = {}
 gaussian_stddev = {}
@@ -76,7 +101,24 @@ pre_color = {}  # theoretical PRE line color
 pre_lw = {}  # theoretical PRE line width
 tag_color = {}
 tag_lw = {}
-tag_ls = {}
+tag_ls = {}""".format(
+        pre["apply_PRE_analysis"],
+        pre["apply_smooth"],
+        pre["gaussian_stdev"],
+        pre["gauss_x_size"],
+        pre["pre_color"],
+        pre["pre_lw"],
+        pre["tag_color"],
+        pre["tag_lw"],
+        pre["tag_ls"],
+    )
+
+"""
+perform_resevo_fit = {}  # Fit parameter evolution over titration experiment
+fit_x_values = [0, 250, 500]  # values for the x axis in the fitting procedure (ex. Ligand concentration)
+# Perform PRE analysis
+
+
 
 #
 plots_PosF1_delta = {}  # Plot nuclei 1 shift perturbation data
@@ -312,37 +354,15 @@ heat_map_bottom_margin = {}
 heat_map_top_margin = {}
 heat_map_cbar_font_size = {}
 #
-    """.format(
-        gen["spectrum_path"],
-        gen["logfile_name"],
-        gen["has_sidechains"],
-        gen["use_sidechains"],
-        cs["perform_cs_correction"],
-        cs["cs_correction_res_ref"],
-        fit["expand_lost_yy"],
-        fit["expand_lost_zz"],
-        fasta["applyFASTA"],
-        fasta["FASTAstart"],
-        fit["do_titvar1"],
-        fit["do_titvar2"],
-        fit["do_titvar3"],
-        csp["csp_res4alpha"],
-        csp["csp_res_exceptions"],
-        csp["cs_lost"],
+
+
+
+
+
+
         fit["perform_resevo_fitting"],
-        pre["apply_PRE_analysis"],
-        pre["apply_smooth"],
-        pre["gaussian_stdev"],
-        pre["gauss_x_size"],
-        pre["d_pre_y_max"],
-        pre["d_pre_y_label"],
-        pre["d_pre_rows"],
-        pre["pre_color"],
-        pre["pre_lw"],
-        pre["tag_color"],
-        pre["tag_lw"],
-        pre["tag_ls"],
         pf1["plots_PosF1_delta"],
+
         pf2["plots_PosF2_delta"],
         p_csp["plots_CSP"],
         p_height["plots_Height_ratio"],
@@ -552,8 +572,8 @@ heat_map_cbar_font_size = {}
         heat_map["heat_map_bottom_margin"],
         heat_map["heat_map_top_margin"],
         heat_map["heat_map_cbar_font_size"],
-    )
-    fsuv2 = """
+    )"""
+    fsuv_dpre = """
 # DELTA PRE oscilations Plot
 dpre_osci_width = {}  # scale factor for the width
 dpre_osci_title_y = {}  # subplot title pad
@@ -586,7 +606,7 @@ fig_height = {}  # Figure height in inches
 fig_file_type = '{}'  # Figure file type
 fig_dpi = {}  # Figure resolution
 #
-import farseermain""".format(
+""".format(
         dpre["dpre_osci_width"],
         dpre["dpre_osci_title_y"],
         dpre["dpre_osci_title_fs"],
