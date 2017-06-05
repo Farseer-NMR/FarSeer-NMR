@@ -1,7 +1,7 @@
 import os, csv
-BASE_DIR = '/Users/fbssps/PycharmProjects/FarSeer-NMR/testing_space/'
 
-def create_directory_structure(spectrum_dir, values_dict, peak_list_objects, peakLists):
+def create_directory_structure(spectrum_path, values_dict, peak_list_objects, peakLists):
+    spectrum_dir = spectrum_path+'/spectra/'
     for z_key in values_dict['z']:
         pls1 = [plo for plo in peak_list_objects if plo.z_cond == z_key]
         os.mkdir(os.path.join(spectrum_dir, z_key))

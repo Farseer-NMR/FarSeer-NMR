@@ -29,6 +29,8 @@ from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.DPrePopup import DPrePopup
 from gui.popups.TitrationPlotPopup import TitrationPlotPopup
 
+from current06.fslibs.io import json_to_fsuv
+
 valuesDict = {
             'x': [],
             'y': [],
@@ -67,19 +69,19 @@ class Main(QTabWidget):
             json.dump(variables, outfile, indent=4, sort_keys=True)
 
     def run_farseer_calculation(self):
-        # from current.setup_farseer_calculation import create_directory_structure
-        # peak_list_objects = self.tab2.peakListArea.peak_list_objects
-        # spectrum_dir = os.getcwd()
-        # create_directory_structure(spectrum_dir, valuesDict, peak_list_objects, peakLists)
+        from current.setup_farseer_calculation import create_directory_structure
         spectrum_path = self.tab1.spectrum_path.field.text()
+        peak_list_objects = self.tab2.peakListArea.peak_list_objects
+        # spectrum_dir = os.getcwd()
+        create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
         self.write_fsuv(spectrum_path)
         from current06.farseermain import read_user_variables, run_farseer
         fsuv, cwd = read_user_variables(spectrum_path)
         run_farseer('{}/spectra'.format(cwd), fsuv)
 
     def write_fsuv(self, file_path):
-        print(self.tab1.variables, 'varvar')
         variables = self.tab1.variables
+        json_to_fsuv(file_path, variables=variables)
 
 
 

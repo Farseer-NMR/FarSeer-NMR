@@ -99,7 +99,7 @@ defaults = {
         "bar_threshold_alpha": 0.8,
         "bar_mark_fontsize": 3,
         "bar_mark_prolines_flag": True,
-        "bar_mark_prolines_symbol": "P",
+        "bar_mark_prolines_symbol": "'P'",
         "bar_mark_user_details_flag": False,
         "bar_color_user_details_flag": False
   },
@@ -107,7 +107,7 @@ defaults = {
           "do_ext_bar": True,
           "ext_bar_cols_page": 5,
           "ext_bar_rows_page": 10,
-          "ext_bar_x_ticks_fn": "monospace",
+          "ext_bar_x_ticks_fn": "'monospace'",
           "ext_bar_x_ticks_fs": 6,
           "ext_bar_x_ticks_rot": 90,
           "ext_bar_x_ticks_pad": 2,
@@ -205,7 +205,7 @@ defaults = {
           "res_evo_set_x_values": True,
           "res_evo_line_style": "-",
           "res_evo_line_width": 1,
-          "res_evo_line_color": "r",
+          "res_evo_line_color": "'#ff0000",
           "res_evo_marker_style": "o",
           "res_evo_marker_color": "darkred",
           "res_evo_marker_size": 3,
@@ -245,7 +245,7 @@ defaults = {
           "cs_scatter_mk_type": "color",
           "cs_scatter_mk_start_color": "#cdcdcd",
           "cs_scatter_mk_end_color": "#000000",
-          "cs_scatter_mk_lost_color": "red",
+          "cs_scatter_mk_lost_color": "'#ff0000'",
           "cs_scatter_markers": [
             "^",
             ">",
@@ -260,7 +260,7 @@ defaults = {
           ],
           "cs_scatter_mk_color": "grey",
           "cs_scatter_mk_edgecolors": "black",
-          "cs_scatter_mk_edge_lost": "red",
+          "cs_scatter_mk_edge_lost": "'#ff0000'",
           "cs_scatter_hide_lost": False
   },
   "cs_scatter_flower_settings": {
