@@ -228,6 +228,7 @@ def gen_refpkl_macro(protein, col_list):
     mask_no_pro = refpkl.loc[:,'Assign F1'].str[-4:] != 'ProH'
     
     refpkl = refpkl.loc[mask_no_pro,:]
+    
     refpkl = add_sidechains(refpkl)
     
     refpkl = refpkl[col_list]
@@ -273,6 +274,36 @@ def write_titration(midf):
                                       index_label=False,
                                       columns=col_list)
         
+    return
+
+def write_protein_fasta(pseq, zz, yy):
+    """
+    :protein: str with the protein sequence
+    """
+    ## ++++++++++++++
+    chunks, chunk_size = len(pseq), len(pseq)//4
+    # generating a string with the broke pseq sequence
+    pseq_fasta = '\n'.join(\
+        [pseq[i:i+chunk_size] for i in range(0, chunks, chunk_size)])
+    ## ++++++++++++++
+    
+    # the string of the fasta file with the most difficult case
+    pseq_fasta = \
+""">some random pseq
+{}
+""".format(pseq_fasta)
+    
+    for z, y in it.product(zz, yy):
+    
+        folder = 'spectra/{}/{}'.format(z, y)
+        if not(os.path.exists(folder)):
+            os.makedirs(folder)
+        
+        path = '{}/pseq.fasta'.format(folder)
+    
+        with open(path, 'w') as ff:
+            ff.write(pseq_fasta)
+    
     return
 
 def exp_populate(midf, refpkl):
@@ -328,6 +359,101 @@ def add_noise(midf):
     
     return midf
 
+
+def hill(vmax, kd, n, values):
+    return (vmax*values**n)/(kd**n+values**n)
+
+def add_signal_x(midf, p):
+    
+    for zz, yy, res in it.product(midf.index.levels[0],
+                                  midf.index.levels[1],
+                                  midf.index.levels[3]):
+        
+        # adds chemical shift signal
+        ## adds to H1
+        midf.loc[(zz, yy, slice(None), res), 'Position F1'] =\
+            midf.loc[(zz, yy, slice(None), res), 'Position F1'].values\
+            + hill(midf.loc[(zz, yy, '0000', res), 'VmaxH'],
+                   midf.loc[(zz, yy, '0000', res), 'kd'],
+                   midf.loc[(zz, yy, '0000', res), 'n'],
+                   np.array(p['xdata']))
+        
+        ## adds to N
+        
+        
+        # adds intensities
+        
+    
+    
+    
+    return midf
+
+
+def init_signal_regions(midf, p, kd=4000.0, n=1.0):
+    
+    
+    
+    for mag, lig, conc in it.product(midf.index.levels[0],
+                                     midf.index.levels[1],
+                                     midf.index.levels[2]):
+        
+        vlen = midf.loc[(mag, lig, conc)].shape[0]
+        
+        mvh = np.random.choice([-0.01, 0.01], size=(vlen,))
+        mvn = np.random.choice([-0.05, 0.05], size=(vlen,))
+        mkd = np.repeat(kd, vlen)
+        mn = np.repeat(n, vlen)
+        mres = midf.loc[(mag, lig, conc, slice(None)), 'Res#'].values
+        
+        
+        # do this because pandas does not allow bool indexing more than
+        # level 0
+        r1 = p['regions'][mag][lig]['r1']
+        r2 = p['regions'][mag][lig]['r2']
+        r3 = p['regions'][mag][lig]['r3']
+        
+        maskr1 = np.in1d(mres, np.arange(r1[0], r1[1]+1))
+        maskr2 = np.in1d(mres, np.arange(r2[0], r2[1]+1))
+        maskr3 = np.in1d(mres, np.arange(r3[0], r3[1]+1))
+        
+        mvh[maskr1] = np.linspace(0.01,0.2, num=np.sum(maskr1))\
+            * np.random.choice([-1, 1], size=np.sum(maskr1))
+        mvn[maskr1] = np.linspace(0.01,1.0, num=np.sum(maskr1))\
+            * np.random.choice([-1, 1], size=np.sum(maskr1))
+        
+        mvh[maskr2] = 0.2\
+            * np.random.choice([-1, 1], size=np.sum(maskr2))
+        mvn[maskr2] = 1.0\
+            * np.random.choice([-1, 1], size=np.sum(maskr2))
+        mkd[maskr2] = np.linspace(p['xdata'][1],
+                                  p['xdata'][-1],
+                                  num=np.sum(maskr2))
+        
+        
+        
+        mvh[maskr3] = 0.2 \
+            * np.random.choice([-1, 1], size=np.sum(maskr3))
+        mvn[maskr3] = 1.0 \
+            * np.random.choice([-1, 1], size=np.sum(maskr3))
+        mkd[maskr3] = p['xdata'][4]
+        mn[maskr3] = np.linspace(0.1, 3.0, num=np.sum(maskr3))
+        
+        midf.loc[(mag, lig, conc), 'VmaxH'] = mvh
+        midf.loc[(mag, lig, conc), 'VmaxN'] = mvn
+        midf.loc[(mag, lig, conc), 'kd'] = mkd
+        midf.loc[(mag, lig, conc), 'n'] = mn
+        
+            
+    return midf
+
+def add_signal_macro(midf, p):
+    
+    midf = init_signal_regions(midf, p)
+    
+    midf = add_signal_x(midf, p)
+    
+    return midf
+
 def run_generator(jpath):
     
     col_list=['Res#', 'Merit', 'Position F1', 'Position F2', 'Height', 'Volume', 
@@ -354,7 +480,12 @@ def run_generator(jpath):
     
     exp = add_noise(exp)
     
+    exp = add_signal_macro(exp, p)
+    
     write_titration(exp)
+    
+    write_protein_fasta(protein, p['zdata'], p['ydata'])
+    
 
 
 

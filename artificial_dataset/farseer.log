@@ -1,1 +1,452 @@
-****** LOG STARTED ** 2017/06/07 - 17:20:01
+****** LOG STARTED ** 2017/06/08 - 17:54:50
+
+
+*******************************************************************************
+                             Initiates Farseer Set                             
+*******************************************************************************
+
+
+path: /home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra
+side chains: True
+FASTA starting residue: 1
+
+
+
+*******************************************************************************
+                          READING INPUT FILES *.csv*                           
+*******************************************************************************
+
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/4000.csv
+
+
+*******************************************************************************
+                         READING INPUT FILES *.fasta*                          
+*******************************************************************************
+
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/pseq.fasta
+1-MIWVPFKHMFAYWSEWTADTSGFVVQVIWCTANSWCYLTHNGLPDRRDGNACYLEKVHLTSLELPKLAYLHESKPKVFAASCMQYTKIASKLRLRPSTLK-100
+
+
+*******************************************************************************
+                          READING INPUT FILES *.csv*                           
+*******************************************************************************
+
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L1/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L2/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/dia/L3/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L1/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L2/4000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0125.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0250.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/0500.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/1000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/2000.csv
+/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/dev/Farseer_dev/Farseer-GitHub/artificial_dataset/spectra/para/L3/4000.csv
+
+
+*******************************************************************************
+                        IDENTIFIED TITRATION VARIABLES                         
+*******************************************************************************
+
+> 1st titration variables (cond1): ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+> 2nd titration variables (cond2): ['L1', 'L2', 'L3']
+> 3rd titration variables (cond3): ['dia', 'para']
+
+
+
+*******************************************************************************
+             IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN             
+*******************************************************************************
+
+[dia][L1][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L1][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L2][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[dia][L3][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L1][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L2][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][0000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][0125] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][0250] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][0500] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][1000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][2000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+[para][L3][4000] | * new columns inserted:  OK  * sidechains user setting: True * sidechains identified: True ** SD count: 15
+
+
+*******************************************************************************
+                   ADDS LOST RESIDUES BASED ON THE REFERENCE                   
+*******************************************************************************
+
+[dia][L1][0000] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][0125] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][0250] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][0500] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][1000] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][2000] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L1][4000] vs. [dia][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][0000] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][0125] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][0250] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][0500] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][1000] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][2000] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L2][4000] vs. [dia][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][0000] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][0125] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][0250] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][0500] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][1000] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][2000] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[dia][L3][4000] vs. [dia][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][0000] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][0125] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][0250] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][0500] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][1000] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][2000] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L1][4000] vs. [para][L1][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][0000] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][0125] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][0250] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][0500] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][1000] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][2000] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L2][4000] vs. [para][L2][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][0000] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][0125] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][0250] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][0500] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][1000] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][2000] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+[para][L3][4000] vs. [para][L3][0000] | Target Initial Length :: 95 * Template Length :: 95 * Target final length :: 95
+
+
+*******************************************************************************
+                     ADDS LOST RESIDUES BASED ON THE FASTA                     
+*******************************************************************************
+
+[dia][L1][0000] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][0125] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][0250] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][0500] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][1000] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][2000] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L1][4000] vs. [dia][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][0000] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][0125] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][0250] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][0500] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][1000] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][2000] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L2][4000] vs. [dia][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][0000] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][0125] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][0250] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][0500] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][1000] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][2000] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[dia][L3][4000] vs. [dia][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][0000] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][0125] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][0250] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][0500] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][1000] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][2000] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L1][4000] vs. [para][L1][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][0000] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][0125] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][0250] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][0500] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][1000] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][2000] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L2][4000] vs. [para][L2][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][0000] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][0125] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][0250] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][0500] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][1000] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][2000] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+[para][L3][4000] vs. [para][L3][pseq] | Target Initial Length :: 95 * Template Length :: 100 * Target final length :: 100
+
+
+*******************************************************************************
+                      ORGANIZING PEAKLIST COLUMNS' ORDER                       
+*******************************************************************************
+
+[dia][L1][0000] | Columns organized :: OK
+[dia][L1][0125] | Columns organized :: OK
+[dia][L1][0250] | Columns organized :: OK
+[dia][L1][0500] | Columns organized :: OK
+[dia][L1][1000] | Columns organized :: OK
+[dia][L1][2000] | Columns organized :: OK
+[dia][L1][4000] | Columns organized :: OK
+[dia][L2][0000] | Columns organized :: OK
+[dia][L2][0125] | Columns organized :: OK
+[dia][L2][0250] | Columns organized :: OK
+[dia][L2][0500] | Columns organized :: OK
+[dia][L2][1000] | Columns organized :: OK
+[dia][L2][2000] | Columns organized :: OK
+[dia][L2][4000] | Columns organized :: OK
+[dia][L3][0000] | Columns organized :: OK
+[dia][L3][0125] | Columns organized :: OK
+[dia][L3][0250] | Columns organized :: OK
+[dia][L3][0500] | Columns organized :: OK
+[dia][L3][1000] | Columns organized :: OK
+[dia][L3][2000] | Columns organized :: OK
+[dia][L3][4000] | Columns organized :: OK
+[para][L1][0000] | Columns organized :: OK
+[para][L1][0125] | Columns organized :: OK
+[para][L1][0250] | Columns organized :: OK
+[para][L1][0500] | Columns organized :: OK
+[para][L1][1000] | Columns organized :: OK
+[para][L1][2000] | Columns organized :: OK
+[para][L1][4000] | Columns organized :: OK
+[para][L2][0000] | Columns organized :: OK
+[para][L2][0125] | Columns organized :: OK
+[para][L2][0250] | Columns organized :: OK
+[para][L2][0500] | Columns organized :: OK
+[para][L2][1000] | Columns organized :: OK
+[para][L2][2000] | Columns organized :: OK
+[para][L2][4000] | Columns organized :: OK
+[para][L3][0000] | Columns organized :: OK
+[para][L3][0125] | Columns organized :: OK
+[para][L3][0250] | Columns organized :: OK
+[para][L3][0500] | Columns organized :: OK
+[para][L3][1000] | Columns organized :: OK
+[para][L3][2000] | Columns organized :: OK
+[para][L3][4000] | Columns organized :: OK
+
+
+*******************************************************************************
+                            INITIATING FARSEER CUBE                            
+*******************************************************************************
+
+** Created cube for all the backbone peaklists
+
+
+*******************************************************************************
+                 GENERATING DICTIONARY OF TITRATIONS FOR cond1                 
+*******************************************************************************
+
+Generated titration [dia][L1] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+Generated titration [dia][L2] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+Generated titration [dia][L3] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+Generated titration [para][L1] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+Generated titration [para][L2] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+Generated titration [para][L3] | with points ['0000', '0125', '0250', '0500', '1000', '2000', '4000']
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/dia/L1
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/dia/L1/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/dia/L1/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L1/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L1/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L1/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/dia/L2
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/dia/L2/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/dia/L2/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L2/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L2/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L2/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/dia/L3
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/dia/L3/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/dia/L3/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/dia/L3/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L3/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/dia/L3/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/para/L1
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/para/L1/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/para/L1/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L1/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L1/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L1/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/para/L2
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/para/L2/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/para/L2/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L2/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L2/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L2/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+***** ANALYZING...  Backbone/Calculations/cond1/para/L3
+** Calculated H1_delta
+** Exported peaklists in Backbone/Calculations/cond1/para/L3/FullPeaklists
+** Data table saved: Backbone/Calculations/cond1/para/L3/TablesAndPlots/H1_delta/H1_delta.tsv
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/0000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/0125_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/0250_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/0500_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/1000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/2000_H1_delta.att
+** Chimera Att file saved: Backbone/Calculations/cond1/para/L3/ChimeraAttributeFiles/H1_delta/4000_H1_delta.att
+** Starting plot bar_extended for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L3/TablesAndPlots/H1_delta/H1_delta_bar_extended.pdf
+** Starting plot res_evo for H1_delta...
+** Plot Saved Backbone/Calculations/cond1/para/L3/TablesAndPlots/H1_delta/H1_delta_res_evo.pdf
+
+
+****** LOG ENDED ** 2017/06/08 - 17:56:38
