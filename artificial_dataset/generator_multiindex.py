@@ -250,12 +250,17 @@ def gen_multiindex_df(z, y, x, rnum, col_list):
     
     return midf
 
-def write_titration(midf):
+def write_titration(midf, mod='full'):
     """
     Saves a titration series to csv files.
     """
     
-    col_list=['Assign F1', 'Assign F2', 'Position F1', 'Position F2', 'Height', 'Volume', 
+    if mod == 'full':
+        col_list = midf.columns
+    
+    elif mod == 'ccp':
+        
+        col_list=['Assign F1', 'Assign F2', 'Position F1', 'Position F2', 'Height', 'Volume', 
               'Line Width F1 (Hz)', 'Line Width F2 (Hz)', 'Fit Method',
               'Vol. Method', 'Merit', 'Details', '#',
               'Number']
@@ -337,8 +342,8 @@ def add_noise(midf):
     
     col_noise_percent = {'Position F1':0.02,
                          'Position F2':0.02,
-                         'Height':10,
-                         'Volume':10,
+                         'Height':2,
+                         'Volume':2,
                          'Line Width F1 (Hz)':1,
                          'Line Width F2 (Hz)':1}
     
@@ -369,6 +374,8 @@ def add_signal_x(midf, p):
                                   midf.index.levels[1],
                                   midf.index.levels[3]):
         
+        print('** adding signal {} {} {}'.format(zz, yy, res))
+        
         # adds chemical shift signal
         ## adds to H1
         midf.loc[(zz, yy, slice(None), res), 'Position F1'] =\
@@ -379,48 +386,70 @@ def add_signal_x(midf, p):
                    np.array(p['xdata']))
         
         ## adds to N
+        midf.loc[(zz, yy, slice(None), res), 'Position F2'] =\
+            midf.loc[(zz, yy, slice(None), res), 'Position F2'].values\
+            + hill(midf.loc[(zz, yy, '0000', res), 'VmaxN'],
+                   midf.loc[(zz, yy, '0000', res), 'kd'],
+                   midf.loc[(zz, yy, '0000', res), 'n'],
+                   np.array(p['xdata']))
         
-        
-        # adds intensities
-        
-    
-    
+        # adds intensities ratios High
+        midf.loc[(zz, yy, slice(None), res), 'Height'] =\
+            midf.loc[(zz, yy, slice(None), res), 'Height'].values\
+            * np.linspace(0.95,
+                          midf.loc[(zz, yy, '0000', res), 'highratio'],
+                          num=midf.loc[(zz, yy, slice(None), res), 'Height'].\
+                            shape[0])
+                            
+        # adds intensities ratios volume
+        midf.loc[(zz, yy, slice(None), res), 'Volume'] =\
+            midf.loc[(zz, yy, slice(None), res), 'Volume'].values\
+            * np.linspace(0.95,
+                          midf.loc[(zz, yy, '0000', res), 'volratio'],
+                          num=midf.loc[(zz, yy, slice(None), res), 'Volume'].\
+                            shape[0])
     
     return midf
 
 
 def init_signal_regions(midf, p, kd=4000.0, n=1.0):
     
-    
-    
     for mag, lig, conc in it.product(midf.index.levels[0],
                                      midf.index.levels[1],
                                      midf.index.levels[2]):
         
+        # shapes the length of the protein
         vlen = midf.loc[(mag, lig, conc)].shape[0]
         
+        # standard variables for regions with no interation
         mvh = np.random.choice([-0.01, 0.01], size=(vlen,))
         mvn = np.random.choice([-0.05, 0.05], size=(vlen,))
         mkd = np.repeat(kd, vlen)
         mn = np.repeat(n, vlen)
         mres = midf.loc[(mag, lig, conc, slice(None)), 'Res#'].values
+        mhi = np.random.choice(np.linspace(0.40,0.60, num=vlen), size=vlen)
+        mvol = np.random.choice(np.linspace(0.50,0.80, num=vlen), size=vlen)
         
-        
+        # reads the regions of interaction
         # do this because pandas does not allow bool indexing more than
         # level 0
         r1 = p['regions'][mag][lig]['r1']
         r2 = p['regions'][mag][lig]['r2']
         r3 = p['regions'][mag][lig]['r3']
         
+        # prepares the masks of interaction regions
         maskr1 = np.in1d(mres, np.arange(r1[0], r1[1]+1))
         maskr2 = np.in1d(mres, np.arange(r2[0], r2[1]+1))
         maskr3 = np.in1d(mres, np.arange(r3[0], r3[1]+1))
         
+        # what occurs in the regions?
+        # r1
         mvh[maskr1] = np.linspace(0.01,0.2, num=np.sum(maskr1))\
             * np.random.choice([-1, 1], size=np.sum(maskr1))
         mvn[maskr1] = np.linspace(0.01,1.0, num=np.sum(maskr1))\
             * np.random.choice([-1, 1], size=np.sum(maskr1))
         
+        # r2
         mvh[maskr2] = 0.2\
             * np.random.choice([-1, 1], size=np.sum(maskr2))
         mvn[maskr2] = 1.0\
@@ -429,8 +458,7 @@ def init_signal_regions(midf, p, kd=4000.0, n=1.0):
                                   p['xdata'][-1],
                                   num=np.sum(maskr2))
         
-        
-        
+        # r3
         mvh[maskr3] = 0.2 \
             * np.random.choice([-1, 1], size=np.sum(maskr3))
         mvn[maskr3] = 1.0 \
@@ -438,10 +466,15 @@ def init_signal_regions(midf, p, kd=4000.0, n=1.0):
         mkd[maskr3] = p['xdata'][4]
         mn[maskr3] = np.linspace(0.1, 3.0, num=np.sum(maskr3))
         
+        
+        # adds the variables to the main df
+        # these will be used later to apply the signal.
         midf.loc[(mag, lig, conc), 'VmaxH'] = mvh
         midf.loc[(mag, lig, conc), 'VmaxN'] = mvn
         midf.loc[(mag, lig, conc), 'kd'] = mkd
         midf.loc[(mag, lig, conc), 'n'] = mn
+        midf.loc[(mag, lig, conc), 'highratio'] = mhi
+        midf.loc[(mag, lig, conc), 'volratio'] = mvol
         
             
     return midf
@@ -482,7 +515,7 @@ def run_generator(jpath):
     
     exp = add_signal_macro(exp, p)
     
-    write_titration(exp)
+    write_titration(exp, mod='ccp')
     
     write_protein_fasta(protein, p['zdata'], p['ydata'])
     
