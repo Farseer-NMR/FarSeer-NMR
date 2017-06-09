@@ -1,5 +1,0 @@
-** TESTS THAT FARSEER HAVE TO PASS BEFORE RELEASING**
-
-* Calculations are okay-
-** use a set of peaklists without 'lost' values and paste the files in FullPeakLists
-** in the excel 'excel_confirmation.ods'. Differences should be zero.

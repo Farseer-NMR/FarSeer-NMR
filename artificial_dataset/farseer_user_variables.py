@@ -51,15 +51,15 @@ tag_ls='-'
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restrains to Plot:
-plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
 plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
 plots_CSP = False  # Plot combined chemical shift perturbation data
-plots_Height_ratio = False  # Plot Height ratio data
-plots_Volume_ratio = False  # Plot Volume ratio data
+plots_Height_ratio = True  # Plot Height ratio data
+plots_Volume_ratio = True  # Plot Volume ratio data
 #
 # Ploting Templates
-plots_extended_bar = True  # Represent data in Extended Bar Plot style
-plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
+plots_extended_bar = False  # Represent data in Extended Bar Plot style
+plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
 plots_residue_evolution = True  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
