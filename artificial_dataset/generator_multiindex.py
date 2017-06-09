@@ -229,7 +229,7 @@ def gen_refpkl_macro(protein, col_list):
     
     refpkl = refpkl.loc[mask_no_pro,:]
     
-    refpkl = add_sidechains(refpkl)
+    #refpkl = add_sidechains(refpkl)
     
     refpkl = refpkl[col_list]
     
@@ -265,19 +265,36 @@ def write_titration(midf, mod='full'):
               'Vol. Method', 'Merit', 'Details', '#',
               'Number']
     
-    for (zz, yy, xx) in it.product(midf.index.levels[0],
-                                   midf.index.levels[1],
-                                   midf.index.levels[2]):
+    
+    for yy in midf.index.levels[1]:
+        # do 
+        res = []
         
-        folder = 'spectra/{}/{}'.format(zz, yy)
-        if not(os.path.exists(folder)):
-            os.makedirs(folder)
-        
-        path = '{}/{}.csv'.format(folder, xx)
-        
-        midf.loc[(zz, yy, xx)].to_csv(path, index=False,
-                                      index_label=False,
-                                      columns=col_list)
+        for xx in midf.index.levels[2]:
+            # do 
+            
+            res.append(random.choice(midf.index.levels[3]))
+            
+            for zz in midf.index.levels[0]:
+                #do 
+                folder = 'spectra/{}/{}'.format(zz, yy)
+                if not(os.path.exists(folder)):
+                    os.makedirs(folder)
+                
+                tmpdf = pd.DataFrame(midf.loc[(zz, yy, xx)])
+                
+                if xx in midf.index.levels[2][1:]\
+                    or zz in midf.index.levels[0][-1]:
+                    tmpdf = drop_lost(tmpdf, res, zz, yy, xx)
+                
+                path = '{}/{}.csv'.format(folder, xx)
+                
+                tmpdf.to_csv(path, index=False,
+                                   index_label=False,
+                                   columns=col_list)
+                # done
+            #done
+        #done
         
     return
 
@@ -487,6 +504,17 @@ def add_signal_macro(midf, p):
     
     return midf
 
+def drop_lost(tmpdf, res, mag, lig, conc):
+    
+    
+    tmpdf.drop(res, axis=0, inplace=True)
+    
+    print('### Dropping lost residues {} {} {} - {}'.\
+                format(mag, lig, conc, res))
+    
+    
+    return tmpdf
+
 def run_generator(jpath):
     
     col_list=['Res#', 'Merit', 'Position F1', 'Position F2', 'Height', 'Volume', 
@@ -513,7 +541,7 @@ def run_generator(jpath):
     
     exp = add_noise(exp)
     
-    exp = add_signal_macro(exp, p)
+    #exp = add_signal_macro(exp, p)
     
     write_titration(exp, mod='ccp')
     
