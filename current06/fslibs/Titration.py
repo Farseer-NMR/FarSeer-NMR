@@ -345,7 +345,7 @@ with window size {} and stdev {}'.\
             format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
         return
     
-    def write_table(self, tablecol):
+    def write_table(self, tablecol, atomtype='Backbone'):
         '''
         Writes to a tsv file the values of a specific column
         along the titration.
@@ -353,6 +353,10 @@ with window size {} and stdev {}'.\
         # concatenates the values of the table with the residues numbers
         table = pd.concat([self.res_info.iloc[0,:,[0]],
                            self.loc[:,:,tablecol].astype(float)], axis=1)
+        
+        if atomtype == 'Sidechains':
+            table.loc[:,'Res#'] = \
+                table.loc[:,'Res#'] + self.ix[0,:,'ATOM']
         
         if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
                                              tablecol))):
