@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from math import ceil
-#import scipy.optimize as sciopt
+import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
 
