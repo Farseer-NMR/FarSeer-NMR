@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from math import ceil
-import scipy.optimize as sciopt
+#import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
 
@@ -687,9 +687,10 @@ recipient: residues
             # this is used to fit both applyFASTA=True or False
             tickpos = \
                 np.arange(\
-                    start=self.loc[experiment,:,'Res#'].astype(float).head(1),
-                    stop=len(self.loc[experiment,:,'Res#'])+1,
+                    start=float(self.loc[experiment,:,'Res#'].head(1)),
+                    stop=float(self.loc[experiment,:,'Res#'].tail(n=1))+1,
                     step=1)
+            
             
             bars = axs[i].bar(tickpos,
                             self.loc[experiment,:,calccol].fillna(0),
@@ -699,8 +700,7 @@ recipient: residues
                             linewidth=bar_linewidth,
                             zorder=4)
             
-            #bars = axs[i].bar(self.loc[experiment,:,'Res#'].astype(float),            
-        
+            
             # Configure XX ticks and Label
             axs[i].set_xticks(tickpos)
         
