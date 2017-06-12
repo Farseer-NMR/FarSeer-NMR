@@ -352,7 +352,7 @@ with window size {} and stdev {}'.\
         '''
         # concatenates the values of the table with the residues numbers
         table = pd.concat([self.res_info.iloc[0,:,[0]],
-                          self.loc[:,:,tablecol].astype(float)], axis=1)
+                           self.loc[:,:,tablecol].astype(float)], axis=1)
         
         if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
                                              tablecol))):
@@ -736,6 +736,8 @@ recipient: residues
             axs[i].set_xticks(self.major_axis)
         
             ## https://github.com/matplotlib/matplotlib/issues/6266
+            print(self.loc[experiment,:,'Res#'])
+            
             axs[i].set_xticklabels(\
                 self.loc[experiment,:,['Res#','1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
