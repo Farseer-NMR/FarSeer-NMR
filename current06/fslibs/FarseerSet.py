@@ -484,6 +484,15 @@ FASTA starting residue: {}
             
             self.allsidechains[z][y][x].reset_index(inplace=True)
             
+            self.allsidechains[z][y][x].loc[:,'Res#'] = \
+                self.allsidechains[z][y][x]['Res#'].astype(int)
+            
+            self.allsidechains[z][y][x].\
+                sort_values(by=['Res#','ATOM'] , inplace=True)
+            
+            self.allsidechains[z][y][x].loc[:,'Res#'] = \
+                self.allsidechains[z][y][x]['Res#'].astype(str)
+            
             # creates backbone peaklist without sidechains
             self.allpeaklists[z][y][x] = \
                 self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
@@ -591,7 +600,8 @@ FASTA starting residue: {}
                          ref_seq_dict,
                          target_seq_dict,
                          fillna_dict,
-                         refscoords=None):
+                         refscoords=None,
+                         atomtype='Backbone'):
         """
         Expands the 'Res#' columns of a target peaklist (seq)
         according to a reference peaklist (seq).
@@ -615,8 +625,23 @@ FASTA starting residue: {}
         # reads the reference key
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
+        if atomtype=='Sidechain':
+            print('HEREEEEEEEEEE')
+            
+            ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
+                ref_seq_dict[z][y][ref_key].loc[:,['Res#', 'ATOM']].\
+                    apply(lambda x: ''.join(x), axis=1)
+            
+            
+            target_seq_dict[z][y][x].loc[:,'Res#'] = \
+                target_seq_dict[z][y][x].loc[:,['Res#', 'ATOM']].\
+                    apply(lambda x: ''.join(x), axis=1)
+        
+        
+        
         # reads new index from the Res# column of the reference peaklist
         ind = ref_seq_dict[refcz][refcy][ref_key].loc[:,'Res#']
+        
         # stores size of new index
         length_ind = ind.size 
         
@@ -644,6 +669,19 @@ FASTA starting residue: {}
         target_seq_dict[z][y][x].loc[:,'Assign F1'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'Assign F1']
         
+        if atomtype=='Sidechain':
+            
+            target_seq_dict[z][y][x].loc[:,'ATOM'] = \
+                ref_seq_dict[refcz][refcy][ref_key].loc[:,'ATOM']
+            
+            
+            target_seq_dict[z][y][x].loc[:,'Res#'] = \
+                target_seq_dict[z][y][x].loc[:,'Res#'].str[:-1]
+            
+            ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
+                ref_seq_dict[z][y][ref_key].loc[:,'Res#'].str[:-1]
+                
+        
         logs = "[{}][{}][{}] vs. [{}][{}][{}] |\
  Target Initial Length :: {} \
 * Template Length :: {} \
@@ -668,7 +706,7 @@ FASTA starting residue: {}
 
         Returns the organized dataframe.
         """
-        print(peaklist[z][y][x].columns)
+        
         if performed_cs_correction and not(sidechains):
             col_order = ['Res#',
                          '1-letter',

@@ -483,7 +483,8 @@ def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
 
 def add_lost(exp, refdata, targetdata,
              peak_status='lost',
-             ref='REFERENCE'):
+             ref='REFERENCE',
+             kwargs={}):
     """Adds lots residues to the peaklists based on a reference.
     """
     
@@ -491,6 +492,7 @@ def add_lost(exp, refdata, targetdata,
     
     exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, exp.seq_expand,
                  args=[refdata, targetdata, fill_na_lost(peak_status)],
+                 kwargs=kwargs,
                  title=ctitle)
     
     return
@@ -597,6 +599,7 @@ def gen_titration_dicts(exp, data_hyper_cube,
 def eval_titrations(titration_dict,
                     fsuv,
                     spectra_path='spectra/',
+                    atomtype='Backbone',
                     param_settings = [],
                     general_plot_params = [],
                     pre_plot_params = []):
@@ -652,7 +655,8 @@ of cond1 variables.')
                 
                 # EXPORTS CALCULATIONS
                 exports_data_tables(titration_dict[cond][dim2_pt][dim1_pt],
-                                    param_settings=param_settings, fsuv=fsuv)
+                                    param_settings=param_settings, fsuv=fsuv,
+                                    atomtype=atomtype)
                 
                 # PLOTS TITRATION DATA
                 plots_data(titration_dict[cond][dim2_pt][dim1_pt],
@@ -800,14 +804,18 @@ def exports_titration(titration_panel):
     titration_panel.export_titration()
     return
 
-def exports_data_tables(titration_panel, param_settings=[], fsuv=None):
+def exports_data_tables(titration_panel,
+                        param_settings=[],
+                        fsuv=None,
+                        atomtype='Backbone'):
     """Exports tables with calculated parameters."""
     
     for calculated_parameter in param_settings.index:
         # if the user wants to plot this parameter
         if param_settings.loc[calculated_parameter,'plot_param_flag']:
             # do exports table
-            titration_panel.write_table(calculated_parameter)
+            titration_panel.write_table(calculated_parameter,
+                                        atomtype=atomtype)
             
             # do export chimera attribute files
             titration_panel.write_Chimera_attributes(\
@@ -1113,9 +1121,10 @@ def run_farseer(spectra_path, fsuv):
              ref='REFERENCE')
     
     if exp.has_sidechains and fsuv.use_sidechains:
-        add_lost(exp, exp.allpeaklists, exp.allpeaklists,
+        add_lost(exp, exp.allsidechains, exp.allsidechains,
                        peak_status='lost',
-                       ref='REFERENCE FOR SIDECHAINS')
+                       ref='REFERENCE FOR SIDECHAINS',
+                       kwargs={'atomtype':'Sidechain'})
     
     # adds fasta
     if fsuv.applyFASTA:
@@ -1179,9 +1188,10 @@ def run_farseer(spectra_path, fsuv):
                                      rt='Sidechains',
                                      cp=calculated_params))
         
-        print(Farseer_SD_titrations_dict['cond1']['298']['ligand1'].iloc[0])
+        
         eval_titrations(Farseer_SD_titrations_dict,
                         fsuv,
+                        atomtype='Sidechains',
                         spectra_path=spectra_path,
                         param_settings = param_settings,
                         general_plot_params = general_plot_params,
