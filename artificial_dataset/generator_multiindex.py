@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import itertools as it
+from scipy import signal
 import sys
 import json
 import random
@@ -496,11 +497,71 @@ def init_signal_regions(midf, p, kd=4000.0, n=1.0):
             
     return midf
 
+def signal_PRE(p, lig, f1, f2, i):
+    """
+    Generates an array with the characteristics of the relaxation induced
+    signal: 1) a gaussian function centered at the tag position and 2) a 
+    smaller guassian function centered at 'interaction' region.
+    
+    inputs:
+        - peaklist length
+        - tag position
+        - tag affecting reagion
+        - reagion of tag interation
+    
+    
+    returns: np.array
+    """
+
+    
+    pre = 1 - signal.exponential(p['pkl_length'],
+                             sym=False,
+                             tau=5*i,
+                             center=p['tag_position'])*1.1
+    
+    pre_int = 1 - signal.exponential(p['pkl_length'],
+                                     sym=False,
+                                     tau=i*3,
+                                     center=p['interaction'][lig]) \
+                  * 0.9*f1
+    
+    int_region = np.less(pre_int, pre)
+    
+    pre[int_region] = pre_int[int_region]
+    
+    pre = pre * f2
+    
+    return pre
+
+def add_signal_z(midf, p):
+    """
+    Simulates the presence of a paramagnetic tag by
+    adding a signal to the z dimension.
+    """
+    M = len(midf.index.levels[2])
+    factor1 = np.linspace(0.1,1,num=M) 
+    factor2 = 1-np.linspace(0.1,0.4,num=M)
+    
+    ## step 2: for each point in the yy dimension (cond2): a intensity
+    ## reduction signal will be applied to the paramagnetic spectra
+    
+    for lig in midf.index.levels[1]:
+        for i, conc in enumerate(midf.index.levels[2]):
+                                
+            midf.loc[('para', lig, conc), 'Height'] = \
+                midf.loc[('para', lig, conc), 'Height'].values \
+                * signal_PRE(p, lig, factor1[i], factor2[i], i)
+    
+    
+    return midf
+
 def add_signal_macro(midf, p):
     
-    midf = init_signal_regions(midf, p)
+    #midf = init_signal_regions(midf, p)
     
-    midf = add_signal_x(midf, p)
+    #midf = add_signal_x(midf, p)
+    
+    midf = add_signal_z(midf, p)
     
     return midf
 
@@ -515,6 +576,30 @@ def drop_lost(tmpdf, res, mag, lig, conc):
     
     return tmpdf
 
+def theoretical_PRE(p):
+    tpre = signal.exponential(p['pkl_length'],
+                              sym=False,
+                              tau=5,
+                              center=p['tag_position']).reshape((p['pkl_length'], 1))
+    
+    res = np.arange(1, p["pkl_length"]+1, dtype=int).reshape((p['pkl_length'], 1))
+    table = np.concatenate((res, tpre), axis=1)
+    
+    
+    
+    for z, y in it.product(['para'], p['ydata']):
+    
+        folder = 'spectra/{}/{}'.format(z, y)
+        if not(os.path.exists(folder)):
+            os.makedirs(folder)
+        
+        path = '{}/tag.pre'.format(folder)
+        
+        np.savetxt(path, table, fmt=('%d', '%s'), delimiter='\t',
+                   header='{}'.format(p['tag_position']))
+        
+    return
+
 def run_generator(jpath):
     
     col_list=['Res#', 'Merit', 'Position F1', 'Position F2', 'Height', 'Volume', 
@@ -524,16 +609,18 @@ def run_generator(jpath):
     
     p = read_params(jpath)  # p of params
     
-    # generates protein
+    ## generates protein
     protein = gen_random_protein(p["protein_length"])
     
-    # generates reference peaklist based on a protein
+    ## generates reference peaklist based on a protein
     refpkl = gen_refpkl_macro(protein, col_list)
+    
+    p['pkl_length'] = refpkl.shape[0]
     
     exp = gen_multiindex_df(p['zdata'], 
                             p['ydata'],
                             p['xdata'],
-                            refpkl.shape[0],
+                            p['pkl_length'],
                             col_list)
     
     
@@ -541,14 +628,17 @@ def run_generator(jpath):
     
     exp = add_noise(exp)
     
-    #exp = add_signal_macro(exp, p)
+    exp = add_signal_macro(exp, p)
     
     write_titration(exp, mod='ccp')
     
-    write_protein_fasta(protein, p['zdata'], p['ydata'])
+    theoretical_PRE(p)
     
+    write_protein_fasta(protein, p['zdata'], p['ydata'])
 
 
 
 if __name__ == "__main__":
     run_generator(sys.argv[1])
+    
+    
