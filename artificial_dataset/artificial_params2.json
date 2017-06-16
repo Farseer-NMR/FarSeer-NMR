@@ -1,5 +1,5 @@
 {
-    "plen": 500,
+    "plen": 100,
     "zdata": ["dia", "para"],
     "ydata": ["L1", "L2", "L3"],
     "xdata": [0, 125, 250, 500, 1000, 2000, 4000],
@@ -17,9 +17,9 @@
                        }
                 },
     "tag_position": 75,
-    "interaction":{"L1":20,
-                   "L2":30,
-                   "L3":15},
+    "pre_interaction":{"L1":20,
+                       "L2":30,
+                       "L3":16},
     "tag_size": 40
 }
 

@@ -301,10 +301,75 @@ class artifset():
         
         return
     
+    def tag_PRE(self):
+        
+        # signal that results from presence of tag
+        sig = signal.gaussian(self.floatdata.shape[3], 4, False)*-1+0.9
+        tag_pre = np.repeat(1.0, self.floatdata.shape[3])
+        # region that the tag affects
+        sl = self.floatdata.shape[3]//2-self.params['tag_size']//2
+        sr = self.floatdata.shape[3]//2+self.params['tag_size']//2
+        #
+        tl = self.params['tag_position']-self.params['tag_size']//2
+        tr = self.params['tag_position']+self.params['tag_size']//2
+        #
+        tag_pre[tl:tr] = sig[sl:sr]
+        mask = np.less_equal(tag_pre, 0)
+        tag_pre[mask] = 0.0001 ## cant't be zero because of ZeroDivision Error
+        
+        tag_pre = np.tile(tag_pre, (self.floatdata.shape[2], 1))
+        
+        return tag_pre
+    
+    def pre_interaction(self, pre_interaction_site):
+        
+        # signal that results from presence of tag
+        sig = signal.exponential(self.floatdata.shape[3],
+                                 pre_interaction_site,
+                                 self.floatdata.shape[3]//7,
+                                 False)
+        
+        pre_int = np.tile(sig, (self.floatdata.shape[2],1))
+        
+        factor = np.tile(np.linspace(0,-1,self.floatdata.shape[2]),
+                        (self.floatdata.shape[3],1)).T
+        
+        pre_int = pre_int * factor + 1
+        
+        mask = np.less_equal(pre_int, 0)
+        pre_int[mask] = 0.0001
+        
+        return pre_int
+    
+    def add_signal_along_z(self):
+        
+        def pre(data, signal):
+            return data * signal
+        
+        vpre = np.vectorize(pre)
+        
+        tag_pre = self.tag_PRE()
+        
+        for i, k in enumerate(sorted(self.params['pre_interaction'].keys())):
+            
+            pre_int = self.pre_interaction(self.params['pre_interaction'][k])
+            
+            int_region_mask = np.less(pre_int, tag_pre)
+            
+            tag_pre[int_region_mask] = pre_int[int_region_mask]
+            
+            self.floatdata[1,i,:,:,2] = \
+                vpre(self.floatdata[1,i,:,:,2], tag_pre)
+            
+            pass
+        
+        return
+    
     def add_signal(self):
         
         self.add_signal_along_x()
         
+        self.add_signal_along_z()
         
         return
 
