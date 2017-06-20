@@ -111,6 +111,8 @@ class artifset():
         self.protein = self.gen_random_protein()
         
         self.resnum = np.arange(1, self.params['plen']+1, dtype=int)
+        self.resnumsd = self.resnum  # help variable for sidechains
+        
         self.res = np.array(list(self.protein))
         
         self.floatdata = self.gen_ref_data()
@@ -232,35 +234,46 @@ class artifset():
     
     def add_sidechains_res(self, restype, sdt):
         """
+        Identifies residues of type <restype> present in the artificial
+        dataset. Inserts the corresponding entries according to the
+        nomenclature.
+        
         AsnHd2a, AsnHd2b, GlnHe2a, GlnHe2b, TrpHe1a
         AsnNd2a, AsnNd2b, GlnNe2a, GlnNe2b, TrpNe1a
         """
+        # Asn and Gln have 2 sidechains entries while Trp has only 1.
         resmult = len(sdt)
         
+        #Where are the <restype> ?
         mask = np.core.defchararray.equal(self.res, restype)
+        # how many there are?
         num_sd_entries = np.count_nonzero(mask)*resmult
         
+        # concatenates the assignment column to the sidechains nomenclature
+        # for example, 'd2a' and 'd2b' in the case of Asn.
         abcolh = \
             np.core.defchararray.add(\
                 np.repeat(self.strdata[0,0,0,mask,0],resmult),
                 np.tile(sdt, num_sd_entries//resmult))
         
+        # same as above but for 'Position F2' col.
         abcoln = \
             np.core.defchararray.add(\
                 np.repeat(self.strdata[0,0,0,mask,1],resmult),
                 np.tile(sdt, num_sd_entries//resmult))
         
-        rescol = np.repeat(self.resnumsd[mask], resmult)
         
-        
-        ##str data
+        ##str data to be inserted in sidechains
         merit = np.repeat('1.0', num_sd_entries)
         details = np.repeat('None', num_sd_entries)
         volm = np.repeat('box sum', num_sd_entries)
         fit = np.repeat('parabolic', num_sd_entries)
         number = np.arange(1, num_sd_entries+1)
         
-        ##float data
+        ##float data to be inserted in sidechains
+        ## this example does not considered that W sidechains appear at
+        ## about 10 and 130 ppm or that chemical shift is the same in the
+        ## Position F2 dimension (Nitrogen)
         p1 = self.gen_numbers(6, 8, num_sd_entries)
         #nitro = self.gen_numbers(105, 115, num_sd_entries//2)
         p2 = self.gen_numbers(105, 115, num_sd_entries)
@@ -269,16 +282,23 @@ class artifset():
         lw1 = self.gen_numbers(5, 50, num_sd_entries, decimal=1000)
         lw2 = self.gen_numbers(5, 50, num_sd_entries, decimal=1000)
         
+        # generates a 2D array with the str related columns
         sdstr = np.array([abcolh, abcoln, merit, details,
                           fit, volm, number, number], dtype=str).T
         
-        
+        # generates a 2D array with the float related columns
         sdfloat = np.array([p1, p2, hgt, vol, lw1, lw2], dtype=float).T
         
+        # sorts the arrays according to the numbers.
+        # this is a "want to play safe" as these arrays shoulb be already
+        # sorted by definition self.strdata and self.floatdata are sorted.
+        # # generates the residue number of the sidechains
+        rescol = np.repeat(self.resnumsd[mask], resmult)
         sort_mask = np.argsort(rescol)
         sdstr = sdstr[sort_mask]
         sdfloat = sdfloat[sort_mask]
         
+        # expands the arrays to the dimensions of the artificial dataset
         sdstr = np.tile(sdstr, (len(self.params['zdata']),
                                 len(self.params['ydata']),
                                 len(self.params['xdata']),1,1))
@@ -287,29 +307,38 @@ class artifset():
                                     len(self.params['ydata']),
                                     len(self.params['xdata']),1,1))
         
-        
+        # concatenates the sidechains residue numbers to the protein
+        # residue numbers
         self.resnumsd = np.concatenate([self.resnumsd, rescol], axis=0)
+        # generates a sort mask
         sort_mask = np.argsort(self.resnumsd)
+        # sorts the residue numbers that also contains the sidechains numbers
         self.resnumsd = self.resnumsd[sort_mask]
         
         
+        # concatenates residue types with sidechains res types array
         self.res = \
-            np.concatenate([self.res, np.repeat(restype, num_sd_entries*2)], axis=0)
+            np.concatenate([self.res,
+                            np.repeat(restype, num_sd_entries*2)],
+                            axis=0)
         
+        # sortes it alike
         self.res = self.res[sort_mask]
         
-        
+        # concatenates str and float data, sidechains with backbone
         self.strdata = np.concatenate([self.strdata, sdstr], axis=3)
         self.floatdata = np.concatenate([self.floatdata, sdfloat], axis=3)
         
-        
+        # sortes alike
         self.strdata = self.strdata[:,:,:,sort_mask]
         self.floatdata = self.floatdata[:,:,:,sort_mask]
         
         return
     
     def add_sidechains(self):
-        self.resnumsd = self.resnum
+        """
+        General macro to add sidechains.
+        """
         self.add_sidechains_res('N', ['d2a','d2b'])
         self.add_sidechains_res('Q', ['e2a','e2b'])
         self.add_sidechains_res('W', ['e1a'])
@@ -564,14 +593,12 @@ class artifset():
         """
         Removes proline entries in the whole dataset.
         """
-        #proline_mask = \
-        #        np.core.defchararray.not_equal(\
-        #            np.array(list(self.protein)),'P')
+        
         
         proline_mask = \
             np.logical_not(np.chararray.endswith(self.strdata[0,0,0,:,0],
                                                  'ProH'))
-        #print(proline_mask)
+        
         self.floatdata = self.floatdata[:,:,:,proline_mask,:]
         self.strdata = self.strdata[:,:,:,proline_mask,:]
         
@@ -609,10 +636,6 @@ class artifset():
                     
                 for iz, zz in enumerate(self.params['zdata']):
                     
-                    #array_s, array_f = \
-                    #    self.remove_prolines(self.strdata[i,k,j],
-                    #                         self.floatdata[i,k,j])
-                    
                     lost.append(\
                         np.random.choice(self.floatdata.shape[-2]))
                     lost.append(\
@@ -639,8 +662,6 @@ class artifset():
                                comments='',
                                delimiter=',',
                                fmt='%s')
-                    
-                    
                     
         return
     
@@ -711,8 +732,6 @@ class artifset():
                        comments='#')
             
         return
-    
-
 
 if __name__ == '__main__':
     
