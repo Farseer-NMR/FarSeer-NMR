@@ -80,7 +80,7 @@ class artifset():
     
     
     João M.C. Teixeira
-    19.06.2017
+    20.06.2017
     """
     def __init__(self, fjson):
         
@@ -342,6 +342,9 @@ class artifset():
         self.add_sidechains_res('N', ['d2a','d2b'])
         self.add_sidechains_res('Q', ['e2a','e2b'])
         self.add_sidechains_res('W', ['e1a'])
+        self.strdata[:,:,:,:,6] = np.arange(1, self.resnumsd.size+1)
+        self.strdata[:,:,:,:,7] = np.arange(1, self.resnumsd.size+1)
+        
         return
     
     def add_noise(self):
@@ -593,8 +596,6 @@ class artifset():
         """
         Removes proline entries in the whole dataset.
         """
-        
-        
         proline_mask = \
             np.logical_not(np.chararray.endswith(self.strdata[0,0,0,:,0],
                                                  'ProH'))
@@ -624,7 +625,7 @@ class artifset():
         
         header = 'Assign F1,Assign F2,Merit,Details,Fit Method,Vol. Method,Number,#,Position F1,Position F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz)'
         
-        self.remove_prolines()
+        #self.remove_prolines()
         
         
         #for i, zz in enumerate(self.floatdata):
@@ -641,10 +642,10 @@ class artifset():
                     lost.append(\
                         np.random.choice(self.floatdata.shape[-2]))
                     
-                    array_s, array_f = \
-                        self.remove_lost(self.strdata[iz,iy,ix],
-                                        self.floatdata[iz,iy,ix],
-                                        lost)
+                    array_s, array_f = self.strdata[iz,iy,ix], \
+                                       self.floatdata[iz,iy,ix]
+                    
+                    #array_s, array_f = self.remove_lost(array_s, array_f, lost)
                     
                     tmp = np.concatenate([array_s, array_f], axis = 1)
                     
