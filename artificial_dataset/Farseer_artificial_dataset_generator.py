@@ -110,14 +110,17 @@ class artifset():
         
         self.protein = self.gen_random_protein()
         
-        self.res = np.arange(1, self.params['plen']+1, dtype=int)
+        self.resnum = np.arange(1, self.params['plen']+1, dtype=int)
+        self.res = np.array(list(self.protein))
         
         self.floatdata = self.gen_ref_data()
         
         self.strdata = self.gen_strdata()
         
+        self.add_sidechains()
+        
         pass
-
+    
     def read_params(self, pfile):
         """
         Reads parameters defined in a .json file.
@@ -127,7 +130,7 @@ class artifset():
         with open(pfile) as data_file:    
             params = json.load(data_file)
         return params
-
+    
     def gen_random_protein(self):
         """
         Generates a random protein string.
@@ -182,7 +185,7 @@ class artifset():
                                  len(self.params['xdata']),1,1))
         
         return strmatrix
-
+    
     def gen_numbers(self, inf, sup, size, decimal=1000):
         """
         Generates a np.array of size <size> containing random float numbers 
@@ -196,7 +199,7 @@ class artifset():
                                             size=size
                                             )/decimal
         return numbers
-
+    
     def gen_ref_data(self):
         """
         Generates a 5D np.array with the peaklist information corresponding
@@ -226,8 +229,92 @@ class artifset():
                                len(self.params['xdata']),1,1))
         
         return fmatrix
-
-
+    
+    def add_sidechains_res(self, restype, sdt):
+        """
+        AsnHd2a, AsnHd2b, GlnHe2a, GlnHe2b, TrpHe1a
+        AsnNd2a, AsnNd2b, GlnNe2a, GlnNe2b, TrpNe1a
+        """
+        resmult = len(sdt)
+        
+        mask = np.core.defchararray.equal(self.res, restype)
+        num_sd_entries = np.count_nonzero(mask)*resmult
+        
+        abcolh = \
+            np.core.defchararray.add(\
+                np.repeat(self.strdata[0,0,0,mask,0],resmult),
+                np.tile(sdt, num_sd_entries//resmult))
+        
+        abcoln = \
+            np.core.defchararray.add(\
+                np.repeat(self.strdata[0,0,0,mask,1],resmult),
+                np.tile(sdt, num_sd_entries//resmult))
+        
+        rescol = np.repeat(self.resnumsd[mask], resmult)
+        
+        
+        ##str data
+        merit = np.repeat('1.0', num_sd_entries)
+        details = np.repeat('None', num_sd_entries)
+        volm = np.repeat('box sum', num_sd_entries)
+        fit = np.repeat('parabolic', num_sd_entries)
+        number = np.arange(1, num_sd_entries+1)
+        
+        ##float data
+        p1 = self.gen_numbers(6, 8, num_sd_entries)
+        #nitro = self.gen_numbers(105, 115, num_sd_entries//2)
+        p2 = self.gen_numbers(105, 115, num_sd_entries)
+        hgt = self.gen_numbers(1, 100, num_sd_entries, decimal=100000)
+        vol = self.gen_numbers(1, 100, num_sd_entries, decimal=100000)
+        lw1 = self.gen_numbers(5, 50, num_sd_entries, decimal=1000)
+        lw2 = self.gen_numbers(5, 50, num_sd_entries, decimal=1000)
+        
+        sdstr = np.array([abcolh, abcoln, merit, details,
+                          fit, volm, number, number], dtype=str).T
+        
+        
+        sdfloat = np.array([p1, p2, hgt, vol, lw1, lw2], dtype=float).T
+        
+        sort_mask = np.argsort(rescol)
+        sdstr = sdstr[sort_mask]
+        sdfloat = sdfloat[sort_mask]
+        
+        sdstr = np.tile(sdstr, (len(self.params['zdata']),
+                                len(self.params['ydata']),
+                                len(self.params['xdata']),1,1))
+        
+        sdfloat = np.tile(sdfloat, (len(self.params['zdata']),
+                                    len(self.params['ydata']),
+                                    len(self.params['xdata']),1,1))
+        
+        
+        self.resnumsd = np.concatenate([self.resnumsd, rescol], axis=0)
+        sort_mask = np.argsort(self.resnumsd)
+        self.resnumsd = self.resnumsd[sort_mask]
+        
+        
+        self.res = \
+            np.concatenate([self.res, np.repeat(restype, num_sd_entries*2)], axis=0)
+        
+        self.res = self.res[sort_mask]
+        
+        
+        self.strdata = np.concatenate([self.strdata, sdstr], axis=3)
+        self.floatdata = np.concatenate([self.floatdata, sdfloat], axis=3)
+        
+        
+        self.strdata = self.strdata[:,:,:,sort_mask]
+        self.floatdata = self.floatdata[:,:,:,sort_mask]
+        
+        return
+    
+    def add_sidechains(self):
+        self.resnumsd = self.resnum
+        self.add_sidechains_res('N', ['d2a','d2b'])
+        self.add_sidechains_res('Q', ['e2a','e2b'])
+        self.add_sidechains_res('W', ['e1a'])
+        return
+    
     def add_noise(self):
         """
         Adds noise to every float value in the artificial data set.
@@ -472,20 +559,24 @@ class artifset():
         self.add_signal_along_z()
         
         return
-
+    
     def remove_prolines(self):
         """
         Removes proline entries in the whole dataset.
         """
-        proline_mask = \
-                np.core.defchararray.not_equal(\
-                    np.array(list(self.protein)),'P')
+        #proline_mask = \
+        #        np.core.defchararray.not_equal(\
+        #            np.array(list(self.protein)),'P')
         
+        proline_mask = \
+            np.logical_not(np.chararray.endswith(self.strdata[0,0,0,:,0],
+                                                 'ProH'))
+        #print(proline_mask)
         self.floatdata = self.floatdata[:,:,:,proline_mask,:]
         self.strdata = self.strdata[:,:,:,proline_mask,:]
         
         return
-
+    
     def remove_lost(self, array_s, array_f, idx):
         """
         Removes a set of rows in 2D arrays.
@@ -552,7 +643,7 @@ class artifset():
                     
                     
         return
-
+    
     def write_protein_fasta(self):
         """
         :protein: str with the protein sequence
@@ -595,8 +686,8 @@ class artifset():
         tpre = signal.gaussian(self.params['plen'], 3, False)*-1+0.9
         tag_pre = np.repeat(1.0, self.params['plen'])
         # region that the tag affects
-        sl = self.floatdata.shape[3]//2-self.params['tag_size']//2
-        sr = self.floatdata.shape[3]//2+self.params['tag_size']//2
+        sl = self.params['plen']//2-self.params['tag_size']//2
+        sr = self.params['plen']//2+self.params['tag_size']//2
         #
         tl = self.params['tag_position']-self.params['tag_size']//2
         tr = self.params['tag_position']+self.params['tag_size']//2
@@ -605,7 +696,7 @@ class artifset():
         
         tag_pre[np.less(tag_pre, 0)] = 0.0
         
-        table = np.column_stack((self.res, tag_pre))
+        table = np.column_stack((self.resnum, tag_pre))
     
         for z, y in it.product(self.params['zdata'][1:], self.params['ydata']):
         
