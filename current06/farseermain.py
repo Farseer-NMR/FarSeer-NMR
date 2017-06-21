@@ -109,6 +109,30 @@ def init_params(fsuv):
     """Reads user defined variables and converts them to 
     organized dicitonaries or DataFrames.
     """
+    
+    if fsuv.apply_PRE_analysis \
+        and not(fsuv.do_cond3 \
+                and (fsuv.plots_Height_ratio or fsuv.plots_Volume_ratio) \
+                and fsuv.perform_comparisons):
+        #DO
+        input("""
+@@@@@   WARNING   @@@@@
+PRE Analaysis is set to <{}>
+and it depends on the following variables:
+do_cond3 :: {}
+plots_Height_ratio :: {}
+plots_Volume_ratio :: {}
+DELTA_PRE Oscilation maps depend on:
+perform_comparisons :: {}
+
+Revisit this variables on farseer_user_variables.py
+to make sure they are set according to you requirements.
+#### Refer to WET list point 1 ####
+press <Enter> to continue the calculation as it is.
+""".format(fsuv.apply_PRE_analysis, fsuv.do_cond3, fsuv.plots_Height_ratio,
+           fsuv.plots_Volume_ratio, fsuv.perform_comparisons))
+    pass
+        
     calculated_params = [fsuv.calccol_name_PosF1_delta,
                      fsuv.calccol_name_PosF2_delta,
                      fsuv.calccol_name_CSP,
@@ -593,6 +617,11 @@ def gen_titration_dicts(exp, data_hyper_cube,
                                 exp.yycoords,
                                 titration_class,
                                 titration_kwargs)
+    
+    if not(cond1 or cond2 or cond3):
+        print("""
+
+""")
     
     return titrations_dict
 
