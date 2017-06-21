@@ -119,7 +119,7 @@ class artifset():
         
         self.strdata = self.gen_strdata()
         
-        self.add_sidechains()
+        #self.add_sidechains()
         
         pass
     
@@ -498,7 +498,9 @@ class artifset():
     def tag_PRE(self):
         """
         Defines the signal derived from the presence of the MTSL paramagnetic
-        tag. Is an inverted Gaussian centered at the 'tag_position'.
+        tag. PRE profiles normally obtained for an IDP
+        using Flexible Meccano. 
+        Is an inverted exponential centered at the 'tag_position'.
         
         return
             np.array
@@ -506,22 +508,18 @@ class artifset():
         
         
         # signal that results from presence of tag
-        sig = signal.gaussian(self.floatdata.shape[3], 4, False)*-1+0.9
-        tag_pre = np.repeat(1.0, self.floatdata.shape[3])
-        # region that the tag affects
-        sl = self.floatdata.shape[3]//2-self.params['tag_size']//2
-        sr = self.floatdata.shape[3]//2+self.params['tag_size']//2
-        #
-        tl = self.params['tag_position']-self.params['tag_size']//2
-        tr = self.params['tag_position']+self.params['tag_size']//2
-        #
-        tag_pre[tl:tr] = sig[sl:sr]
-        mask = np.less_equal(tag_pre, 0)
-        tag_pre[mask] = 0.0001 ## cant't be zero because of ZeroDivision Error
+        sig = signal.exponential(self.floatdata.shape[3],
+                                 center=self.params['tag_position']-1,
+                                 tau=5, sym=False)*-1+1
         
-        tag_pre = np.tile(tag_pre, (self.floatdata.shape[2], 1))
+        sig[self.params['tag_position']-3:\
+            self.params['tag_position']+2] = 0.00001
         
-        return tag_pre
+        sig = np.tile(sig, (self.floatdata.shape[2], 1))
+        
+        self.write_theoretical_PRE(sig[0])
+        
+        return sig
     
     def pre_interaction(self, pre_interaction_site):
         """
@@ -625,7 +623,7 @@ class artifset():
         
         header = 'Assign F1,Assign F2,Merit,Details,Fit Method,Vol. Method,Number,#,Position F1,Position F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz)'
         
-        #self.remove_prolines()
+        self.remove_prolines()
         
         
         #for i, zz in enumerate(self.floatdata):
@@ -645,7 +643,7 @@ class artifset():
                     array_s, array_f = self.strdata[iz,iy,ix], \
                                        self.floatdata[iz,iy,ix]
                     
-                    #array_s, array_f = self.remove_lost(array_s, array_f, lost)
+                    array_s, array_f = self.remove_lost(array_s, array_f, lost)
                     
                     tmp = np.concatenate([array_s, array_f], axis = 1)
                     
@@ -698,27 +696,13 @@ class artifset():
         return
 
 
-    def write_theoretical_PRE(self):
+    def write_theoretical_PRE(self, sig):
         """
         Writes the theoretical PRE profiles normally obtained for an IDP
         using Flexible Meccano.
         """
         
-        # signal that results from presence of tag
-        tpre = signal.gaussian(self.params['plen'], 3, False)*-1+0.9
-        tag_pre = np.repeat(1.0, self.params['plen'])
-        # region that the tag affects
-        sl = self.params['plen']//2-self.params['tag_size']//2
-        sr = self.params['plen']//2+self.params['tag_size']//2
-        #
-        tl = self.params['tag_position']-self.params['tag_size']//2
-        tr = self.params['tag_position']+self.params['tag_size']//2
-        #
-        tag_pre[tl:tr] = tpre[sl:sr]
-        
-        tag_pre[np.less(tag_pre, 0)] = 0.0
-        
-        table = np.column_stack((self.resnum, tag_pre))
+        table = np.column_stack((self.resnum, sig))
     
         for z, y in it.product(self.params['zdata'][1:], self.params['ydata']):
         
@@ -765,6 +749,6 @@ cols:
     af.add_signal()
     af.write_data()
     af.write_protein_fasta()
-    af.write_theoretical_PRE()
+    #af.write_theoretical_PRE()
     
     
