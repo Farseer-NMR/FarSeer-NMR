@@ -1,4 +1,5 @@
 CORRECTED:
-- 21.06.2017 14:09:37 compacted bar plot last tick label now appears.
+- 21.06.2017 add function Tritration.clean_subplots(), removes/hides subplots not used in the plotting figures.
+- 21.06.2017 compacted bar plot last tick label now appears.
 TODO:
-- 21.06.2017 14:09:47 remove empty plots
+- 21.06.2017 remove empty plots

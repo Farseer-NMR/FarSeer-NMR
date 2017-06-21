@@ -1969,6 +1969,18 @@ farseer_user_variables.py does not match the number of data points for cond1')
                            tag_lw=tag_lw)
         
     
+    def clean_subplots(self, fig, axs, start, end):
+        """Hides/Removes the unused subplots from the plotting figure."""
+        for i in range(start, end):
+            axs[i].spines['bottom'].set_visible(False)
+            axs[i].spines['top'].set_visible(False)
+            axs[i].spines['right'].set_visible(False)
+            axs[i].spines['left'].set_visible(False)
+            
+            axs[i].tick_params(axis='both', bottom='off', left='off',
+                               labelleft='off', labelbottom='off')
+        return
+    
     def plot_base(self, calccol, plot_type, plot_style, param_dict,
                      par_ylims=(0,1),
                      ylabel='ppm or ratio',
@@ -2014,12 +2026,17 @@ farseer_user_variables.py does not match the number of data points for cond1')
                                          ylabel=ylabel, **param_dict)
                 fig.subplots_adjust(hspace=hspace)
                 
+            else:
+                self.clean_subplots(fig, axs, len(self), len(axs))
+                
         elif plot_style == 'bar_vertical':
         
             for i, experiment in enumerate(self):
                 self.plot_bar_vertical(calccol, fig, axs, i, experiment,
                                        y_lims=par_ylims, ylabel=ylabel,
                                        **param_dict)
+            else:
+                self.clean_subplots(fig, axs, len(self), len(axs))
         
         elif plot_style == 'res_evo':
             
@@ -2027,6 +2044,8 @@ farseer_user_variables.py does not match the number of data points for cond1')
                 self.plot_res_evo(calccol, fig, axs, i, row_number,
                                   y_lims=par_ylims, y_label=ylabel,
                                   **param_dict)
+            else:
+                self.clean_subplots(fig, axs, len(self.major_axis), len(axs))
         
         elif plot_style == 'cs_scatter':
             
