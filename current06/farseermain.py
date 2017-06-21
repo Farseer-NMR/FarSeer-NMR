@@ -619,9 +619,26 @@ def gen_titration_dicts(exp, data_hyper_cube,
                                 titration_kwargs)
     
     if not(cond1 or cond2 or cond3):
+        exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
+                     exp.exports_parsed_pkls,
+                     title='EXPORTS PARSED PEAKLISTS')
         print("""
+@@@@@ WARNING @@@@@
+All possible Farseer data analysis are set to <False>
+in the farseer_user_variables file:
+condition 1 :: <{}>
+condition 2 :: <{}>
+condition 3 :: <{}>
 
-""")
+There is nothing to calculate or plot.
+Confirm that this is actually what you want
+
+    +Check WET #2+
+
+Parsed Peaklists have been exported.
+Farseer completed correctly.
+Bye :-)
+""".format(cond1, cond2, cond3))
     
     return titrations_dict
 

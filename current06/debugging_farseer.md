@@ -1,5 +1,7 @@
 # CORRECTED:
 ## 21.06.2017
+- Added WET #2. In case user sets cond1-3 to False and no calculations are performed.
+  - added function FarseerSet.exports_parsed_pkls() and function call on farseermain.gen_titration_dicts().
 - added WET on Documentation/
   - Added WET #1 regarding PRE Analysis on farseermain.init_params()
 - Remove apply_PRE_smooth flag. All the PRE Analysis is performed when fsuv.apply_PRE_analysis is True.

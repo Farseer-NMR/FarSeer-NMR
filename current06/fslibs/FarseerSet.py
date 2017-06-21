@@ -467,6 +467,7 @@ FASTA starting residue: {}
         # initiates SD counter
         sd_count = {True:0}
         
+        # if the user says it has sidechains and there are actually sidechains.
         if self.has_sidechains and (True in sidechains_bool.value_counts()):
             # two condition are evaluated in case the user has set sidechains
             # to True but there are actually no sidechains.
@@ -899,3 +900,31 @@ with points {}'.format(dim2_pts,
                 #fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         
         return D
+    
+    def exports_parsed_pkls(self, z, y, x, args):
+        """
+        Exports the parsed peaklists.
+        """
+        folder = 'spectra_parsed/{}/{}'.format(z,y)
+        if not(os.path.exists(folder)):
+            os.makedirs(folder)
+        fpath = '{}/{}.csv'.format(folder, x)
+        fileout = open(fpath, 'w')
+        fileout.write(self.allpeaklists[z][y][x].to_csv(sep=',',
+                                                index=False,
+                                                na_rep='NaN',
+                                                float_format='%.4f'))
+        
+        if self.has_sidechains:
+            folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
+            if not(os.path.exists(folder)):
+                os.makedirs(folder)
+            fpath = '{}/{}.csv'.format(folder, x)
+            fileout = open(fpath, 'w')
+            fileout.write(self.allsidechains[z][y][x].to_csv(sep=',',
+                                                    index=False,
+                                                    na_rep='NaN',
+                                                    float_format='%.4f'))
+            
+            fileout.close()
+        return
