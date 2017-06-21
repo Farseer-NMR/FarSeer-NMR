@@ -735,12 +735,11 @@ def PRE_analysis(titration_panel,
                                              titration_panel.dim2_pts)
         
         for sourcecol, targetcol in zip(param_settings.index[3:],\
-                                        ['H_DPRE', 'V_DPRE']):
+                                        ['Hgt_DPRE', 'Vol_DPRE']):
         
             # only in the parameters allowed by the user
             if param_settings.loc[sourcecol, 'plot_param_flag']:
                 titration_panel.calc_Delta_PRE(sourcecol, targetcol,
-                                         apply_smooth=fsuv.apply_smooth,
                                          gaussian_stddev=fsuv.gaussian_stddev,
                                          guass_x_size=fsuv.gauss_x_size)
     
@@ -753,15 +752,14 @@ def PRE_analysis(titration_panel,
         
         # do
         for sourcecol, targetcol in zip(list(param_settings.index[3:])*2,
-                                        ['H_DPRE',
-                                         'V_DPRE',
-                                         'H_DPRE_smooth',
-                                         'V_DPRE_smooth']):
+                                        ['Hgt_DPRE',
+                                         'Vol_DPRE',
+                                         'Hgt_DPRE_smooth',
+                                         'Vol_DPRE_smooth']):
             
             # only for the parameters allowed by the user
             if param_settings.loc[sourcecol, 'plot_param_flag']:
                 
-                titration_panel.write_table(targetcol)
                 titration_panel.plot_base(targetcol, 'exp', 'heat_map',
                     heat_map_dict,
                     par_ylims=\
@@ -784,7 +782,7 @@ def PRE_analysis(titration_panel,
         
         
         for sourcecol, targetcols in zip(param_settings.index[3:],
-                                         ['H_DPRE', 'V_DPRE']):
+                                         ['Hgt_DPRE', 'Vol_DPRE']):
             if param_settings.loc[sourcecol, 'plot_param_flag']:
                 titration_panel.plot_base(targetcols, 'exp', 'delta_osci',
                     {**tplot_general_dict,**delta_osci_dict},
@@ -813,10 +811,6 @@ def exports_data_tables(titration_panel,
     for calculated_parameter in param_settings.index:
         # if the user wants to plot this parameter
         if param_settings.loc[calculated_parameter,'plot_param_flag']:
-            # do exports table
-            titration_panel.write_table(calculated_parameter,
-                                        atomtype=atomtype)
-            
             # do export chimera attribute files
             titration_panel.write_Chimera_attributes(\
                     calculated_parameter,
@@ -926,6 +920,7 @@ def plots_data(titration_panel, fsuv,
                     hspace=fsuv.tplot_vspace,
                     cols_per_page=fsuv.ext_bar_cols_page,
                     rows_per_page=fsuv.ext_bar_rows_page,
+                    atomtype='Sidechains',
                     fig_height=fsuv.fig_height,
                     fig_width=fsuv.fig_width/2,
                     fig_file_type=fsuv.fig_file_type,

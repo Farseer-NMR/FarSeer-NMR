@@ -308,7 +308,6 @@ class Titration(pd.Panel):
         return
         
     def calc_Delta_PRE(self, sourcecol, targetcol,
-                       apply_smooth=True,
                        gaussian_stddev=1,
                        guass_x_size=7):
         
@@ -330,14 +329,13 @@ class Titration(pd.Panel):
             negmask = self.loc[exp,:,targetcol] < 0
             self.loc[exp,negmask,targetcol] = 0
             
-            if apply_smooth:
-                # aplies convolution with a normalized 1D Gaussian kernel
-                smooth_col = '{}_smooth'.format(targetcol)
-                self.loc[exp,:,smooth_col] = \
-                    convolve(np.array(self.loc[exp,:,targetcol]),
-                             gauss,
-                             boundary='extend',
-                             normalize_kernel=True)
+            # aplies convolution with a normalized 1D Gaussian kernel
+            smooth_col = '{}_smooth'.format(targetcol)
+            self.loc[exp,:,smooth_col] = \
+                convolve(np.array(self.loc[exp,:,targetcol]),
+                         gauss,
+                         boundary='extend',
+                         normalize_kernel=True)
         
         self.log_r(\
         '*** Calculated DELTA PRE Smoothed for source {} in target {} \
@@ -345,7 +343,7 @@ with window size {} and stdev {}'.\
             format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
         return
     
-    def write_table(self, tablecol, atomtype='Backbone'):
+    def write_table(self, folder, tablecol, atomtype='Backbone'):
         '''
         Writes to a tsv file the values of a specific column
         along the titration.
@@ -358,12 +356,12 @@ with window size {} and stdev {}'.\
             table.loc[:,'Res#'] = \
                 table.loc[:,'Res#'] + self.ix[0,:,'ATOM']
         
-        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
-                                             tablecol))):
-            os.makedirs('{}/{}'.format(self.tables_and_plots_folder, tablecol))
+        tablefolder = '{}/{}'.format(self.tables_and_plots_folder, folder)
         
-        file_path = '{0}/{1}/{1}.tsv'.format(self.tables_and_plots_folder,
-                                             tablecol)
+        if not(os.path.exists(tablefolder)):
+            os.makedirs(tablefolder)
+        
+        file_path = '{}/{}.tsv'.format(tablefolder, tablecol)
         
         fileout = open(file_path, 'w')
         
@@ -1987,13 +1985,16 @@ farseer_user_variables.py does not match the number of data points for cond1')
                      hspace=0.5,
                      rows_per_page=5,
                      cols_per_page=1,
+                     atomtype='Backcone',
                      fig_height=11.69,
                      fig_width=8.69,
-                     
                      fig_file_type='pdf',
                      fig_dpi=300):
         
         self.log_r('** Starting plot {} for {}...'.format(plot_style, calccol))
+        
+        # this to allow folder change in PRE_analysis
+        folder = calccol
         
         if plot_type == 'exp':
             num_subplots = len(self.items)
@@ -2060,6 +2061,9 @@ farseer_user_variables.py does not match the number of data points for cond1')
                 self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment,
                                        y_lims=par_ylims, ylabel=ylabel,
                                        **param_dict)
+                pass
+            # to write all the PRE_analysis in the same folder
+            folder='PRE_analysis'
             
         elif plot_style == 'delta_osci':
             
@@ -2076,21 +2080,25 @@ farseer_user_variables.py does not match the number of data points for cond1')
                                      ylabel=ylabel,
                                      color=next(dp_color),
                                      **param_dict)
+                pass
+            # to write all the PRE_analysis in the same folder
+            folder='PRE_analysis'
         
-        self.write_plot(fig, plot_style, calccol, fig_file_type, fig_dpi)
+        self.write_plot(fig, plot_style, folder, calccol, fig_file_type, fig_dpi)
+        self.write_table(folder, calccol, atomtype=atomtype)
         plt.close('all')
         return
     
-    def write_plot(self, fig, plot_name, calccol, fig_file_type, fig_dpi):
+    def write_plot(self, fig, plot_name, folder, calccol, fig_file_type, fig_dpi):
         """Saves plot to a file."""
         
-        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
-                                             calccol))):
-            os.makedirs('{}/{}'.format(self.tables_and_plots_folder, calccol))
+        plot_folder = '{}/{}'.format(self.tables_and_plots_folder, folder)
         
-        file_path = '{0}/{1}/{1}_{2}.{3}'.format(self.tables_and_plots_folder,
-                                                 calccol, plot_name,
-                                                 fig_file_type)
+        if not(os.path.exists(plot_folder)):
+            os.makedirs(plot_folder)
+        
+        file_path = '{}/{}_{}.{}'.format(plot_folder, calccol, plot_name,
+                                         fig_file_type)
         
         fig.savefig(file_path, dpi=fig_dpi)
         
