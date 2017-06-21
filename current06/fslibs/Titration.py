@@ -772,7 +772,7 @@ recipient: residues
             first_tick = ceil(initialresidue/10)*10
             axs[i].set_xticks(np.arange(first_tick, finalresidue+1, 10))
             # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
+            axs[i].set_xticklabels(np.arange(first_tick, finalresidue+1, 10),
                                    fontname=x_ticks_fn,
                                    fontsize=x_ticks_fs,
                                    fontweight=x_ticks_weight,
