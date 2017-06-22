@@ -1,5 +1,7 @@
 # CORRECTED:
 ## 22.06.2017
+- Added WET #3.
+
 ## 21.06.2017
 - Added WET #2. In case user sets cond1-3 to False and no calculations are performed.
   - added function FarseerSet.exports_parsed_pkls() and function call on farseermain.gen_titration_dicts().
