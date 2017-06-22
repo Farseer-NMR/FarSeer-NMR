@@ -116,21 +116,32 @@ def init_params(fsuv):
                 and fsuv.perform_comparisons):
         #DO
         input("""
-@@@@@   WARNING   @@@@@
-PRE Analaysis is set to <{}>
-and it depends on the following variables:
-do_cond3 :: {}
-plots_Height_ratio :: {}
-plots_Volume_ratio :: {}
-DELTA_PRE Oscilation maps depend on:
-perform_comparisons :: {}
+@@@@@@@@@@@@@@@@@@@@@@@@@  WARNING  @@@@@@@@@@@@@@@@@@@@@@@@@
+@                                                           @
+@{: ^59}@
+@         and it depends on the following variables:        @
+@                                                           @
+@        {: <51}@
+@        {: <51}@
+@        {: <51}@
+@                                                           @
+@          DELTA_PRE Oscilation maps depend on:             @
+@                                                           @
+@        {: <51}@
+@                                                           @
+@    Revisit this variables on farseer_user_variables.py    @
+@           to make sure they are set according             @
+@                   to you requirements.                    @
+@                                                           @
+@            #### Refer to WET list point 1 ####            @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-Revisit this variables on farseer_user_variables.py
-to make sure they are set according to you requirements.
-#### Refer to WET list point 1 ####
-press <Enter> to continue the calculation as it is.
-""".format(fsuv.apply_PRE_analysis, fsuv.do_cond3, fsuv.plots_Height_ratio,
-           fsuv.plots_Volume_ratio, fsuv.perform_comparisons))
+press <Enter> to continue the calculation as it is or abort it.
+""".format('PRE Analaysis is set to <{}>'.format(fsuv.apply_PRE_analysis),
+           'do_cond3 :: {}'.format(fsuv.do_cond3),
+           'plots_Height_ratio :: {}'.format(fsuv.plots_Height_ratio),
+           'plots_Volume_ratio :: {}'.format(fsuv.plots_Volume_ratio),
+           'perform_comparisons :: {}'.format(fsuv.perform_comparisons)))
     pass
         
     calculated_params = [fsuv.calccol_name_PosF1_delta,
@@ -164,6 +175,7 @@ press <Enter> to continue the calculation as it is.
     # An array of settings that are local for each parameter
     # the index of this dataframe are the calculated parameters.
     param_settings = pd.DataFrame(param_settings_d, index=calculated_params)
+    
     
     tplot_general_dict = {
         'subtitle_fn':fsuv.tplot_subtitle_fn,
@@ -622,23 +634,28 @@ def gen_titration_dicts(exp, data_hyper_cube,
         exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
                      exp.exports_parsed_pkls,
                      title='EXPORTS PARSED PEAKLISTS')
-        print("""
-@@@@@ WARNING @@@@@
-All possible Farseer data analysis are set to <False>
-in the farseer_user_variables file:
-condition 1 :: <{}>
-condition 2 :: <{}>
-condition 3 :: <{}>
-
-There is nothing to calculate or plot.
-Confirm that this is actually what you want
-
-    +Check WET #2+
-
-Parsed Peaklists have been exported.
-Farseer completed correctly.
-Bye :-)
-""".format(cond1, cond2, cond3))
+        exp.log_r("""
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ WARNING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@                                                                 @
+@      All possible Farseer data analysis are set to <False>      @
+@               in the farseer_user_variables file:               @
+@                                                                 @
+@{: ^65}@
+@{: ^65}@
+@{: ^65}@
+@                                                                 @
+@              There is nothing to calculate or plot.             @
+@           Confirm that this is actually what you want           @
+@                                                                 @
+@                         +Check WET #2+                          @
+@                                                                 @
+@               Parsed Peaklists have been exported.              @
+@                   Farseer completed correctly.                  @
+@                             Bye :-)                             @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+""".format('condition 1 :: <{}>'.format(cond1),
+           'condition 2 :: <{}>'.format(cond2),
+           'condition 3 :: <{}>'.format(cond3)))
     
     return titrations_dict
 
@@ -861,6 +878,36 @@ def exports_data_tables(titration_panel,
             titration_panel.write_Chimera_attributes(\
                     calculated_parameter,
                     resformat=fsuv.chimera_att_select_format)
+    
+    if not(pd.Series([fsuv.plots_extended_bar,
+                              fsuv.plots_compacted_bar,
+                              fsuv.plots_vertical_bar,
+                              fsuv.plots_residue_evolution,
+                              fsuv.plots_cs_scatter,
+                              fsuv.plots_cs_scatter_flower]).any()):
+        
+        for calculated_parameter in param_settings.index:
+        # if the user wants to plot this parameter
+            if param_settings.loc[calculated_parameter,'plot_param_flag']:
+                titration_panel.write_table(calculated_parameter,
+                                            calculated_parameter,
+                                            atomtype=atomtype)
+        
+        titration_panel.log_r("""
+@@@@@@@@@@@@@@ WARNING @@@@@@@@@@@@@@@@
+@                                     @
+@  All potting flags are turned off.  @
+@        No plots will be drawn       @
+@    Check if this is the desired     @
+@           configuration.            @
+@                                     @
+@ Farseer exported all the calculated @
+@ parameters so that you can use your @
+@      own external plotting tool.    @
+@                                     @
+@           Refer to WET #3           @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+""")
     
     return
 
