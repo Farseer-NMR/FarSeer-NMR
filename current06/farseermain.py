@@ -9,6 +9,7 @@ import pandas as pd
 from current06.fslibs import FarseerSet as fset
 from current06.fslibs import Titration as fst
 from current06.fslibs import Comparisons as fsc
+from current06.fslibs import wet as fsw
 
 def read_user_variables(path):
     """
@@ -115,35 +116,15 @@ def init_params(fsuv):
                 and (fsuv.plots_Height_ratio or fsuv.plots_Volume_ratio) \
                 and fsuv.perform_comparisons):
         #DO
-        input("""
-@@@@@@@@@@@@@@@@@@@@@@@@@  WARNING  @@@@@@@@@@@@@@@@@@@@@@@@@
-@                                                           @
-@{: ^59}@
-@         and it depends on the following variables:        @
-@                                                           @
-@        {: <51}@
-@        {: <51}@
-@        {: <51}@
-@                                                           @
-@          DELTA_PRE Oscilation maps depend on:             @
-@                                                           @
-@        {: <51}@
-@                                                           @
-@    Revisit this variables on farseer_user_variables.py    @
-@           to make sure they are set according             @
-@                   to you requirements.                    @
-@                                                           @
-@            #### Refer to WET list point 1 ####            @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-press <Enter> to continue the calculation as it is or abort it.
-""".format('PRE Analaysis is set to <{}>'.format(fsuv.apply_PRE_analysis),
-           'do_cond3 :: {}'.format(fsuv.do_cond3),
-           'plots_Height_ratio :: {}'.format(fsuv.plots_Height_ratio),
-           'plots_Volume_ratio :: {}'.format(fsuv.plots_Volume_ratio),
-           'perform_comparisons :: {}'.format(fsuv.perform_comparisons)))
-    pass
-        
+        fsw.wet1(fsuv.apply_PRE_analysis, fsuv.do_cond3,
+                 fsuv.plots_Height_ratio, fsuv.plots_Volume_ratio,
+                 fsuv.perform_comparisons)
+        pass
+    
+    general_variables = {}
+    general_variables['txv'] = sorted(fsuv.titration_x_values)
+    
+    
     calculated_params = [fsuv.calccol_name_PosF1_delta,
                      fsuv.calccol_name_PosF2_delta,
                      fsuv.calccol_name_CSP,
@@ -293,7 +274,7 @@ press <Enter> to continue the calculation as it is or abort it.
         'fit_line_color':fsuv.res_evo_fit_line_color,
         'fit_line_width':fsuv.res_evo_fit_line_width,
         'fit_line_style':fsuv.res_evo_fit_line_style,
-        'titration_x_values':fsuv.titration_x_values
+        'titration_x_values':general_variables['txv']
         }
     
     cs_scatter_par_dict = {
@@ -399,7 +380,7 @@ press <Enter> to continue the calculation as it is or abort it.
     
     
     return calculated_params, param_settings,\
-           general_plot_params, pre_plot_params
+           general_plot_params, pre_plot_params, general_variables
 
 def init_farseer(path, has_sidechains=False, FASTAstart=1):
     '''Initiates the Farseer data set.'''
@@ -633,34 +614,14 @@ def gen_titration_dicts(exp, data_hyper_cube,
     if not(cond1 or cond2 or cond3):
         exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
                      exp.exports_parsed_pkls,
-                     title='EXPORTS PARSED PEAKLISTS')
-        exp.log_r("""
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ WARNING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@                                                                 @
-@      All possible Farseer data analysis are set to <False>      @
-@               in the farseer_user_variables file:               @
-@                                                                 @
-@{: ^65}@
-@{: ^65}@
-@{: ^65}@
-@                                                                 @
-@              There is nothing to calculate or plot.             @
-@           Confirm that this is actually what you want           @
-@                                                                 @
-@                         +Check WET #2+                          @
-@                                                                 @
-@               Parsed Peaklists have been exported.              @
-@                   Farseer completed correctly.                  @
-@                             Bye :-)                             @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-""".format('condition 1 :: <{}>'.format(cond1),
-           'condition 2 :: <{}>'.format(cond2),
-           'condition 3 :: <{}>'.format(cond3)))
+                     title='EXPORTED PARSED PEAKLISTS')
+        exp.log_r(fsw.wet2(cond1, cond2, cond3))
     
     return titrations_dict
 
 def eval_titrations(titration_dict,
                     fsuv,
+                    general_variables,
                     spectra_path='spectra/',
                     atomtype='Backbone',
                     param_settings = [],
@@ -690,20 +651,9 @@ def eval_titrations(titration_dict,
                               fsuv)
                 
                 # PERFORMS FITS
-                # *fits are allowed only to cond1 titrations
-                if fsuv.perform_resevo_fit \
-                    and titration_dict[cond][dim2_pt][dim1_pt].\
-                        titration_type == 'cond1':
-                    # do
-                    if len(fsuv.titration_x_values) != \
-                        titration_dict[cond][dim2_pt][dim1_pt].shape[0]:
-                        raise ValueError(\
-'!!! Values given for x axis in fitting (fitting_x_values) do not match length\
-of cond1 variables.')
-                    else:
-                        perform_fits(titration_dict[cond][dim2_pt][dim1_pt],
-                                     param_settings=param_settings,
-                                     txv=fsuv.titration_x_values)
+                perform_fits(titration_dict[cond][dim2_pt][dim1_pt],
+                             param_settings=param_settings,
+                             txv=general_variables['txv'])
                 
                 # Analysis of PRE data - only in cond3
                 PRE_analysis(titration_dict[cond][dim2_pt][dim1_pt],
@@ -769,12 +719,48 @@ def perform_fits(titration_panel, param_settings=None, txv=[]):
     """Performs fits for 1H, 15N and CSPs data."""
     # runs only for CSPs, 1H and 15N.
     
+    # *fits are allowed only to cond1 titrations
+    if not(fsuv.perform_resevo_fit \
+           and titration_panel.titration_type == 'cond1'):
+        return
+    
+    # sanity check ############################################################
+    try: 
+        if set([(int(x)) for x in titration_panel.items]).\
+            symmetric_difference(txv):
+            #DO
+            titration_panel.log_r(fsw.wet4(txv, titration_panel.items))
+            choice = '.'
+            while not(choice in ['U', 'A']):
+                choice = input('=> type: [U]se cond1 variable \
+names as x values or [A]bort: ').upper()
+            if choice == 'U':
+                txv = [(int(x)) for x in titration_panel.items]
+                
+            elif choice == 'A':
+                titration_panel.log_r(fsw.end_bad())
+    
+    except SystemExit:
+        titration_panel.log_r(fsw.end_bad())
+    
+    except:
+        if len(txv) != len(titration_panel.items):
+            titration_panel.log_r(fsw.wet5())
+            titration_panel.log_r(fsw.end_bad())
+        else:
+            titration_panel.log_r(fsw.wet7(txv))
+    
+    if not(all([False for x in txv if x<0])):
+        titration_panel.log_r(fsw.wet6(txv))
+    
+    ###########################################################################
+    
     for calculated_parameter in param_settings.index[:3]:
         
         if param_settings.loc[calculated_parameter, 'plot_param_flag']:
+            
             titration_panel.perform_fit(calccol = calculated_parameter,
                                         x_values=txv)
-    
     return
 
 def PRE_analysis(titration_panel,
@@ -893,21 +879,7 @@ def exports_data_tables(titration_panel,
                                             calculated_parameter,
                                             atomtype=atomtype)
         
-        titration_panel.log_r("""
-@@@@@@@@@@@@@@ WARNING @@@@@@@@@@@@@@@@
-@                                     @
-@  All potting flags are turned off.  @
-@        No plots will be drawn       @
-@    Check if this is the desired     @
-@           configuration.            @
-@                                     @
-@ Farseer exported all the calculated @
-@ parameters so that you can use your @
-@      own external plotting tool.    @
-@                                     @
-@           Refer to WET #3           @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-""")
+        titration_panel.log_r(fsw.wet3())
     
     return
 
@@ -1146,7 +1118,8 @@ def run_farseer(spectra_path, fsuv):
     calculated_params, \
     param_settings, \
     general_plot_params, \
-    pre_plot_params = init_params(fsuv)
+    pre_plot_params, \
+    general_variables = init_params(fsuv)
     
     # Initiates Farseer
     exp = init_farseer(spectra_path,
@@ -1257,6 +1230,7 @@ def run_farseer(spectra_path, fsuv):
     # evaluates the titrations and plots the data
     eval_titrations(Farseer_titration_dict,
                     fsuv,
+                    general_variables,
                     spectra_path=spectra_path,
                     param_settings = param_settings,
                     general_plot_params = general_plot_params,
@@ -1279,6 +1253,7 @@ def run_farseer(spectra_path, fsuv):
         
         eval_titrations(Farseer_SD_titrations_dict,
                         fsuv,
+                        general_variables,
                         atomtype='Sidechains',
                         spectra_path=spectra_path,
                         param_settings = param_settings,
@@ -1336,3 +1311,5 @@ if __name__ == '__main__':
     # $ python farseer_main.py .
     
     run_farseer('{}/spectra'.format(cwd), fsuv)
+    
+    fsw.end_good()

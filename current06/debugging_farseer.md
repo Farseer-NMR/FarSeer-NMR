@@ -1,4 +1,11 @@
 # CORRECTED:
+## 04.07.2017
+- Added WET #4.
+- Created fslibs/wet.py to store all the WET messages
+- farseermain.py -> transferred if-clauses of perform_fits in eval_titrations() to perform_fits().
+- Added WET #5, #6, #7, regarding titration_x_values variable and usage.
+- added general_variables dictionary in farseermain.init_params() to control lonely vars.
+
 ## 22.06.2017
 - Added WET #3.
 
@@ -12,4 +19,3 @@
 - removed Titration.writetable() call from farseermain. Now call occurs in Titration.plot_base()
 - added function Tritration.clean_subplots(), removes/hides subplots not used in the plotting figures.
 - compacted bar plot last tick label now appears.
-TODO:

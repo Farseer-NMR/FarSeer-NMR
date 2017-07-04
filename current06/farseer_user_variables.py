@@ -57,7 +57,7 @@ plots_CSP = True  # Plot combined chemical shift perturbation data
 plots_Height_ratio = False  # Plot Height ratio data
 plots_Volume_ratio = False  # Plot Volume ratio data
 #
-t
+
 plots_extended_bar = False  # Represent data in Extended Bar Plot style
 plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
