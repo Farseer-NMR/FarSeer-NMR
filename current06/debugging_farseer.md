@@ -1,6 +1,7 @@
 # CORRECTED:
 
 ## 05.07.2017
+- Added WET #8 on FarseerSet.py
 - corrected and improved WET related to fitting.
 - WET #5 does not allow negative values.
 

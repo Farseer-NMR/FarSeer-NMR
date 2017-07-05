@@ -92,7 +92,7 @@ def wet3():
 {}
 {}
 {}
-""".format(title(' WARNING '),
+""".format(title(' NOTE '),
            line(),
            line('All potting flags are turned off.'),
            line('No plots will be drawn'),
@@ -243,6 +243,35 @@ def wet7(values):
            referwet(7),
            title())
     return strwet
+
+def wet8(f, s):
+    ss = """
+{}
+{}
+{}
+{}
+{}
+{}
+{}
+
+{}
+{}
+{}
+{}
+{}
+""".format(title(' ERROR '),
+           line(),
+           line('The no. of files of type {}'.format(f)),
+           line('is not the same for every titration folder.'),
+           line('Bellow a table with the files input.'),
+           line('Check for the missing ones!'),
+           line(),
+           s,
+           line(),
+           line(),
+           referwet(8),
+           title())
+    return ss
 
 def end_bad():
     sys.exit("""

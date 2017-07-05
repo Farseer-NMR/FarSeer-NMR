@@ -16,3 +16,5 @@
 6. **There are negative values in titration_x_values variable.** Farseer has implemented fitting only to the Hill Equation (http://www.physiologyweb.com/calculators/hill_equation_interactive_graph.html) which does not consider the use of negative values in the coordinate axis. Please correct your input data in titration_x_values variable.
 
 7. **x values given by the user for fitting look good.** This is not an error nor a warning, it's just an alert to the user about the values used in as x coordinates to perform the fitting.
+
+8. **Files are missing in the input folder tree.** Farseer assumes that when analysing different titrations together, those are related. Therefore the same number of files (data points) should be given for every condition. For example, there should be the same number of peaklists (.csv files) in each subfolder, as well as the same subfolder tree should be maintained under spectra/.

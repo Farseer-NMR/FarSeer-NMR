@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+from current06.fslibs import wet as fsw
 
 class FarseerSet:
     """
@@ -219,8 +220,8 @@ FASTA starting residue: {}
         
         self.log_t('READING INPUT FILES *{}*'.format(filetype))
         
-        if not(np.array([p.endswith(filetype) for p in self.paths]).any()):
-            raise ValueError('@@@ There is no files in spectra\
+        if not(any([p.endswith(filetype) for p in self.paths])):
+            raise ValueError('@@@ There are no files in spectra\
  with the extension {}'.format(filetype))
         
         
@@ -237,6 +238,27 @@ FASTA starting residue: {}
                 self.log_r(p)
                 lessparts = parts[-1].split('.')[0]
                 branch[lessparts] = branch.get(parts[-1], f(p))
+        
+        ############ WET #8
+        zkeys = list(target.keys())
+        ykeys = list(target[zkeys[0]].keys())
+        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
+        
+        if not(len(zkeys) * len(ykeys) * len(xkeys) == \
+            len([x for x in self.paths if x.endswith(filetype)])):
+            #DO
+            str1 = ''
+            for z, vz in target.items():
+                str1 += z+'/\n'
+                for y, vy in target[z].items():
+                    str1 += \
+                        "\t{}/\t{}\n".format(y, "\t".join(sorted(vy.keys())))
+            
+            self.log_r(fsw.wet8(filetype, str1))
+            fsw.end_bad()
+        else:
+            self.log_r('> No file of type <{}> missing - OK'.format(filetype))
+        ############
         
         return
     
@@ -300,7 +322,8 @@ FASTA starting residue: {}
         self.log_r(logs)
         
         return df
-        
+    
+    
     def init_conditions(self):
         """
         Identifies the data points for each titration condition.
