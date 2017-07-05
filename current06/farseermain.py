@@ -726,7 +726,10 @@ def perform_fits(titration_panel, param_settings=None, txv=[]):
     
     # sanity check ############################################################
     try: 
-        if set([(int(x)) for x in titration_panel.items]).\
+        if not(all([False for x in txv if x<0])):
+            titration_panel.log_r(fsw.wet6(txv))
+            fsw.end_bad()
+        elif set([(int(x)) for x in titration_panel.items]).\
             symmetric_difference(txv):
             #DO
             titration_panel.log_r(fsw.wet4(txv, titration_panel.items))
@@ -745,13 +748,10 @@ names as x values or [A]bort: ').upper()
     
     except:
         if len(txv) != len(titration_panel.items):
-            titration_panel.log_r(fsw.wet5())
+            titration_panel.log_r(fsw.wet5(txv, titration_panel.items))
             titration_panel.log_r(fsw.end_bad())
         else:
             titration_panel.log_r(fsw.wet7(txv))
-    
-    if not(all([False for x in txv if x<0])):
-        titration_panel.log_r(fsw.wet6(txv))
     
     ###########################################################################
     

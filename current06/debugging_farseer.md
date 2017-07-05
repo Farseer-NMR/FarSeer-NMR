@@ -1,4 +1,9 @@
 # CORRECTED:
+
+## 05.07.2017
+- corrected and improved WET related to fitting.
+- WET #5 does not allow negative values.
+
 ## 04.07.2017
 - Added WET #4.
 - Created fslibs/wet.py to store all the WET messages
@@ -19,3 +24,5 @@
 - removed Titration.writetable() call from farseermain. Now call occurs in Titration.plot_base()
 - added function Tritration.clean_subplots(), removes/hides subplots not used in the plotting figures.
 - compacted bar plot last tick label now appears.
+
+TODO:

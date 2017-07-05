@@ -2123,7 +2123,6 @@ farseer_user_variables.py does not match the number of data points for cond1')
             self.fitdf[calccol] = self.fitdf[calccol].append(dfres)
             return
         
-        
         def calc_r_squared(x, y , f, popt):
             """
             Calculates R**2

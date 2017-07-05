@@ -149,8 +149,12 @@ def wet4(xvalues, items):
     
     return strwet
 
-def wet5():
+def wet5(values, pkls):
     strwet = """
+{}
+{}
+{}
+{}
 {}
 {}
 {}
@@ -162,20 +166,26 @@ def wet5():
 {}
 {}
 """.format(title(' ERROR '),
-           line('X Axis values set for fitting (fitting_x_values variable)'),
-           line('do not match the number of <cond1> data points'),
+           line('Coordinate values defined for fitting'),
+           line('(fitting_x_values variable).'),
+           line(str(values)),
            line(),
-           line('Names of .csv files could not be converted to int values.'),
+           line('do not match the number of <cond1> data points,'),
+           line('a.k.a, input peaklists.'),
+           line(str(list(pkls))),
            line(),
            line('Please correct fitting_x_values variable or'),
-           line('the number of input peaklists'),
+           line('confirm you have not forgot to input any peaklist'),
            line(),
+           referwet(5),
            title())
            
     return strwet
 
 def wet6(values):
     strwet = """
+{}
+{}
 {}
 {}
 {}
@@ -194,7 +204,9 @@ def wet6(values):
            line(),
            line(str(values)),
            line(),
-           line('Confirm that is according your preferences'),
+           line('This is not expected considering fitting data with'),
+           line('the Hill equation.'),
+           line('Please revisit your input'),
            line(),
            referwet(6),
            title())
