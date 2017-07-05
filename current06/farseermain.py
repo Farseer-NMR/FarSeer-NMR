@@ -637,6 +637,7 @@ def eval_titrations(titration_dict,
     :sidechains: whether the data analysis corresponds to sidechain
                  resonances.
     """
+    
     # for each kind of titration (cond{1,2,3})
     for cond in sorted(titration_dict.keys()):
         # for each point in the corresponding second dimension/condition
@@ -668,14 +669,14 @@ def eval_titrations(titration_dict,
                 
                 # EXPORTS CALCULATIONS
                 exports_data_tables(titration_dict[cond][dim2_pt][dim1_pt],
-                                    param_settings=param_settings, fsuv=fsuv,
-                                    atomtype=atomtype)
+                                    param_settings=param_settings, fsuv=fsuv)
                 
                 # PLOTS TITRATION DATA
                 plots_data(titration_dict[cond][dim2_pt][dim1_pt],
                            fsuv,
                            *general_plot_params,
-                           param_settings=param_settings)
+                           param_settings=param_settings,
+                           atomtype=atomtype)
                 
                 #DONE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
@@ -853,8 +854,7 @@ def exports_titration(titration_panel):
 
 def exports_data_tables(titration_panel,
                         param_settings=[],
-                        fsuv=None,
-                        atomtype='Backbone'):
+                        fsuv=None):
     """Exports tables with calculated parameters."""
     
     for calculated_parameter in param_settings.index:
@@ -864,22 +864,6 @@ def exports_data_tables(titration_panel,
             titration_panel.write_Chimera_attributes(\
                     calculated_parameter,
                     resformat=fsuv.chimera_att_select_format)
-    
-    if not(pd.Series([fsuv.plots_extended_bar,
-                              fsuv.plots_compacted_bar,
-                              fsuv.plots_vertical_bar,
-                              fsuv.plots_residue_evolution,
-                              fsuv.plots_cs_scatter,
-                              fsuv.plots_cs_scatter_flower]).any()):
-        
-        for calculated_parameter in param_settings.index:
-        # if the user wants to plot this parameter
-            if param_settings.loc[calculated_parameter,'plot_param_flag']:
-                titration_panel.write_table(calculated_parameter,
-                                            calculated_parameter,
-                                            atomtype=atomtype)
-        
-        titration_panel.log_r(fsw.wet3())
     
     return
 
@@ -892,11 +876,30 @@ def plots_data(titration_panel, fsuv,
                res_evo_par_dict,
                cs_scatter_par_dict,
                cs_scatter_flower_dict,
-               param_settings=None):
+               param_settings=None,
+               atomtype='Backbone'):
     '''
     This function was written because it serves normal titrations and
     control titrations.
     '''
+    # checks if there are any plot flags activated
+    # and if not outputs eh respective message.
+    if not(any([fsuv.plots_extended_bar,
+                fsuv.plots_compacted_bar,
+                fsuv.plots_vertical_bar,
+                fsuv.plots_residue_evolution,
+                fsuv.plots_cs_scatter,
+                fsuv.plots_cs_scatter_flower])):
+        
+        for calculated_parameter in param_settings.index:
+        # if the user wants to plot this parameter
+            if param_settings.loc[calculated_parameter,'plot_param_flag']:
+                titration_panel.write_table(calculated_parameter,
+                                            calculated_parameter,
+                                            atomtype=atomtype)
+        
+        titration_panel.log_r(fsw.wet3())
+    
     # PLOTS DATA
     for calculated_parameter in param_settings.index:
         # if the user wants to plot this parameter
