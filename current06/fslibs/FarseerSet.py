@@ -222,7 +222,7 @@ FASTA starting residue: {}
         
         if not(any([p.endswith(filetype) for p in self.paths])):
             self.log_r(fsw.wet9(filetype))
-            self.log_r(fsw.end_bad())
+            fsw.end_bad()
         
         
         # loads files in nested dictionaries
@@ -255,6 +255,7 @@ FASTA starting residue: {}
                         "\t{}/\t{}\n".format(y, "\t".join(sorted(vy.keys())))
             
             self.log_r(fsw.wet8(filetype, str1))
+            fsw.end_bad()
         else:
             self.log_r('> No file of type <{}> missing - OK'.format(filetype))
         ############

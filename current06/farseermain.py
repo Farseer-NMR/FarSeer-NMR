@@ -113,11 +113,11 @@ def init_params(fsuv):
     
     if fsuv.apply_PRE_analysis \
         and not(fsuv.do_cond3 \
-                and (fsuv.plots_Height_ratio or fsuv.plots_Volume_ratio) \
+                and (fsuv.calcs_Height_ratio or fsuv.calcs_Volume_ratio) \
                 and fsuv.perform_comparisons):
         #DO
         fsw.wet1(fsuv.apply_PRE_analysis, fsuv.do_cond3,
-                 fsuv.plots_Height_ratio, fsuv.plots_Volume_ratio,
+                 fsuv.calcs_Height_ratio, fsuv.calcs_Volume_ratio,
                  fsuv.perform_comparisons)
         pass
     
@@ -134,11 +134,11 @@ def init_params(fsuv):
 
 
     param_settings_d = {
-    'plot_param_flag':    [fsuv.plots_PosF1_delta,
-                           fsuv.plots_PosF2_delta,
-                           fsuv.plots_CSP,
-                           fsuv.plots_Height_ratio,
-                           fsuv.plots_Volume_ratio],
+    'plot_param_flag':    [fsuv.calcs_PosF1_delta,
+                           fsuv.calcs_PosF2_delta,
+                           fsuv.calcs_CSP,
+                           fsuv.calcs_Height_ratio,
+                           fsuv.calcs_Volume_ratio],
                            
     'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta,
                            fsuv.yy_label_PosF2_delta,
@@ -687,7 +687,7 @@ def perform_calcs(titration_panel, fsuv):
     Calculates the NMR restraints according to the user specifications.
     """
     # if the user wants to calculate combined Chemical Shift Perturbations
-    if fsuv.plots_CSP:
+    if fsuv.calcs_CSP:
         # calculate differences in chemical shift for each dimension
         titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta,
                                       'Position F1')
@@ -701,17 +701,17 @@ def perform_calcs(titration_panel, fsuv):
     
     # if the user only wants to calculate perturbation in single dimensions
     else:
-        if fsuv.plots_PosF1_delta:
+        if fsuv.calcs_PosF1_delta:
             titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta,
                                           'Position F1')
-        if fsuv.plots_PosF2_delta:
+        if fsuv.calcs_PosF2_delta:
             titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF2_delta,
                                           'Position F2')
     
     # Calculates Ratios
-    if fsuv.plots_Height_ratio:
+    if fsuv.calcs_Height_ratio:
         titration_panel.calc_ratio(fsuv.calccol_name_Height_ratio, 'Height')
-    if fsuv.plots_Volume_ratio:
+    if fsuv.calcs_Volume_ratio:
         titration_panel.calc_ratio(fsuv.calccol_name_Volume_ratio, 'Volume')
     
     return
@@ -1013,8 +1013,8 @@ def plots_data(titration_panel, fsuv,
                     fig_dpi=fsuv.fig_dpi)
             
     if fsuv.plots_cs_scatter \
-        and ((fsuv.plots_PosF1_delta and fsuv.plots_PosF2_delta)\
-            or fsuv.plots_CSP):
+        and ((fsuv.calcs_PosF1_delta and fsuv.calcs_PosF2_delta)\
+            or fsuv.calcs_CSP):
         titration_panel.plot_base('15N_vs_1H', 'res', 'cs_scatter',
                             {**revo_plot_general_dict,
                              **cs_scatter_par_dict},
@@ -1026,8 +1026,8 @@ def plots_data(titration_panel, fsuv,
                             fig_dpi=fsuv.fig_dpi)
     
     if fsuv.plots_cs_scatter_flower \
-        and ((fsuv.plots_PosF1_delta and fsuv.plots_PosF2_delta)\
-            or fsuv.plots_CSP):
+        and ((fsuv.calcs_PosF1_delta and fsuv.calcs_PosF2_delta)\
+            or fsuv.calcs_CSP):
         #DO
         titration_panel.plot_base('15N_vs_1H', 'single', 'cs_scatter_flower',
                                   {**revo_plot_general_dict,
