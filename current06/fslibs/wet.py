@@ -166,7 +166,7 @@ def wet5(values, pkls):
 {}
 {}
 """.format(title(' ERROR '),
-           line('Coordinate values defined for fitting'),
+           line('Coordinate values defined for fitting/data respresentation'),
            line('(fitting_x_values variable).'),
            line(str(values)),
            line(),
@@ -263,7 +263,7 @@ def wet8(f, s):
            line(),
            line('The no. of files of type {}'.format(f)),
            line('is not the same for every titration folder.'),
-           line('Bellow a table with the files input.'),
+           line('Below a table with the files input.'),
            line('Check for the missing ones!'),
            line(),
            s,
@@ -272,6 +272,20 @@ def wet8(f, s):
            referwet(8),
            title())
     return ss
+
+def wet9(f):
+    strwet = """
+{}
+{}
+{}
+{}
+{}
+""".format(title(' ERROR '),
+           line('There are no files in spectra/ with extension {}'.format(f)),
+           line(),
+           referwet(9),
+           title())
+    return strwet
 
 def end_bad():
     sys.exit("""

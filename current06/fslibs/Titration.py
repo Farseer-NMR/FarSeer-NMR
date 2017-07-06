@@ -6,6 +6,7 @@ from math import ceil
 import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
+from current06.fslibs import wet as fsw
 
 #from matplotlib.colors import colorConverter
 #from math import ceil as mceil
@@ -1155,8 +1156,8 @@ recipient: residues
             (self.titration_type == 'cond1' or self.dim_comparison == 'cond1'):
             # do
             if len(titration_x_values) != len(self.items):
-                raise ValueError('> The titration_x_values variable length in \
-farseer_user_variables.py does not match the number of data points for cond1')
+                self.log_r(fsw.wet5(titration_x_values, self.items))
+                fsw.end_bad()
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
             

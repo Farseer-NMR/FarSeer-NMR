@@ -221,8 +221,8 @@ FASTA starting residue: {}
         self.log_t('READING INPUT FILES *{}*'.format(filetype))
         
         if not(any([p.endswith(filetype) for p in self.paths])):
-            raise ValueError('@@@ There are no files in spectra\
- with the extension {}'.format(filetype))
+            self.log_r(fsw.wet9(filetype))
+            self.log_r(fsw.end_bad())
         
         
         # loads files in nested dictionaries
@@ -255,7 +255,6 @@ FASTA starting residue: {}
                         "\t{}/\t{}\n".format(y, "\t".join(sorted(vy.keys())))
             
             self.log_r(fsw.wet8(filetype, str1))
-            fsw.end_bad()
         else:
             self.log_r('> No file of type <{}> missing - OK'.format(filetype))
         ############
@@ -466,7 +465,21 @@ FASTA starting residue: {}
         # are labeled as 'measured'. On later stages of the script
         # peaks not identified will be added to the peaklist, and those
         # peaks will be label as 'lost' or 'unassigned'.
-        self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
+        try:
+            self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
+        except ValueError:
+            self.allpeaklists[z][y][x] = self.allpeaklists[z][y][self.xxref].copy()
+            self.allpeaklists[z][y][x].loc[:,['Peak Status',
+                                              'Merit',
+                                              'Position F1',
+                                              'Position F2',
+                                              'Height',
+                                              'Volume',
+                                              'Line Width F1 (Hz)',
+                                              'Line Width F2 (Hz)']] =\
+                ['lost',np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]
+            #print(self.allpeaklists[z][y][x])
+            #input('')
         
         # Step 6)
         # sorts the peaklist.
