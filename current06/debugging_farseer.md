@@ -1,5 +1,13 @@
 # CORRECTED:
 ## 06.07.2017
+- plotting x ticks on large proteins.
+  - Extended and Vertical barplots ticks number set to maximum 100. If protein is larger than 100, ticks jump accordingly to *num_of_residues//100+1*.
+  - Compacted Barplot also set to spacer accoring to protein number of residues.
+- Corrections Vertical Bar plot:
+  - axis invertion.
+  - corrected text_marker to align marks to vertical bar center.
+- added in barplots, threshold_zorder parameter.
+- plots_PosF1_delta and similar variables renamed to calcs_*.
 - Added WET #9 in FarseerSet.load_experiments().
 
 
@@ -30,3 +38,4 @@
 - compacted bar plot last tick label now appears.
 
 TODO:
+- plotting x ticks on large proteins

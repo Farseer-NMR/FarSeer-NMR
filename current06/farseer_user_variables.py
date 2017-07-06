@@ -6,7 +6,7 @@ logfile_name = 'farseer.log' #  the name of the log file
 
 ### Input Data Setup
 applyFASTA = True  # complete the sequence with a FASTA file?
-FASTAstart = 31  # Residue number for the first residue in the FASTA file?
+FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
 perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
 cs_correction_res_ref = 76  # To which residue?
@@ -27,11 +27,11 @@ perform_comparisons = False  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
-cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
+cs_lost = 'full'  # how to represent the lost residues in CSPs [prev/full]
 #
 perform_resevo_fit = False  # Fit parameter evolution over titration experiment
 #
-titration_x_values = [0, 125, 250, 500, 1000, 2000, 2500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
+titration_x_values = [0, 125, 250, 500, 1000, 2000, 4000] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 #
 ## Perform PRE analysis
 apply_PRE_analysis = False
@@ -51,19 +51,19 @@ tag_ls='-'
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restraints to Plot:
-plots_PosF1_delta = True # Plot nuclei 1 shift perturbation data
-plots_PosF2_delta = True # Plot nuclei 2 shift perturbation data
-plots_CSP = True  # Plot combined chemical shift perturbation data
-plots_Height_ratio = False  # Plot Height ratio data
-plots_Volume_ratio = False  # Plot Volume ratio data
+calcs_PosF1_delta = False # Plot nuclei 1 shift perturbation data
+calcs_PosF2_delta = False # Plot nuclei 2 shift perturbation data
+calcs_CSP = True  # Plot combined chemical shift perturbation data
+calcs_Height_ratio = False  # Plot Height ratio data
+calcs_Volume_ratio = False  # Plot Volume ratio data
 #
 
 plots_extended_bar = False  # Represent data in Extended Bar Plot style
 plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
-plots_vertical_bar = False # Represent data in Vertical Bar Plot style
+plots_vertical_bar = True # Represent data in Vertical Bar Plot style
 plots_residue_evolution = False  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
-plots_cs_scatter_flower = True
+plots_cs_scatter_flower = False
 #
 # Y Axis Label for each restraint
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
@@ -82,7 +82,7 @@ calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 # Y axis scale for each calculated restraint
 yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
 yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
-yy_scale_CSP = 0.3  # y axis sacle for combined chemical shift
+yy_scale_CSP = 0.02  # y axis sacle for combined chemical shift
 yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
 yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
 yy_scale_nbins=5  # adjusted number of ticks
@@ -129,7 +129,8 @@ bar_threshold_flag= True  # applies stdev thresold
 bar_threshold_color= 'red'  # threshold color
 bar_threshold_linewidth= 0.5  # threshold line width
 bar_threshold_alpha= 0.8  # threshold transparency
-bar_mark_fontsize=3  # user defined marks fontsize
+bar_threshold_zorder=4  # <4 threshold behind bars, >=4 over bars
+bar_mark_fontsize=2  # user defined marks fontsize
 bar_mark_prolines_flag=True  # mark prolines ON/OFF
 bar_mark_prolines_symbol='P'  # symbol to mark prolines
 bar_mark_user_details_flag=False  # mark user details ON/OFF

@@ -205,6 +205,7 @@ def init_params(fsuv):
         'threshold_color':fsuv.bar_threshold_color,
         'threshold_linewidth':fsuv.bar_threshold_linewidth,
         'threshold_alpha':fsuv.bar_threshold_alpha,
+        'threshold_zorder':fsuv.bar_threshold_zorder,
         'mark_fontsize':fsuv.bar_mark_fontsize,
         'mark_prolines_flag':fsuv.bar_mark_prolines_flag,
         'mark_prolines_symbol':fsuv.bar_mark_prolines_symbol,
