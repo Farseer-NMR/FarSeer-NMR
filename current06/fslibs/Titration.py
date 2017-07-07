@@ -2106,7 +2106,8 @@ recipient: residues
             folder='PRE_analysis'
         
         self.write_plot(fig, plot_style, folder, calccol, fig_file_type, fig_dpi)
-        self.write_table(folder, calccol, atomtype=atomtype)
+        if not(plot_style in ['cs_scatter', 'cs_scatter_flower']):
+            self.write_table(folder, calccol, atomtype=atomtype)
         plt.close('all')
         return
     
