@@ -460,37 +460,40 @@ class artifset():
             self.signal_cs(i, 1, v['r1'][0], v['r1'][1],
                            vvmaxn, kdmax, 1,   xvalues, vh)
             
+            if 'r2' in self.params['regions'][k].keys():
             # region 2 range of kd
             
-            vmaxhh = np.random.choice([-vmaxh, vmaxh], size=v['r2'][1])
-            vmaxnn = np.random.choice([-vmaxn, vmaxn], size=v['r2'][1])
+                vmaxhh = np.random.choice([-vmaxh, vmaxh], size=v['r2'][1])
+                vmaxnn = np.random.choice([-vmaxn, vmaxn], size=v['r2'][1])
+                
+                
+                vvkd = np.tile(\
+                        (signal.gaussian(v['r2'][1] , v['r2'][1]//2, True)**8)    
+                          * kdmax + kdmin,
+                        (self.floatdata.shape[2], 1))
+                
+                self.signal_cs(i, 0, v['r2'][0], v['r2'][1],
+                               vmaxhh,  vvkd,  1,   xvalues, vh)
+                self.signal_cs(i, 1, v['r2'][0], v['r2'][1],
+                               vmaxnn,  vvkd,  1,   xvalues, vh)
             
+            if 'r3' in self.params['regions'][k].keys():
             
-            vvkd = np.tile(\
-                    (signal.gaussian(v['r2'][1] , v['r2'][1]//2, True)**8)    
-                      * kdmax + kdmin,
-                    (self.floatdata.shape[2], 1))
-            
-            self.signal_cs(i, 0, v['r2'][0], v['r2'][1],
-                           vmaxhh,  vvkd,  1,   xvalues, vh)
-            self.signal_cs(i, 1, v['r2'][0], v['r2'][1],
-                           vmaxnn,  vvkd,  1,   xvalues, vh)
-            
-            #ragion 3 range of n
-            vvn = np.tile(\
-                    (signal.gaussian(v['r3'][1] , v['r3'][1]//2, True)**8)\
-                           * nmax + nmin,
-                          (self.floatdata.shape[2], 1))
-            
-            vmaxhh = np.random.choice([-vmaxh, vmaxh], size=v['r3'][1])
-            vmaxnn = np.random.choice([-vmaxn, vmaxn], size=v['r3'][1])
-            
-            
-            
-            self.signal_cs(i, 0, v['r3'][0], v['r3'][1],
-                           vmaxhh,  kdmax, vvn, xvalues, vh)
-            self.signal_cs(i, 1, v['r3'][0], v['r3'][1],
-                           vmaxnn,  kdmax, vvn, xvalues, vh)
+                #ragion 3 range of n
+                vvn = np.tile(\
+                        (signal.gaussian(v['r3'][1] , v['r3'][1]//2, True)**8)\
+                               * nmax + nmin,
+                              (self.floatdata.shape[2], 1))
+                
+                vmaxhh = np.random.choice([-vmaxh, vmaxh], size=v['r3'][1])
+                vmaxnn = np.random.choice([-vmaxn, vmaxn], size=v['r3'][1])
+                
+                
+                
+                self.signal_cs(i, 0, v['r3'][0], v['r3'][1],
+                               vmaxhh,  kdmax, vvn, xvalues, vh)
+                self.signal_cs(i, 1, v['r3'][0], v['r3'][1],
+                               vmaxnn,  kdmax, vvn, xvalues, vh)
         
         
         return
@@ -586,7 +589,7 @@ class artifset():
         
         self.add_signal_along_x()
         
-        self.add_signal_along_z()
+        #self.add_signal_along_z()
         
         return
     
