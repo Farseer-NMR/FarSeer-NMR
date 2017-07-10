@@ -622,6 +622,15 @@ class artifset():
         
         spectra/zz/yy/xx.csv
         """
+        
+        def lost_region(yy):
+            
+            lost_res = np.random.choice(\
+                            np.arange(self.params['regions'][yy]['r1'][0]-self.params['regions'][yy]['r1'][1]/2,
+                                      self.params['regions'][yy]['r1'][0]+self.params['regions'][yy]['r1'][1]/2+1))
+            
+            return lost_res
+        
         #https://stackoverflow.com/questions/3685265/how-to-write-a-multidimensional-array-to-a-text-file
         
         header = 'Assign F1,Assign F2,Merit,Details,Fit Method,Vol. Method,Number,#,Position F1,Position F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz)'
@@ -638,10 +647,12 @@ class artifset():
                     
                 for iz, zz in enumerate(self.params['zdata']):
                     
-                    lost.append(\
-                        np.random.choice(self.floatdata.shape[-2]))
-                    lost.append(\
-                        np.random.choice(self.floatdata.shape[-2]))
+                    
+                    
+                    lost.append(lost_region(yy))
+                        
+                    
+                    lost.append(lost_region(yy))
                     
                     array_s, array_f = self.strdata[iz,iy,ix], \
                                        self.floatdata[iz,iy,ix]

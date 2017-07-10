@@ -706,7 +706,11 @@ recipient: residues
             # ticks positions:
             # this is used to fit both applyFASTA=True or False
             # reduces xticks to 100 as maximum to avoid ticklabel overlap
-            xtick_spacing = self.shape[1]//100+1
+            if self.shape[1] > 100:
+                xtick_spacing = self.shape[1]//100
+            else:
+                xtick_spacing = 1
+            
             tickspos = np.arange(\
                         start=float(self.loc[experiment,:,'Res#'].head(1)),
                         stop=float(self.loc[experiment,:,'Res#'].tail(n=1))+1,
@@ -782,7 +786,10 @@ recipient: residues
             initialresidue = int(self.ix[0, 0, 'Res#'])
             finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
             
-            xtick_spacing = self.shape[1]//100*10
+            if self.shape[1] > 100:
+                xtick_spacing = self.shape[1]//100*10
+            else:
+                xtick_spacing = 10
             
             first_tick = ceil(initialresidue/10)*xtick_spacing
             xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
