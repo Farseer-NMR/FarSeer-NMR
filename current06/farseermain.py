@@ -44,15 +44,16 @@ def copy_Farseer_version(cwd, file_name='farseer_version',
     
     return 
 
-def init_log(logfile_name, mod='a'):
+def init_log(logfile_name, mod='a', state='STARTED'):
     """Starts the log file."""
-    log_title = '****** LOG STARTED ** '
-    s2w = "{}{}\n".format(log_title,
-                           datetime.\
-                           datetime.now().strftime("%Y/%m/%d - %H:%M:%S"))
+    log_title = \
+        '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
+            format(79*'*',
+                   datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"),
+                   state)
     
     with open(logfile_name, mod) as logfile:
-        logfile.write(s2w)
+        logfile.write(log_title)
     return
 
 def close_log(farseerset=False, 
@@ -96,13 +97,7 @@ def close_log(farseerset=False,
             sidechain_comparison[cond].write_log(mod=mod, path=logfile_name)
     
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    log_title = '\n\n****** LOG ENDED ** '
-    s2w = "{}{}\n".format(log_title,
-                           datetime.\
-                           datetime.now().strftime("%Y/%m/%d - %H:%M:%S"))
-    
-    with open(logfile_name, mod) as logfile:
-        logfile.write(s2w)
+    init_log(logfile_name, state='ENDED')
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     return
 

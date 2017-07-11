@@ -1,4 +1,8 @@
 # CORRECTED:
+## 11.07.2017
+- Added Wiki pages
+- converted farseer.log to markdown syntax (farseer_log.md)
+
 ## 06.07.2017
 - plotting x ticks on large proteins.
   - Extended and Vertical barplots ticks number set to maximum 100. If protein is larger than 100, ticks jump accordingly to *num_of_residues//100+1*.
@@ -38,4 +42,4 @@
 - compacted bar plot last tick label now appears.
 
 TODO:
-- plotting x ticks on large proteins
+- print .log when farseer breaks.

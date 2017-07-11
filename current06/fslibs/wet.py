@@ -1,10 +1,10 @@
 import sys
 
 def title(s=''):
-    return "{:@^62}".format(s)
+    return "    {:@^62}  ".format(s)
 
 def line(s=''):
-    return "@{:^60}@".format(s)
+    return "    @{:^60}@  ".format(s)
 
 def referwet(n):
     return line("+ Refer to WET #{} +".format(n))

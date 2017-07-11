@@ -122,7 +122,7 @@ class Titration(pd.Panel):
         
         :logstring: the string to be registered in the log
         """
-        logstr = '{}\n'.format(logstr)
+        logstr = '{}  \n'.format(logstr)
         print(logstr)
         self.log += logstr
         return
@@ -130,7 +130,9 @@ class Titration(pd.Panel):
     def log_t(self, titlestr):
         """Formats a title for log."""
         log_title = \
-            '\n\n{0} {1} {2}\n'.format('*'*5, titlestr, self.calc_path)
+        '\n{0}  \n### {1}  {2}  \n{0}  \n'.format('*'*79,
+                                                 titlestr.upper(),
+                                                 self.calc_path)
         print(log_title)
         self.log += log_title
         return
@@ -217,7 +219,7 @@ class Titration(pd.Panel):
                 mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
                 self.ix[iitem,mask_lost,calccol] = 0
         
-        self.log_r('** Calculated {}'.format(calccol))
+        self.log_r('**Calculated** {}'.format(calccol))
         
         return
     
@@ -261,7 +263,7 @@ class Titration(pd.Panel):
         self.loc[:,:,calccol] = \
             self.loc[:,:,['1-letter',pos1,pos2]].\
                 apply(lambda x: self.csp_willi(x), axis=2)
-        self.log_r('** Calculated {}'.format(calccol))
+        self.log_r('**Calculated** {}'.format(calccol))
         return
     
     def load_theoretical_PRE(self, spectra_path, dimpt):
@@ -392,7 +394,7 @@ with window size {} and stdev {}'.\
                       na_rep='NaN', float_format='%.4f'))
         fileout.close()
         
-        self.log_r('** Data table saved: {}'.format(file_path))
+        self.log_r('**Exported data table:** {}'.format(file_path))
         return
     
     def write_Chimera_attributes(self, calccol, resformat=':',
@@ -469,7 +471,7 @@ recipient: residues
                 
             fileout.close()
             
-            self.log_r('** Chimera Att file saved: {}'.format(file_name))
+            self.log_r('**Exported Chimera Att** {}'.format(file_name))
         return
     
     def export_titration(self):
@@ -486,11 +488,10 @@ recipient: residues
                                                 index=False,
                                                 na_rep='NaN',
                                                 float_format='%.4f'))
-            
+            self.log_r(\
+            '**Exported peaklist** {}'.format(file_path))
             fileout.close()
         
-        self.log_r(\
-            '** Exported peaklists in {}'.format(self.export_tit_folder))
         return
     
     def set_item_colors(self, items, series, d):
@@ -1003,7 +1004,12 @@ recipient: residues
         
         ## Configure XX ticks and Label
         axs[i].margins(y=0.01)
-        xtick_spacing = self.shape[1]//100+1
+        
+        if self.shape[1] > 100:
+            xtick_spacing = self.shape[1]//100
+        else:
+            xtick_spacing = 1
+        
         axs[i].set_yticks(\
             np.arange(float(self.loc[experiment,:,'Res#'].head(1)),
                       float(self.loc[experiment,:,'Res#'].tail(1))+1,
@@ -2019,7 +2025,7 @@ recipient: residues
                      fig_file_type='pdf',
                      fig_dpi=300):
         
-        self.log_r('** Starting plot {} for {}...'.format(plot_style, calccol))
+        self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
         
         # this to allow folder change in PRE_analysis
         folder = calccol
@@ -2029,7 +2035,7 @@ recipient: residues
         elif plot_type == 'res':
             num_subplots = len(self.major_axis)
         elif plot_type == 'single':
-            num_subplots = 4
+            num_subplots = 1
         else:
             raise ValueError('Not a valid Farseer plot type')
         
@@ -2083,6 +2089,7 @@ recipient: residues
         
         elif plot_style == 'cs_scatter_flower':
             self.plot_cs_scatter_flower(fig, axs, **param_dict)
+            self.clean_subplots(fig, axs, 1, len(axs))
         
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
@@ -2131,7 +2138,7 @@ recipient: residues
         
         fig.savefig(file_path, dpi=fig_dpi)
         
-        self.log_r('** Plot Saved {}'.format(file_path))
+        self.log_r('**Plot Saved** {}'.format(file_path))
         
         return
     

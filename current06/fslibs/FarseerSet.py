@@ -74,11 +74,9 @@ class FarseerSet:
         #self.log_t('Farseer Set initiated in {}'.format(spectra_path))
         self.log_t('Initiates Farseer Set')
         input_log = \
-"""
-path: {}
-side chains: {}
-FASTA starting residue: {}
-""".format(spectra_path, self.has_sidechains, self.FASTAstart)
+"""path: {}  
+side chains: {}  
+FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.FASTAstart)
         
         self.log_r(input_log)
         
@@ -141,7 +139,7 @@ FASTA starting residue: {}
     
     def log_t(self, titlestr):
         """Formats a title for log."""
-        log_title = '\n\n{0}\n{1:^79}\n{0}\n'.format('*'*79, titlestr)
+        log_title = '\n{0}  \n### {1}  \n{0}  \n'.format('*'*79, titlestr.upper())
         self.log_r(log_title)
         return
     
@@ -152,7 +150,7 @@ FASTA starting residue: {}
         :logstring: the string to be registered in the log
         """
         print(logstr)
-        self.log += logstr+'\n'
+        self.log += logstr+'  \n'
         return
     
     def write_log(self, mod='a', path='farseer.log'):
@@ -235,7 +233,7 @@ FASTA starting residue: {}
             # reads the .csv file to a pd.DataFrame removes
             # the '.csv' from the key name to increase asthetics in output
             if parts[-1].lower().endswith(filetype):
-                self.log_r(p)
+                self.log_r('* {}'.format(p))
                 lessparts = parts[-1].split('.')[0]
                 branch[lessparts] = branch.get(parts[-1], f(p))
         
@@ -257,7 +255,7 @@ FASTA starting residue: {}
             self.log_r(fsw.wet8(filetype, str1))
             fsw.end_bad()
         else:
-            self.log_r('> No file of type <{}> missing - OK'.format(filetype))
+            self.log_r('> All <{}> files found - OK!'.format(filetype))
         ############
         
         return
@@ -317,7 +315,7 @@ FASTA starting residue: {}
                                    '3-letter', 
                                    '1-letter', 'Assign F1', 'Details'])
         
-        logs = '{}-{}-{}'.format(self.FASTAstart, FASTA, dd['Res#'][-1])
+        logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['Res#'][-1])
         
         self.log_r(logs)
         
@@ -355,9 +353,9 @@ FASTA starting residue: {}
             self.hasxx = True
         
         logs = '''\
-> 1st titration variables (cond1): {}
-> 2nd titration variables (cond2): {}
-> 3rd titration variables (cond3): {}
+* 1st titration variables (cond1): {}
+* 2nd titration variables (cond2): {}
+* 3rd titration variables (cond3): {}
 '''.format(self.xxcoords, self.yycoords, self.zzcoords)
         
         self.log_r(logs)
@@ -543,9 +541,9 @@ FASTA starting residue: {}
         # the script does not correct for the fact that the user sets
         # no sidechains but that actually are sidechains, 
         # though the log file register such occurrence.
-        logs = '[{}][{}][{}] | * new columns inserted:  {}  \
-* sidechains user setting: {} \
-* sidechains identified: {} ** SD count: {}'.\
+        logs = '**[{}][{}][{}]** new columns inserted:  {}  \
+| sidechains user setting: {} \
+| sidechains identified: {} | SD count: {}'.\
             format(z,y,x,columns_OK,
             self.has_sidechains,
             (True in sidechains_bool.value_counts()),
@@ -603,10 +601,10 @@ FASTA starting residue: {}
                 self.allpeaklists[z][y][x].loc[:,'Position F2'].sub(F2_cs_diff)
         
         # logs the operation
-        logs = '[{}][{}][{}] | * On residue {} * F1 ref {:.4f} \
-:: correction factor {:.4f} \
-* F2 ref {:.4f} \
-:: correction factor {:.4f}'\
+        logs = '**[{}][{}][{}]** | On residue {} F1 ref {:.4f} \
+| correction factor {:.4f} \
+| F2 ref {:.4f} \
+| correction factor {:.4f}'\
         .format(z,y,x, ref_res,
                 float(ref_data['F1_cs']), F1_cs_diff, 
                 float(ref_data['F2_cs']), F2_cs_diff)
@@ -664,7 +662,6 @@ FASTA starting residue: {}
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
         if atomtype=='Sidechain':
-            print('HEREEEEEEEEEE')
             
             ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
                 ref_seq_dict[z][y][ref_key].loc[:,['Res#', 'ATOM']].\
@@ -720,10 +717,10 @@ FASTA starting residue: {}
                 ref_seq_dict[z][y][ref_key].loc[:,'Res#'].str[:-1]
                 
         
-        logs = "[{}][{}][{}] vs. [{}][{}][{}] |\
- Target Initial Length :: {} \
-* Template Length :: {} \
-* Target final length :: {}".format(z,y,x,
+        logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+| Target Initial Length :: {} \
+| Template Length :: {} \
+| Target final length :: {}".format(z,y,x,
                                     refcz, refcy, ref_key,
                                     length_target_init,
                                     length_ind,
@@ -841,7 +838,7 @@ FASTA starting residue: {}
         
         
         peaklist[z][y][x] = peaklist[z][y][x][col_order]
-        self.log_r('[{}][{}][{}] | Columns organized :: OK'.format(z,y,x))
+        self.log_r('**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x))
         return
     
     def init_Farseer_cube(self, use_sidechains=False):
@@ -857,11 +854,12 @@ FASTA starting residue: {}
         
         self.log_t('INITIATING FARSEER CUBE')
         self.peaklists_p5d = self.p5d(self.allpeaklists)
-        self.log_r('** Created cube for all the backbone peaklists')
+        self.log_r('> Created cube for all the backbone peaklists - OK!')
         
         if use_sidechains:
             self.sidechains_p5d = self.p5d(self.allsidechains)
-            self.log_r('** Created cube for all the sidechains peaklists')
+            self.log_r(\
+                '> Created cube for all the sidechains peaklists - OK!')
             
         return
     
@@ -929,10 +927,10 @@ FASTA starting residue: {}
                     self.gen_titration(panelT.loc[dim2_pts, dim1_pts, :, :, :],
                                        titration_class, titration_kwargs)
                 #
-                self.log_r('Generated titration [{}][{}] | \
-with points {}'.format(dim2_pts,
-                         dim1_pts,
-                         list(D[dim2_pts][dim1_pts].items)))
+                self.log_r('**Titration [{}][{}]** \
+with data points {}'.format(dim2_pts,
+                       dim1_pts,
+                       list(D[dim2_pts][dim1_pts].items)))
                 
                 #fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         
