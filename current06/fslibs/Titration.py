@@ -233,7 +233,7 @@ class Titration(pd.Panel):
         '''
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
-        self.log_r('** Calculated {}'.format(calccol))
+        self.log_r('**Calculated** {}'.format(calccol))
         return
     
     def csp_willi(self, s):
@@ -292,9 +292,9 @@ class Titration(pd.Panel):
         self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1],
                                  names=['Theo PRE'], comment='#')
         self.log_r(\
-            '** Added Theoretical PRE file {}'.format(pre_file[0]))
+            '**Added Theoretical PRE file** {}'.format(pre_file[0]))
         self.log_r(\
-            '** Theoretical PRE for diamagnetic set to 1 by default')
+            '*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
         self.loc['para',:,'Theo PRE'] = self.predf.loc[:,'Theo PRE']
         
@@ -306,7 +306,7 @@ class Titration(pd.Panel):
         self.loc['para',tagmask,'tag'] = '*'
         tagf.close()
         self.log_r(\
-            '** Tag position found at residue {}'.format(\
+            '**Tag position found** at residue {}'.format(\
                 int(self.loc['para',tagmask,'Res#'])))
         return
         
@@ -324,7 +324,7 @@ class Titration(pd.Panel):
             self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
         
         self.log_r(\
-            '** Calculated DELTA PRE for source {} in target {}'.\
+            '**Calculated DELTA PRE** for source {} in target {}'.\
             format(sourcecol, targetcol))
         
         for exp in self.items:
@@ -341,7 +341,7 @@ class Titration(pd.Panel):
                          normalize_kernel=True)
         
         self.log_r(\
-        '*** Calculated DELTA PRE Smoothed for source {} in target {} \
+        '**Calculated DELTA PRE Smoothed** for source {} in target {} \
 with window size {} and stdev {}'.\
             format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
         return
@@ -1734,7 +1734,7 @@ recipient: residues
                           vmin=0,
                           vmax=1,
                           ylabel='DELTA PRE',
-                          x_ticks_fs=6,
+                          x_ticks_fs=4,
                           x_ticks_rot=0,
                           x_ticks_fn='Arial',
                           x_ticks_pad=1,
@@ -1745,7 +1745,7 @@ recipient: residues
                           y_label_weight='bold',
                           right_margin=0.1,
                           bottom_margin=0.1,
-                          top_margin=0.1,
+                          top_margin=0.9,
                           cbar_font_size=4,
                           tag_color='red',
                           tag_lw=0.3,
@@ -1789,23 +1789,33 @@ recipient: residues
             
             cbar.ax.tick_params(labelsize=cbar_font_size)
             axs[i].get_xaxis().set_visible(True)
-            axs[i].tick_params(axis='x', bottom='on')
+            axs[i].tick_params(axis='x', bottom='on', length=1.5)
+            
             initialresidue = int(self.ix[0, 0, 'Res#'])
             finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
-            first_tick = ceil(initialresidue/10)*10
-            axs[i].set_xticks(np.arange(first_tick-0.5, finalresidue+1, 10))
-            axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
-                               fontsize=x_ticks_fs,
-                               rotation=x_ticks_rot,
-                               fontname=x_ticks_fn,
-                               fontweight=x_ticks_weight)
+            
+            if self.shape[1] > 100:
+                xtick_spacing = self.shape[1]//100*10
+            else:
+                xtick_spacing = 10
+            
+            first_tick = ceil(initialresidue/10)*xtick_spacing
+            xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
+            axs[i].set_xticks(xtickarange)
+            # https://github.com/matplotlib/matplotlib/issues/6266
+            axs[i].set_xticklabels(xtickarange,
+                                   fontname=x_ticks_fn,
+                                   fontsize=x_ticks_fs,
+                                   fontweight=x_ticks_weight,
+                                   rotation=x_ticks_rot)
+                               
             axs[i].tick_params(axis='x', which='major', pad=x_ticks_pad)
             fig.subplots_adjust(right=right_margin,
                                 bottom=bottom_margin,
                                 top=top_margin,
                                 hspace=0)
             
-        pass
+    
     
     def plot_delta_osci(self, calccol, fig, axs, i ,experiment,
                         y_lims=(0,1),
@@ -1919,10 +1929,17 @@ recipient: residues
         # Set Ticks
         initialresidue = int(self.ix[0, 0, 'Res#'])
         finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
-        first_tick = ceil(initialresidue/10)*10
-        axs[i].set_xticks(np.arange(first_tick, finalresidue+1, 10))
+        
+        if self.shape[1] > 100:
+            xtick_spacing = self.shape[1]//100*10
+        else:
+            xtick_spacing = 10
+        
+        first_tick = ceil(initialresidue/10)*xtick_spacing
+        xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
+        axs[i].set_xticks(xtickarange)
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
+        axs[i].set_xticklabels(xtickarange,
                                fontname=x_ticks_fn,
                                fontsize=x_ticks_fs,
                                fontweight=x_ticks_weight,
@@ -2041,8 +2058,7 @@ recipient: residues
         
         numrows = ceil(num_subplots/cols_per_page)
         real_fig_height = (fig_height / rows_per_page) * numrows
-        print(numrows)
-        print(cols_per_page)
+        
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
         fig, axs = plt.subplots(nrows=numrows, ncols=cols_per_page,
                                 figsize=(fig_width, real_fig_height))

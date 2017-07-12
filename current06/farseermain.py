@@ -334,7 +334,7 @@ def init_params(fsuv):
         'y_label_weight':fsuv.heat_map_y_label_weight,
         'right_margin':fsuv.heat_map_right_margin,
         'bottom_margin':fsuv.heat_map_bottom_margin,
-        'top_margin':fsuv.heat_map_top_margin,
+        #'top_margin':fsuv.heat_map_top_margin,
         'cbar_font_size':fsuv.heat_map_cbar_font_size,
         'tag_color':fsuv.tag_color,
         'tag_lw':fsuv.tag_lw,
