@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 import pickle
 
 width = 1100
-height = 420
+height = 720
 
 import math
 
@@ -11,13 +11,14 @@ class PeakListArea(QWidget):
     def __init__(self, parent, valuesDict):
 
         QWidget.__init__(self, parent)
+        self.setObjectName("PeakListArea")
         self.scene = QGraphicsScene(self)
         self.scrollContents = QGraphicsView(self.scene, self)
         self.scene.setSceneRect(0, 0, 900, height)
         layout = QGridLayout()
         self.setLayout(layout)
         self.layout().addWidget(self.scrollContents)
-        self.scrollContents.setMaximumSize(1100, height)
+        # self.scrollContents.setMaximumSize(1100, height)
         self.scrollContents.setMinimumSize(800, height)
         self.scrollContents.setAcceptDrops(True)
 
@@ -116,6 +117,11 @@ class PeakListArea(QWidget):
 
 
         newLine = QGraphicsLineItem(x1, y1, x2, y2)
+        pen = QtGui.QPen()
+        pen.setColor(QtGui.QColor("#0360A9"))
+        pen.setCosmetic(True)
+        pen.setWidth(1)
+        newLine.setPen(pen)
         self.scene.addItem(newLine)
 
 class ConditionLabel(QGraphicsTextItem):
@@ -123,14 +129,14 @@ class ConditionLabel(QGraphicsTextItem):
 
   def __init__(self, text, pos=None):
       QGraphicsTextItem.__init__(self)
-      self.setPlainText(text)
+      self.setHtml('<div style="color: %s; font-size: 12pt; ">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
 
 class PeakListLabel(QGraphicsTextItem):
 
   def __init__(self, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
       QGraphicsTextItem.__init__(self)
-      self.setPlainText(text)
+      self.setHtml('<div style="color: %s; font-size: 12pt;">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
       self.setAcceptDrops(True)
       self.scene = scene

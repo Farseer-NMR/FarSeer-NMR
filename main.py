@@ -2,9 +2,9 @@ import sys
 from functools import partial
 import json
 import os
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
-    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter
+    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QToolButton, QSizePolicy, QSplashScreen, QSpacerItem
 
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
@@ -15,6 +15,7 @@ from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
+from gui.components.Icon import Icon, ICON_DIR
 
 from gui.popups.BarPlotPopup import BarPlotPopup
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
@@ -29,6 +30,11 @@ from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.DPrePopup import DPrePopup
 from gui.popups.TitrationPlotPopup import TitrationPlotPopup
 
+from gui.Footer import Footer
+
+from gui import resources_rc
+
+
 from current06.fslibs.io import json_to_fsuv
 
 valuesDict = {
@@ -39,19 +45,48 @@ valuesDict = {
 
 peakLists = {}
 
-class Main(QTabWidget):
+
+
+
+
+class TabWidget(QTabWidget):
 
     def __init__(self, app_dims):
         QTabWidget.__init__(self, parent=None)
-        self.tab1 = Settings(self)
-        self.tab2 = Interface(self)
-        self.tab3 = QWidget(self)
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+        self.tab1.setLayout(QGridLayout())
+        self.tab2.setLayout(QGridLayout())
+        self.tab3 = QWidget()
+
+        self.tab1.layout().addWidget(Settings())
+        self.tab2.layout().addWidget(Interface())
+
+
         self.addTab(self.tab2, "PeakList Selection")
         self.addTab(self.tab1, "Settings")
         self.addTab(self.tab3, "Results")
+        self.tabButton = QToolButton(self)
+        self.tabButton.setIcon(Icon('icons/header-cogs.png'))
+        self.tabButton.setText('')
+        self.tabButton.setObjectName("Cog")
+        #
+        self.tabButton.setIconSize(self.tabButton.size())
+        self.setAutoFillBackground(True)
+        self.tabButton.setStyleSheet('QIcon {background-color: #001450;}')
 
+
+        self.setCornerWidget(self.tabButton)
+        self.tablogo = QLabel(self)
+        self.tablogo.setAutoFillBackground(True)
+
+        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
+        # pixmap.fill(QtGui.QColor('))
+
+        self.tablogo.setPixmap(pixmap)
+        self.tablogo.setContentsMargins(10, 0, 0, 4)
+        self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
         self.setFixedSize(app_dims)
-        # self.setFixedWidth(app_dims[0])
 
 
     def load_config(self):
@@ -88,12 +123,14 @@ class Main(QTabWidget):
 
 
 class Settings(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         QWidget.__init__(self, parent=parent)
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         grid.setSpacing(3)
+        self.setObjectName("Settings")
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         from current.default_config import defaults
         # self.variables = None
         self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current06', 'blank_config.json'), 'r'))
@@ -409,7 +446,6 @@ class Settings(QWidget):
 
         grid.layout().addWidget(buttons_groupbox, 20, 0, 1, 20)
 
-
     def load_config(self):
         self.variables = self.parent().parent().load_config()
         if self.variables:
@@ -509,26 +545,25 @@ class Settings(QWidget):
 
 class Interface(QWidget):
  
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         QWidget.__init__(self, parent=parent)
-
         self.initUI()
+        self.widget2.setObjectName("InterfaceTop")
+
 
     def initUI(self):
         self.peakListArea = PeakListArea(self, valuesDict=valuesDict)
         grid = QGridLayout()
-        grid1 = QGridLayout()
         grid2 = QGridLayout()
-        grid.setVerticalSpacing(0)
+        grid2.setHorizontalSpacing(0)
         grid.setAlignment(QtCore.Qt.AlignTop)
+        grid.setAlignment(QtCore.Qt.AlignLeft)
         self.setLayout(grid)
-
-
-        widget1 = QWidget(self)
-        widget1.setLayout(grid1)
+        self.setObjectName("Interface")
         self.widget2 = QWidget(self)
         self.widget2.setLayout(grid2)
         axes_label = QLabel("Use axes", self)
+        axes_label.setObjectName("AxesLabel")
         self.x_checkbox = LabelledCheckbox(self, "x", fixed=True)
         self.y_checkbox = LabelledCheckbox(self, "y", fixed=True)
         self.z_checkbox = LabelledCheckbox(self, "z", fixed=True)
@@ -547,8 +582,11 @@ class Interface(QWidget):
         self.layout().addWidget(self.h_splitter)
 
         num_points_label = QLabel("Number of Points", self)
+        num_points_label.setObjectName("AxesLabel")
+        num_points_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        grid2.layout().addWidget(num_points_label, 0, 1, 1, 12)
 
-        grid2.layout().addWidget(num_points_label, 0, 1)
+        self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.z_combobox = QSpinBox(self)
         self.y_combobox = QSpinBox(self)
@@ -557,10 +595,10 @@ class Interface(QWidget):
         self.x_combobox.valueChanged.connect(partial(self.update_condition_boxes, 3, 'x'))
         self.y_combobox.valueChanged.connect(partial(self.update_condition_boxes, 2, 'y'))
         self.z_combobox.valueChanged.connect(partial(self.update_condition_boxes, 1, 'z'))
-
-        self.z_combobox.setFixedWidth(100)
-        self.y_combobox.setFixedWidth(100)
-        self.x_combobox.setFixedWidth(100)
+        #
+        # self.z_combobox.setFixedWidth(100)
+        # self.y_combobox.setFixedWidth(100)
+        # self.x_combobox.setFixedWidth(100)
 
         grid2.layout().addWidget(self.x_combobox, 3, 1, 1, 1)
         grid2.layout().addWidget(self.y_combobox, 2, 1, 1, 1)
@@ -569,17 +607,25 @@ class Interface(QWidget):
         self.z_combobox.setValue(1)
         self.y_combobox.setValue(1)
         self.x_combobox.setValue(1)
+        self.sideBar.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
 
         self.widget3.layout().addWidget(self.widget2, 1, 1)
 
         self.showTreeButton = QPushButton('Show Parameter Tree', self)
-        self.showTreeButton.setMaximumWidth(1150)
 
-        self.widget3.layout().addWidget(self.showTreeButton, 2, 1, 1, 3)
+        self.showTreeButton.setObjectName("TreeButton")
+        # self.showTreeButton.setMaximumWidth(1150)
+
+        self.widget2.layout().addWidget(self.showTreeButton, 5, 1, 1, 12)
+        # spacer = QSpacerItem(0, 20)
+        # self.widget2.layout().addItem(spacer, 4, 0, 1, 12)
+
+        self.showTreeButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.widget3.layout().addWidget(self.peakListArea, 3, 1, 1, 3)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         # self.peakListArea.hide()
         self.h_splitter.addWidget(self.widget3)
+
 
 
     def update_condition_boxes(self, row, dim, value):
@@ -599,22 +645,53 @@ class Interface(QWidget):
             valuesDict[dim] = valuesDict[dim][:value]
         for x in range(value):
             text_box = ValueField(self, x, dim, valuesDict)
-            text_box.setFixedWidth(50)
+            # text_box.setFixedWidth(50)
             text_box.setText(str(valuesDict[dim][x]))
             layout.addWidget(text_box, row, x+2, 1, 1)
+
+
+class Main(QWidget):
+
+    def __init__(self, parent=None, **kw):
+        QWidget.__init__(self, parent=parent)
+
+        tabWidget = TabWidget(app_dims)
+        footer = Footer(self)
+        layout = QVBoxLayout(self)
+        self.setLayout(layout)
+        self.layout().setAlignment(QtCore.Qt.AlignTop)
+        self.layout().addWidget(tabWidget)
+        self.layout().addWidget(footer)
+        self.setObjectName("MainWidget")
+
 
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    import time
+    splash_pix = QtGui.QPixmap('gui/images/splash-screen.png')
+
+    splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
+    splash.setEnabled(False)
+
+    splash.show()
+
     screen_resolution = app.desktop().screenGeometry()
     if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
         app_dims = screen_resolution.size()
     # elif (screen_resolution.height(), screen_resolution.width()) == (1440, 2560):
     #     app_dims = QtCore.QSize(1800, 850)
     else:
-        app_dims = QtCore.QSize(1600, 850)
-    ex = Main(app_dims)
+        app_dims = QtCore.QSize(1600, 1000)
+    ex = Main()
+    splash.finish(ex)
+    fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'
+    font_id = QtGui.QFontDatabase.addApplicationFont(fin)
+    stylesheet = open('gui/stylesheet.qss').read()
+    app.setStyleSheet(stylesheet)
+
     ex.show()
     ex.raise_()
     sys.exit(app.exec_())

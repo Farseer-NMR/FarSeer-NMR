@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+<file alias="bg-gradient-1k.png">images/bg-gradient-1k.png</file>
+<file alias="gradient-tree-bg.png">images/gradient-tree-bg.png</file>
+<file alias="gradient-box-bg.png">images/gradient-box-bg.png</file>
+<file>stylesheet.qss</file>
+</qresource>
+</RCC>
