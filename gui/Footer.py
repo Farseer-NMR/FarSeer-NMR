@@ -7,16 +7,16 @@ class Footer(QWidget):
 
     def __init__(self, parent):
         QWidget.__init__(self, parent=parent)
-        self.setFixedHeight(51)
+        self.setFixedHeight(60)
         self.setObjectName("footer")
 
-        affiliations = '<span style="display:inline"><span style="color: #D5FD84; font-size: 6pt; display:inline">Joao MC Texeira<span style="color: #08F2EE">* </span>' \
-                       '<span style="color: #D5FD84; font-size: 6pt;">Simon P. Skinner</span><span style="color: #07C3F5">** </span>' \
-                       '<span style="color: #D5FD84; font-size: 6pt;">Miguel Arbescu</span><span style="color: #08F2EE">* </span>' \
-                       '<span style="color: #D5FD84; font-size: 6pt;">Alexander L. Breeze</span><span style="color: #07C3F5">** </span>' \
-                       '<span style="color: #D5FD84; font-size: 6pt;">Miquel Pons</span><span style="color: #08F2EE">*</span>'
-        address1 = '<span style="color: #08F2EE; font-size: 6pt;">*BioNMR Laboratory, Inorganic and Organic Chemistry Department, Universitat de Barcelona, Baldiri Reixac 10-12, 08028 Barcelona, Spain</span>'
-        address2 = '<span style="color: #07C3F5; font-size: 6pt;">**Astbury Centre for Structural Molecular Biology, Faculty of Biological Sciences, University of Leeds, LS2 9JT, UK</span>'
+        affiliations = '<span style="display:inline"><span style="color: #D5FD84; font-size: 6pt; display:inline">Joao MC Texeira<span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
+                       '<span style="color: #D5FD84; font-size: 6pt;">Simon P. Skinner</span><span style="color: #07C3F5">**&nbsp;&nbsp;</span>' \
+                       '<span style="color: #D5FD84; font-size: 6pt;"> Miguel Arbescu</span><span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
+                       '<span style="color: #D5FD84; font-size: 6pt;"> Alexander L. Breeze</span><span style="color: #07C3F5">**&nbsp;&nbsp;</span>' \
+                       '<span style="color: #D5FD84; font-size: 6pt;"> Miquel Pons</span><span style="color: #08F2EE">*</span>'
+        address1 = '<span style="color: #08F2EE; font-size: 6pt;">* BioNMR Laboratory, Inorganic and Organic Chemistry Department, Universitat de Barcelona, Baldiri Reixac 10-12, 08028 Barcelona, Spain</span>'
+        address2 = '<span style="color: #07C3F5; font-size: 6pt;">** Astbury Centre for Structural Molecular Biology, Faculty of Biological Sciences, University of Leeds, LS2 9JT, UK</span>'
 
 
 
@@ -27,7 +27,7 @@ class Footer(QWidget):
 
         layout = QGridLayout()
         self.setLayout(layout)
-        self.layout().setSpacing(6)
+        # self.layout().setSpacing(6)
         self.layout().addWidget(self.label1, 0, 0)
         self.layout().addWidget(self.label2, 1, 0)
         self.layout().addWidget(self.label3, 2, 0)
@@ -52,7 +52,7 @@ class Footer(QWidget):
         self.layout().addWidget(self.emailButton, 0, 5, 3, 1)
         self.layout().addWidget(self.twitterButton, 0, 6, 3, 1)
 
-        version = '<span style="color: #036D8F; font-size: 6pt; font-weight: 400; margin-right: 20px; margin-top: 4px; float: right;">v.1.0.0</span>'
+        version = '<span style="color: #036D8F; font-size: 6pt; font-weight: 400; margin-right: 29px; margin-top: 4px;">v.1.0.0&nbsp;&nbsp;&nbsp;&nbsp;</span>'
         self.versionLabel = QLabel(version, self)
         self.versionLabel.setAlignment(QtCore.Qt.AlignRight)
 
@@ -67,4 +67,5 @@ class Footer(QWidget):
         self.ctfpLabel.setPixmap(pixmap)
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
         self.layout().addWidget(self.ctfpLabel, 1, 7, 2, 2)
+
 

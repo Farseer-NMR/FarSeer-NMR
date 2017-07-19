@@ -13,6 +13,7 @@ class SideBar(QTreeWidget):
         self.acceptDrops()
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
+        self.setFixedHeight(887)
         self.addLists()
         self.peakLists = peakLists
 
@@ -37,7 +38,7 @@ class SideBar(QTreeWidget):
                     item = self.addItem(filePath.split('/')[-1].split('.')[0])
                     self.peakLists[item.text(0)] = peaklist
                 else:
-                    print("Invalid file")
+                    print("Invalid file: %s" % filePath)
 
 
     def addItem(self, name):

@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView,
 from PyQt5 import QtCore, QtGui
 import pickle
 
-width = 1100
-height = 720
+width = 1200
+height = 660
 
 import math
 
@@ -11,15 +11,16 @@ class PeakListArea(QWidget):
     def __init__(self, parent, valuesDict):
 
         QWidget.__init__(self, parent)
-        self.setObjectName("PeakListArea")
+        # self.setStyleSheet("")
         self.scene = QGraphicsScene(self)
         self.scrollContents = QGraphicsView(self.scene, self)
-        self.scene.setSceneRect(0, 0, 900, height)
+        self.scrollContents.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.scene.setSceneRect(0, 0, width, height)
         layout = QGridLayout()
         self.setLayout(layout)
         self.layout().addWidget(self.scrollContents)
         # self.scrollContents.setMaximumSize(1100, height)
-        self.scrollContents.setMinimumSize(800, height)
+        self.scrollContents.setMinimumSize(920, height)
         self.scrollContents.setAcceptDrops(True)
 
         self.valuesDict = valuesDict
@@ -118,7 +119,7 @@ class PeakListArea(QWidget):
 
         newLine = QGraphicsLineItem(x1, y1, x2, y2)
         pen = QtGui.QPen()
-        pen.setColor(QtGui.QColor("#0360A9"))
+        pen.setColor(QtGui.QColor("#FAFAF7"))
         pen.setCosmetic(True)
         pen.setWidth(1)
         newLine.setPen(pen)
