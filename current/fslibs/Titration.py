@@ -6,7 +6,7 @@ from math import ceil
 import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
-from current06.fslibs import wet as fsw
+from current.fslibs import wet as fsw
 
 #from matplotlib.colors import colorConverter
 #from math import ceil as mceil
