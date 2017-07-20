@@ -6,10 +6,10 @@ import shutil
 import datetime  # used to write the log file
 import pandas as pd
 #farseer_user_variables are imported in the if __main__ :
-from current06.fslibs import FarseerSet as fset
-from current06.fslibs import Titration as fst
-from current06.fslibs import Comparisons as fsc
-from current06.fslibs import wet as fsw
+from current.fslibs import FarseerSet as fset
+from current.fslibs import Titration as fst
+from current.fslibs import Comparisons as fsc
+from current.fslibs import wet as fsw
 
 def read_user_variables(path):
     """

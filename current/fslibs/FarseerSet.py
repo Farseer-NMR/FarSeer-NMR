@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from current06.fslibs import wet as fsw
+from current.fslibs import wet as fsw
 
 class FarseerSet:
     """
