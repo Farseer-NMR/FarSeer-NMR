@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QLineEdit, QSizePolicy
 
 
 class ValueField(QLineEdit):
@@ -9,6 +9,7 @@ class ValueField(QLineEdit):
         self.dim = dim
         self.textChanged.connect(self.updateValuesDict)
         self.valuesDict = valuesDict
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
 
     def updateValuesDict(self, value):
         self.valuesDict[self.dim][self.index] = value

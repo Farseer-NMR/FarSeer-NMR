@@ -170,7 +170,7 @@ font-weight: 400;
 
 #TreeButton {
 margin-right: 16px;
-margin-bottom: 8px;
+margin-bottom: 2px;
 }
 
 #SettingsWidget  {
@@ -193,24 +193,29 @@ margin-right: 5px;
 #AxesLabel {
 background-color: #07AFF8;
 border-top: 1px solid #07AFF8;
+border-right: 0;
 color: #001450;
 font-size: 8pt;
 font-weight: 400;
 height: 10px;
-padding-bottom: 0px;
+padding-bottom: 4px;
 margin-left: 4px;
-padding-top: 0px;
+padding-right: 4px;
+padding-top: 4px;
 }
 
 #PointsLabel {
 background-color: #07AFF8;
+border-right: 0;
 border-top: 1px solid #07AFF8;
 color: #001450;
 font-size: 8pt;
 font-weight: 400;
 height: 10px;
-padding-bottom: 0px;
-padding-top: 0px;
+margin-left: -4px;
+padding-left: 10px;
+padding-bottom: 4px;
+padding-top: 4px;
 }
 
 

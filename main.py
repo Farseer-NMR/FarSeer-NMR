@@ -137,14 +137,15 @@ class Settings(QWidget):
         self.layout().addWidget(newWidget)
 
         grid.setAlignment(QtCore.Qt.AlignTop)
-        grid.setSpacing(3)
+        # grid.setSpacing(3)
+        grid.setVerticalSpacing(0)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         from current.default_config import defaults
         # self.variables = None
         self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
-        paths_groupbox_layout.setSpacing(5)
+        paths_groupbox_layout.setSpacing(2)
         paths_group_box.setLayout(paths_groupbox_layout)
 
         self.spectrum_path = LabelledLineEdit(self, "Spectrum Path")
@@ -217,7 +218,7 @@ class Settings(QWidget):
 
         general_groupbox = QGroupBox()
         general_groupbox_layout = QHBoxLayout()
-        general_groupbox_layout.setSpacing(5)
+        general_groupbox_layout.setSpacing(2)
         general_groupbox.setLayout(general_groupbox_layout)
 
         general_groupbox.layout().addWidget(self.has_sidechains_checkbox)
@@ -228,7 +229,7 @@ class Settings(QWidget):
 
         figure_groupbox = QGroupBox()
         figure_groupbox_layout = QHBoxLayout()
-        figure_groupbox_layout.setSpacing(10)
+        figure_groupbox_layout.setSpacing(5)
         figure_groupbox.setLayout(figure_groupbox_layout)
 
         figure_groupbox.layout().addWidget(self.figure_width)
@@ -238,7 +239,7 @@ class Settings(QWidget):
 
 
         grid.layout().addWidget(general_groupbox, 5, 0, 2, 20)
-        grid.layout().addWidget(figure_groupbox, 7, 0, 2, 20)
+        grid.layout().addWidget(figure_groupbox, 7, 0, 2, 12)
 
         # res_evo_groupbox = QGroupBox()
         # res_evo_groupbox_layout = QHBoxLayout()
@@ -256,7 +257,7 @@ class Settings(QWidget):
 
         fasta_groupbox.layout().addWidget(self.apply_fasta_checkbox)
         fasta_groupbox.layout().addWidget(self.fasta_start)
-        grid.layout().addWidget(fasta_groupbox, 9, 14, 2, 6)
+        grid.layout().addWidget(fasta_groupbox, 7, 12, 2, 8)
 
 
 
@@ -283,7 +284,7 @@ class Settings(QWidget):
         cs_groupbox.layout().addWidget(self.csp_exceptions)
 
 
-        grid.layout().addWidget(cs_groupbox, 9, 0, 2, 14)
+        grid.layout().addWidget(cs_groupbox, 9, 0, 2, 20)
 
         self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
         self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
@@ -327,11 +328,11 @@ class Settings(QWidget):
         plot_height_group_box.setLayout(plot_height_layout)
         plot_volume_group_box.setLayout(plot_volume_layout)
 
-        plot_F1_layout.setSpacing(5)
-        plot_F2_layout.setSpacing(5)
-        plot_csp_layout.setSpacing(5)
-        plot_height_layout.setSpacing(5)
-        plot_volume_layout.setSpacing(5)
+        plot_F1_layout.setSpacing(2)
+        plot_F2_layout.setSpacing(2)
+        plot_csp_layout.setSpacing(2)
+        plot_height_layout.setSpacing(2)
+        plot_volume_layout.setSpacing(2)
 
 
         plot_F1_group_box.layout().addWidget(self.plot_F1_data)
@@ -566,7 +567,7 @@ class Interface(QWidget):
         self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
-        # grid2.setHorizontalSpacing(0)
+        grid2.setHorizontalSpacing(0)
         grid.setAlignment(QtCore.Qt.AlignTop)
         grid.setAlignment(QtCore.Qt.AlignLeft)
         self.setLayout(grid)
@@ -600,6 +601,8 @@ class Interface(QWidget):
         widget4.setLayout(widget4_layout)
         widget4.layout().addWidget(self.sideBar)
         self.h_splitter.addWidget(widget4)
+        widget4.setObjectName("Widget4")
+        widget4.layout().setAlignment(QtCore.Qt.AlignTop)
 
         self.layout().addWidget(self.h_splitter)
 
@@ -630,6 +633,8 @@ class Interface(QWidget):
         self.z_combobox.setMaximum(10)
         self.y_combobox.setMaximum(10)
         self.x_combobox.setMaximum(10)
+
+
         self.sideBar.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
 
         self.widget3.layout().addWidget(self.widget2, 0, 0, 1, 2)
@@ -669,6 +674,7 @@ class Interface(QWidget):
             valuesDict[dim] = valuesDict[dim][:value]
         for x in range(value):
             text_box = ValueField(self, x, dim, valuesDict)
+            text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             # text_box.setFixedWidth(50)
             text_box.setText(str(valuesDict[dim][x]))
             layout.addWidget(text_box, row, x+3, 1, 1)

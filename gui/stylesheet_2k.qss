@@ -131,8 +131,9 @@ QTreeWidget {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 background-color: #08F2EE;
-border: 8px solid #FAFAF7;
 margin-right: 16px;
+border: 8px solid #FAFAF7;
+
 }
 
 QTreeWidget::branch::selected {
@@ -194,7 +195,6 @@ border: 8px solid #FAFAF7;
 margin-top: 1px;
 margin-left: 9px;
 margin-right: 1px;
-
 }
 
 #AxesLabel {
@@ -208,6 +208,7 @@ padding-bottom: 6px;
 margin-left: 8px;
 padding-top: 8px;
 }
+
 #PointsLabel {
 background-color: #07AFF8;
 border-top: 1px solid #07AFF8;
@@ -218,6 +219,7 @@ height: 26px;
 padding-bottom: 6px;
 padding-top: 8px;
 }
+
 
 QCheckBox {
 color: #FAFAF7;
@@ -232,16 +234,22 @@ background-color: #001450;
 }
 
 
+QCheckBox {
+margin-left: 18px;
+}
+
 QDialog {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 background-color: #08F2EE;
 }
 
-SideBar {
-margin-top: 10px;
-}
 
 QSplitter {
 padding-left: 12px;
 }
+
+QCheckBox::indicator::checked {
+    background-color: #000000;
+}
+
