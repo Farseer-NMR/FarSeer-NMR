@@ -45,13 +45,9 @@ valuesDict = {
 
 peakLists = {}
 
-
-
-
-
 class TabWidget(QTabWidget):
 
-    def __init__(self, app_dims):
+    def __init__(self, app_dims, gui_settings):
         QTabWidget.__init__(self, parent=None)
         self.tab1 = QWidget()
         self.tab2 = QWidget()
@@ -59,8 +55,8 @@ class TabWidget(QTabWidget):
         self.tab2.setLayout(QGridLayout())
         self.tab3 = QWidget()
 
-        self.tab1.layout().addWidget(Settings())
-        self.tab2.layout().addWidget(Interface())
+        self.tab1.layout().addWidget(Settings(gui_settings=gui_settings))
+        self.tab2.layout().addWidget(Interface(gui_settings=gui_settings))
 
 
         self.addTab(self.tab2, "PeakList Selection")
@@ -92,7 +88,7 @@ class TabWidget(QTabWidget):
         self.tablogo.setPixmap(pixmap)
         self.tablogo.setContentsMargins(9, 0, 0, 6)
         self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
-        self.setFixedSize(app_dims)
+        self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
 
     def load_config(self):
@@ -129,12 +125,12 @@ class TabWidget(QTabWidget):
 
 
 class Settings(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, gui_settings=None):
         QWidget.__init__(self, parent=parent)
         grid = QGridLayout()
         grid2 = QGridLayout()
         self.setLayout(grid2)
-
+        self.gui_settings = gui_settings
         newWidget = QWidget(self)
         newWidget.setObjectName("SettingsWidget")
         newWidget.setLayout(grid)
@@ -221,7 +217,7 @@ class Settings(QWidget):
 
         general_groupbox = QGroupBox()
         general_groupbox_layout = QHBoxLayout()
-        general_groupbox_layout.setSpacing(10)
+        general_groupbox_layout.setSpacing(5)
         general_groupbox.setLayout(general_groupbox_layout)
 
         general_groupbox.layout().addWidget(self.has_sidechains_checkbox)
@@ -559,14 +555,14 @@ class Settings(QWidget):
 
 class Interface(QWidget):
  
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, gui_settings=None):
         QWidget.__init__(self, parent=parent)
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
-
+        self.gui_settings = gui_settings
 
     def initUI(self):
-        self.peakListArea = PeakListArea(self, valuesDict=valuesDict)
+        self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
         grid2.setHorizontalSpacing(0)
@@ -589,11 +585,12 @@ class Interface(QWidget):
         widget3_layout = QGridLayout()
         self.widget3.setLayout(widget3_layout)
 
-        self.sideBar = SideBar(self, peakLists)
+        self.sideBar = SideBar(self, peakLists, gui_settings=gui_settings)
         self.h_splitter = QSplitter(QtCore.Qt.Horizontal)
         self.h_splitter.addWidget(self.sideBar)
 
         self.layout().addWidget(self.h_splitter)
+        self.setStyleSheet('margin-top: 0px;')
 
         num_points_label = QLabel("Number of Points", self)
         num_points_label.setObjectName("PointsLabel")
@@ -632,7 +629,9 @@ class Interface(QWidget):
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.h_splitter.addWidget(self.widget3)
-        self.widget2.setFixedWidth(1264)
+        # self.widget2.setFixedWidth(1264)
+        self.widget2.setFixedWidth(gui_settings['interface_top_width'])
+        self.widget2.setFixedHeight(gui_settings['interface_top_height'])
 
 
 
@@ -660,11 +659,11 @@ class Interface(QWidget):
 
 class Main(QWidget):
 
-    def __init__(self, parent=None, **kw):
+    def __init__(self, parent=None, gui_settings=None, **kw):
         QWidget.__init__(self, parent=parent)
-
-        tabWidget = TabWidget(app_dims)
-        footer = Footer(self)
+        print(gui_settings)
+        tabWidget = TabWidget(app_dims, gui_settings)
+        footer = Footer(self, gui_settings=gui_settings)
 
         layout = QVBoxLayout(self)
         self.setLayout(layout)
@@ -688,17 +687,25 @@ if __name__ == '__main__':
     splash.show()
 
     screen_resolution = app.desktop().screenGeometry()
+
+    from gui import gui_utils
+    gui_settings = gui_utils.deliver_settings(screen_resolution)
+
+
     if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
         app_dims = screen_resolution.size()
+        stylesheet = open('C:\\Users\simon\PycharmProjects\\farseer\gui\stylesheet_720p.qss').read()
+        print('720p')
     # elif (screen_resolution.height(), screen_resolution.width()) == (1440, 2560):
     #     app_dims = QtCore.QSize(1800, 850)
     else:
         app_dims = QtCore.QSize(1600, 1000)
-    ex = Main()
+        stylesheet = open('C:\\Users\simon\PycharmProjects\\farseer\gui\stylesheet_2k.qss').read()
+    ex = Main(gui_settings=gui_settings)
     splash.finish(ex)
     fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'
     font_id = QtGui.QFontDatabase.addApplicationFont(fin)
-    stylesheet = open('gui/stylesheet.qss').read()
+
     app.setStyleSheet(stylesheet)
 
     ex.show()

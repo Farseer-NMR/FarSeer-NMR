@@ -4,7 +4,7 @@ from parsing import read_peaklist
 
 
 class SideBar(QTreeWidget):
-    def __init__(self, parent=None, peakLists=None):
+    def __init__(self, parent=None, peakLists=None, gui_settings=None):
         QTreeWidget.__init__(self, parent)
         self.header().hide()
         self.setDragEnabled(True)
@@ -13,7 +13,8 @@ class SideBar(QTreeWidget):
         self.acceptDrops()
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
-        self.setFixedHeight(887)
+
+        self.setFixedHeight(gui_settings['sideBar_height'])
         self.addLists()
         self.peakLists = peakLists
 
