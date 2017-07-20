@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView,
 from PyQt5 import QtCore, QtGui
 import pickle
 
-width = 1200
-height = 660
+width = 600
+# height = 660
 
 import math
 
@@ -13,6 +13,7 @@ class PeakListArea(QWidget):
         QWidget.__init__(self, parent)
         # self.setStyleSheet("")
         self.scene = QGraphicsScene(self)
+        height = gui_settings['peaklistarea_height']
         self.scrollContents = QGraphicsView(self.scene, self)
         self.scrollContents.setRenderHint(QtGui.QPainter.Antialiasing)
         self.scene.setSceneRect(0, 0, width, height)
@@ -20,7 +21,7 @@ class PeakListArea(QWidget):
         self.setLayout(layout)
         self.layout().addWidget(self.scrollContents)
         # self.scrollContents.setMaximumSize(1100, height)
-        self.scrollContents.setMinimumSize(920, height)
+        self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
 
         self.valuesDict = valuesDict

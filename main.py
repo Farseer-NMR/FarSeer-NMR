@@ -4,7 +4,7 @@ import json
 import os
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
-    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QToolButton, QSizePolicy, QSplashScreen, QSpacerItem
+    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem
 
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
@@ -112,7 +112,7 @@ class TabWidget(QTabWidget):
         # spectrum_dir = os.getcwd()
         create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
         self.write_fsuv(spectrum_path)
-        from current06.farseermain import read_user_variables, run_farseer
+        from current.farseermain import read_user_variables, run_farseer
         fsuv, cwd = read_user_variables(spectrum_path)
         run_farseer('{}/spectra'.format(cwd), fsuv)
 
@@ -141,7 +141,7 @@ class Settings(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         from current.default_config import defaults
         # self.variables = None
-        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current06', 'blank_config.json'), 'r'))
+        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QVBoxLayout()
         paths_groupbox_layout.setSpacing(5)
@@ -560,12 +560,13 @@ class Interface(QWidget):
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
         self.gui_settings = gui_settings
+        # self.setStyleSheet('.QWidget { border: 1px solid red; margin-top: 0;}')
 
     def initUI(self):
         self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
-        grid2.setHorizontalSpacing(0)
+        # grid2.setHorizontalSpacing(0)
         grid.setAlignment(QtCore.Qt.AlignTop)
         grid.setAlignment(QtCore.Qt.AlignLeft)
         self.setLayout(grid)
@@ -574,28 +575,38 @@ class Interface(QWidget):
         self.widget2.setLayout(grid2)
         axes_label = QLabel(" Axes    ", self)
         axes_label.setObjectName("AxesLabel")
-        self.x_checkbox = LabelledCheckbox(self, " x")
-        self.y_checkbox = LabelledCheckbox(self, " y")
-        self.z_checkbox = LabelledCheckbox(self, " z")
-        self.widget2.layout().addWidget(axes_label, 0, 0, 1, 1)
-        self.widget2.layout().addWidget(self.x_checkbox, 3, 0)
-        self.widget2.layout().addWidget(self.y_checkbox, 2, 0)
-        self.widget2.layout().addWidget(self.z_checkbox, 1, 0)
+        self.x_checkbox = QCheckBox(self)
+        self.y_checkbox = QCheckBox(self)
+        self.z_checkbox = QCheckBox(self)
+        self.x_label = QLabel("x", self)
+        self.y_label = QLabel("y", self)
+        self.z_label = QLabel("z", self)
+        self.widget2.layout().addWidget(axes_label, 0, 0, 1, 2)
+        self.widget2.layout().addWidget(self.x_checkbox, 3, 0, 1, 1)
+        self.widget2.layout().addWidget(self.y_checkbox, 2, 0, 1, 1)
+        self.widget2.layout().addWidget(self.z_checkbox, 1, 0, 1, 1)
+        self.widget2.layout().addWidget(self.x_label, 3, 1, 1, 1)
+        self.widget2.layout().addWidget(self.y_label, 2, 1, 1, 1)
+        self.widget2.layout().addWidget(self.z_label, 1, 1, 1, 1)
         self.widget3 = QWidget(self)
         widget3_layout = QGridLayout()
+
         self.widget3.setLayout(widget3_layout)
 
         self.sideBar = SideBar(self, peakLists, gui_settings=gui_settings)
         self.h_splitter = QSplitter(QtCore.Qt.Horizontal)
-        self.h_splitter.addWidget(self.sideBar)
+        widget4 = QWidget()
+        widget4_layout = QGridLayout()
+        widget4.setLayout(widget4_layout)
+        widget4.layout().addWidget(self.sideBar)
+        self.h_splitter.addWidget(widget4)
 
         self.layout().addWidget(self.h_splitter)
-        self.setStyleSheet('margin-top: 0px;')
 
         num_points_label = QLabel("Number of Points", self)
         num_points_label.setObjectName("PointsLabel")
-        num_points_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        grid2.layout().addWidget(num_points_label, 0, 1, 1, 12)
+        num_points_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        grid2.layout().addWidget(num_points_label, 0, 2, 1, 12)
 
 
         self.z_combobox = QSpinBox(self)
@@ -606,13 +617,19 @@ class Interface(QWidget):
         self.y_combobox.valueChanged.connect(partial(self.update_condition_boxes, 2, 'y'))
         self.z_combobox.valueChanged.connect(partial(self.update_condition_boxes, 1, 'z'))
 
-        grid2.layout().addWidget(self.x_combobox, 3, 1, 1, 1)
-        grid2.layout().addWidget(self.y_combobox, 2, 1, 1, 1)
-        grid2.layout().addWidget(self.z_combobox, 1, 1, 1, 1)
+        grid2.layout().addWidget(self.x_combobox, 3, 2, 1, 1)
+        grid2.layout().addWidget(self.y_combobox, 2, 2, 1, 1)
+        grid2.layout().addWidget(self.z_combobox, 1, 2, 1, 1)
 
         self.z_combobox.setValue(1)
         self.y_combobox.setValue(1)
         self.x_combobox.setValue(1)
+        self.z_combobox.setMinimum(1)
+        self.y_combobox.setMinimum(1)
+        self.x_combobox.setMinimum(1)
+        self.z_combobox.setMaximum(10)
+        self.y_combobox.setMaximum(10)
+        self.x_combobox.setMaximum(10)
         self.sideBar.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
 
         self.widget3.layout().addWidget(self.widget2, 0, 0, 1, 2)
@@ -621,7 +638,7 @@ class Interface(QWidget):
 
         self.showTreeButton.setObjectName("TreeButton")
 
-        self.widget2.layout().addWidget(self.showTreeButton, 4, 1, 1, 12)
+        self.widget2.layout().addWidget(self.showTreeButton, 4, 2, 1, 12)
         self.peakListArea.setObjectName("PeakListArea")
 
         self.showTreeButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
@@ -640,7 +657,7 @@ class Interface(QWidget):
         self.x, self.y, self.z = self.x_combobox.value(), self.y_combobox.value(), self.z_combobox.value()
         layout = self.widget2.layout()
         colCount = layout.columnCount()
-        for m in range(2, colCount):
+        for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
             if item:
                 if item.widget():
@@ -654,7 +671,7 @@ class Interface(QWidget):
             text_box = ValueField(self, x, dim, valuesDict)
             # text_box.setFixedWidth(50)
             text_box.setText(str(valuesDict[dim][x]))
-            layout.addWidget(text_box, row, x+2, 1, 1)
+            layout.addWidget(text_box, row, x+3, 1, 1)
 
 
 class Main(QWidget):
@@ -692,15 +709,15 @@ if __name__ == '__main__':
     gui_settings = gui_utils.deliver_settings(screen_resolution)
 
 
-    if (screen_resolution.height(), screen_resolution.width()) == (768, 1366):
+    if (screen_resolution.height(), screen_resolution.width()) == (720, 1280):
         app_dims = screen_resolution.size()
-        stylesheet = open('C:\\Users\simon\PycharmProjects\\farseer\gui\stylesheet_720p.qss').read()
+        stylesheet = open('gui/stylesheet_720p.qss').read()
         print('720p')
     # elif (screen_resolution.height(), screen_resolution.width()) == (1440, 2560):
     #     app_dims = QtCore.QSize(1800, 850)
     else:
         app_dims = QtCore.QSize(1600, 1000)
-        stylesheet = open('C:\\Users\simon\PycharmProjects\\farseer\gui\stylesheet_2k.qss').read()
+        stylesheet = open('gui/stylesheet_2k.qss').read()
     ex = Main(gui_settings=gui_settings)
     splash.finish(ex)
     fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'

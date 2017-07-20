@@ -1,8 +1,7 @@
 * {
 font-family: "Sinkin Sans";
 font-weight: normal;
-font-size: 10pt;
-
+font-size: 8pt;
 }
 
 QWidget#MainWidget {
@@ -19,11 +18,9 @@ margin-right: 16px;
 margin-top: 0px;
 }
 
-
 QTabWidget::tab-bar {
 alignment: bottom;
 }
-
 
 QTabBar::tab {
 background-color: #001450;
@@ -47,11 +44,9 @@ border-bottom: 4px solid #FBFB04;
 color: #1FE80C;
 }
 
-
 QTabWidget > QWidget > QWidget {
 background-image: url(:/bg-gradient-1k.png);
 }
-
 
 QToolButton {
 background-color: #001450;
@@ -60,16 +55,15 @@ height: 51px;
 width: 51px;
 }
 
-
 QLineEdit {
 background-color: #08F2EE;
-border: 2px solid #058BD2;
+border: 1px solid #058BD2;
 color: #012C6E;
-font-size: 10pt;
+font-size: 8pt;
 height: 18px;
 margin-right: 16px;
-padding-left: 6px;
-width: 80px;
+padding-left: 3px;
+width: 40px;
 }
 
 QLineEdit::hover {
@@ -81,12 +75,15 @@ QLabel {
 color: #FAFAF7;
 }
 
+QCheckBox {
+margin-left: 9px;
+}
 
 QComboBox {
 background-color: #08F2EE;
 border: 2px solid #058BD2;
 color: #012C6E;
-font-size: 10pt;
+font-size: 8pt;
 height: 24px;
 /*    margin-right: 16px;*/
 padding-left: 6px;
@@ -107,7 +104,7 @@ QAbstractSpinBox {
 background-color: #08F2EE;
 border: 2px solid #058BD2;
 color: #012C6E;
-font-size: 10pt;
+font-size: 8pt;
 height: 18px;
 margin-right: 16px;
 padding-left: 6px;
@@ -118,7 +115,6 @@ QPushButton {
 background-color: #08F2EE;
 border: 2px solid #FAFAF7;
 color: #012C6E;
-font-size: 10pt;
 font-weight: 400;
 height: 18px;
 }
@@ -142,7 +138,6 @@ border: 0;
 color: #001450;
 }
 
-
 QTreeWidget::item {
 color:  #FAFAF7;
 font-size: 10pt;
@@ -151,7 +146,6 @@ padding: 16px;
 selection-background-color: #AAD1F1;
 selection-color: #001450;
 }
-
 
 QTreeWidget::item::hover {
 color:  #FBFB04;
@@ -175,7 +169,6 @@ font-weight: 400;
 }
 
 #TreeButton {
-
 margin-right: 16px;
 margin-bottom: 8px;
 }
@@ -192,49 +185,39 @@ background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 background-color: #08F2EE;
 border: 4px solid #FAFAF7;
-margin-top: 1px;
+margin-top: 5px;
 margin-left: 9px;
-margin-right: 1px;
-
+margin-right: 5px;
 }
 
 #AxesLabel {
 background-color: #07AFF8;
 border-top: 1px solid #07AFF8;
 color: #001450;
-font-size: 10pt;
+font-size: 8pt;
 font-weight: 400;
-height: 18px;
-padding-bottom: 3px;
-margin-left: 8px;
-padding-top: 4px;
+height: 10px;
+padding-bottom: 0px;
+margin-left: 4px;
+padding-top: 0px;
 }
+
 #PointsLabel {
 background-color: #07AFF8;
 border-top: 1px solid #07AFF8;
 color: #001450;
-font-size: 10pt;
+font-size: 8pt;
 font-weight: 400;
-height: 18px;
-padding-bottom: 3px;
-padding-top: 4px;
+height: 10px;
+padding-bottom: 0px;
+padding-top: 0px;
 }
 
 
-
-QCheckBox {
-color: #FAFAF7;
-font-size: 10pt;
-font-weight: 400;
-margin-left: 4px;
-margin-right: 2px;
-height: 18px;
-}
 
 QTabWidget > QLabel {
 background-color: #001450;
 }
-
 
 QDialog {
 background-image: url(:/gradient-box-bg);
@@ -243,9 +226,13 @@ background-color: #08F2EE;
 }
 
 SideBar {
-margin-top: 10px;
+margin-top: 0px;
 }
 
-QSplitter {
-padding-left: 12px;
+.QSplitter {
+padding-left: 5px;
+}
+
+.QGroupBox {
+margin: 2px;
 }
