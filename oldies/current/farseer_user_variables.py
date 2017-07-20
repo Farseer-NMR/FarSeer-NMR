@@ -1,7 +1,7 @@
-
+import sys
 ### Paths to somewhere:
-
-logfile_name = 'farseer_log.md' #  the name of the log file
+spectra_path = sys.argv[1]  # where spectra peaklists .csv files are stored - relative path
+logfile_name = 'file.log' #  the name of the log file
 ####################################
 
 ### Input Data Setup
@@ -15,26 +15,26 @@ has_sidechains = False  # Are there sidechain entries in the peaklists?
 use_sidechains = False  # Do you want to analyse those sidechains?
 #
 expand_lost_yy = False  # Considers lost residue over yy references and xx reference
-expand_lost_zz = True  # Considers lost residue over zz references and xx reference
+expand_lost_zz = False  # Considers lost residue over zz references and xx reference
 ####################################
 
 ### Calculations Setup
 do_cond1 = True  # Analyse data in the first titration condition (dimension)
 do_cond2 = False  # Analyse data in the second titration condition (dimension)
-do_cond3 = True  # Analyse data in the thrid titration condition (dimension)
+do_cond3 = False  # Analyse data in the thrid titration condition (dimension)
 #
-perform_comparisons = True  # Compares data obtained for condition experiment.
+perform_comparisons = False  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
 cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
 #
-perform_resevo_fit = False  # Fit parameter evolution over titration experiment
+perform_resevo_fit = True  # Fit parameter evolution over titration experiment
 #
-titration_x_values = [0, 125, 250, 500, 1000, 2000, 4000] # values for the x axis in the fitting procedure (ex. Ligand concentration)
+titration_x_values = [0, 125, 250, 500, 1000, 2000, 2500] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 #
 ## Perform PRE analysis
-apply_PRE_analysis = True
+apply_PRE_analysis = False
 apply_smooth=True
 gaussian_stddev=1
 gauss_x_size=7
@@ -50,20 +50,19 @@ tag_ls='-'
 #
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
-# Restraints to Plot:
-calcs_PosF1_delta = False # Plot nuclei 1 shift perturbation data
-calcs_PosF2_delta = False # Plot nuclei 2 shift perturbation data
-calcs_CSP = False  # Plot combined chemical shift perturbation data
-calcs_Height_ratio = True  # Plot Height ratio data
-calcs_Volume_ratio = False  # Plot Volume ratio data
+# Restrains to Plot:
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
+plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
+plots_CSP = True  # Plot combined chemical shift perturbation data
+plots_Height_ratio = False  # Plot Height ratio data
+plots_Volume_ratio = False  # Plot Volume ratio data
 #
-
+# Ploting Templates
 plots_extended_bar = False  # Represent data in Extended Bar Plot style
 plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
 plots_residue_evolution = False  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
-plots_cs_scatter_flower = False
 #
 # Y Axis Label for each restraint
 yy_label_PosF1_delta = 'ppm'  # y axis label for nuclei 1
@@ -80,8 +79,8 @@ calccol_name_Height_ratio = 'Height_ratio'  # column name for Height Ratio data
 calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 #
 # Y axis scale for each calculated restraint
-yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
-yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
+yy_scale_PosF1_delta = 0.1  # y axis sacle for nuclei 1
+yy_scale_PosF2_delta = 0.25  # y axis scale for nuclei 2
 yy_scale_CSP = 0.3  # y axis sacle for combined chemical shift
 yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
 yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
@@ -105,10 +104,10 @@ tplot_y_label_weight= 'bold'  #y_label font weight: bold, italic, etc...
 tplot_x_ticks_pad=2  # x ticks pad
 tplot_x_ticks_len=2  # length of xticks
 tplot_y_ticks_fn='Arial'  # y-tick font name
-tplot_y_ticks_fs=6  # y-tick font size
-tplot_y_ticks_rot=0 # y-tick rotation
-tplot_y_ticks_pad=1  # y-tick separation
-tplot_y_ticks_weight= 'normal'  #y_label font weight: bold, italic, etc...on
+tplot_y_ticks_fs=5  # y-tick font size
+tplot_y_ticks_rot=0
+tplot_y_ticks_pad=1  # y-tick separati
+tplot_y_ticks_weight= 'normal'  #x_label font weight: bold, italic, etc...on
 tplot_y_ticks_len=2  # length of y ticks
 tplot_y_grid_flag=True  # ON/OFF horizontal grid
 tplot_y_grid_color='lightgrey'  # grid color
@@ -122,19 +121,18 @@ bar_measured_color= 'black'  # bar color for measured peaks
 bar_status_color_flag= True  # applies color to the 'lost' residues
 bar_lost_color= 'red'  # bar color for the lost residues
 bar_unassigned_color= 'lightgrey'  # xticks and shade color for unassigned residues.
-bar_width= 0.8  # bar width
+bar_width= 0.6  # bar width
 bar_alpha= 1  # 0 is full transparency, 1 full opacity
 bar_linewidth= 0  # bar border line width, 0 to desable
 bar_threshold_flag= True  # applies stdev thresold
 bar_threshold_color= 'red'  # threshold color
 bar_threshold_linewidth= 0.5  # threshold line width
 bar_threshold_alpha= 0.8  # threshold transparency
-bar_threshold_zorder=4  # <4 threshold behind bars, >=4 over bars
 bar_mark_fontsize=3  # user defined marks fontsize
 bar_mark_prolines_flag=True  # mark prolines ON/OFF
 bar_mark_prolines_symbol='P'  # symbol to mark prolines
-bar_mark_user_details_flag=False  # mark user details ON/OFF
-bar_color_user_details_flag=False  # color bars according to user detail marks ON/OFF
+bar_mark_user_details_flag=True  # mark user details ON/OFF
+bar_color_user_details_flag=True  # color bars according to user detail marks ON/OFF
 bar_user_marks_dict = {
     'H0': 'H',
     'V0': 'V',
@@ -190,7 +188,7 @@ dpre_osci_width=3  # scale factor for the width of the plot
 dpre_osci_y_label = r'$\Delta$PRE$_(rc-exp)$'
 dpre_osci_y_label_fs=5
 dpre_osci_dpre_ms=2  # DELTA_PRE circle marker size
-dpre_osci_ymax=1.0
+dpre_osci_ymax=0.8
 dpre_osci_dpre_alpha=0.5  # DELTA_PRE alpha
 dpre_osci_smooth_lw=1  # smooted DPRE line width
 dpre_osci_ref_color='black'  # color for the reference data
@@ -238,7 +236,7 @@ res_evo_cols_page = 5  # number of columns of subplots per page
 res_evo_rows_page = 8  # number of rows of subplots per page 
 res_evo_set_x_values=True  # use user defined x values? Necessary for titration fitting.
 res_evo_x_ticks_nbins=5  #adjust number of ticks
-res_evo_x_label='ligand ratio'  # x label
+res_evo_x_label='[RNF125]'  # x label
 res_evo_line_style='-'  # data line style
 res_evo_line_width=1  # data line width
 res_evo_line_color='r'  # data line color
@@ -266,56 +264,32 @@ cs_scatter_markers=['^','>','v','<','s','p','h','8','*','D']  # sequencial marke
 cs_scatter_mk_color=['none']  # marker inside color for shape style - SHOULD BE LIST
 cs_scatter_mk_edgecolors=['black']  # marker edge color for shape style - SHOULD BE LIST
 cs_scatter_mk_lost_color='red'  # color for lost data points - color style
-cs_scatter_hide_lost=False
-#
-cs_scatter_flower_x_label='1H (ppm)'
-cs_scatter_flower_y_label='15N (ppm)'
-cs_scatter_flower_mksize=8  # marker size
-cs_scatter_flower_color_grad=True
-cs_scatter_flower_color_start="#e7e7e7"
-cs_scatter_flower_color_end="#000000"
-cs_scatter_flower_color_list=[]
-cs_scatter_flower_x_label_fn='Arial'  # y label font
-cs_scatter_flower_x_label_fs=10  # x label font size
-cs_scatter_flower_x_label_pad=2  # x label pad
-cs_scatter_flower_x_label_weight='normal'  # x label weight
-cs_scatter_flower_y_label_fn='Arial'  # y label font
-cs_scatter_flower_y_label_fs=10  # y label font size
-cs_scatter_flower_y_label_pad=2  # y label pad
-cs_scatter_flower_y_label_weight='normal'  # y label weight
-cs_scatter_flower_x_ticks_fn='Arial'  # x ticks font
-cs_scatter_flower_x_ticks_fs=8  # x ticks font size
-cs_scatter_flower_x_ticks_pad=1  # x ticks pad
-cs_scatter_flower_x_ticks_weight=1  # x ticks font style
-cs_scatter_flower_x_ticks_rot=0  # ticks label rotation
-cs_scatter_flower_y_ticks_fn='Arial'  # x ticks font
-cs_scatter_flower_y_ticks_fs=8  # x ticks font size
-cs_scatter_flower_y_ticks_pad=1  # x ticks pad
-cs_scatter_flower_y_ticks_weight=1  # x ticks font style
-cs_scatter_flower_y_ticks_rot=0
 #
 ### DELTA PRE Heat Maps
-heat_map_rows = 20  # number of rows
-heat_map_vmin=0.05  # color scale
-heat_map_vmax=1.0  # color scale
-heat_map_x_ticks_fn='Arial'  # x ticks font
-heat_map_x_ticks_fs=4  # x ticks font size
-heat_map_x_ticks_pad=1  # x ticks pad
-heat_map_x_ticks_weight='normal'  # x ticks font weight
-heat_map_x_ticks_rot=0  # x ticks rotation
-heat_map_y_label_fn='Arial'  # y label font
-heat_map_y_label_fs=3  # y label font size
-heat_map_y_label_pad=2  # y label pad
-heat_map_y_label_weight='bold'  # y label font weight
-heat_map_right_margin=0.22  # width of plots, higher is larger
-heat_map_bottom_margin=0.6  # height of plots, higher is shorter
-heat_map_cbar_font_size=4  # font size of color map legend
+heat_map_rows = 20
+heat_map_vmin=0.2
+heat_map_vmax=0.7
+heat_map_x_ticks_fn='Arial'
+heat_map_x_ticks_fs=6
+heat_map_x_ticks_pad=1
+heat_map_x_ticks_weight='normal'
+heat_map_x_ticks_rot=0
+heat_map_y_label_fn='Arial'
+heat_map_y_label_fs=3
+heat_map_y_label_pad=2
+heat_map_y_label_weight='bold'
+heat_map_right_margin=0.2
+heat_map_bottom_margin=0.5
+heat_map_top_margin=0.9
+heat_map_cbar_font_size=4
 ########################################
 
 #
 ### Figure Details
 fig_width = 8.69  # Figure width in inches
 fig_height = 11.69  # Figure height in inches
-fig_file_type = 'png'  # Figure file type
+fig_file_type = 'pdf'  # Figure file type
 fig_dpi = 300  # Figure resolution
 #s
+
+import farseermain

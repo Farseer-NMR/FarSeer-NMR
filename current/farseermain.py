@@ -1,22 +1,566 @@
-import datetime  # used to write the log file
-import shutil
+#  
+import importlib.util
+import sys
 import os
-import numpy as np
+import shutil
+import datetime  # used to write the log file
 import pandas as pd
-#
-import farseer_user_variables as fsuv
-import fslibs.parameters as fspar
-import fslibs.FarseerSet as fsFS
-import fslibs.Titration as fsT
-import fslibs.utils as fsut
+#farseer_user_variables are imported in the if __main__ :
+from current06.fslibs import FarseerSet as fset
+from current06.fslibs import Titration as fst
+from current06.fslibs import Comparisons as fsc
+from current06.fslibs import wet as fsw
 
-def gen_dim_tit_dict(farseer_set, data_hyper_cube, reso_type='Backbone'):
+def read_user_variables(path):
+    """
+    Reads user defined variables from file.
+    """
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+    # IMPORTING FARSEER USER VARIABLES FROM CALCULATION DIR
+    # I placed this here as a draft to make it work for now.
+    # Simon: for sure with the JSON you will make it work differently :-P
+    cwd =  os.path.abspath(path)
+    spec = \
+        importlib.util.spec_from_file_location(\
+                                 "farseer_user_variables",
+                                 "{}/farseer_user_variables.py".format(cwd))
+    #
+    fsuv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fsuv)
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    return fsuv, cwd
+
+def copy_Farseer_version(cwd, file_name='farseer_version',
+                         compress_type='zip'):
+    """MAKES COPY OF THE RUNNING VERSION"""
+    
+    script_wd = os.path.dirname(os.path.realpath(__file__))
+    shutil.make_archive('{}/{}'.format(cwd, file_name),
+                        compress_type,
+                        script_wd)
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    return 
+
+def init_log(logfile_name, mod='a', state='STARTED'):
+    """Starts the log file."""
+    log_title = \
+        '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
+            format(79*'*',
+                   datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"),
+                   state)
+    
+    with open(logfile_name, mod) as logfile:
+        logfile.write(log_title)
+    return
+
+def close_log(farseerset=False, 
+              backbone_titration=False,
+              sidechain_titration=False,
+              backbone_comparison=False,
+              sidechain_comparison=False,
+              logfile_name='farseer.log',
+              mod='a'):
+    
+    def tdictcycle(td):
+        """:td: titration dictionary"""
+        for cond in sorted(td.keys()):
+            # for each point in the corresponding second dimension/condition
+            for dim2_pt in sorted(td[cond].keys()):
+                # for each point in the corresponding first dimension/condition
+                for dim1_pt in sorted(td[cond][dim2_pt].keys()):
+                    
+                    td[cond][dim2_pt][dim1_pt].\
+                        write_log(mod=mod, path=logfile_name)
+        return
+    
+    
+    if farseerset:
+        farseerset.write_log(mod=mod, path=logfile_name)
+    
+    if backbone_titration:
+        tdictcycle(backbone_titration)
+    
+    if sidechain_titration:
+        tdictcycle(sidechain_titration)
+    
+    if backbone_comparison:
+        for cond in sorted(backbone_comparison.keys()):
+            #backbone_comparison[cond].transfer_log()
+            backbone_comparison[cond].write_log(mod=mod, path=logfile_name)
+    
+    if sidechain_comparison:
+        for cond in sorted(sidechain_comparison.keys()):
+            #sidechain_comparison[cond].transfer_log()
+            sidechain_comparison[cond].write_log(mod=mod, path=logfile_name)
+    
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    init_log(logfile_name, state='ENDED')
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    return
+
+def init_params(fsuv):
+    """Reads user defined variables and converts them to 
+    organized dicitonaries or DataFrames.
+    """
+    
+    if fsuv.apply_PRE_analysis \
+        and not(fsuv.do_cond3 \
+                and (fsuv.calcs_Height_ratio or fsuv.calcs_Volume_ratio) \
+                and fsuv.perform_comparisons):
+        #DO
+        fsw.wet1(fsuv.apply_PRE_analysis, fsuv.do_cond3,
+                 fsuv.calcs_Height_ratio, fsuv.calcs_Volume_ratio,
+                 fsuv.perform_comparisons)
+        pass
+    
+    general_variables = {}
+    general_variables['txv'] = sorted(fsuv.titration_x_values)
+    
+    
+    calculated_params = [fsuv.calccol_name_PosF1_delta,
+                     fsuv.calccol_name_PosF2_delta,
+                     fsuv.calccol_name_CSP,
+                     fsuv.calccol_name_Height_ratio,
+                     fsuv.calccol_name_Volume_ratio
+                    ]
+
+
+    param_settings_d = {
+    'plot_param_flag':    [fsuv.calcs_PosF1_delta,
+                           fsuv.calcs_PosF2_delta,
+                           fsuv.calcs_CSP,
+                           fsuv.calcs_Height_ratio,
+                           fsuv.calcs_Volume_ratio],
+                           
+    'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta,
+                           fsuv.yy_label_PosF2_delta,
+                           fsuv.yy_label_CSP,
+                           fsuv.yy_label_Height_ratio,
+                           fsuv.yy_label_Volume_ratio],
+                           
+    'plot_yy_axis_scale': [(-fsuv.yy_scale_PosF1_delta, fsuv.yy_scale_PosF1_delta),
+                           (-fsuv.yy_scale_PosF2_delta, fsuv.yy_scale_PosF2_delta),
+                           (0, fsuv.yy_scale_CSP),
+                           (0, fsuv.yy_scale_Height_ratio),
+                           (0, fsuv.yy_scale_Volume_ratio)]
+                           }
+    
+    # An array of settings that are local for each parameter
+    # the index of this dataframe are the calculated parameters.
+    param_settings = pd.DataFrame(param_settings_d, index=calculated_params)
+    
+    
+    tplot_general_dict = {
+        'subtitle_fn':fsuv.tplot_subtitle_fn,
+        'subtitle_fs':fsuv.tplot_subtitle_fs,
+        'subtitle_pad':fsuv.tplot_subtitle_pad,
+        'subtitle_weight':fsuv.tplot_subtitle_weight,
+        'x_label_fn':fsuv.tplot_x_label_fn,
+        'x_label_fs':fsuv.tplot_x_label_fs,
+        'x_label_pad':fsuv.tplot_x_label_pad,
+        'x_label_weight':fsuv.tplot_x_label_weight,
+        'y_label_fn':fsuv.tplot_y_label_fn,
+        'y_label_fs':fsuv.tplot_y_label_fs,
+        'y_label_pad':fsuv.tplot_y_label_pad,
+        'y_label_weight':fsuv.tplot_y_label_weight,
+        'x_ticks_pad':fsuv.tplot_x_ticks_pad,
+        'x_ticks_len':fsuv.tplot_x_ticks_len,
+        'y_ticks_fn':fsuv.tplot_y_ticks_fn,
+        'y_ticks_fs':fsuv.tplot_y_ticks_fs,
+        'y_ticks_pad':fsuv.tplot_y_ticks_pad,
+        'y_ticks_weight':fsuv.tplot_y_ticks_weight,
+        'y_ticks_rot':fsuv.tplot_y_ticks_rot,
+        'y_ticks_len':fsuv.tplot_y_ticks_len,
+        'y_ticks_nbins':fsuv.yy_scale_nbins,
+        'y_grid_flag':fsuv.tplot_y_grid_flag,
+        'y_grid_color':fsuv.tplot_y_grid_color,
+        'y_grid_linestyle':fsuv.tplot_y_grid_linestyle,
+        'y_grid_linewidth':fsuv.tplot_y_grid_linewidth,
+        'y_grid_alpha':fsuv.tplot_y_grid_alpha,
+        'PRE_flag':fsuv.apply_PRE_analysis,
+        'pre_color':fsuv.pre_color,
+        'pre_lw':fsuv.pre_lw,
+        'tag_color':fsuv.tag_color,
+        'tag_lw':fsuv.tag_lw,
+        'tag_ls':fsuv.tag_ls
+        }
+    
+    bar_plot_general_dict = {
+        'measured_color':fsuv.bar_measured_color,
+        'status_color_flag':fsuv.bar_status_color_flag,
+        'lost_color':fsuv.bar_lost_color,
+        'unassigned_color':fsuv.bar_unassigned_color,
+        'bar_width':fsuv.bar_width,
+        'bar_alpha':fsuv.bar_alpha,
+        'bar_linewidth':fsuv.bar_linewidth,
+        'threshold_flag':fsuv.bar_threshold_flag,
+        'threshold_color':fsuv.bar_threshold_color,
+        'threshold_linewidth':fsuv.bar_threshold_linewidth,
+        'threshold_alpha':fsuv.bar_threshold_alpha,
+        'threshold_zorder':fsuv.bar_threshold_zorder,
+        'mark_fontsize':fsuv.bar_mark_fontsize,
+        'mark_prolines_flag':fsuv.bar_mark_prolines_flag,
+        'mark_prolines_symbol':fsuv.bar_mark_prolines_symbol,
+        'mark_user_details_flag':fsuv.bar_mark_user_details_flag,
+        'color_user_details_flag':fsuv.bar_color_user_details_flag,
+        'user_marks_dict':fsuv.bar_user_marks_dict,
+        'user_bar_colors_dict':fsuv.bar_user_bar_colors_dict
+        }
+    
+    bar_ext_par_dict = {
+        'x_ticks_fn':fsuv.ext_bar_x_ticks_fn,
+        'x_ticks_fs':fsuv.ext_bar_x_ticks_fs,
+        'x_ticks_rot':fsuv.ext_bar_x_ticks_rot,
+        'x_ticks_weight':fsuv.ext_bar_x_ticks_weight,
+        'x_ticks_color_flag':fsuv.ext_bar_x_ticks_color_flag
+        }
+    
+    comp_bar_par_dict = {
+        'x_ticks_fn':fsuv.comp_bar_x_ticks_fn,
+        'x_ticks_fs':fsuv.comp_bar_x_ticks_fs,
+        'x_ticks_rot':fsuv.comp_bar_x_ticks_rot,
+        'x_ticks_weight':fsuv.comp_bar_x_ticks_weight,
+        'unassigned_shade':fsuv.comp_bar_unassigned_shade,
+        'unassigned_shade_alpha':fsuv.comp_bar_unassigned_shade_alpha
+        }
+    
+    revo_plot_general_dict = {
+        'subtitle_fn':fsuv.revo_subtitle_fn,
+        'subtitle_fs':fsuv.revo_subtitle_fs,
+        'subtitle_pad':fsuv.revo_subtitle_pad,
+        'subtitle_weight':fsuv.revo_subtitle_weight,
+        'x_label_fn':fsuv.revo_x_label_fn,
+        'x_label_fs':fsuv.revo_x_label_fs,
+        'x_label_pad':fsuv.revo_x_label_pad,
+        'x_label_weight':fsuv.revo_x_label_weight,
+        'y_label_fn':fsuv.revo_y_label_fn,
+        'y_label_fs':fsuv.revo_y_label_fs,
+        'y_label_pad':fsuv.revo_y_label_pad,
+        'y_label_weight':fsuv.revo_y_label_weight,
+        'x_ticks_fn':fsuv.revo_x_ticks_fn,
+        'x_ticks_fs':fsuv.revo_x_ticks_fs,
+        'x_ticks_pad':fsuv.revo_x_ticks_pad,
+        'x_ticks_weight':fsuv.revo_x_ticks_weight,
+        'x_ticks_rot':fsuv.revo_x_ticks_rot,
+        'y_ticks_fn':fsuv.revo_y_ticks_fn,
+        'y_ticks_fs':fsuv.revo_y_ticks_fs,
+        'y_ticks_pad':fsuv.revo_y_ticks_pad,
+        'y_ticks_weight':fsuv.revo_y_ticks_weight,
+        'y_ticks_rot':fsuv.revo_y_ticks_rot,
+        }
+    
+    res_evo_par_dict = {
+        'x_label':fsuv.res_evo_x_label,
+        'set_x_values':fsuv.res_evo_set_x_values,
+        'y_ticks_nbins':fsuv.yy_scale_nbins,
+        'x_ticks_nbins':fsuv.res_evo_x_ticks_nbins,
+        'line_style':fsuv.res_evo_line_style,
+        'line_color':fsuv.res_evo_line_color,
+        'marker_style':fsuv.res_evo_marker_style,
+        'marker_color':fsuv.res_evo_marker_color,
+        'marker_size':fsuv.res_evo_marker_size,
+        'line_width':fsuv.res_evo_line_width,
+        'fill_between':fsuv.res_evo_fill_between,
+        'fill_color':fsuv.res_evo_fill_color,
+        'fill_alpha':fsuv.res_evo_fill_alpha,
+        'fit_perform':fsuv.perform_resevo_fit,
+        'fit_line_color':fsuv.res_evo_fit_line_color,
+        'fit_line_width':fsuv.res_evo_fit_line_width,
+        'fit_line_style':fsuv.res_evo_fit_line_style,
+        'titration_x_values':general_variables['txv']
+        }
+    
+    cs_scatter_par_dict = {
+        'x_label':fsuv.cs_scatter_x_label,
+        'y_label':fsuv.cs_scatter_y_label,
+        'mksize':fsuv.cs_scatter_mksize,
+        'scale':fsuv.cs_scatter_scale,
+        'mk_type':fsuv.cs_scatter_mk_type,
+        'mk_start_color':fsuv.cs_scatter_mk_start_color,
+        'mk_end_color':fsuv.cs_scatter_mk_end_color,
+        'markers':fsuv.cs_scatter_markers,
+        'mk_color':fsuv.cs_scatter_mk_color,
+        'mk_edgecolors':fsuv.cs_scatter_mk_edgecolors,
+        'mk_lost_color':fsuv.cs_scatter_mk_lost_color,
+        'hide_lost':fsuv.cs_scatter_hide_lost
+        }
+    
+    cs_scatter_flower_dict = {
+        'x_label':fsuv.cs_scatter_x_label,
+        'y_label':fsuv.cs_scatter_y_label,
+        'mksize':fsuv.cs_scatter_flower_mksize,
+        'color_grad':fsuv.cs_scatter_flower_color_grad,
+        'mk_start_color':fsuv.cs_scatter_flower_color_start,
+        'mk_end_color':fsuv.cs_scatter_flower_color_end,
+        'color_list':fsuv.cs_scatter_flower_color_list,
+        'x_label_fn':fsuv.cs_scatter_flower_x_label_fn,
+        'x_label_fs':fsuv.cs_scatter_flower_x_label_fs,
+        'x_label_pad':fsuv.cs_scatter_flower_x_label_pad,
+        'x_label_weight':fsuv.cs_scatter_flower_x_label_weight,
+        'y_label_fn':fsuv.cs_scatter_flower_y_label_fn,
+        'y_label_fs':fsuv.cs_scatter_flower_y_label_fs,
+        'y_label_pad':fsuv.cs_scatter_flower_y_label_pad,
+        'y_label_weight':fsuv.cs_scatter_flower_y_label_weight,
+        'x_ticks_fn':fsuv.cs_scatter_flower_x_ticks_fn,
+        'x_ticks_fs':fsuv.cs_scatter_flower_x_ticks_fs,
+        'x_ticks_pad':fsuv.cs_scatter_flower_x_ticks_pad,
+        'x_ticks_weight':fsuv.cs_scatter_flower_x_ticks_weight,
+        'x_ticks_rot':fsuv.cs_scatter_flower_x_ticks_rot,
+        'y_ticks_fn':fsuv.cs_scatter_flower_y_ticks_fn,
+        'y_ticks_fs':fsuv.cs_scatter_flower_y_ticks_fs,
+        'y_ticks_pad':fsuv.cs_scatter_flower_y_ticks_pad,
+        'y_ticks_weight':fsuv.cs_scatter_flower_y_ticks_weight,
+        'y_ticks_rot':fsuv.cs_scatter_flower_y_ticks_rot,
+        'x_max':fsuv.yy_scale_PosF1_delta,
+        'x_min':-fsuv.yy_scale_PosF1_delta,
+        'y_max':fsuv.yy_scale_PosF2_delta,
+        'y_min':-fsuv.yy_scale_PosF2_delta
+        }
+    
+    heat_map_dict = {
+        'vmin':fsuv.heat_map_vmin,
+        'vmax':fsuv.heat_map_vmax,
+        'x_ticks_fn':fsuv.heat_map_x_ticks_fn,
+        'x_ticks_fs':fsuv.heat_map_x_ticks_fs,
+        'x_ticks_pad':fsuv.heat_map_x_ticks_pad,
+        'x_ticks_weight':fsuv.heat_map_x_ticks_weight,
+        'x_ticks_rot':fsuv.heat_map_x_ticks_rot,
+        'y_label_fn':fsuv.heat_map_y_label_fn,
+        'y_label_fs':fsuv.heat_map_y_label_fs,
+        'y_label_pad':fsuv.heat_map_y_label_pad,
+        'y_label_weight':fsuv.heat_map_y_label_weight,
+        'right_margin':fsuv.heat_map_right_margin,
+        'bottom_margin':fsuv.heat_map_bottom_margin,
+        #'top_margin':fsuv.heat_map_top_margin,
+        'cbar_font_size':fsuv.heat_map_cbar_font_size,
+        'tag_color':fsuv.tag_color,
+        'tag_lw':fsuv.tag_lw,
+        'tag_ls':fsuv.tag_ls
+        }
+    
+    delta_osci_dict = {
+        'y_label_fs':fsuv.dpre_osci_y_label_fs,
+        'dpre_ms':fsuv.dpre_osci_dpre_ms,
+        'dpre_alpha':fsuv.dpre_osci_dpre_alpha,
+        'smooth_lw':fsuv.dpre_osci_smooth_lw,
+        'ref_color':fsuv.dpre_osci_ref_color,
+        'color_init':fsuv.dpre_osci_color_init,
+        'color_end':fsuv.dpre_osci_color_end,
+        'x_ticks_fn':fsuv.dpre_osci_x_ticks_fn,
+        'x_ticks_fs':fsuv.dpre_osci_x_ticks_fs,
+        'x_ticks_pad':fsuv.dpre_osci_x_ticks_pad,
+        'x_ticks_weight':fsuv.dpre_osci_x_ticks_weight,
+        'grid_color':fsuv.dpre_osci_grid_color,
+        'shade':fsuv.dpre_osci_shade,
+        'shade_regions':fsuv.dpre_osci_shade_regions,
+        'res_highlight':fsuv.dpre_osci_res_highlight,
+        'res_hl_list':fsuv.dpre_osci_res_hl_list,
+        'res_highlight_fs':fsuv.dpre_osci_rh_fs,
+        'res_highlight_y':fsuv.dpre_osci_rh_y,
+        }
+    
+    general_plot_params = [tplot_general_dict,
+                                   bar_plot_general_dict,
+                                   bar_ext_par_dict,
+                                   comp_bar_par_dict,
+                                   revo_plot_general_dict, 
+                                   res_evo_par_dict,
+                                   cs_scatter_par_dict,
+                                   cs_scatter_flower_dict]
+    
+    pre_plot_params = [heat_map_dict,
+                       delta_osci_dict]
+    
+    
+    return calculated_params, param_settings,\
+           general_plot_params, pre_plot_params, general_variables
+
+def init_farseer(path, has_sidechains=False, FASTAstart=1):
+    '''Initiates the Farseer data set.'''
+    exp = fset.FarseerSet(path,
+                          has_sidechains=has_sidechains,
+                          FASTAstart=FASTAstart)
+    
+    return exp
+
+def reads_input(exp, fsuv):
+    """Loads the tree of peaklists."""
+    
+    exp.load_experiments(target=exp.allpeaklists)
+    
+    if fsuv.applyFASTA:
+        exp.load_experiments(target=exp.allFASTA,
+                                    f=exp.read_FASTA,
+                                    filetype='.fasta')
+    
+    if exp.has_sidechains:
+        # str() is passed as a dummy function
+        exp.load_experiments(target=exp.allsidechains,
+                                    f=str,
+                                    filetype='.csv')
+    return
+
+def inits_conditions(exp):
+    exp.init_conditions()
+    return
+    
+def identify_residues(exp):
+    '''
+    Reads Assignment information and generates split
+    columns with information on residue number, and aminoacid
+    1 and 3 letter code.
+    '''
+    exp.tricicle(exp.zzcoords,
+                 exp.yycoords,
+                 exp.xxcoords,
+                 exp.split_res_info,
+                 title=\
+                    'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN')
+    
+    return
+
+def correct_shifts(exp, res_ref=1, reso_type='Backbone'):
+    
+    if reso_type == 'Backbone':
+        ctitle = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
+        exp.tricicle(exp.zzcoords, 
+                     exp.yycoords, 
+                     exp.xxcoords, 
+                     exp.correct_shifts_backbone,
+                     kwargs={'ref_res':str(res_ref)},
+                     title=ctitle)
+    
+    elif reso_type=='Sidechains':
+        ctitle = \
+            'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
+        exp.tricicle(exp.zzcoords, 
+                     exp.yycoords, 
+                     exp.xxcoords, 
+                     exp.correct_shifts_sidechains,
+                     title=ctitle)
+    return
+
+def fill_na_lost(peak_status):
+    """
+    A dictionary that configures how the fields of the
+    lost residues are fill.
+    """
+    d = {
+    'Peak Status': peak_status,
+    'Merit': 0,
+    'Details': 'None'
+    }
+    return d
+
+def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
+    """
+    Expands lost residues for the reference experiments
+    over the other conditions of the titration.
+    """
+    
+    
+    if dim == 'y':
+        exp.log_t(\
+        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()))
+        # expands to yy (cond2) condition
+        for a in acoords:
+            #do
+            for b in bcoords:
+                #do
+                refscoords = {'z': a, 'y': refcoord}
+                exp.seq_expand(a, b, exp.xxref, 'expanding',
+                               titration_set, 
+                               titration_set,
+                               fill_na_lost('lost'),
+                               refscoords=refscoords)
+    if dim == 'z':
+        exp.log_t(\
+        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()))
+        # expands to yy (cond2) condition
+        for a in acoords:
+            #do
+            for b in bcoords:
+                #do
+                refscoords = {'z': refcoord, 'y': a}
+                exp.seq_expand(b, a, exp.xxref, 'expanding',
+                               titration_set, 
+                               titration_set,
+                               fill_na_lost('lost'),
+                               refscoords=refscoords)
+    
+    
+    return
+
+def add_lost(exp, refdata, targetdata,
+             peak_status='lost',
+             ref='REFERENCE',
+             kwargs={}):
+    """Adds lots residues to the peaklists based on a reference.
+    """
+    
+    ctitle = 'ADDS LOST RESIDUES BASED ON THE {}'.format(ref)
+    
+    exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, exp.seq_expand,
+                 args=[refdata, targetdata, fill_na_lost(peak_status)],
+                 kwargs=kwargs,
+                 title=ctitle)
+    
+    return
+
+def organize_columns(exp, titration_set,
+                     performed_cs_correction=False,
+                     scbool=False):
+    """Organizes the columns order."""
+    ctitle = "ORGANIZING PEAKLIST COLUMNS' ORDER"
+    exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, 
+                 exp.organize_cols,
+                 args=[titration_set],
+                 kwargs={'performed_cs_correction':performed_cs_correction,
+                         'sidechains':scbool},
+                 title=ctitle)
+    
+    return
+
+def init_fs_cube(exp, sidechains=False):
+    """
+    Generates a 5 dimension cube containing all the information
+    of the titration experiment set. The cube is stored
+    as a variable of the FarseerSet class.
+    """
+    exp.init_Farseer_cube(use_sidechains=sidechains)
+    
+    return
+
+def titration_kwargs(fsuv, rt='Backbone', cp=None):
+    """
+    Defines the kwargs dictionary that will be used to generate
+    the Titration class object. The aim of this dictionary
+    is to avoid fst.Titration to import anything from
+    farseer_user_variables.
+    """
+    dd = {'resonance_type':rt,
+          'csp_alpha4res':fsuv.csp_alpha4res,
+          'csp_res_exceptions':fsuv.csp_res_exceptions,
+          'cs_lost':fsuv.cs_lost,
+          'calculated_params':cp}
+    
+    return dd
+
+def gen_titration_dicts(exp, data_hyper_cube,
+                        cond1=False,
+                        cond2=False,
+                        cond3=False,
+                        titration_class=None,
+                        titration_kwargs={}):
     """
     Returns a dictionary containing all the titrations to be analysed.
     
     primary keys: 'cond1', 'cond2', 'cond3'.
     
-    :farseer_set: the FarseerSet object with all the titration data
+    :exp: the FarseerSet object with all the titration data
     :data_hyper_cube: the 5D cube with all the titration data
     :reso_type: default:'Backbone', labels the data according
                 to its resonance of origin (Backbone or Sidechain).
@@ -28,43 +572,60 @@ def gen_dim_tit_dict(farseer_set, data_hyper_cube, reso_type='Backbone'):
     titrations_dict = {}
 
     # creates the titrations for the first condition (1D)
-    if farseer_set.hasxx and fsuv.do_cond1:
+    if exp.hasxx and cond1:
         titrations_dict['cond1'] = \
-            farseer_set.gen_titration_dict(\
-                data_hyper_cube,
-                'cond1', 
-                farseer_set.xxcoords,
-                farseer_set.yycoords,
-                farseer_set.zzcoords,
-                reso_type)
+            exp.gen_titration_dict(\
+                                data_hyper_cube,
+                                'cond1', 
+                                exp.xxcoords,
+                                exp.yycoords,
+                                exp.zzcoords,
+                                titration_class,
+                                titration_kwargs)
     
     # creates the titrations for the second condition (2D)
-    if farseer_set.hasyy and fsuv.do_cond2:
+    if exp.hasyy and cond2:
         titrations_dict['cond2'] = \
-            farseer_set.gen_titration_dict(\
-                data_hyper_cube.transpose(2,0,1,3,4),
-                'cond2',
-                farseer_set.yycoords,
-                farseer_set.zzcoords,
-                farseer_set.xxcoords,
-                reso_type)
+            exp.gen_titration_dict(\
+                                data_hyper_cube.transpose(2,0,1,3,4),
+                                'cond2',
+                                exp.yycoords,
+                                exp.zzcoords,
+                                exp.xxcoords,
+                                titration_class,
+                                titration_kwargs)
 
     # creates the titrations for the third condition (3D)  
-    if farseer_set.haszz and fsuv.do_cond3:
+    if exp.haszz and cond3:
         titrations_dict['cond3'] = \
-            farseer_set.gen_titration_dict(\
-                data_hyper_cube.transpose(1,2,0,3,4),
-                'cond3',
-                farseer_set.zzcoords,
-                farseer_set.xxcoords,
-                farseer_set.yycoords,
-                reso_type)
+            exp.gen_titration_dict(\
+                                data_hyper_cube.transpose(1,2,0,3,4),
+                                'cond3',
+                                exp.zzcoords,
+                                exp.xxcoords,
+                                exp.yycoords,
+                                titration_class,
+                                titration_kwargs)
+    
+    if not(cond1 or cond2 or cond3):
+        exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
+                     exp.exports_parsed_pkls,
+                     title='EXPORTED PARSED PEAKLISTS')
+        exp.log_r(fsw.wet2(cond1, cond2, cond3))
     
     return titrations_dict
 
-def dimension_loop(titration_dict, sidechains=False):
+def eval_titrations(titration_dict,
+                    fsuv,
+                    general_variables,
+                    spectra_path='spectra/',
+                    atomtype='Backbone',
+                    param_settings = [],
+                    general_plot_params = [],
+                    pre_plot_params = []):
     """
-    Executes a standard nested for loop cycle across the three
+    Executes a set of functions for each titration panel
+    navigating throught the nested for loop cycle accross the three
     titration conditions.
     
     :titration_dict: the dictionary containing the information of all
@@ -72,75 +633,140 @@ def dimension_loop(titration_dict, sidechains=False):
     :sidechains: whether the data analysis corresponds to sidechain
                  resonances.
     """
+    
     # for each kind of titration (cond{1,2,3})
     for cond in sorted(titration_dict.keys()):
-        fsut.write_log(fsut.dim_sperator(cond, 'top'))
-        
         # for each point in the corresponding second dimension/condition
+        
         for dim2_pt in sorted(titration_dict[cond].keys()):
-            fsut.write_log(fsut.dim_sperator(dim2_pt, 'midle'))
-            
             # for each point in the corresponding first dimension/condition
             for dim1_pt in sorted(titration_dict[cond][dim2_pt].keys()):
-                fsut.write_log(fsut.dim_sperator(dim1_pt, 'own'))
-                fsut.write_log('\n')  #exception
-                
+                titration_dict[cond][dim2_pt][dim1_pt].log_t('ANALYZING... ')
+                # DO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 # performs the calculations
-                perform_calcs(titration_dict[cond][dim2_pt][dim1_pt])
-            
+                perform_calcs(titration_dict[cond][dim2_pt][dim1_pt],
+                              fsuv)
+                
                 # PERFORMS FITS
-                # *fits are blocked to cond1 titrations
-                if fsuv.perform_resevo_fit \
-                    and titration_dict[cond][dim2_pt][dim1_pt].\
-                        tittype == 'cond1':
-                    # do
-                    if len(fsuv.titration_x_values) != \
-                        titration_dict[cond][dim2_pt][dim1_pt].shape[0]:
-                        raise ValueError(\
-'!!! Values given for x axis in fitting (fitting_x_values) do not match length\
-of cond1 variables.')
-                    else:
-                        perform_fits(\
-                            titration_dict[cond][dim2_pt][dim1_pt])
+                perform_fits(titration_dict[cond][dim2_pt][dim1_pt],
+                             param_settings=param_settings,
+                             txv=general_variables['txv'])
                 
                 # Analysis of PRE data - only in cond3
-                PRE_analysis(titration_dict[cond][dim2_pt][dim1_pt], 
-                             spectra_path=fsuv.spectra_path)
+                PRE_analysis(titration_dict[cond][dim2_pt][dim1_pt],
+                             fsuv,
+                             general_plot_params[0],
+                             *pre_plot_params,
+                             param_settings=param_settings,
+                             spectra_path=spectra_path)
                 
-                # EXPORTS AND PLOTS TITRATION DATA
-                plot_tit_data(titration_dict[cond][dim2_pt][dim1_pt])
+                # EXPORTS FULLY PARSED PEAKLISTS
+                exports_titration(titration_dict[cond][dim2_pt][dim1_pt])
+                
+                # EXPORTS CALCULATIONS
+                exports_data_tables(titration_dict[cond][dim2_pt][dim1_pt],
+                                    param_settings=param_settings, fsuv=fsuv)
+                
+                # PLOTS TITRATION DATA
+                plots_data(titration_dict[cond][dim2_pt][dim1_pt],
+                           fsuv,
+                           *general_plot_params,
+                           param_settings=param_settings,
+                           atomtype=atomtype)
+                
+                #DONE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                
+    return
 
-def perform_calcs(tit_panel):
+def perform_calcs(titration_panel, fsuv):
     """
     Calculates the NMR restraints according to the user specifications.
     """
     # if the user wants to calculate combined Chemical Shift Perturbations
-    if fsuv.plots_CSP:
+    if fsuv.calcs_CSP:
         # calculate differences in chemical shift for each dimension
-        tit_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta, 'Position F1')
-        tit_panel.calc_cs_diffs(fsuv.calccol_name_PosF2_delta, 'Position F2')
+        titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta,
+                                      'Position F1')
+        titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF2_delta,
+                                      'Position F2')
     
         # Calculates CSPs
-        tit_panel.calc_csp(calccol=fsuv.calccol_name_CSP,
-                        pos1=fsuv.calccol_name_PosF1_delta,
-                        pos2=fsuv.calccol_name_PosF2_delta)
+        titration_panel.calc_csp(calccol=fsuv.calccol_name_CSP,
+                                 pos1=fsuv.calccol_name_PosF1_delta,
+                                 pos2=fsuv.calccol_name_PosF2_delta)
     
     # if the user only wants to calculate perturbation in single dimensions
     else:
-        if fsuv.plots_PosF1_delta:
-            tit_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta,
-                                    'Position F1')
-        if fsuv.plots_PosF2_delta:
-            tit_panel.calc_cs_diffs(fsuv.calccol_name_PosF2_delta,
-                                    'Position F2')
+        if fsuv.calcs_PosF1_delta:
+            titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF1_delta,
+                                          'Position F1')
+        if fsuv.calcs_PosF2_delta:
+            titration_panel.calc_cs_diffs(fsuv.calccol_name_PosF2_delta,
+                                          'Position F2')
     
     # Calculates Ratios
-    if fsuv.plots_Height_ratio:
-        tit_panel.calc_ratio(fsuv.calccol_name_Height_ratio, 'Height')
-    if fsuv.plots_Volume_ratio:
-        tit_panel.calc_ratio(fsuv.calccol_name_Volume_ratio, 'Volume')
+    if fsuv.calcs_Height_ratio:
+        titration_panel.calc_ratio(fsuv.calccol_name_Height_ratio, 'Height')
+    if fsuv.calcs_Volume_ratio:
+        titration_panel.calc_ratio(fsuv.calccol_name_Volume_ratio, 'Volume')
     
-def PRE_analysis(tit_panel, spectra_path=None):
+    return
+
+def perform_fits(titration_panel, param_settings=None, txv=[]):
+    """Performs fits for 1H, 15N and CSPs data."""
+    # runs only for CSPs, 1H and 15N.
+    
+    # *fits are allowed only to cond1 titrations
+    if not(fsuv.perform_resevo_fit \
+           and titration_panel.titration_type == 'cond1'):
+        return
+    
+    # sanity check ############################################################
+    try: 
+        if not(all([False for x in txv if x<0])):
+            titration_panel.log_r(fsw.wet6(txv))
+            fsw.end_bad()
+        elif set([(int(x)) for x in titration_panel.items]).\
+            symmetric_difference(txv):
+            #DO
+            titration_panel.log_r(fsw.wet4(txv, titration_panel.items))
+            choice = '.'
+            while not(choice in ['U', 'A']):
+                choice = input('=> type: [U]se cond1 variable \
+names as x values or [A]bort: ').upper()
+            if choice == 'U':
+                txv = [(int(x)) for x in titration_panel.items]
+                
+            elif choice == 'A':
+                titration_panel.log_r(fsw.end_bad())
+    
+    except SystemExit:
+        titration_panel.log_r(fsw.end_bad())
+    
+    except:
+        if len(txv) != len(titration_panel.items):
+            titration_panel.log_r(fsw.wet5(txv, titration_panel.items))
+            titration_panel.log_r(fsw.end_bad())
+        else:
+            titration_panel.log_r(fsw.wet7(txv))
+    
+    ###########################################################################
+    
+    for calculated_parameter in param_settings.index[:3]:
+        
+        if param_settings.loc[calculated_parameter, 'plot_param_flag']:
+            
+            titration_panel.perform_fit(calccol = calculated_parameter,
+                                        x_values=txv)
+    return
+
+def PRE_analysis(titration_panel,
+                 fsuv,
+                 tplot_general_dict,
+                 heat_map_dict,
+                 delta_osci_dict,
+                 param_settings=None,
+                 spectra_path='spectra/'):
     """
     Performs dedicated PRE analysis on the cond3 dimension.
     Data can be represented under the calculations of cond3 or when
@@ -149,43 +775,43 @@ def PRE_analysis(tit_panel, spectra_path=None):
     # if user do not wants PRE analysis, do nothing
     if not(fsuv.apply_PRE_analysis):
         return
-    
     # if analysing cond3: performs calculations.
-    if tit_panel.tittype == 'cond3':
-        tit_panel.load_theoretical_PRE(spectra_path, tit_panel.dim2_pts)
-        for sourcecol, targetcol in zip(fspar.param_settings.index[3:],\
-                                        ['H_DPRE', 'V_DPRE']):
+    if titration_panel.titration_type == 'cond3':
+        titration_panel.load_theoretical_PRE(spectra_path,
+                                             titration_panel.dim2_pts)
+        
+        for sourcecol, targetcol in zip(param_settings.index[3:],\
+                                        ['Hgt_DPRE', 'Vol_DPRE']):
+        
             # only in the parameters allowed by the user
-            if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
-                tit_panel.calc_Delta_PRE(sourcecol, targetcol,
-                                         apply_smooth=fsuv.apply_smooth,
+            if param_settings.loc[sourcecol, 'plot_param_flag']:
+                titration_panel.calc_Delta_PRE(sourcecol, targetcol,
                                          gaussian_stddev=fsuv.gaussian_stddev,
                                          guass_x_size=fsuv.gauss_x_size)
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
     # for cond3 and for comparison C3.
-    if tit_panel.tittype == 'cond3' \
-            or (tit_panel.tittype == 'C3' \
-                and (tit_panel.dim2_pts == 'para'\
-                    or tit_panel.dim1_pts == 'para')):
+    if titration_panel.titration_type == 'cond3' \
+            or (titration_panel.titration_type == 'C3' \
+                and (titration_panel.dim2_pts == 'para'\
+                    or titration_panel.dim1_pts == 'para')):
         
         # do
-        for sourcecol, targetcol in zip(list(fspar.param_settings.index[3:])*2,
-                                        ['H_DPRE',
-                                         'V_DPRE',
-                                         'H_DPRE_smooth',
-                                         'V_DPRE_smooth']):
+        for sourcecol, targetcol in zip(list(param_settings.index[3:])*2,
+                                        ['Hgt_DPRE',
+                                         'Vol_DPRE',
+                                         'Hgt_DPRE_smooth',
+                                         'Vol_DPRE_smooth']):
             
             # only for the parameters allowed by the user
-            if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
+            if param_settings.loc[sourcecol, 'plot_param_flag']:
                 
-                tit_panel.write_table(targetcol)
-                tit_panel.plot_base(targetcol, 'exp', 'heat_map',
-                    fspar.heat_map_dict,
+                titration_panel.plot_base(targetcol, 'exp', 'heat_map',
+                    heat_map_dict,
                     par_ylims=\
-                    fspar.param_settings.loc[sourcecol,'plot_yy_axis_scale'],
+                    param_settings.loc[sourcecol,'plot_yy_axis_scale'],
                     ylabel=\
-                    fspar.param_settings.loc[sourcecol,'plot_yy_axis_label'],
+                    param_settings.loc[sourcecol,'plot_yy_axis_label'],
                     cols_per_page=1,
                     rows_per_page=fsuv.heat_map_rows,
                     fig_height=fsuv.fig_height,
@@ -196,16 +822,16 @@ def PRE_analysis(tit_panel, spectra_path=None):
     # plots the DeltaPRE oscilation analysis only for <C3> comparison.
     # because DeltaPRE oscilation represents the results obtained only
     # for paramagnetic ('para') data.
-    if tit_panel.tittype == 'C3' \
-        and (tit_panel.dim2_pts == 'para' \
-            or tit_panel.dim1_pts == 'para'):
+    if titration_panel.titration_type == 'C3' \
+        and (titration_panel.dim2_pts == 'para' \
+            or titration_panel.dim1_pts == 'para'):
         
         
-        for sourcecol, targetcols in zip(fspar.param_settings.index[3:],
-                                         ['H_DPRE', 'V_DPRE']):
-            if fspar.param_settings.loc[sourcecol, 'plot_param_flag']:
-                tit_panel.plot_base(targetcols, 'exp', 'delta_osci',
-                    {**fspar.tplot_general_dict,**fspar.delta_osci_dict},
+        for sourcecol, targetcols in zip(param_settings.index[3:],
+                                         ['Hgt_DPRE', 'Vol_DPRE']):
+            if param_settings.loc[sourcecol, 'plot_param_flag']:
+                titration_panel.plot_base(targetcols, 'exp', 'delta_osci',
+                    {**tplot_general_dict,**delta_osci_dict},
                     par_ylims=(0,fsuv.dpre_osci_ymax),
                     ylabel=fsuv.dpre_osci_y_label,
                     cols_per_page=1,
@@ -214,48 +840,81 @@ def PRE_analysis(tit_panel, spectra_path=None):
                     fig_width=fsuv.fig_width/fsuv.dpre_osci_width,
                     fig_file_type=fsuv.fig_file_type,
                     fig_dpi=fsuv.fig_dpi)
+    
+    
+    return
 
-def perform_fits(tit_panel):
-    """Performs fits for 1H, 15N and CSPs data."""
-    # runs only for CSPs, 1H and 15N.
-    for calculated_parameter in fspar.param_settings.index[:3]:
-        
-        if fspar.param_settings.loc[calculated_parameter, 'plot_param_flag']:
-            tit_panel.perform_fit(calccol = calculated_parameter,
-                                  x_values=fsuv.titration_x_values)
+def exports_titration(titration_panel):
+    titration_panel.export_titration()
+    return
 
-def plot_tit_data(tit_panel):
+def exports_data_tables(titration_panel,
+                        param_settings=[],
+                        fsuv=None):
+    """Exports tables with calculated parameters."""
+    
+    for calculated_parameter in param_settings.index:
+        # if the user wants to plot this parameter
+        if param_settings.loc[calculated_parameter,'plot_param_flag']:
+            # do export chimera attribute files
+            titration_panel.write_Chimera_attributes(\
+                    calculated_parameter,
+                    resformat=fsuv.chimera_att_select_format)
+    
+    return
+
+def plots_data(titration_panel, fsuv,
+               tplot_general_dict,
+               bar_plot_general_dict,
+               bar_ext_par_dict,
+               comp_bar_par_dict,
+               revo_plot_general_dict,
+               res_evo_par_dict,
+               cs_scatter_par_dict,
+               cs_scatter_flower_dict,
+               param_settings=None,
+               atomtype='Backbone'):
     '''
     This function was written because it serves normal titrations and
     control titrations.
     '''
-    # EXPORTS CALCULATIONS
-    tit_panel.export_titration()
+    # checks if there are any plot flags activated
+    # and if not outputs eh respective message.
+    if not(any([fsuv.plots_extended_bar,
+                fsuv.plots_compacted_bar,
+                fsuv.plots_vertical_bar,
+                fsuv.plots_residue_evolution,
+                fsuv.plots_cs_scatter,
+                fsuv.plots_cs_scatter_flower])):
+        
+        for calculated_parameter in param_settings.index:
+        # if the user wants to plot this parameter
+            if param_settings.loc[calculated_parameter,'plot_param_flag']:
+                titration_panel.write_table(calculated_parameter,
+                                            calculated_parameter,
+                                            atomtype=atomtype)
+        
+        titration_panel.log_r(fsw.wet3())
     
     # PLOTS DATA
-    for calculated_parameter in fspar.param_settings.index:
+    for calculated_parameter in param_settings.index:
         # if the user wants to plot this parameter
-        if fspar.param_settings.loc[calculated_parameter,'plot_param_flag']:
-            # writes titration data table
-            tit_panel.write_table(calculated_parameter)
-            # writes chimera attribute files
-            tit_panel.write_Chimera_attributes(calculated_parameter,
-                                    resformat=fsuv.chimera_att_select_format)
-            
-            if tit_panel.resonance_type == 'Backbone':
-            
+        if param_settings.loc[calculated_parameter,'plot_param_flag']:
+            #input('plooooot {}'.format(titration_panel.resonance_type))
+            if titration_panel.resonance_type == 'Backbone':
+                
                 # Plot Extended Bar Plot
                 if fsuv.plots_extended_bar:
-                    tit_panel.plot_base(
+                    titration_panel.plot_base(
                         calculated_parameter, 'exp', 'bar_extended',
-                        {   **fspar.tplot_general_dict,
-                            **fspar.bar_plot_general_dict,
-                            **fspar.bar_ext_par_dict    },
+                        {   **tplot_general_dict,
+                            **bar_plot_general_dict,
+                            **bar_ext_par_dict},
                         par_ylims=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
                         ylabel=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_label'],
                         hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.ext_bar_cols_page,
@@ -267,14 +926,17 @@ def plot_tit_data(tit_panel):
                 
                 # Plot Compacted Bar Plot
                 if fsuv.plots_compacted_bar:
-                    tit_panel.plot_base(\
+                    
+                    titration_panel.plot_base(\
                         calculated_parameter, 'exp', 'bar_compacted',
-                        {**fspar.tplot_general_dict,**fspar.bar_plot_general_dict,**fspar.comp_bar_par_dict},
+                        {**tplot_general_dict,
+                         **bar_plot_general_dict,
+                         **comp_bar_par_dict},
                         par_ylims=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
                         ylabel=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_label'],
                         hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.comp_bar_cols_page,
@@ -286,15 +948,16 @@ def plot_tit_data(tit_panel):
             
                 # Plot Vertical Bar Plot
                 if fsuv.plots_vertical_bar:
-                    tit_panel.plot_base(
+                    titration_panel.plot_base(
                         calculated_parameter, 'exp', 'bar_vertical',
-                        {   **fspar.tplot_general_dict, **fspar.bar_plot_general_dict,
-                            **fspar.bar_ext_par_dict    },
+                        {**tplot_general_dict,
+                         **bar_plot_general_dict,
+                         **bar_ext_par_dict},
                         par_ylims=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_scale'],
                         ylabel=\
-                        fspar.param_settings.loc[calculated_parameter,
+                        param_settings.loc[calculated_parameter,
                                                  'plot_yy_axis_label'],
                         cols_per_page=fsuv.vert_bar_cols_page,
                         rows_per_page=fsuv.vert_bar_rows_page,
@@ -304,22 +967,24 @@ def plot_tit_data(tit_panel):
                         fig_dpi=fsuv.fig_dpi)
             
             # Sidechain data is represented in a different bar plot
-            elif tit_panel.resonance_type == 'Sidechains'\
-                and fsuv.plots_extended_bar:
+            elif titration_panel.resonance_type == 'Sidechains'\
+                and (fsuv.plots_extended_bar or fsuv.plots_compacted_bar):
                 #do - dedicated single plot for sidechains
-                tit_panel.plot_base(
+                titration_panel.plot_base(
                     calculated_parameter, 'exp', 'bar_extended',
-                    {   **fspar.tplot_general_dict,**fspar.bar_plot_general_dict,
-                        **fspar.bar_ext_par_dict    },
+                    {**tplot_general_dict,
+                     **bar_plot_general_dict,
+                     **bar_ext_par_dict},
                     par_ylims=\
-                    fspar.param_settings.loc[calculated_parameter,
+                    param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_scale'],
                     ylabel=\
-                    fspar.param_settings.loc[calculated_parameter,
+                    param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_label'],
                     hspace=fsuv.tplot_vspace,
                     cols_per_page=fsuv.ext_bar_cols_page,
                     rows_per_page=fsuv.ext_bar_rows_page,
+                    atomtype='Sidechains',
                     fig_height=fsuv.fig_height,
                     fig_width=fsuv.fig_width/2,
                     fig_file_type=fsuv.fig_file_type,
@@ -327,14 +992,14 @@ def plot_tit_data(tit_panel):
             
             # Plots Parameter Evolution Plot
             if fsuv.plots_residue_evolution:
-                tit_panel.plot_base(\
+                titration_panel.plot_base(\
                     calculated_parameter, 'res', 'res_evo',
-                    {**fspar.revo_plot_general_dict,**fspar.res_evo_par_dict},
+                    {**revo_plot_general_dict,**res_evo_par_dict},
                     par_ylims=  
-                    fspar.param_settings.loc[calculated_parameter,
+                    param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_scale'],
                     ylabel=\
-                    fspar.param_settings.loc[calculated_parameter,
+                    param_settings.loc[calculated_parameter,
                                              'plot_yy_axis_label'],
                     cols_per_page=fsuv.res_evo_cols_page,
                     rows_per_page=fsuv.res_evo_rows_page,
@@ -344,309 +1009,306 @@ def plot_tit_data(tit_panel):
                     fig_dpi=fsuv.fig_dpi)
             
     if fsuv.plots_cs_scatter \
-        and (fsuv.plots_PosF1_delta and fsuv.plots_PosF2_delta):
-        tit_panel.plot_base('15N_vs_1H', 'res', 'cs_scatter',
-                            {**fspar.revo_plot_general_dict,**fspar.cs_scatter_par_dict},
+        and ((fsuv.calcs_PosF1_delta and fsuv.calcs_PosF2_delta)\
+            or fsuv.calcs_CSP):
+        titration_panel.plot_base('15N_vs_1H', 'res', 'cs_scatter',
+                            {**revo_plot_general_dict,
+                             **cs_scatter_par_dict},
                             cols_per_page=fsuv.cs_scatter_cols_page,
                             rows_per_page=fsuv.cs_scatter_rows_page,
                             fig_height=fsuv.fig_height,
                             fig_width=fsuv.fig_width,
                             fig_file_type=fsuv.fig_file_type,
                             fig_dpi=fsuv.fig_dpi)
-    else:
-        fsut.write_log('*** Not performing cs_scatter plot. Check plotting flags in farseer_user_variables.py')
+    
+    if fsuv.plots_cs_scatter_flower \
+        and ((fsuv.calcs_PosF1_delta and fsuv.calcs_PosF2_delta)\
+            or fsuv.calcs_CSP):
+        #DO
+        titration_panel.plot_base('15N_vs_1H', 'single', 'cs_scatter_flower',
+                                  {**revo_plot_general_dict,
+                                    **cs_scatter_flower_dict},
+                                  cols_per_page=2,
+                            rows_per_page=3,
+                            fig_height=fsuv.fig_height,
+                            fig_width=fsuv.fig_width,
+                            fig_file_type=fsuv.fig_file_type,
+                            fig_dpi=fsuv.fig_dpi)
+    return
 
-def analyse_comparisons(tit_dict, p5d, reso_type='Backbone'):
+def analyse_comparisons(exp, titration_dict, fsuv,
+                        gpp=[],
+                        ppp=[],
+                        ps=[],
+                        reso_type='Backbone'):
     """Algorythm to perform data comparisons over titration conditions."""
-    # dictionary with titration variable dimension order.
-    # cond 1 has cond2 as next 1st dimension
-    # and cond 3 as next 2nd dimension
-    # etc...
-    tit_dim_keys = {'cond1':['cond2','cond3'],
-                    'cond2':['cond3','cond1'],
-                    'cond3':['cond1','cond2']}
     
-    for dimension in sorted(tit_dict.keys()):
-        fsut.write_log(fsut.dim_sperator(dimension, 'top'))
+    def run_comparative(comp_panel):
+        # EXPORTS FULLY PARSED PEAKLISTS
+        exports_titration(comp_panel)
+    
+        # EXPORTS CALCULATIONS
+        exports_data_tables(comp_panel, param_settings=ps, fsuv=fsuv)
         
-        Farseer_comparisons_hyper_panel = p5d(tit_dict[dimension])
-        # performs comparisons only if there are points to which compare to
-        if len(Farseer_comparisons_hyper_panel.labels) > 1:
+        # performs pre analysis
+        PRE_analysis(comp_panel, fsuv, gpp[0], *ppp, param_settings=ps)
         
-            for dim2_pt in Farseer_comparisons_hyper_panel.items:
-                fsut.write_log(fsut.dim_sperator(dim2_pt, 'midle'))
+        # plots data
+        plots_data(comp_panel, fsuv, *gpp, param_settings=ps)
+        
+        return
+        
+    titration_dim_keys = {'cond1':['cond2','cond3'],
+                          'cond2':['cond3','cond1'],
+                          'cond3':['cond1','cond2']}
+    
+    cp = {} # dictionary stored comparisons over dimensions
+    
+    for dimension in sorted(titration_dict.keys()):
+        # this send, cond1, cond2, cond3 ...
+        c = fsc.Comparisons(titration_dict[dimension].copy(),
+                        selfdim=dimension,
+                        other_dim_keys=titration_dim_keys[dimension],
+                        reso_type=reso_type)
+        
+        # stores comparison in a dictionary
+        cp.setdefault(dimension, c)
+        
+        c.gen_comparison_labels(fst.Titration)
+        
+        #print(c.allClabels)
+        #input('dimension {}'.format(dimension))
+        
+        if c.haslabels:
+            for dim2_pt in sorted(c.allClabels.keys()):
                 
-                for dim1_pt in Farseer_comparisons_hyper_panel.cool:
-                    fsut.write_log(fsut.dim_sperator(dim1_pt, 'own'))
-                    fsut.write_log('\n')
+                for dim1_pt in sorted(c.allClabels[dim2_pt].keys()):
                     
-                    control = fsT.Titration(\
-                        np.array(Farseer_comparisons_hyper_panel.\
-                            loc[dim1_pt,:,dim2_pt,:,:]),
-                        items=Farseer_comparisons_hyper_panel.labels,
-                        minor_axis=Farseer_comparisons_hyper_panel.minor_axis,
-                        major_axis=Farseer_comparisons_hyper_panel.major_axis)
+                    c.allClabels[dim2_pt][dim1_pt].log_t('COMPARING...')
                     
-                    control.create_titration_attributes(
-                                  tittype='C'+ dimension[-1], 
-                                  owndim_pts=\
-                                  Farseer_comparisons_hyper_panel.labels, 
-                                  dim1_pts=dim1_pt, 
-                                  dim2_pts=dim2_pt,
-                                  dim_comparison=tit_dim_keys[dimension][0],
-                                  resonance_type=reso_type)
+                    run_comparative(c.allClabels[dim2_pt][dim1_pt])
                     
-                    # performs pre analysis
-                    PRE_analysis(control)
-                    # plots data
-                    plot_tit_data(control)
-        else:
-            
-            fsut.write_log('*** There are no points to compare with in {}\n'.\
-                format(tit_dim_keys[dimension][0]))
-            
-        if len(Farseer_comparisons_hyper_panel.cool) > 1:
-            
-            for dim2_pt in Farseer_comparisons_hyper_panel.labels:
-                fsut.write_log(fsut.dim_sperator(dim2_pt, 'midle'))
-                for dim1_pt in Farseer_comparisons_hyper_panel.items:
-                    fsut.write_log(fsut.dim_sperator(dim1_pt, 'own'))
-                    
-                    control = fsT.Titration(\
-                        np.array(Farseer_comparisons_hyper_panel.\
-                            loc[:,dim2_pt,dim1_pt,:,:]),
-                        items=Farseer_comparisons_hyper_panel.cool,
-                        minor_axis=Farseer_comparisons_hyper_panel.minor_axis,
-                        major_axis=Farseer_comparisons_hyper_panel.major_axis)
-                                            
-                    control.create_titration_attributes(\
-                        tittype='C'+ dimension[-1],
-                        owndim_pts=Farseer_comparisons_hyper_panel.cool, 
-                        dim1_pts=dim1_pt, 
-                        dim2_pts=dim2_pt,
-                        dim_comparison=tit_dim_keys[dimension][1],
-                        resonance_type=reso_type)
-                    
-                    # performs pre analysis
-                    PRE_analysis(control)
-                    # plots data
-                    plot_tit_data(control)
-        else:
-            
-            fsut.write_log('*** There are no points to compare with in {}\n'.\
-                format(tit_dim_keys[dimension][1]))
+                    c.log += c.allClabels[dim2_pt][dim1_pt].log
+        
+        c.gen_comparison_cool(fst.Titration)
+        
+        if c.hascool:
+            for dim2_pt in sorted(c.allCcool.keys()):
+                
+                for dim1_pt in sorted(c.allCcool[dim2_pt].keys()):
+                    c.allCcool[dim2_pt][dim1_pt].log_t('COMPARING...')
+                    run_comparative(c.allCcool[dim2_pt][dim1_pt])
+                    c.log += c.allCcool[dim2_pt][dim1_pt].log
+        
+    return cp
 
-# Starts Log
-ltitle = fsut.write_title('LOG STARTED', onlytitle=True)
-startlog = "{}{}\n".format(ltitle,
-                           datetime.\
-                            datetime.now().strftime("%Y/%m/%d - %H:%M:%S"))
-fsut.write_log(startlog, mod='w')
-
-# backups code
-cwd = os.getcwd()
-script_wd = os.path.dirname(os.path.realpath(__file__))
-
-fsut.write_log('\n-> Farseer base dictory: {}\n'.format(script_wd))
-fsut.write_log('-> current working directiory: {}\n'.format(cwd))
-
-# creates farseer backup of the version user for the calculations
-shutil.make_archive(cwd+'/farseer_used_version', 'zip', script_wd)
-
-
-# Reads spectra peaklists, .csv files.
-# creates an FarseerSet object
-ttt = fsFS.FarseerSet(fsuv.spectra_path,
-                      has_sidechains=fsuv.has_sidechains,
-                      applyFASTA=fsuv.applyFASTA,
-                      FASTAstart=fsuv.FASTAstart)
-
-# writelog titration coordinates
-str2write = \
-'''{}> xx (1D) :: {} :: {}
-> yy (2D) :: {} :: {}
-> zz (3D) :: {} :: {}
-{}'''.format(fsut.write_title('AXIS :: FOUND :: ALLOWED', onlytitle=True),
-             ttt.hasxx, fsuv.do_cond1,
-             ttt.hasyy, fsuv.do_cond2,
-             ttt.haszz, fsuv.do_cond3,
-             fsut.titlesperator)
-fsut.write_log(str2write)
-
-# Reads Residue information
-fsut.write_title('ADDS Res#, 1-letter, 3-letter code, Peak Status COLUMNS')
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, ttt.split_res_info)
-
-# Corrects chemical shifts based on a specific peak
-# i.e. applies an internal reference
-if fsuv.perform_cs_correction:
-    fsut.write_title('CORRECTS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK')
-    ttt.tricicle(ttt.zzcoords, 
-                 ttt.yycoords, 
-                 ttt.xxcoords, 
-                 ttt.correct_shifts,
-                 kwargs={'ref_res':str(fsuv.cs_correction_res_ref)})
-
-# Identifies lost residues across the titration
-# information to fill 'lost' residues entry
-fillnalost = {
-'Peak Status': 'lost',
-'Merit': 0,
-'Details': 'None'}
-
-## 1st) expands the residue 'lost' information to other dimensions
-# this operation has to be perform prior to identify the lost residues in the
-# same dimension. Normally used for diamagnetic/paramagnetic cases, which
-# are set in zz(cond3) dimension, though it is also possible to use for the
-# yy(cond2) dimension.
-if fsuv.expand_lost_yy or fsuv.expand_lost_zz:
-    fsut.write_title('EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
+def run_farseer(spectra_path, fsuv):
+    """
+    Runs all the standard Farseer algorithm.
+    Function calls here should give all the inputs to the functions.
+    Other functions should not rely on external variables besides those
+    received in parameters.
+    """
     
-    # expands to yy (cond2) condition
+    # Initiates the log
+    init_log(fsuv.logfile_name, mod='w')
+    
+    # reads parameters into dictionaries and DataFrames
+    calculated_params, \
+    param_settings, \
+    general_plot_params, \
+    pre_plot_params, \
+    general_variables = init_params(fsuv)
+    
+    # Initiates Farseer
+    exp = init_farseer(spectra_path,
+                       has_sidechains=fsuv.has_sidechains,
+                       FASTAstart=fsuv.FASTAstart)
+        
+    # reads input
+    reads_input(exp, fsuv)
+    
+    inits_conditions(exp)
+    
+    # identify residues
+    identify_residues(exp)
+    
+    # corrects chemical shifts
+    if fsuv.perform_cs_correction:
+        correct_shifts(exp,
+                       reso_type='Backbone',
+                       res_ref=fsuv.cs_correction_res_ref)
+        
+        if exp.has_sidechains and fsuv.use_sidechains:
+            correct_shifts(exp, reso_type='Sidechains')
+    
+    # expands lost residues to other dimensions
     if fsuv.expand_lost_yy:
-        for z in ttt.zzcoords:
-            fsut.write_log(fsut.dim_sperator(z, 'top'))
-            for y in ttt.yycoords:
-                fsut.write_log(fsut.dim_sperator(y, 'own'))
-                refscoords = {'z': z, 'y': ttt.yyref}
-                ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists, 
-                               ttt.allpeaklists,
-                               fillnalost, refscoords=refscoords)
+        expand_lost(exp,
+                    exp.allpeaklists,
+                    exp.zzcoords,
+                    exp.yycoords,
+                    exp.yyref,
+                    dim='y')
+        
+        if exp.has_sidechains and fsuv.use_sidechains:
+            expand_lost(exp,
+                        exp.allsidechains,
+                        exp.zzcoords,
+                        exp.yycoords,
+                        exp.yyref,
+                        dim='y')
     
-    # expands to zz (cond3) condition
     if fsuv.expand_lost_zz:
-        for y in ttt.yycoords:
-            fsut.write_log(fsut.dim_sperator(y, 'top'))
-            for z in ttt.zzcoords:
-                fsut.write_log(fsut.dim_sperator(z, 'own'))
-                refscoords = {'z': ttt.zzref, 'y': y}
-                ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                               ttt.allpeaklists, 
-                               ttt.allpeaklists,
-                               fillnalost, refscoords=refscoords)
-    
-    # if there are sidechains to be used
-    if ttt.has_sidechains and fsuv.use_sidechains:
-        fsut.write_title('SIDECHAINS: \
-                         EXPANDS LOST RESIDUES TO OTHER CONDITIONS/DIMENSIONS')
+        expand_lost(exp,
+                    exp.allpeaklists,
+                    exp.yycoords,
+                    exp.zzcoords,
+                    exp.zzref,
+                    dim='z')
         
-        if fsuv.expand_lost_yy:
-            for z in ttt.zzcoords:
-                fsut.write_log(fsut.dim_sperator(z, 'top'))
-                for y in ttt.yycoords:
-                    fsut.write_log(fsut.dim_sperator(y, 'own'))
-                    refscoords = {'z': z, 'y': ttt.yyref}
-                    ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains, 
-                                   ttt.allsidechains,
-                                   fillnalost, refscoords=refscoords)
-            
-        if fsuv.expand_lost_zz:
-            for y in ttt.yycoords:
-                fsut.write_log(fsut.dim_sperator(y, 'top'))
-                for z in ttt.zzcoords:
-                    fsut.write_log(fsut.dim_sperator(z, 'own'))
-                    refscoords = {'z': ttt.zzref, 'y': y}
-                    ttt.seq_expand(z, y, ttt.xxref, 'expanding',
-                                   ttt.allsidechains, 
-                                   ttt.allsidechains,
-                                   fillnalost, refscoords=refscoords)
-
-## Identifies lost residues across the titration
-fsut.write_title('ADDS LOST RESIDUES BASED ON THE REFERENCE LIST')
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
-             ttt.seq_expand,
-             [ttt.allpeaklists, ttt.allpeaklists, fillnalost])
-
-## the same for the sidechains if exist
-if ttt.has_sidechains and fsuv.use_sidechains:
-    # Identifies lost residues across the titration
-    fsut.write_title(\
-        'ADDS LOST SIDE CHAIN RESIDUES BASED ON THE REFERENCE LIST')
+        if exp.has_sidechains and fsuv.use_sidechains:
+            expand_lost(exp,
+                        exp.allsidechains,
+                        exp.yycoords,
+                        exp.zzcoords,
+                        exp.zzref,
+                        dim='z')
     
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
-                 ttt.seq_expand,
-                 args=[ttt.allsidechains, ttt.allsidechains, fillnalost])
-
-# Adds unassigned residues to the peaklists based on a FASTA file
-if fsuv.applyFASTA:
-
-    fsut.write_title('ADDS UNASSIGNED RESIDUES BASED ON THE FASTA FILE')
+    ## expands peaklists to lost residues
+    add_lost(exp, exp.allpeaklists, exp.allpeaklists,
+             peak_status='lost',
+             ref='REFERENCE')
+    
+    if exp.has_sidechains and fsuv.use_sidechains:
+        add_lost(exp, exp.allsidechains, exp.allsidechains,
+                       peak_status='lost',
+                       ref='REFERENCE FOR SIDECHAINS',
+                       kwargs={'atomtype':'Sidechain'})
+    
+    # adds fasta
+    if fsuv.applyFASTA:
+        add_lost(exp, exp.allFASTA, exp.allpeaklists,
+                 peak_status='unassigned', ref='FASTA')
+    
+    #organize peaklist columns
+    organize_columns(exp, exp.allpeaklists,
+                     performed_cs_correction=fsuv.perform_cs_correction)
+    
+    if exp.has_sidechains and fsuv.use_sidechains:
+        organize_columns(exp, exp.allsidechains, 
+                         performed_cs_correction=fsuv.perform_cs_correction,
+                         scbool=True)
+    
+    init_fs_cube(exp, sidechains=fsuv.use_sidechains)
+    
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # init the dictionaries,
+    # this is just to ease the call of close_log()
+    Farseer_titration_dict = False
+    Farseer_SD_titrations_dict = False
+    comparison_dict = False
+    comparison_dict_SD =False
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    # initiates a dictionary that contains all the titration to be evaluated
+    # along all the conditions.
+    Farseer_titration_dict = \
+        gen_titration_dicts(\
+            exp,
+            exp.peaklists_p5d,
+            cond1=fsuv.do_cond1,
+            cond2=fsuv.do_cond2,
+            cond3=fsuv.do_cond3,
+            titration_class=fst.Titration,
+            titration_kwargs=\
+                titration_kwargs(fsuv,
+                                 rt='Backbone',
+                                 cp=calculated_params))
+    
+    # evaluates the titrations and plots the data
+    eval_titrations(Farseer_titration_dict,
+                    fsuv,
+                    general_variables,
+                    spectra_path=spectra_path,
+                    param_settings = param_settings,
+                    general_plot_params = general_plot_params,
+                    pre_plot_params = pre_plot_params)
+    
+    if exp.has_sidechains and fsuv.use_sidechains:
+        Farseer_SD_titrations_dict = \
+            gen_titration_dicts(\
+                exp,
+                exp.sidechains_p5d,
+                cond1=fsuv.do_cond1,
+                cond2=fsuv.do_cond2,
+                cond3=fsuv.do_cond3,
+                titration_class=fst.Titration,
+                titration_kwargs=\
+                    titration_kwargs(fsuv,
+                                     rt='Sidechains',
+                                     cp=calculated_params))
         
-    fillnaunassigned = {
-    'Peak Status': 'unassigned',
-    'Merit': 0,
-    'Details': 'None'}
+        
+        eval_titrations(Farseer_SD_titrations_dict,
+                        fsuv,
+                        general_variables,
+                        atomtype='Sidechains',
+                        spectra_path=spectra_path,
+                        param_settings = param_settings,
+                        general_plot_params = general_plot_params,
+                        pre_plot_params = pre_plot_params)
     
+    # Representing the results comparisons
+    if fsuv.perform_comparisons:
+        #fsut.write_title('WRITES TITRATION COMPARISONS')
+        
+        # analyses comparisons.
+        comparison_dict = \
+            analyse_comparisons(exp,
+                                Farseer_titration_dict,
+                                fsuv,
+                                gpp=general_plot_params,
+                                ps=param_settings,
+                                ppp=pre_plot_params,
+                                reso_type='Backbone')
+        
+        if exp.has_sidechains and fsuv.use_sidechains:
+            #fsut.write_title('WRITES TITRATION COMPARISONS FOR SIDECHAINS')
+            comparison_dict_SD = \
+                analyse_comparisons(exp,
+                                    Farseer_SD_titrations_dict,
+                                    fsuv,
+                                    gpp=general_plot_params,
+                                    ps=param_settings,
+                                    ppp=pre_plot_params,
+                                    reso_type='Sidechains')
     
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
-                 ttt.seq_expand,
-                 args=[ttt.allFASTA, ttt.allpeaklists, fillnaunassigned])
-
-# organizes peaklists dataframe columns
-fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER")
-ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
-             ttt.column_organizor,
-             args=[ttt.allpeaklists],
-             kwargs={'performed_cs_correction':fsuv.perform_cs_correction})
-
-## writes the parsed peaklists corresponding to the sidechains information
-if ttt.has_sidechains and fsuv.use_sidechains:
+    # writes all the logs to a txt file.
+    close_log(farseerset=exp, 
+              backbone_titration=Farseer_titration_dict,
+              sidechain_titration=Farseer_SD_titrations_dict,
+              backbone_comparison=comparison_dict,
+              sidechain_comparison=comparison_dict_SD,
+              logfile_name=fsuv.logfile_name,
+              mod='a')
     
-    fsut.write_title("ORGANIZING PEAKLIST COLUMNS' ORDER FOR SIDECHAINS")
-    ttt.tricicle(ttt.zzcoords, ttt.yycoords, ttt.xxcoords, 
-                 ttt.column_organizor, args=[ttt.allsidechains],
-                 kwargs={'sidechains':True})
+    return
 
-# Generates Farseer cube. Which is a pd.Panel of all the peaklists
-# that constitute the Fareer Experiment Set.
-# The cube can be generated now because all the peaklists (pd.DataFrame)
-# in the allpeaklists{} have now the same shape.
-fsut.write_title('Farseer Cube Generated')
-ttt.gen_Farseer_cube(use_sidechains=fsuv.use_sidechains)
-
-
-#### Generates Titrations
-# Farseer_titrations_dict stores the titrations that are to be evaluated.
-# 'cond1' key would store all the titrations that progress in the
-# first dimension
-# aka first condition - usually the concentration range of the ligand.
-#
-# 'cond2' stores titrations in the second dimention,
-# aka progresion along different mutants (default case)
-#
-# 'cond3', stores titrations along the third dimension,
-# aka external conditions, for instance, dia and paramagnetic,
-# temperature, etc...
-fsut.write_title('GENERATING TITRATION DICTIONARIES')
-Farseer_titrations_dict = gen_dim_tit_dict(ttt, ttt.peaklists_p5d)
-
-# Perfors calculations and plots data
-fsut.write_title('PERFORMS CALCULATIONS')
-dimension_loop(Farseer_titrations_dict)
-
-
-if ttt.has_sidechains and fsuv.use_sidechains:
-    fsut.write_title('GENERATING TITRATION DICTIONARIES FOR SIDECHAINS')
-    Farseer_SD_titrations_dict = gen_dim_tit_dict(ttt,
-                                                  ttt.sidechains_p5d,
-                                                  reso_type='Sidechains')
-    fsut.write_title('PERFORMS CALCULATIONS FOR SIDECHAINS')
-    dimension_loop(Farseer_SD_titrations_dict, sidechains=True)
-
-# Representing the results comparisons
-if fsuv.perform_comparisons:
-    fsut.write_title('WRITES TITRATION COMPARISONS')
+if __name__ == '__main__':
     
-    # analyses comparisons.
-    analyse_comparisons(Farseer_titrations_dict, fspar.p5d)
+    fsuv, cwd = read_user_variables(sys.argv[1])
     
-    if ttt.has_sidechains and fsuv.use_sidechains:
-        fsut.write_title('WRITES TITRATION COMPARISONS FOR SIDECHAINS')
-        analyse_comparisons(Farseer_SD_titrations_dict,
-                            fspar.p5d, 
-                            reso_type='Sidechains')
-
-fsut.write_title('LOG ENDED')
-fsut.write_log(datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"))
+    copy_Farseer_version(cwd)
+    
+    # path evaluations now consider the absolute path, always.
+    # in this way the user can run farseer from any folder taking the
+    # input from any other folder.
+    # path should be the folder where the 'spectra/' are stored and NOT the
+    # path to the 'spectra/' folder.
+    # if running from the actual folder, use:
+    # $ python farseer_main.py .
+    
+    run_farseer('{}/spectra'.format(cwd), fsuv)
+    
+    fsw.end_good()
