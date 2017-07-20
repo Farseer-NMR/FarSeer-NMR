@@ -8,7 +8,7 @@ height = 660
 import math
 
 class PeakListArea(QWidget):
-    def __init__(self, parent, valuesDict):
+    def __init__(self, parent, valuesDict, gui_settings):
 
         QWidget.__init__(self, parent)
         # self.setStyleSheet("")

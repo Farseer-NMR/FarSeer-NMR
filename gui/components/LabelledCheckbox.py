@@ -8,7 +8,7 @@ class LabelledCheckbox(QWidget):
         grid = QGridLayout()
         self.setLayout(grid)
         self.checkBox = QCheckBox()
-        self.checkBox.setFixedWidth(20)
+        # self.checkBox.setFixedWidth(20)
 
         label = QLabel(text, self)
 

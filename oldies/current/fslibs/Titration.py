@@ -6,7 +6,11 @@ from math import ceil
 import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
-from current06.fslibs import wet as fsw
+
+import farseer_user_variables as fsuv
+import farseermain as fsm
+import fslibs.parameters as fspar
+import fslibs.utils as fsut
 
 #from matplotlib.colors import colorConverter
 #from math import ceil as mceil
@@ -18,6 +22,7 @@ class Titration(pd.Panel):
     and the progression along Items is the evolution of the titration.
     """
     # how to represent lost values
+    cs_lost = fsuv.cs_lost
     calc_parameters_list = 0
     # folder to store titration calculations
     calc_folder = 'Calculations'  
@@ -32,36 +37,22 @@ class Titration(pd.Panel):
     # dictionary to store dataframes with information on fitting results
     fitdf = {}
     # prepares dictionary that stores alpha values to use in CSPs calculations
-
+    # to correct 15N dimension
+    csp_alpha4res = {key:fsuv.csp_alpha4res for key in 'ARNDCEQGHILKMFPSTWYV'}
+    for k, v in fsuv.csp_res_exceptions.items():
+        csp_alpha4res[k] = v
     
-    def create_titration_attributes(self, titration_type='cond',
+    def create_titration_attributes(self, tittype='cond',
                                           owndim_pts=['foo'],
                                           dim1_pts='bar',
                                           dim2_pts='zoo',
                                           dim_comparison='not applied',
-                                          resonance_type='Backbone',
-                                          csp_alpha4res=0.14,
-                                          csp_res_exceptions={'G':0.2},
-                                          cs_lost='prev',
-                                          calculated_params=['H1_delta',
-                                                             'N15_delta',
-                                                             'CSP',
-                                                             'Height_ratio',
-                                                             'Vol_ratio']):
-                                                                 
+                                          resonance_type='Backbone'):
         # I think I created this function because I couldn't initialise all
         # these parameters with the init()
         
-        self.cs_lost = cs_lost
-        
-        # to correct 15N dimension
-        self.csp_alpha4res = {key:csp_alpha4res \
-                              for key in 'ARNDCEQGHILKMFPSTWYV'}
-        for k, v in csp_res_exceptions.items():
-            self.csp_alpha4res[k] = v
-        
         # variables that store characteristics of the titration.
-        self.titration_type = titration_type
+        self.tittype = tittype
         self.att_dict = owndim_pts
         self.dim1_pts = dim1_pts
         self.dim2_pts = dim2_pts
@@ -69,22 +60,20 @@ class Titration(pd.Panel):
         self.resonance_type = resonance_type
         self.res_info = \
             self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
-        self.calculated_params = calculated_params
-        self.log = ''
         
         # defines the path to store the calculations
         # if stores the result of a calculation
-        if titration_type.startswith('cond'):
+        if tittype.startswith('cond'):
             self.calc_path = '{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                      self.calc_folder,
-                                                     self.titration_type,
+                                                     self.tittype,
                                                      self.dim2_pts,
                                                      self.dim1_pts)
         # if stores comparisons among calculations
-        elif titration_type.startswith('C'):
+        elif tittype.startswith('C'):
             self.calc_path = '{}/{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                         self.comparison_folder,
-                                                        self.titration_type,
+                                                        self.tittype,
                                                         self.dim_comparison,
                                                         self.dim2_pts,
                                                         self.dim1_pts)
@@ -115,81 +104,6 @@ class Titration(pd.Panel):
     def _constructor(self):
         # because Titration inherits a pd.Panel.
         return Titration
-        
-    def log_r(self, logstr):
-        """
-        Registers the log and prints to the user.
-        
-        :logstring: the string to be registered in the log
-        """
-        logstr = '{}  \n'.format(logstr)
-        print(logstr)
-        self.log += logstr
-        return
-    
-    def log_t(self, titlestr):
-        """Formats a title for log."""
-        log_title = \
-        '\n{0}  \n### {1}  {2}  \n{0}  \n'.format('*'*79,
-                                                 titlestr.upper(),
-                                                 self.calc_path)
-        print(log_title)
-        self.log += log_title
-        return
-    
-    def write_log(self, mod='a', path='farseer.log'):
-        with open(path, mod) as logfile:
-            logfile.write(self.log)
-        return
-    
-    
-    def hex_to_RGB(self, hexx):
-        ''' http://bsou.io/posts/color-gradients-with-python
-        "#FFFFFF" -> [255,255,255] '''
-        # Pass 16 to the integer function for change of base
-        return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
-
-
-    def RGB_to_hex(self, RGB):
-        ''' http://bsou.io/posts/color-gradients-with-python
-        [255,255,255] -> "#FFFFFF" '''
-        # Components need to be integers for hex to make sense
-        RGB = [int(x) for x in RGB]
-        return "#"+"".join(["0{0:x}".format(v) if v < 16 else "{0:x}".format(v) for v in RGB])
-    
-    def color_dict(self, gradient):
-        ''' http://bsou.io/posts/color-gradients-with-python
-        Takes in a list of RGB sub-lists and returns dictionary of
-        colors in RGB and hex form for use in a graphing function
-        defined later on '''
-        return {"hex":[self.RGB_to_hex(RGB) for RGB in gradient],
-            "r":[RGB[0] for RGB in gradient],
-            "g":[RGB[1] for RGB in gradient],
-            "b":[RGB[2] for RGB in gradient]}
-    
-    
-    def linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
-        ''' http://bsou.io/posts/color-gradients-with-python
-        returns a gradient list of (n) colors between
-        two hex colors. start_hex and finish_hex
-        should be the full six-digit color string,
-        inlcuding the number sign ("#FFFFFF") '''
-        # Starting and ending colors in RGB form
-        s = self.hex_to_RGB(start_hex)
-        f = self.hex_to_RGB(finish_hex)
-        # Initilize a list of the output colors with the starting color
-        RGB_list = [s]
-        # Calcuate a color at each evenly spaced value of t from 1 to n
-        for t in range(1, n):
-            # Interpolate RGB vector for color at the current value of t
-            curr_vector = [
-                int(s[j] + (float(t)/(n-1))*(f[j]-s[j]))
-                for j in range(3)
-            ]
-            # Add it to our list of output colors
-            RGB_list.append(curr_vector)
-        return self.color_dict(RGB_list)
-    
     
     def calc_cs_diffs(self, calccol, sourcecol):
         '''
@@ -214,14 +128,7 @@ class Titration(pd.Panel):
                 self.ix[iitem,mask_lost,calccol] = \
                     self.ix[iitem-1,mask_lost,calccol]
         
-        elif self.cs_lost == 'zero':
-            for iitem in range(1, len(self.items)):
-                mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = 0
-        
-        self.log_r('**Calculated** {}'.format(calccol))
-        
-        return
+        fsut.write_log('*** Calculated {}\n'.format(calccol))
     
     def calc_ratio(self, calccol, sourcecol):
         '''
@@ -233,8 +140,86 @@ class Titration(pd.Panel):
         '''
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
-        self.log_r('**Calculated** {}'.format(calccol))
-        return
+        fsut.write_log('*** Calculated {}\n'.format(calccol))
+    
+    def load_theoretical_PRE(self, spectra_path, dimpt):
+        """
+        Loads theoretical PRE values to represent in bar plots.
+        Theorital PRE files (*.pre) should be stored in a 'para' folder
+        at the cond3 hierarchy level.
+        
+        Reads information on the tag position which should be inpu in the
+        *.pre file as an header comment, for example, '#40'.
+        
+        """
+        
+        target_folder = '{}/para/{}/'.format(spectra_path.strip('/'), dimpt)
+        pre_file = glob.glob('{}*.pre'.format(target_folder))
+        
+        if len(pre_file) > 1:
+            raise ValueError(   
+                '@@@ There are more than one .pre file in the folder {}'.\
+                format(target_folder))
+        elif len(pre_file) < 1:
+            raise ValueError('@@@ There is no .pre file in folder {}'.\
+                format(target_folder))
+        
+        # loads theoretical PRE data to 'Theo PRE' new column
+        # sets 1 to the diamagnetic Item.
+        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1],
+                                 names=['Theo PRE'], comment='#')
+        fsut.write_log(\
+            '*** Added Theoretical PRE file {}\n'.format(pre_file[0]))
+        fsut.write_log(\
+            '*** Theoretical PRE for diamagnetic set to 1 by default\n')
+        self.loc[:,:,'Theo PRE'] = 1
+        self.loc['para',:,'Theo PRE'] = self.predf.loc[:,'Theo PRE']
+        
+        # reads information on the tag position.
+        tagf = open(pre_file[0], 'r')
+        tag = tagf.readline().strip().strip('#')
+        self.loc['para',:,'tag'] = ''
+        tagmask = self.loc['para',:,'Res#'] == tag
+        self.loc['para',tagmask,'tag'] = '*'
+        tagf.close()
+        
+        
+    def calc_Delta_PRE(self, sourcecol, targetcol,
+                       apply_smooth=True,
+                       gaussian_stddev=1,
+                       guass_x_size=7):
+        
+        # astropy is imported to avoind demanding import when not necessary
+        from astropy.convolution import Gaussian1DKernel, convolve
+        
+        # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
+        gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
+        
+        self.loc[:,:,targetcol] = \
+            self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
+        
+        fsut.write_log(\
+            '*** Calculated DELTA PRE for source {} in target {}\n'.\
+            format(sourcecol, targetcol))
+        
+        for exp in self.items:
+            # converts to 0 negative values
+            negmask = self.loc[exp,:,targetcol] < 0
+            self.loc[exp,negmask,targetcol] = 0
+            
+            if apply_smooth:
+                # aplies convolution with a normalized 1D Gaussian kernel
+                smooth_col = '{}_smooth'.format(targetcol)
+                self.loc[exp,:,smooth_col] = \
+                    convolve(np.array(self.loc[exp,:,targetcol]),
+                             gauss,
+                             boundary='extend',
+                             normalize_kernel=True)
+        
+        fsut.write_log(\
+        '*** Calculated DELTA PRE Smoothed for source {} in target {} \
+with window size {} and stdev {} \n'.\
+            format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
     
     def csp_willi(self, s):
         """
@@ -263,216 +248,53 @@ class Titration(pd.Panel):
         self.loc[:,:,calccol] = \
             self.loc[:,:,['1-letter',pos1,pos2]].\
                 apply(lambda x: self.csp_willi(x), axis=2)
-        self.log_r('**Calculated** {}'.format(calccol))
-        return
+        fsut.write_log('*** Calculated {}\n'.format(calccol))
     
-    def load_theoretical_PRE(self, spectra_path, dimpt):
-        """
-        Loads theoretical PRE values to represent in bar plots.
-        Theorital PRE files (*.pre) should be stored in a 'para' folder
-        at the cond3 hierarchy level.
-        
-        Reads information on the tag position which should be inpu in the
-        *.pre file as an header comment, for example, '#40'.
-        
-        """
-        target_folder = '{}/para/{}/'.format(spectra_path, dimpt)
-        pre_file = glob.glob('{}*.pre'.format(target_folder))
-        
-        if len(pre_file) > 1:
-            raise ValueError(   
-                '@@@ There are more than one .pre file in the folder {}'.\
-                format(target_folder))
-        elif len(pre_file) < 1:
-            raise ValueError('@@@ There is no .pre file in folder {}'.\
-                format(target_folder))
-        
-        # loads theoretical PRE data to 'Theo PRE' new column
-        # sets 1 to the diamagnetic Item.
-        self.predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1],
-                                 names=['Theo PRE'], comment='#')
-        self.log_r(\
-            '**Added Theoretical PRE file** {}'.format(pre_file[0]))
-        self.log_r(\
-            '*Theoretical PRE for diamagnetic set to 1 by default*')
-        self.loc[:,:,'Theo PRE'] = 1
-        self.loc['para',:,'Theo PRE'] = self.predf.loc[:,'Theo PRE']
-        
-        # reads information on the tag position.
-        tagf = open(pre_file[0], 'r')
-        tag = tagf.readline().strip().strip('#')
-        self.loc['para',:,'tag'] = ''
-        tagmask = self.loc['para',:,'Res#'] == tag
-        self.loc['para',tagmask,'tag'] = '*'
-        tagf.close()
-        self.log_r(\
-            '**Tag position found** at residue {}'.format(\
-                int(self.loc['para',tagmask,'Res#'])))
-        return
-        
-    def calc_Delta_PRE(self, sourcecol, targetcol,
-                       gaussian_stddev=1,
-                       guass_x_size=7):
-        
-        # astropy is imported to avoind demanding import when not necessary
-        from astropy.convolution import Gaussian1DKernel, convolve
-        
-        # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
-        gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
-        
-        self.loc[:,:,targetcol] = \
-            self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
-        
-        self.log_r(\
-            '**Calculated DELTA PRE** for source {} in target {}'.\
-            format(sourcecol, targetcol))
-        
-        for exp in self.items:
-            # converts to 0 negative values
-            negmask = self.loc[exp,:,targetcol] < 0
-            self.loc[exp,negmask,targetcol] = 0
-            
-            # aplies convolution with a normalized 1D Gaussian kernel
-            smooth_col = '{}_smooth'.format(targetcol)
-            self.loc[exp,:,smooth_col] = \
-                convolve(np.array(self.loc[exp,:,targetcol]),
-                         gauss,
-                         boundary='extend',
-                         normalize_kernel=True)
-        
-        self.log_r(\
-        '**Calculated DELTA PRE Smoothed** for source {} in target {} \
-with window size {} and stdev {}'.\
-            format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
-        return
-    
-    def write_table(self, folder, tablecol, atomtype='Backbone'):
+    def write_table(self, tablecol):
         '''
         Writes to a tsv file the values of a specific column
         along the titration.
         '''
+        
         # concatenates the values of the table with the residues numbers
         table = pd.concat([self.res_info.iloc[0,:,[0]],
-                           self.loc[:,:,tablecol].astype(float)], axis=1)
+                          self.loc[:,:,tablecol].astype(float)], axis=1)
         
-        if atomtype == 'Sidechains':
-            table.loc[:,'Res#'] = \
-                table.loc[:,'Res#'] + self.ix[0,:,'ATOM']
+        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
+                                             tablecol))):
+            os.makedirs('{}/{}'.format(self.tables_and_plots_folder, tablecol))
         
-        tablefolder = '{}/{}'.format(self.tables_and_plots_folder, folder)
-        
-        if not(os.path.exists(tablefolder)):
-            os.makedirs(tablefolder)
-        
-        file_path = '{}/{}.tsv'.format(tablefolder, tablecol)
+        file_path = '{0}/{1}/{1}.tsv'.format(self.tables_and_plots_folder,
+                                             tablecol)
         
         fileout = open(file_path, 'w')
         
-        if self.titration_type.startswith('cond'):
+        if self.tittype.startswith('cond'):
             header = \
 """# Table for '{0}' resonances.
 # A titration results for variable '{1}'
 # ranging datapoints '{2}', where:
 # conditions '{3}' and '{4}' are kept constants.
 # {5} data.
-""".format(self.resonance_type, self.titration_type, list(self.att_dict),
+""".format(self.resonance_type, self.tittype, list(self.att_dict),
            self.dim2_pts, self.dim1_pts, tablecol)
         
-        elif self.titration_type.startswith('C'):
+        elif self.tittype.startswith('C'):
             header = \
 """# Table for '{0}' resonances.
 # The comparison '{1}': for the results obtained for titrations 'cond{7}'
 # across variable '{2}' which ranges datapoints '{3}', where:
 # conditions '{4}' and '{5}' are kept constants.
 # {6} data.
-""".format(self.resonance_type, self.titration_type, self.dim_comparison,
+""".format(self.resonance_type, self.tittype, self.dim_comparison,
            list(self.att_dict), self.dim2_pts, self.dim1_pts, tablecol,
-           self.titration_type[-1])
+           self.tittype[-1])
         
         fileout.write(header)
         fileout.write(table.to_csv(sep='\t', index=False,
                       na_rep='NaN', float_format='%.4f'))
         fileout.close()
-        
-        self.log_r('**Exported data table:** {}'.format(file_path))
-        return
-    
-    def write_Chimera_attributes(self, calccol, resformat=':',
-                                 colformat='{:.5f}'):
-        """
-        :param resformat: the formating options for the 'Res#' column. This must
-        match the residue selection command in Chimera. See:
-        www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
-        this is defined in the Chimera_ATT_Res_format variable in
-        farseer_user_variables.
-        
-        :param listpar: a list with the names of the columns that are 
-        to be written to chimera.
-        
-        Writes one Chimera Attribute file to each calculated parameter
-        and for each titration point. Generated files are stored in the folder
-        'ChimeraAttributeFiles'.
-        
-        This function was written this way because it
-        is easier to generate all the files at one than to make several calls
-        for each desired column.
-        """
-        s2w = ''
-        
-        resform = lambda x: "\t{}{}\t".format(resformat, x)
-        colform = lambda x: colformat.format(x)
-        
-        formatting = {'Res#': resform}
-        
-        ####
-        
-        
-        for item in self.items:
-            mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
-            mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
-            mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
-            
-            #for column in listpar:
-            file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
-            if not(os.path.exists(file_path)):
-                os.makedirs(file_path)
-            
-            file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
-            fileout = open(file_name, 'w')
-                
-                
-            attheader = """#
-#
-# lost peaks {}
-#
-# unassigned peaks {}
-#
-attribute: {}
-match mode: 1-to-1
-recipient: residues
-\t""".format(resformat + self.loc[item,mask_lost,'Res#'].\
-                to_string(header=False, index=False).\
-                    replace(' ', '').replace('\n', ','),
-             resformat + self.loc[item,mask_unassigned,'Res#'].\
-                to_string(header=False, index=False).\
-                    replace(' ', '').replace('\n', ','),
-             calccol.lower())
-             
-            fileout.write(attheader)
-                
-            formatting[calccol] = colform
-            to_write = self.loc[item,mask_measured,['Res#',calccol]].\
-                        to_string(header=False, index=False,
-                                formatters=formatting,
-                                col_space=0).replace(' ', '')
-                
-                
-            fileout.write(to_write)
-                
-            fileout.close()
-            
-            self.log_r('**Exported Chimera Att** {}'.format(file_name))
-        return
+        fsut.write_log('*** File saved {}\n'.format(file_path))
     
     def export_titration(self):
         """
@@ -480,7 +302,6 @@ recipient: residues
         calculated data) to .tsv files. These files are stored
         in the folder 'full_peaklists'.
         """
-        
         for item in self.items:
             file_path = '{}/{}.tsv'.format(self.export_tit_folder, item)
             fileout = open(file_path, 'w')
@@ -488,23 +309,15 @@ recipient: residues
                                                 index=False,
                                                 na_rep='NaN',
                                                 float_format='%.4f'))
-            self.log_r(\
-            '**Exported peaklist** {}'.format(file_path))
             fileout.close()
-        
-        return
+            fsut.write_log('*** File saved {}\n'.format(file_path))
     
     def set_item_colors(self, items, series, d):
         """
-        Translates the 'Peak Status' to a dict defined list of colors.
-        
-        :items: items object, either plot bars, ticks, etc...
-        :series: a pd.Series containing the 'Peak Status' information.
-        :d: a dictionary that translates information to colors.
-        
-        Does return anything because it changes the :items: in place.
+        Creates a list of colors based on a series of items and a
+        dictionary to translate the series keys to a value.
         """
-        for i, it in zip(series.index, items):
+        for i, it in enumerate(items):
             if series[i] in d.keys():
                 it.set_color(d[series[i]])
             else:
@@ -527,29 +340,23 @@ recipient: residues
                 return x+(yy_scale/20)
             else:
                 return (x*-1)-(yy_scale/20)
-        
-        for i, bar in zip(series.index, axbar):
+            
+        for i, bar in enumerate(axbar):
             if series[i] in d.keys():
                 x0, y0 = bar.xy
                 if orientation == 'vertical':
                     hpos = hpos_sign(bar.get_width(), x0)
-                    vpos = bar.get_y() + bar.get_height()/2
-                    vaa='center'
-                
+                    vpos = bar.get_y() - bar.get_height() / 2.5
                 elif orientation == 'horizontal':
                     vpos = vpos_sign(bar.get_height(), y0)
                     hpos = bar.get_x() + bar.get_width() / 2.5
-                    vaa='bottom'
-                
                 ax.text(hpos, vpos, d[series[i]],
-                        ha='center', va=vaa, fontsize=fs)
+                        ha='center', va='bottom', fontsize=fs)
             else:
                 continue
     
-     
-    
     def plot_threshold(self, ax, series, color, lw, alpha,
-                       orientation = 'horizontal', zorder=5):
+                       orientation = 'horizontal'):
         """Plots threshold line that identifies relevant perturnations."""
         
         sorted_cs = series.abs().sort_values().dropna()
@@ -557,20 +364,20 @@ recipient: residues
         threshold = firstdecile.mean() + 5*firstdecile.std()
         if orientation == 'horizontal':
             ax.axhline(y=threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+                       linewidth=lw, alpha=alpha, zorder=0)
             
             # in case there are negative numbers, plots the threshold,
             # if there are not negative numbers, this line is never displayed
             ax.axhline(y=-threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+                       linewidth=lw, alpha=alpha, zorder=0)
         if orientation == 'vertical':
             ax.axvline(x=threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+                       linewidth=lw, alpha=alpha, zorder=0)
             
             # in case there are negative numbers, plots the threshold,
             # if there are not negative numbers, this line is never displayed
             ax.axvline(x=-threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+                       linewidth=lw, alpha=alpha, zorder=0)
     
     def theo_pre_plot(self, axs, exp, y,
                       bartype='h',
@@ -581,8 +388,8 @@ recipient: residues
                       tag_lw=0.1
                       ):
         
-        if (self.titration_type == 'cond3' and exp == 'para') \
-            or (self.titration_type == 'C3' \
+        if (self.tittype == 'cond3' and exp == 'para') \
+            or (self.tittype == 'C3' \
                 and ( self.dim1_pts == 'para' or self.dim2_pts == 'para')):
             # plot theoretical PRE
             if bartype == 'v':
@@ -643,7 +450,6 @@ recipient: residues
                           threshold_color='red',
                           threshold_linewidth=1,
                           threshold_alpha=1,
-                          threshold_zorder=5,
                           x_label_fn='Arial',
                           x_label_fs=8, 
                           x_label_pad=2,
@@ -695,49 +501,34 @@ recipient: residues
         
         if plot_style == 'bar_extended' and self.resonance_type == 'Backbone':
             # fillna(0) is added because nan conflicts with text_maker()
-            # in bar.get_height() which return nan
-            bars = axs[i].bar(self.loc[experiment,:,'Res#'].astype(int),
+            # in bat.get_height() which return nan
+            bars = axs[i].bar(self.loc[experiment,:,'Res#'].astype(float),
                             self.loc[experiment,:,calccol].fillna(0),
                             width=bar_width,
                             align='center',
                             alpha=bar_alpha,
                             linewidth=bar_linewidth,
                             zorder=4)
-            
-            # ticks positions:
-            # this is used to fit both applyFASTA=True or False
-            # reduces xticks to 100 as maximum to avoid ticklabel overlap
-            if self.shape[1] > 100:
-                xtick_spacing = self.shape[1]//100
-            else:
-                xtick_spacing = 1
-            
-            tickspos = np.arange(\
-                        start=float(self.loc[experiment,:,'Res#'].head(1)),
-                        stop=float(self.loc[experiment,:,'Res#'].tail(n=1))+1,
-                        step=xtick_spacing)
-            
-            ticklabels = self.loc[experiment,\
-                                  0::xtick_spacing,\
-                                  ['Res#','1-letter']].\
-                            apply(lambda x: ''.join(x), axis=1)
-            
+        
             # Configure XX ticks and Label
-            axs[i].set_xticks(tickspos)
+            axs[i].set_xticks(\
+                np.arange(float(self.loc[experiment,:,'Res#'].head(1)),
+                          float(self.loc[experiment,:,'Res#'].tail(1))+1,
+                1))
         
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(ticklabels,
-                                    fontname=x_ticks_fn,
-                                    fontsize=x_ticks_fs,
-                                    fontweight=x_ticks_weight,
-                                    rotation=x_ticks_rot)
+            axs[i].set_xticklabels(\
+                self.loc[experiment,:,['Res#','1-letter']].\
+                    apply(lambda x: ''.join(x), axis=1),
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot)
                 
             # defines xticks colors
             if x_ticks_color_flag:
                 self.set_item_colors(axs[i].get_xticklabels(),
-                                     self.loc[experiment,\
-                                              0::xtick_spacing,\
-                                              'Peak Status'],
+                                     self.loc[experiment, :, 'Peak Status'],
                                      {'measured':measured_color,
                                       'lost':lost_color,
                                       'unassigned':unassigned_color})
@@ -757,8 +548,6 @@ recipient: residues
             axs[i].set_xticks(self.major_axis)
         
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            print(self.loc[experiment,:,'Res#'])
-            
             axs[i].set_xticklabels(\
                 self.loc[experiment,:,['Res#','1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
@@ -786,17 +575,10 @@ recipient: residues
             
             initialresidue = int(self.ix[0, 0, 'Res#'])
             finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
-            
-            if self.shape[1] > 100:
-                xtick_spacing = self.shape[1]//100*10
-            else:
-                xtick_spacing = 10
-            
-            first_tick = ceil(initialresidue/10)*xtick_spacing
-            xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
-            axs[i].set_xticks(xtickarange)
+            first_tick = ceil(initialresidue/10)*10
+            axs[i].set_xticks(np.arange(first_tick, finalresidue+1, 10))
             # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(xtickarange,
+            axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
                                    fontname=x_ticks_fn,
                                    fontsize=x_ticks_fs,
                                    fontweight=x_ticks_weight,
@@ -874,12 +656,11 @@ recipient: residues
                               zorder=0)
                               
         # Adds red line to identify significant changes.
-        if threshold_flag and (calccol in self.calculated_params[:3]):
+        if threshold_flag and calccol in fspar.param_settings.index[:3]:
             self.plot_threshold(axs[i], self.loc[experiment,:,calccol],
                                 threshold_color,
                                 threshold_linewidth,
-                                threshold_alpha,
-                                zorder=threshold_zorder)
+                                threshold_alpha)
         
         if mark_prolines_flag:
             self.text_marker(axs[i],
@@ -901,7 +682,7 @@ recipient: residues
             self.set_item_colors(bars, self.loc[experiment,:,'Details'],
                                   user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.calculated_params[3:]):
+        if PRE_flag and (calccol in fspar.param_settings.index[3:]):
             self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.05,
                               bartype='h',
                               pre_color=pre_color,
@@ -929,7 +710,6 @@ recipient: residues
                           threshold_color='red',
                           threshold_linewidth=1,
                           threshold_alpha=1,
-                          threshold_zorder=5,
                           x_label_fn='Arial',
                           x_label_fs=8, 
                           x_label_pad=2,
@@ -976,69 +756,61 @@ recipient: residues
         """
         :param: idx, calculated parameter, that is index to param_settings
         """
-        
+
         # fillna(0) is added because nan conflicts with text_maker()
         # .iloc[::-1]
         # in bat.get_height() which return nan
-        bars = axs[i].barh(self.loc[experiment,:,'Res#'].astype(float),
-                           self.loc[experiment,:,calccol].fillna(0),
-                           height=bar_width,
-                           align='center',
-                           alpha=bar_alpha,
-                           linewidth=bar_linewidth,
-                           zorder=4)
-        
-        axs[i].invert_yaxis()
+        bars = axs[i].barh(self.loc[experiment,::-1,'Res#'].astype(float),
+                         self.loc[experiment,::-1,calccol].fillna(0),
+                         height=bar_width,
+                         align='center',
+                         alpha=bar_alpha,
+                         linewidth=bar_linewidth,
+                         zorder=4)
         
         # Set subplot titles
         axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
                          fontname=subtitle_fn, weight=subtitle_weight)
         
-        
+        # defines bars colors
+        self.set_item_colors(bars,
+                             self.loc[experiment,::-1,'Peak Status'].\
+                                reset_index(drop=True),
+                             {'measured':measured_color,
+                              'lost':lost_color,
+                              'unassigned':unassigned_color})
         
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        axs[i].spines['left'].set_zorder(10)
-        axs[i].spines['right'].set_zorder(10)
         
-        ## Configure XX ticks and Label
+        # Configure XX ticks and Label
         axs[i].margins(y=0.01)
-        
-        if self.shape[1] > 100:
-            xtick_spacing = self.shape[1]//100
-        else:
-            xtick_spacing = 1
         
         axs[i].set_yticks(\
             np.arange(float(self.loc[experiment,:,'Res#'].head(1)),
                       float(self.loc[experiment,:,'Res#'].tail(1))+1,
-                      xtick_spacing))
+                      1))
     
-        # https://github.com/matplotlib/matplotlib/issues/6266
+        ## https://github.com/matplotlib/matplotlib/issues/6266
         axs[i].set_yticklabels(\
-            self.loc[experiment,0::xtick_spacing,['Res#','1-letter']].\
+            self.loc[experiment,::-1,['Res#','1-letter']].\
                 apply(lambda x: ''.join(x), axis=1),
             fontname=x_ticks_fn,
             fontsize=x_ticks_fs-2,
             fontweight=x_ticks_weight,
             rotation=0)
             
-        ## defines colors
-        self.set_item_colors(bars,
-                             self.loc[experiment,:,'Peak Status'],
-                             {'measured':measured_color,
-                              'lost':lost_color,
-                              'unassigned':unassigned_color})
-        
+        # defines xticks colors
         if x_ticks_color_flag:
             self.set_item_colors(axs[i].get_yticklabels(),
-                                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                                 self.loc[experiment,::-1,'Peak Status'].\
+                                    reset_index(drop=True),
                                  {'measured':measured_color,
                                   'lost':lost_color,
                                   'unassigned':unassigned_color})
         
-        ## Configures YY ticks
+        # cConfigures YY ticks
         axs[i].set_xlim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='x', tight=True, nbins=y_ticks_nbins)
         axs[i].set_xticklabels(['{:.2f}'.format(xx) \
@@ -1083,19 +855,19 @@ recipient: residues
                               zorder=0)
         
         # Adds red line to identify significant changes.
-        if threshold_flag and (calccol in self.calculated_params[:3]):
+        if threshold_flag and calccol in fspar.param_settings.index[:3]:
             self.plot_threshold(axs[i],
                                 self.loc[experiment,:,calccol],
                                 threshold_color,
                                 threshold_linewidth,
                                 threshold_alpha,
-                                orientation='vertical',
-                                zorder=threshold_zorder)
+                                orientation='vertical')
         
         if mark_prolines_flag:
             self.text_marker(axs[i],
                               bars,
-                              self.loc[experiment,:,'1-letter'],
+                              self.loc[experiment,::-1,'1-letter'].\
+                                reset_index(drop=True),
                               {'P':mark_prolines_symbol},
                               y_lims[1]*0.6,
                               fs=mark_fontsize,
@@ -1104,18 +876,20 @@ recipient: residues
         if mark_user_details_flag:
             self.text_marker(axs[i],
                               bars,
-                              self.loc[experiment,:,'Details'],
+                              self.loc[experiment,::-1,'Details'].\
+                                reset_index(drop=True),
                               user_marks_dict,
-                              y_lims[1]*0.6,
+                              y_lims[1],
                               fs=mark_fontsize,
                               orientation='vertical')
         
         if color_user_details_flag:
             self.set_item_colors(bars,
-                                 self.loc[experiment,:,'Details'],
-                                 user_bar_colors_dict)
+                                 self.loc[experiment,::-1,'Details'].\
+                                    reset_index(drop=True),
+                                  user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.calculated_params[3:]):
+        if PRE_flag and (calccol in fspar.param_settings.index[3:]):
             self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.1,
                               bartype='v',
                               pre_color=pre_color,
@@ -1186,16 +960,16 @@ recipient: residues
         # if the user wants to represent the condition in the x axis
         # for the first dimension
         if set_x_values and \
-            (self.titration_type == 'cond1' or self.dim_comparison == 'cond1'):
+            (self.tittype == 'cond1' or self.dim_comparison == 'cond1'):
             # do
             if len(titration_x_values) != len(self.items):
-                self.log_r(fsw.wet5(titration_x_values, self.items))
-                fsw.end_bad()
+                raise ValueError('> The titration_x_values variable length in \
+farseer_user_variables.py does not match the number of data points for cond1')
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
-        elif (self.titration_type in ['cond2', 'cond3']) \
+        elif (self.tittype in ['cond2', 'cond3']) \
             or (self.dim_comparison in ['cond2', 'cond3']):
             #do
             x = np.arange(0, len(y))
@@ -1217,7 +991,7 @@ recipient: residues
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
         if set_x_values and \
-            (self.titration_type == 'cond1' or self.dim_comparison == 'cond1'):
+            (self.tittype == 'cond1' or self.dim_comparison == 'cond1'):
                 #do
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
             xlabels = [int(n) for n in axs[i].get_xticks()]
@@ -1297,8 +1071,8 @@ recipient: residues
                                 facecolor=fill_color, alpha=fill_alpha)
         
         if fit_perform \
-                and self.titration_type == 'cond1'\
-                and (calccol in self.calculated_params[:3])\
+                and self.tittype == 'cond1'\
+                and (calccol in fspar.param_settings.index[:3])\
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
             
             # plot fit
@@ -1342,8 +1116,8 @@ recipient: residues
             
             # plot fit param numbers
             txtkwargs = {'fontsize':4}
-            n_hillc = ( titration_x_values[-1], y_lims[1]+y_lims[1]*0.02)
-            r_sq = ( titration_x_values[0], y_lims[1]+y_lims[1]*0.02)
+            n_hillc = ( titration_x_values[-1], y_lims[1]+y_lims[1]*0.015)
+            r_sq = ( titration_x_values[0], y_lims[1]+y_lims[1]*0.015)
             
             # kd value label
             if  titration_x_values[-1]/2 \
@@ -1370,7 +1144,7 @@ recipient: residues
             if self.fitdf[calccol].ix[i, 'ymax'] > y_lims[1]:
                 # places value label right bellow ylim[1]
                 ymaxc = (titration_x_values[-1]*0.02,
-                         y_lims[1]-y_lims[1]*0.15,
+                         y_lims[1]-y_lims[1]*0.08,
                          'ymax {:.3f}'.\
                             format(self.fitdf[calccol].ix[i, 'ymax']))
                             
@@ -1441,8 +1215,7 @@ recipient: residues
                      markers=['^','>','v','<','s','p','h','8','*','D'],
                      mk_color=['none'],
                      mk_edgecolors='black',
-                     mk_lost_color='red',
-                     hide_lost=False):
+                     mk_lost_color='red'):
         """
         Represents the peak evolution in chemical
         shift change along the titration.
@@ -1520,35 +1293,27 @@ recipient: residues
         if mk_type == 'shape':
             # represents the points in different shapes
             mcycle = it.cycle(markers)
-            ccycle = it.cycle(mk_color)
-            cedge = it.cycle(mk_edgecolors)
+            mk_color = mk_color * len(self.items)
+            mk_edgecolors = mk_edgecolors * len(self.items)
             for k, j in enumerate(self.items):
-                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned']\
-                and hide_lost:
-                    #do
-                    next(mcycle)
-                    next(ccycle)
-                    next(cedge)
-                
-                elif self.ix[j,i,'Peak Status'] == 'lost':
+                if self.ix[j,i,'Peak Status'] == 'lost':
                     axs[i].scatter(self.ix[j,i,'H1_delta'],
                                    self.ix[j,i,'N15_delta'],
                                    marker=next(mcycle),
                                    s=mksize,
-                                   color=next(ccycle),
+                                   color=mk_color[k],
                                    edgecolors=mk_lost_color)
-                    next(cedge)
+                
                 else:
                     axs[i].scatter(self.ix[j,i,'H1_delta'],
                                    self.ix[j,i,'N15_delta'],
                                    marker=next(mcycle),
-                                   s=mksize, color=next(ccycle),
-                                   edgecolors=next(cedge))
+                                   s=mksize, color=mk_color[k],
+                                   edgecolors=mk_edgecolors[k])
         
         elif mk_type == 'color':
-            
             # represents the points as circles with a gradient of color
-            mk_color = self.linear_gradient(mk_start_color,
+            mk_color = fsut.linear_gradient(mk_start_color,
                                             finish_hex=mk_end_color,
                                             n=self.shape[0])
             # this is used instead of passing a list to .scatter because
@@ -1568,22 +1333,22 @@ recipient: residues
                                    marker='o', s=mksize, c=next(mccycle),
                                    edgecolors='none')
         
-        measured = self.ix[:,i,'Peak Status'] == 'measured'
+        
         xlimmin = -scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).min()*1.5
+                  if self.ix[:,i,'H1_delta'].fillna(value=0).min() > -scale \
+                  else self.ix[:,i,'H1_delta'].fillna(value=0).min()*1.5
         
         xlimmax = scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).max()*1.5
+                  if self.ix[:,i,'H1_delta'].fillna(value=0).max() < scale \
+                  else self.ix[:,i,'H1_delta'].fillna(value=0).max()*1.5
         
         ylimmin = -scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).min()*1.5
+                  if self.ix[:,i,'N15_delta'].fillna(value=0).min() > -scale \
+                  else self.ix[:,i,'N15_delta'].fillna(value=0).min()*1.5
         
         ylimmax = scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).max()*1.5
+                  if self.ix[:,i,'N15_delta'].fillna(value=0).max() < scale \
+                  else self.ix[:,i,'N15_delta'].fillna(value=0).max()*1.5
         
         axs[i].set_xlim(xlimmin, xlimmax)
         axs[i].set_ylim(ylimmin, ylimmax)
@@ -1607,134 +1372,12 @@ recipient: residues
                       linestyles='-', linewidth=1)
         
     
-    def plot_cs_scatter_flower(self, fig, axs,
-                               subtitle_fn='Arial',
-                             subtitle_fs=8,
-                             subtitle_pad=0.98,
-                             subtitle_weight='normal',
-                             x_label='1H (ppm)',
-                             x_label_fn='Arial',
-                             x_label_fs=3,
-                             x_label_pad=2,
-                             x_label_weight='normal',
-                             y_label='15N (ppm)',
-                             y_label_fn='Arial',
-                             y_label_fs=6 ,
-                             y_label_pad=2,
-                             y_label_weight='normal',
-                             x_ticks_fn='Arial',
-                             x_ticks_fs=5,
-                             x_ticks_pad=1,
-                             x_ticks_weight=1,
-                             x_ticks_rot=0,
-                             x_ticks_len=2,
-                             y_ticks_fn='Arial',
-                             y_ticks_fs=5,
-                             y_ticks_pad=1,
-                             y_ticks_weight=1,
-                             y_ticks_rot=0,
-                             y_ticks_len=2,
-                             
-                             x_max=0.2,
-                             x_min=-0.2,
-                             y_max=1,
-                             y_min=-1,
-                             
-                             mksize=2,
-                             color_grad=True,
-                             color_list=[],
-                             mk_start_color="#ff0000",
-                             mk_end_color='#30ff00'):
-                                            
-                                            
-        if color_grad:
-            mk_color = self.linear_gradient(mk_start_color,
-                                        finish_hex=mk_end_color,
-                                        n=len(self.items))['hex']
-        
-        else: 
-            mk_color = color_list
-        for i, residue in enumerate(self.major_axis):
-            
-            if self.ix[0,residue,'Peak Status'] == 'unassigned':
-                continue
-            
-            mesmask = self.loc[:,residue,'Peak Status'] == 'measured'
-            #print(self.loc[:,residue,'Res#'], self.loc[:,residue,'H1_delta'])
-            
-            
-            axs[0].scatter(self.loc[mesmask,residue,'H1_delta'],
-                           self.loc[mesmask,residue,'N15_delta'],
-                           c=mk_color,
-                           s=mksize,
-                           zorder=9)
-            
-            
-            axs[0].text(\
-                float(self.loc[mesmask,residue,'H1_delta'].tail(n=1))*1.05,
-                float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
-                self.ix[0,residue,'Res#'],
-                fontsize=4, color='#c99543', zorder=10)
-        
-        # Configure Axis Ticks
-        axs[0].xaxis.tick_bottom()
-        axs[0].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-        axs[0].yaxis.tick_left()
-        axs[0].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
-        ## Configure axes labels
-        axs[0].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
-        ## Configure YY ticks/label
-        axs[0].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
-        
-        # draws axis 0 dotted line
-        axs[0].hlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        axs[0].vlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        
-        axs[0].set_xlim(x_min, x_max)
-        axs[0].set_ylim(y_min, y_max)
-        axs[0].invert_xaxis()
-        axs[0].invert_yaxis()
-        
-        axs[0].locator_params(axis='both', tight=True, nbins=10)
-        
-        axs[0].set_xticklabels(axs[0].get_xticks(),
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
-        axs[0].set_yticklabels(axs[0].get_yticks(),
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-        
-        return
-    
     def plot_DPRE_heatmap(self, calccol, fig, axs, i, experiment,
                           y_lims=(0,1),
                           vmin=0,
                           vmax=1,
                           ylabel='DELTA PRE',
-                          x_ticks_fs=4,
+                          x_ticks_fs=6,
                           x_ticks_rot=0,
                           x_ticks_fn='Arial',
                           x_ticks_pad=1,
@@ -1745,7 +1388,7 @@ recipient: residues
                           y_label_weight='bold',
                           right_margin=0.1,
                           bottom_margin=0.1,
-                          top_margin=0.9,
+                          top_margin=0.1,
                           cbar_font_size=4,
                           tag_color='red',
                           tag_lw=0.3,
@@ -1789,33 +1432,23 @@ recipient: residues
             
             cbar.ax.tick_params(labelsize=cbar_font_size)
             axs[i].get_xaxis().set_visible(True)
-            axs[i].tick_params(axis='x', bottom='on', length=1.5)
-            
+            axs[i].tick_params(axis='x', bottom='on')
             initialresidue = int(self.ix[0, 0, 'Res#'])
             finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
-            
-            if self.shape[1] > 100:
-                xtick_spacing = self.shape[1]//100*10
-            else:
-                xtick_spacing = 10
-            
-            first_tick = ceil(initialresidue/10)*xtick_spacing
-            xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
-            axs[i].set_xticks(xtickarange)
-            # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(xtickarange,
-                                   fontname=x_ticks_fn,
-                                   fontsize=x_ticks_fs,
-                                   fontweight=x_ticks_weight,
-                                   rotation=x_ticks_rot)
-                               
+            first_tick = ceil(initialresidue/10)*10
+            axs[i].set_xticks(np.arange(first_tick-0.5, finalresidue+1, 10))
+            axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
+                               fontsize=x_ticks_fs,
+                               rotation=x_ticks_rot,
+                               fontname=x_ticks_fn,
+                               fontweight=x_ticks_weight)
             axs[i].tick_params(axis='x', which='major', pad=x_ticks_pad)
             fig.subplots_adjust(right=right_margin,
                                 bottom=bottom_margin,
                                 top=top_margin,
                                 hspace=0)
             
-    
+        pass
     
     def plot_delta_osci(self, calccol, fig, axs, i ,experiment,
                         y_lims=(0,1),
@@ -1929,17 +1562,10 @@ recipient: residues
         # Set Ticks
         initialresidue = int(self.ix[0, 0, 'Res#'])
         finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
-        
-        if self.shape[1] > 100:
-            xtick_spacing = self.shape[1]//100*10
-        else:
-            xtick_spacing = 10
-        
-        first_tick = ceil(initialresidue/10)*xtick_spacing
-        xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
-        axs[i].set_xticks(xtickarange)
+        first_tick = ceil(initialresidue/10)*10
+        axs[i].set_xticks(np.arange(first_tick, finalresidue+1, 10))
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_xticklabels(xtickarange,
+        axs[i].set_xticklabels(np.arange(first_tick, finalresidue, 10),
                                fontname=x_ticks_fn,
                                fontsize=x_ticks_fs,
                                fontweight=x_ticks_weight,
@@ -2018,34 +1644,19 @@ recipient: residues
                            tag_lw=tag_lw)
         
     
-    def clean_subplots(self, fig, axs, start, end):
-        """Hides/Removes the unused subplots from the plotting figure."""
-        for i in range(start, end):
-            axs[i].spines['bottom'].set_visible(False)
-            axs[i].spines['top'].set_visible(False)
-            axs[i].spines['right'].set_visible(False)
-            axs[i].spines['left'].set_visible(False)
-            
-            axs[i].tick_params(axis='both', bottom='off', left='off',
-                               labelleft='off', labelbottom='off')
-        return
-    
     def plot_base(self, calccol, plot_type, plot_style, param_dict,
                      par_ylims=(0,1),
                      ylabel='ppm or ratio',
                      hspace=0.5,
                      rows_per_page=5,
                      cols_per_page=1,
-                     atomtype='Backcone',
                      fig_height=11.69,
                      fig_width=8.69,
+                     
                      fig_file_type='pdf',
                      fig_dpi=300):
         
-        self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
-        
-        # this to allow folder change in PRE_analysis
-        folder = calccol
+        #calccol = fspar.param_settings.loc[idx,'calc_column_name']
         
         if plot_type == 'exp':
             num_subplots = len(self.items)
@@ -2058,6 +1669,7 @@ recipient: residues
         
         numrows = ceil(num_subplots/cols_per_page)
         real_fig_height = (fig_height / rows_per_page) * numrows
+        
         
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
         fig, axs = plt.subplots(nrows=numrows, ncols=cols_per_page,
@@ -2077,17 +1689,12 @@ recipient: residues
                                          ylabel=ylabel, **param_dict)
                 fig.subplots_adjust(hspace=hspace)
                 
-            else:
-                self.clean_subplots(fig, axs, len(self), len(axs))
-                
         elif plot_style == 'bar_vertical':
         
             for i, experiment in enumerate(self):
                 self.plot_bar_vertical(calccol, fig, axs, i, experiment,
                                        y_lims=par_ylims, ylabel=ylabel,
                                        **param_dict)
-            else:
-                self.clean_subplots(fig, axs, len(self), len(axs))
         
         elif plot_style == 'res_evo':
             
@@ -2095,33 +1702,25 @@ recipient: residues
                 self.plot_res_evo(calccol, fig, axs, i, row_number,
                                   y_lims=par_ylims, y_label=ylabel,
                                   **param_dict)
-            else:
-                self.clean_subplots(fig, axs, len(self.major_axis), len(axs))
         
         elif plot_style == 'cs_scatter':
             
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(fig, axs, i, row_number, **param_dict)
         
-        elif plot_style == 'cs_scatter_flower':
-            self.plot_cs_scatter_flower(fig, axs, **param_dict)
-            self.clean_subplots(fig, axs, 1, len(axs))
-        
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
                 self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment,
                                        y_lims=par_ylims, ylabel=ylabel,
                                        **param_dict)
-                pass
-            # to write all the PRE_analysis in the same folder
-            folder='PRE_analysis'
             
         elif plot_style == 'delta_osci':
             
-            dp_colors = self.linear_gradient(param_dict['color_init'],
+            dp_colors = fsut.linear_gradient(param_dict['color_init'],
                                             param_dict['color_end'],
                                             n=self.shape[0])
             
+            print(param_dict.keys())
             
             dp_color = it.cycle(dp_colors['hex'])
             
@@ -2131,32 +1730,27 @@ recipient: residues
                                      ylabel=ylabel,
                                      color=next(dp_color),
                                      **param_dict)
-                pass
-            # to write all the PRE_analysis in the same folder
-            folder='PRE_analysis'
+            
         
-        self.write_plot(fig, plot_style, folder, calccol, fig_file_type, fig_dpi)
-        if not(plot_style in ['cs_scatter', 'cs_scatter_flower']):
-            self.write_table(folder, calccol, atomtype=atomtype)
+        
+        
+        self.write_plot(fig, plot_style, calccol, fig_file_type, fig_dpi)
         plt.close('all')
-        return
     
-    def write_plot(self, fig, plot_name, folder, calccol, fig_file_type, fig_dpi):
-        """Saves plot to a file."""
+    def write_plot(self, fig, plot_name, calccol, fig_file_type, fig_dpi):
         
-        plot_folder = '{}/{}'.format(self.tables_and_plots_folder, folder)
         
-        if not(os.path.exists(plot_folder)):
-            os.makedirs(plot_folder)
+        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
+                                             calccol))):
+            os.makedirs('{}/{}'.format(self.tables_and_plots_folder, calccol))
         
-        file_path = '{}/{}_{}.{}'.format(plot_folder, calccol, plot_name,
-                                         fig_file_type)
+        file_path = '{0}/{1}/{1}_{2}.{3}'.format(self.tables_and_plots_folder,
+                                                 calccol, plot_name,
+                                                 fig_file_type)
         
         fig.savefig(file_path, dpi=fig_dpi)
         
-        self.log_r('**Plot Saved** {}'.format(file_path))
-        
-        return
+        fsut.write_log('*** Plot saved {}\n'.format(file_path))
     
     def perform_fit(self, calccol='CSP', x_values=None):
         """
@@ -2173,7 +1767,7 @@ recipient: residues
                                      index=[row_number],
                                      columns=name_list)
             self.fitdf[calccol] = self.fitdf[calccol].append(dfres)
-            return
+        
         
         def calc_r_squared(x, y , f, popt):
             """
@@ -2189,8 +1783,8 @@ recipient: residues
             
             return [r_squared, ss_res, ss_tot]
         
-        def write_fit_failed(x, y, row_number):
-            s2w=\
+        def write_fit_failed(x, y, row_number, logf):
+            str2write=\
 """
 Res#:  {}
 xdata: {}
@@ -2199,12 +1793,10 @@ ydata: {}
 **************************
 """.format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
            list(x), list(y))
-            logfout.write(s2w)
-            print('* Res# {} - fit not found!'.format(resnum))
+            fsut.write_log(str2write, logfile_name=logf)
             add_fit_results(['Failed'] + [np.NaN]*6,
                             ['fit', 'ymax', 'yhalf','kd',
                              'n_hill', 'r_sq', 'yfit'])
-            return
         
         # sets an x linear space
         self.xfit=np.linspace(0, 10000, 100000+1)
@@ -2219,15 +1811,12 @@ ydata: {}
         logf = '{0}/{1}/{1}_fit_report.log'.format(\
             self.tables_and_plots_folder, calccol)
         
-        logfout = open(logf, 'w')
-        self.log_r('** Performing fitting for {}...'.format(calccol))
-        
         s2w = \
 """# fitting for parameter: '{}'
 fit performed: Hill Equation
 (Vmax*[S]**n)/(K0.5**n+[S]**n)
 """.format(calccol)
-        logfout.write(s2w)
+        fsut.write_log(s2w, logfile_name=logf, mod='w')
 
         # for each assigned residue
         for row_number in \
@@ -2246,7 +1835,7 @@ fit performed: Hill Equation
             
             # makes no sense to perform a fitting in only 2 or less datapoints
             if len(x) <= 2: 
-                s2w=\
+                str2write=\
 """
 Res#:  {}
 xdata: {}
@@ -2255,8 +1844,7 @@ ydata: {}
 **************************
 """.format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
            x, y)
-                logfout.write(s2w)
-                print('* Res# {} - not enough data points!'.format(resnum))
+                fsut.write_log(str2write, logfile_name=logf)
                 add_fit_results(['No Data',np.nan, np.nan, np.nan,
                                  np.nan, np.nan, False],
                                 ['fit', 'ymax', 'yhalf','kd',
@@ -2304,12 +1892,11 @@ rsq: {}
 """.format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
            list(x), list(y), ymax, yhalf, kd, n_hill, r_squared,
            popt, pcov, rsq)
-                logfout.write(s2w)
-                print('* Res# {} - fit converged!'.format(resnum))
+                fsut.write_log(s2w, logfile_name=logf)
             
             except:
             #    pass
-                write_fit_failed(x, y, row_number)
+                write_fit_failed(x, y, row_number, logf)
         
         
         self.fitdf[calccol] = pd.concat([self.res_info.iloc[0,:,:],
@@ -2320,11 +1907,81 @@ rsq: {}
             to_csv('{0}/{1}/{1}_fit_data.csv'.\
                 format(self.tables_and_plots_folder, calccol),
                     index=False, float_format='%.3f')
-        self.log_r('*** File Saved {}\n'.format(\
-            '{0}/{1}/{1}_fit_data.csv'.format(\
-                self.tables_and_plots_folder, calccol)))
-        
-        logfout.close()
-        return
+        fsut.write_log('*** File Saved {}\n'.\
+            format('{0}/{1}/{1}_fit_data.csv'.\
+                format(self.tables_and_plots_folder, calccol)))
     
+    def write_Chimera_attributes(self, calccol, resformat=':',
+                                 colformat='{:.5f}'):
+        """
+        :param resformat: the formating options for the 'Res#' column. This must
+        match the residue selection command in Chimera. See:
+        www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
+        this is defined in the Chimera_ATT_Res_format variable in
+        farseer_user_variables.
+        
+        :param listpar: a list with the names of the columns that are 
+        to be written to chimera.
+        
+        Writes one Chimera Attribute file to each calculated parameter
+        and for each titration point. Generated files are stored in the folder
+        'ChimeraAttributeFiles'.
+        
+        This function was written this way because it
+        is easier to generate all the files at one than to make several calls
+        for each desired column.
+        """
+        
+        resform = lambda x: "\t{}{}\t".format(resformat, x)
+        colform = lambda x: colformat.format(x)
+        
+        formatting = {'Res#': resform}
+        
+        ####
+        
+        
+        for item in self.items:
+            mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
+            mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
+            mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
+            
+            #for column in listpar:
+            file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
+            if not(os.path.exists(file_path)):
+                os.makedirs(file_path)
+            
+            file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
+            fileout = open(file_name, 'w')
+                
+                
+            attheader = """#
+#
+# lost peaks {}
+#
+# unassigned peaks {}
+#
+attribute: {}
+match mode: 1-to-1
+recipient: residues
+\t""".format(resformat + self.loc[item,mask_lost,'Res#'].\
+                to_string(header=False, index=False).\
+                    replace(' ', '').replace('\n', ','),
+             resformat + self.loc[item,mask_unassigned,'Res#'].\
+                to_string(header=False, index=False).\
+                    replace(' ', '').replace('\n', ','),
+             calccol.lower())
+             
+            fileout.write(attheader)
+                
+            formatting[calccol] = colform
+            to_write = self.loc[item,mask_measured,['Res#',calccol]].\
+                        to_string(header=False, index=False,
+                                formatters=formatting,
+                                col_space=0).replace(' ', '')
+                
+                
+            fileout.write(to_write)
+                
+            fileout.close()
+            fsut.write_log('*** File saved {}\n'.format(file_name))
     

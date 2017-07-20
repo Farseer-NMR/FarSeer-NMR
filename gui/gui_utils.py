@@ -18,22 +18,32 @@ colours = OrderedDict([('#ff0000','red'),
                        ('#000000', 'black')])
 
 
-settings_720p = {'peaklistarea_height': 420,
-                 'peaklistarea_width': 420,
-                 'app_height': 768,
-                 'app_width': 1366
+settings_720p = {'peaklistarea_height': 250,
+                 'peaklistarea_width': 390,
+                 'app_height': 600,
+                 'app_width': 1200,
+                 'sideBar_height': 520,
+                 'interface_top_width': 920,
+                 'interface_top_height': 200,
+                 'footer_height': 60
                  }
 settings_1k = {'peaklistarea_height': 420,
                'peaklistarea_width': 420,
                'app_height': 850,
-               'app_width': 1300
+               'app_width': 1300,
+               'sideBar_height': 887,
+               'interface_top_width': 1264,
+               'footer_height': 60
                }
 settings_2k = {}
 
 font_weights = ["ultralight", "light", "normal", "regular", "book", "medium", "roman", "semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
 
 def deliver_settings(resolution):
-    if resolution == (768, 1366):
+    print(resolution.height(), resolution.width())
+    if (resolution.height(), resolution.width()) == (768, 1366):
         return settings_720p
-    elif resolution == (1920, 1080):
+    elif (resolution.height(), resolution.width()) == (1080, 1920):
         return settings_1k
+    else:
+        return settings_2k

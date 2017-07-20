@@ -5,9 +5,9 @@ from gui.components.Icon import Icon, ICON_DIR
 
 class Footer(QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, gui_settings=None):
         QWidget.__init__(self, parent=parent)
-        self.setFixedHeight(60)
+        self.setFixedHeight(gui_settings['footer_height'])
         self.setObjectName("footer")
 
         affiliations = '<span style="display:inline"><span style="color: #D5FD84; font-size: 6pt; display:inline">Joao MC Texeira<span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \

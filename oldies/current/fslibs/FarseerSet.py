@@ -1,7 +1,11 @@
+import collections
 import os
 import numpy as np
 import pandas as pd
-from current06.fslibs import wet as fsw
+import farseer_user_variables as fsuv
+import fslibs.Titration as fsT
+import fslibs.utils as fsut
+from fslibs.parameters import p5d
 
 class FarseerSet:
     """
@@ -53,6 +57,7 @@ class FarseerSet:
         
         # loads information into the object
         self.has_sidechains = has_sidechains
+        self.applyFASTA = applyFASTA
         self.FASTAstart = FASTAstart
         
         # lists the names of the different axes point names which are given by 
@@ -69,107 +74,132 @@ class FarseerSet:
         self.hasyy = False
         self.hasxx = False
         
-        self.log = ''  # all log goes here
-        
-        #self.log_t('Farseer Set initiated in {}'.format(spectra_path))
-        self.log_t('Initiates Farseer Set')
-        input_log = \
-"""path: {}  
-side chains: {}  
-FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.FASTAstart)
-        
-        self.log_r(input_log)
-        
         # Runs __init__ functions
-        #self.load_experiments()
-        #self.coordinates_list()
-        
-        self.p5d = pd.core.panelnd.create_nd_panel_factory(\
-            klass_name='Panel5D',
-            orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
-            slices={'labels': 'labels',
-                    'items': 'items',
-                    'major_axis': 'major_axis',
-                    'minor_axis': 'minor_axis'},
-            slicer=pd.Panel4D,
-            aliases={'major': 'index', 'minor': 'minor_axis'},
-            stat_axis=2)
-        
-        self.aal3tol1 = {"Ala": "A",
-                        "Arg": "R",
-                        "Asn": "N",
-                        "Asp": "D",
-                        "Cys": "C",
-                        "Glu": "E",
-                        "Gln": "Q",
-                        "Gly": "G",
-                        "His": "H",
-                        "Ile": "I",
-                        "Leu": "L",
-                        "Lys": "K",
-                        "Met": "M",
-                        "Phe": "F",
-                        "Pro": "P",
-                        "Ser": "S",
-                        "Thr": "T",
-                        "Trp": "W",
-                        "Tyr": "Y",
-                        "Val": "V"}
-        self.aal1tol3 = {
-                        "A": "Ala",
-                        "R": "Arg",
-                        "N": "Asn",
-                        "D": "Asp",
-                        "C": "Cys",
-                        "E": "Glu",
-                        "Q": "Gln",
-                        "G": "Gly",
-                        "H": "His",
-                        "I": "Ile",
-                        "L": "Leu",
-                        "K": "Lys",
-                        "M": "Met",
-                        "F": "Phe",
-                        "P": "Pro",
-                        "S": "Ser",
-                        "T": "Thr",
-                        "W": "Trp",
-                        "Y": "Tyr",
-                        "V": "Val"}
+        self.load_experiments()
+        self.coordinates_list()
     
-    def log_t(self, titlestr):
-        """Formats a title for log."""
-        log_title = '\n{0}  \n### {1}  \n{0}  \n'.format('*'*79, titlestr.upper())
-        self.log_r(log_title)
-        return
-    
-    def log_r(self, logstr):
+    def load_experiments(self):
         """
-        Registers the log and prints to the user.
-        
-        :logstring: the string to be registered in the log
-        """
-        print(logstr)
-        self.log += logstr+'  \n'
-        return
-    
-    def write_log(self, mod='a', path='farseer.log'):
-        with open(path, mod) as logfile:
-            logfile.write(self.log)
-        return
-    
-    def load_experiments(self,
-                         target=None,
-                         filetype='.csv',
-                         f=pd.read_csv):
-        """
-        Loads the <filetype> files in self.paths folder into nested
+        Loads the .csv and .fasta files in the spectra/ folder into nested
         dictionaries as pd.DataFrames.
+        """
+        
+        # logs activity
+        str2write = \
+'''{}{}
+{}
+'''.format(fsut.write_title('READS INPUT DATA',onlytitle=True),
+           '\n'.join(self.paths),
+           fsut.titlesperator)
+        fsut.write_log(str2write)
+        #
+        
+        # loads files in nested dictionaries
+        # piece of code found in stackoverflow
+        for p in self.paths:
+            parts = p.split('/')
+            branch = self.allpeaklists
+            brench = self.allsidechains
+            brinch = self.allFASTA
+            for part in parts[1:-1]:
+                branch = branch.setdefault(part, {})
+                brench = brench.setdefault(part, {})
+                brinch = brinch.setdefault(part, {})
+            # reads the .csv file to a pd.DataFrame removes
+            # the '.csv' from the key name to increase asthetics in output
+            if parts[-1].lower().endswith('.csv'):
+                lessparts = parts[-1][:-4]
+                branch[lessparts] = branch.get(parts[-1], pd.read_csv(p))
+                # sets sidechains to 0
+                brench[lessparts] = brench.get(parts[-1], 0)
+                
+                fsut.write_log('===> file read :: {}\n'.format(p))
+                
+            elif parts[-1].lower().endswith('.fasta'):
+                lessparts = parts[-1][:-4]
+                brinch[lessparts] = brinch.get(parts[-1], 
+                                               self.read_FASTA(p,
+                                                         start=self.FASTAstart))
+                fsut.write_log('===> file read :: {}\n'.format(p))
+            elif parts[-1].lower().endswith('.pre'):
+                pass
+            else:
+                raise ValueError('@@@ There is a file in spectra\
+ with other extension than .csv, .fasta or .pre')
+        
+        fsut.write_log(fsut.titlesperator)
+    
+    def read_FASTA(self, FASTApath, start=1):
+        """
+         str -> pd.DataFrame
+
+        :param FASTApath: the FASTA file path
+        :param start: the residue number of the first residue in the
+                      FASTA file
+        :param logfilename: the log file name
+        :return: pd.DataFrame containing the information in
+                 the FASTA file
+
+        PROCEDURE:
+
+        Reads the FASTA file and generates a 5 column DataFrame
+        with the information ready to be incorporated in the peaklists
+        dataframes.
+
+        """
+        # Opens the FASTA file, which is a string of capital letters
+        # 1-letter residue code that can be split in several lines.
+        FASTAfile = open(FASTApath, 'r')
+        fl = FASTAfile.readlines()
+        
+        # Generates a single string from the FASTA file
+        FASTA = ''
+        for i in fl:
+            if i.startswith('>'):
+                continue
+            else:
+                FASTA += i.replace(' ', '').replace('\n', '').upper()
+        
+        FASTAfile.close()
+
+        # Res# is kept as str() to allow reindexing
+        # later on the seq_expand function.
+        #
+        dd = {}
+        dd["Res#"] = [str(i) for i in range(start, (start + len(FASTA)))]
+        dd["1-letter"] = list(FASTA)
+        # aal1tol3 dictionary is defined at the end of this module
+        dd["3-letter"] = [fsut.aal1tol3[i] for i in FASTA]
+        #
+        # Assign F1 is generated here because it will serve in future
+        # functions.
+        dd["Assign F1"] = [str(i + j) for i, j in zip(dd["Res#"], 
+                                                      dd["3-letter"])]
+        # Details set to 'None' as it is by default in CCPNMRv2 peaklists
+        dd['Details'] = ['None' for i in FASTA]
+
+        df = pd.DataFrame(dd, 
+                          columns=['Res#', 
+                                   '3-letter', 
+                                   '1-letter', 'Assign F1', 'Details'])
+
+        logstring = "*** Input FASTA Sequence {}:\t{}-{}-{}\n"\
+                    .format(FASTApath, 
+                            dd['Res#'][0], FASTA, dd['Res#'][-1])
+        
+        fsut.write_log(logstring)
+        
+        return df
+    
+    def coordinates_list(self):
+        """
+        Identifies the points in each dimension of the titration.
+        In othe words: How many conditions must be analysed.
         
         It is necessary that the names of the data points for
         one dimension (condition) are the same in the other dimensions.
         
-        Example of a mandatory file hierarchy:
+        Example of a seq file mandatory hierarchy:
         
         :3rd dimension: para/ and dia/ 
         :2nd dimension: 278/, 285/ and 298/
@@ -214,123 +244,8 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         ---> l3.csv
         ---> l4.csv
         ---> seq.fasta
+        
         """
-        
-        self.log_t('READING INPUT FILES *{}*'.format(filetype))
-        
-        if not(any([p.endswith(filetype) for p in self.paths])):
-            self.log_r(fsw.wet9(filetype))
-            fsw.end_bad()
-        
-        
-        # loads files in nested dictionaries
-        # piece of code found in stackoverflow
-        for p in self.paths:
-            parts = p.split('spectra')[-1].split('/')
-            branch = target
-            for part in parts[1:-1]:
-                branch = branch.setdefault(part, {})
-            # reads the .csv file to a pd.DataFrame removes
-            # the '.csv' from the key name to increase asthetics in output
-            if parts[-1].lower().endswith(filetype):
-                self.log_r('* {}'.format(p))
-                lessparts = parts[-1].split('.')[0]
-                branch[lessparts] = branch.get(parts[-1], f(p))
-        
-        ############ WET #8
-        zkeys = list(target.keys())
-        ykeys = list(target[zkeys[0]].keys())
-        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
-        
-        if not(len(zkeys) * len(ykeys) * len(xkeys) == \
-            len([x for x in self.paths if x.endswith(filetype)])):
-            #DO
-            str1 = ''
-            for z, vz in target.items():
-                str1 += z+'/\n'
-                for y, vy in target[z].items():
-                    str1 += \
-                        "\t{}/\t{}\n".format(y, "\t".join(sorted(vy.keys())))
-            
-            self.log_r(fsw.wet8(filetype, str1))
-            fsw.end_bad()
-        else:
-            self.log_r('> All <{}> files found - OK!'.format(filetype))
-        ############
-        
-        return
-    
-    
-    def read_FASTA(self, FASTApath):
-        """
-         str -> pd.DataFrame
-
-        :param FASTApath: the FASTA file path
-        :param start: the residue number of the first residue in the
-                      FASTA file
-        :return: pd.DataFrame containing the information in
-                 the FASTA file
-
-        PROCEDURE:
-
-        Reads the FASTA file and generates a 5 column DataFrame
-        with the information ready to be incorporated in the peaklists
-        dataframes.
-
-        """
-        # Opens the FASTA file, which is a string of capital letters
-        # 1-letter residue code that can be split in several lines.
-        FASTAfile = open(FASTApath, 'r')
-        fl = FASTAfile.readlines()
-        
-        # Generates a single string from the FASTA file
-        FASTA = ''
-        for i in fl:
-            if i.startswith('>'):
-                continue
-            else:
-                FASTA += i.replace(' ', '').replace('\n', '').upper()
-        
-        FASTAfile.close()
-
-        # Res# is kept as str() to allow reindexing
-        # later on the seq_expand function.
-        #
-        dd = {}
-        dd["Res#"] = [str(i) for i in range(self.FASTAstart,
-                                           (self.FASTAstart + len(FASTA)))]
-        dd["1-letter"] = list(FASTA)
-        # aal1tol3 dictionary is defined at the end of this module
-        dd["3-letter"] = [self.aal1tol3[i] for i in FASTA]
-        #
-        # Assign F1 is generated here because it will serve in future
-        # functions.
-        dd["Assign F1"] = [str(i + j) for i, j in zip(dd["Res#"], 
-                                                      dd["3-letter"])]
-        # Details set to 'None' as it is by default in CCPNMRv2 peaklists
-        dd['Details'] = ['None' for i in FASTA]
-
-        df = pd.DataFrame(dd, 
-                          columns=['Res#', 
-                                   '3-letter', 
-                                   '1-letter', 'Assign F1', 'Details'])
-        
-        logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['Res#'][-1])
-        
-        self.log_r(logs)
-        
-        return df
-    
-    
-    def init_conditions(self):
-        """
-        Identifies the data points for each titration condition.
-        Configures the conditions to be analyzed.
-        
-        returns: output log string.
-        """
-        
-        self.log_t('IDENTIFIED TITRATION VARIABLES')
         
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
@@ -352,25 +267,25 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         if len(self.xxcoords) > 1:
             self.hasxx = True
         
-        logs = '''\
-* 1st titration variables (cond1): {}
-* 2nd titration variables (cond2): {}
-* 3rd titration variables (cond3): {}
-'''.format(self.xxcoords, self.yycoords, self.zzcoords)
-        
-        self.log_r(logs)
-        
-        return
+        # logs activity, which keys where found in each dimension
+        str2write = \
+'''{}> 1st titration variables (cond1): {}
+> 2nd titration variables (cond2): {}
+> 3rd titration variables (cond3): {}
+{}
+'''.format(fsut.write_title('IDENTIFIED TITRATION VARIABLES', onlytitle=True),
+           self.xxcoords, self.yycoords, self.zzcoords, fsut.titlesperator)
+
+        fsut.write_log(str2write)
     
-    def tricicle(self, zz, yy, xx, exec_func, args=[],
-                 title='TRICILES', kwargs={}):
+    def tricicle(self, zz, yy, xx, exec_func, args=[], kwargs={}):
         """
         Executes a function over the nested dictionary.
         FarseerSet() functions operate on each pd.DataFrame,
         therefore tricicle() is a way to perform an action over
         all the DataFrames (spectra).
         
-        :zz, yy, xx: the lists of condition data points
+        :zz, yy, xx: the lists of dimension points
         :exec_func: the name of the function to executed
         :args: a list to be passed as *args to the exec_func
         :kwargs: a dict to be passed as *kwargs to the exec_func
@@ -381,21 +296,22 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # helper variable. Some function return variables that are used in the
         # next cycle.
         tmp_vars = {}
-        self.log_t(title)
         
         for z in zz:
+            fsut.write_log(fsut.dim_sperator(z, 'top'))
             for y in yy:
+                fsut.write_log(fsut.dim_sperator(y, 'midle'))
                 for x in xx:
+                    fsut.write_log(fsut.dim_sperator(x, 'own'))
                     # tmp_vars is a helper variable that is useful for
                     # some functions
                     #
-                    # The exec_func that operates on the pd.DataFrame,
-                    # therefore, x, y and x are
-                    # passed to the function so that the pd.DataFrame
+                    #The exec_func that operates on the pd.DataFrame,
+                    #therefore, x, y and x are
+                    #passed to the function so that the pd.DataFrame
                     # can be indexed in the dictionary.
                     tmp_vars = exec_func(z, y, x, tmp_vars, *args, **kwargs)
-        
-        return
+
 
     def split_res_info(self, z, y ,x, tmp_vars):
         """
@@ -438,7 +354,6 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         '1-letter' and '3-letter' to identify the two sidechains resonances.
         """
         
-        
         # Step 1)
         # extracts residue information from "Assign F1" column.
         resInfo = self.allpeaklists[z][y][x].\
@@ -449,7 +364,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # Step 2)
         # generates 1-letter code column
         resInfo.loc[:,'1-letter'] = \
-            resInfo.loc[:,"3-letter"].map(self.aal3tol1.get)
+            resInfo.loc[:,"3-letter"].map(fsut.aal3tol1.get)
         
         # Step 3)
         # concatenates the original peaklist DataFrame and the new
@@ -464,21 +379,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # are labeled as 'measured'. On later stages of the script
         # peaks not identified will be added to the peaklist, and those
         # peaks will be label as 'lost' or 'unassigned'.
-        try:
-            self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
-        except ValueError:
-            self.allpeaklists[z][y][x] = self.allpeaklists[z][y][self.xxref].copy()
-            self.allpeaklists[z][y][x].loc[:,['Peak Status',
-                                              'Merit',
-                                              'Position F1',
-                                              'Position F2',
-                                              'Height',
-                                              'Volume',
-                                              'Line Width F1 (Hz)',
-                                              'Line Width F2 (Hz)']] =\
-                ['lost',np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]
-            #print(self.allpeaklists[z][y][x])
-            #input('')
+        self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
         
         # Step 6)
         # sorts the peaklist.
@@ -502,7 +403,6 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # initiates SD counter
         sd_count = {True:0}
         
-        # if the user says it has sidechains and there are actually sidechains.
         if self.has_sidechains and (True in sidechains_bool.value_counts()):
             # two condition are evaluated in case the user has set sidechains
             # to True but there are actually no sidechains.
@@ -512,22 +412,10 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
             # DataFrame with side chains
             self.allsidechains[z][y][x] = \
                 self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-
+            
             # adds 'a' or 'b'
             self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                 self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
-            
-            
-            self.allsidechains[z][y][x].reset_index(inplace=True)
-            
-            self.allsidechains[z][y][x].loc[:,'Res#'] = \
-                self.allsidechains[z][y][x]['Res#'].astype(int)
-            
-            self.allsidechains[z][y][x].\
-                sort_values(by=['Res#','ATOM'] , inplace=True)
-            
-            self.allsidechains[z][y][x].loc[:,'Res#'] = \
-                self.allsidechains[z][y][x]['Res#'].astype(str)
             
             # creates backbone peaklist without sidechains
             self.allpeaklists[z][y][x] = \
@@ -541,20 +429,16 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # the script does not correct for the fact that the user sets
         # no sidechains but that actually are sidechains, 
         # though the log file register such occurrence.
-        logs = '**[{}][{}][{}]** new columns inserted:  {}  \
-| sidechains user setting: {} \
-| sidechains identified: {} | SD count: {}'.\
-            format(z,y,x,columns_OK,
+        str2write = '*** new columns inserted:  {}  \
+*** sidechains user setting: {} \
+** sidechains identified: {} ** SD count: {}.\n'.\
+            format(columns_OK,
             self.has_sidechains,
             (True in sidechains_bool.value_counts()),
             sd_count[True])
-        
-        self.log_r(logs)
-        
-        return
-
-    def correct_shifts_backbone(self, z, y, x, ref_data,
-                       ref_res='1'):
+        fsut.write_log(str2write)
+    
+    def correct_shifts(self, z, y, x, ref_data, ref_res='1'):
         """
         Corrects Chemical Shifts in a peaklist DataFrame according
         to an internal reference peak which is chosen by user. This
@@ -563,25 +447,31 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         :ref_res: string with the number of the reference residue
         """
         
-        dp_res_mask = self.allpeaklists[z][y][x].loc[:,'Res#'] == ref_res
-        dp_F1_cs = self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F1']
-        dp_F2_cs = self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F2']
+        pt_res_mask = self.allpeaklists[z][y][x].loc[:,'Res#'] == ref_res
+        pt_F1_cs = self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F1']
+        pt_F2_cs = self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F2']
         
         # Reads the information of the selected peak in the reference spectrum
         if x == self.xxref:
             
             # loads the chemical shift for F1 of the ref res
-            ref_data['F1_cs'] = dp_F1_cs
+            ref_data['F1_cs'] = \
+                self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F1']
             
             # loads the chemical shift for the F2 of the ref res
-            ref_data['F2_cs'] = dp_F2_cs
+            ref_data['F2_cs'] = \
+                self.allpeaklists[z][y][x].loc[pt_res_mask,'Position F2']
+            
+            # copies the chemical shift values to a new column
+            self.allpeaklists[z][y][x].loc[:,'Position F1 original'] =\
+                self.allpeaklists[z][y][x].loc[:,'Position F1']
         
         # calculates the difference between the reference chemical shift the
         # chemical shift of the reference residue in the present spectrum
-        # in case we are analysing the refence spectrum this operation should
+        # in case we are analysing the refence spectrum this operation shoul
         # return 0.
-        F1_cs_diff = float(dp_F1_cs) - float(ref_data['F1_cs'])
-        F2_cs_diff = float(dp_F2_cs) - float(ref_data['F2_cs'])
+        F1_cs_diff = float(pt_F1_cs) - float(ref_data['F1_cs'])
+        F2_cs_diff = float(pt_F2_cs) - float(ref_data['F2_cs'])
         
         # copies the chemical shift data to a backup column
         self.allpeaklists[z][y][x].loc[:,'Position F1 original'] =\
@@ -601,43 +491,19 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                 self.allpeaklists[z][y][x].loc[:,'Position F2'].sub(F2_cs_diff)
         
         # logs the operation
-        logs = '**[{}][{}][{}]** | On residue {} F1 ref {:.4f} \
-| correction factor {:.4f} \
-| F2 ref {:.4f} \
-| correction factor {:.4f}'\
-        .format(z,y,x, ref_res,
-                float(ref_data['F1_cs']), F1_cs_diff, 
-                float(ref_data['F2_cs']), F2_cs_diff)
-        
-        self.log_r(logs)
+        str2write = '''
+> F1 ref data :: {:.4f} :: correction {:.4f}
+> F2 ref data :: {:.4f} :: correction {:.4f}
+'''.format(float(ref_data['F1_cs']), F1_cs_diff,
+           float(ref_data['F2_cs']), F2_cs_diff)
+        fsut.write_log(str2write)
         
         # returns a dictionary containing the infomation on the reference
         # chemical shift
         return ref_data
     
-    def correct_shifts_sidechains(self):
-        """
-        Corrects the chemical shifts of the sidechains residues
-        based on the correction values previously obtained for the
-        backbone residues.
-        """
-        self.allsidechains[z][y][x].loc[:,'Position F1'] = \
-            self.allsidechains[z][y][x].loc[:,'Position F1'].sub(\
-                self.allpeaklists[z][y][x].loc[0,'Pos F1 correction'])
-        
-        self.allsidechains[z][y][x].loc[:,'Position F2'] = \
-            self.allsidechains[z][y][x].loc[:,'Position F2'].sub(\
-                self.allpeaklists[z][y][x].loc[0,'Pos F2 correction'])
-        
-        s2w = 'Corrected sidechain shifts based on reference.'
-        return None, s2w
-    
-    def seq_expand(self, z, y, x, tmp_vars,
-                         ref_seq_dict,
-                         target_seq_dict,
-                         fillna_dict,
-                         refscoords=None,
-                         atomtype='Backbone'):
+    def seq_expand(self, z, y, x, tmp_vars, ref_seq_dict, target_seq_dict,
+                   fillna_dict, refscoords=None):
         """
         Expands the 'Res#' columns of a target peaklist (seq)
         according to a reference peaklist (seq).
@@ -658,43 +524,18 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
             refcz = z
             refcy = y
         
-        # reads the reference key
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
-        if atomtype=='Sidechain':
-            
-            ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
-                ref_seq_dict[z][y][ref_key].loc[:,['Res#', 'ATOM']].\
-                    apply(lambda x: ''.join(x), axis=1)
-            
-            
-            target_seq_dict[z][y][x].loc[:,'Res#'] = \
-                target_seq_dict[z][y][x].loc[:,['Res#', 'ATOM']].\
-                    apply(lambda x: ''.join(x), axis=1)
-        
-        
-        
-        # reads new index from the Res# column of the reference peaklist
         ind = ref_seq_dict[refcz][refcy][ref_key].loc[:,'Res#']
+        length_ind = ind.size  # stores size of new index
         
-        # stores size of new index
-        length_ind = ind.size 
-        
-        # stores initial size of the target peaklist
         length_target_init = target_seq_dict[z][y][x].shape[0]
         
-        # expands the target peaklist to the new index
-        target_seq_dict[z][y][x] = \
-            target_seq_dict[z][y][x].set_index('Res#').\
-                                     reindex(ind).\
-                                     reset_index().\
-                                     fillna(fillna_dict)
+        target_seq_dict[z][y][x] = target_seq_dict[z][y][x].set_index('Res#').\
+                            reindex(ind).reset_index().fillna(fillna_dict)
     
-        # reads length of the expanded peaklist
         length_target_final = target_seq_dict[z][y][x].shape[0]
-        
-        # transfers information of the different columns
-        # from the reference to the expanded peaklist
+    
         target_seq_dict[z][y][x].loc[:,'3-letter'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'3-letter']
         
@@ -704,33 +545,16 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         target_seq_dict[z][y][x].loc[:,'Assign F1'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'Assign F1']
         
-        if atomtype=='Sidechain':
-            
-            target_seq_dict[z][y][x].loc[:,'ATOM'] = \
-                ref_seq_dict[refcz][refcy][ref_key].loc[:,'ATOM']
-            
-            
-            target_seq_dict[z][y][x].loc[:,'Res#'] = \
-                target_seq_dict[z][y][x].loc[:,'Res#'].str[:-1]
-            
-            ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
-                ref_seq_dict[z][y][ref_key].loc[:,'Res#'].str[:-1]
-                
-        
-        logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
-| Target Initial Length :: {} \
-| Template Length :: {} \
-| Target final length :: {}".format(z,y,x,
-                                    refcz, refcy, ref_key,
-                                    length_target_init,
-                                    length_ind,
-                                    length_target_final)
-        
-        self.log_r(logs)
-        
-        return
-        
-    def organize_cols(self, z, y, x, tmp_vars, peaklist,
+        str2write = \
+""" > Template Length[{}|{}|{}] :: {} \
+| Target Initial Length[{}|{}|{}] :: {} \
+| Target final length :: {}
+""".format(refcz, refcy, ref_key, length_ind, z, y, x,
+           length_target_init, length_target_final)
+    
+        fsut.write_log(str2write)
+    
+    def column_organizor(self, z, y, x, tmp_vars, peaklist,
                          performed_cs_correction=False,
                          sidechains=False):
         """
@@ -741,7 +565,6 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
 
         Returns the organized dataframe.
         """
-        
         if performed_cs_correction and not(sidechains):
             col_order = ['Res#',
                          '1-letter',
@@ -759,8 +582,8 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                          'Assign F1',
                          'Assign F2',
                          'Details',
-                         '#',
                          'Number',
+                         '#',
                          'index',
                          'Position F1 original',
                          'Position F2 original',
@@ -785,8 +608,8 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                          'Assign F1',
                          'Assign F2',
                          'Details',
-                         '#',
                          'Number',
+                         '#',
                          'index',
                          'Position F1 original',
                          'Position F2 original',
@@ -836,12 +659,12 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                          '#',
                          'index']
         
-        
+        print(peaklist[z][y][x].columns)
         peaklist[z][y][x] = peaklist[z][y][x][col_order]
-        self.log_r('**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x))
-        return
+        str2write = ' > Columns organized :: [{}|{}|{}]\n'.format(z, y, x)
+        fsut.write_log(str2write)
     
-    def init_Farseer_cube(self, use_sidechains=False):
+    def gen_Farseer_cube(self, use_sidechains=False):
         """
         Creates a pd.Panel5D with the information of all
         the parsed peaklists from this panel, the information will
@@ -852,38 +675,48 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         are treated separately from the backbone atoms.
         """
         
-        self.log_t('INITIATING FARSEER CUBE')
-        self.peaklists_p5d = self.p5d(self.allpeaklists)
-        self.log_r('> Created cube for all the backbone peaklists - OK!')
+        self.peaklists_p5d = p5d(self.allpeaklists)
         
         if use_sidechains:
-            self.sidechains_p5d = self.p5d(self.allsidechains)
-            self.log_r(\
-                '> Created cube for all the sidechains peaklists - OK!')
+            self.sidechains_p5d = p5d(self.allsidechains)
             
-        return
+        fsut.write_log('OK!')
     
-    def gen_titration(self, titration_panel, titration_class, titration_kwargs):
-        """Creates a titration object fsT.Titration."""
+    def write_parsed_pkl(self, z, y, x, tmp_vars, peaklists,
+                         tsv_path='Backbone/parsed_peaklists'):
+        """
+        Writes the parsed peaklists to .tsv files.
+        """
+        tsv_path += '/{}/{}'.format(z, y)
+        tsv_file = tsv_path + '/{}.tsv'.format(x)
         
-        titration_panel = \
-            titration_class(np.array(titration_panel),
-                            items=titration_panel.items,
-                            minor_axis=titration_panel.minor_axis,
-                            major_axis=titration_panel.major_axis)
+        if not os.path.exists(tsv_path):
+            os.makedirs(tsv_path)
+        
+        tsv_output = open(tsv_file, 'w')
+        
+        tsv_output.write(\
+            peaklists[z][y][x].to_csv(sep="\t", na_rep='NaN',
+                                      float_format='%.4f', index=False))
+        
+        fsut.write_log('> writen: {}\n'.format(tsv_file))
+        tsv_output.close()
+    
+    def gen_titration(self, titpanel, D_attributes):
+        """
+        Creates a titration object fsT.Titration.
+        """
+        tmp = fsT.Titration(np.array(titpanel),
+             items=titpanel.items,
+             minor_axis=titpanel.minor_axis,
+             major_axis=titpanel.major_axis)
              
         # activates the titration attibutes
-        titration_panel.create_titration_attributes(**titration_kwargs)
-        #
-        return titration_panel
+        tmp.create_titration_attributes(**D_attributes)
+        return tmp
     
-    def gen_titration_dict(self, panelT,
-                                 titration_type,
-                                 owndim_pts,
-                                 nextdims1,
-                                 nextdims2,
-                                 titration_class,
-                                 titration_kwargs):
+    def gen_titration_dict(self, panelT, tittype, owndim_pts,
+                           nextdims1, nextdims2, reso_type):
         '''
         :panelT: the pd.Panel5D storing all the information of the
                  titration set transposed so that the items are the
@@ -905,61 +738,37 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         dimension/condition.
         '''
         
-        self.log_t(\
-            'GENERATING DICTIONARY OF TITRATIONS FOR {}'.format(\
-                titration_type))
-        
         # initiates dictionary
         D = {}
         
         # initiates attributes that will be pased as kwargs
-        titration_kwargs['titration_type'] = titration_type
-        titration_kwargs['owndim_pts'] = owndim_pts
+        D_attributes = {}
+        D_attributes['resonance_type'] = reso_type
+        D_attributes['tittype'] = tittype
+        D_attributes['owndim_pts'] = owndim_pts
         
         for dim2_pts in nextdims2:
-            #fsut.write_log(fsut.dim_sperator(dim2_pts, 'top'))
+            fsut.write_log(fsut.dim_sperator(dim2_pts, 'top'))
             D.setdefault(dim2_pts, {})
             for dim1_pts in nextdims1:
-                #fsut.write_log(fsut.dim_sperator(dim1_pts, 'midle'))
-                titration_kwargs['dim2_pts'] = dim2_pts
-                titration_kwargs['dim1_pts'] = dim1_pts
+                fsut.write_log(fsut.dim_sperator(dim1_pts, 'midle'))
+                D_attributes['dim2_pts'] = dim2_pts
+                D_attributes['dim1_pts'] = dim1_pts
                 D[dim2_pts][dim1_pts] = \
                     self.gen_titration(panelT.loc[dim2_pts, dim1_pts, :, :, :],
-                                       titration_class, titration_kwargs)
-                #
-                self.log_r('**Titration [{}][{}]** \
-with data points {}'.format(dim2_pts,
-                       dim1_pts,
-                       list(D[dim2_pts][dim1_pts].items)))
+                                       D_attributes)
                 
-                #fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
-        
+                fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         return D
     
-    def exports_parsed_pkls(self, z, y, x, args):
-        """
-        Exports the parsed peaklists.
-        """
-        folder = 'spectra_parsed/{}/{}'.format(z,y)
-        if not(os.path.exists(folder)):
-            os.makedirs(folder)
-        fpath = '{}/{}.csv'.format(folder, x)
-        fileout = open(fpath, 'w')
-        fileout.write(self.allpeaklists[z][y][x].to_csv(sep=',',
-                                                index=False,
-                                                na_rep='NaN',
-                                                float_format='%.4f'))
-        
-        if self.has_sidechains:
-            folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
-            if not(os.path.exists(folder)):
-                os.makedirs(folder)
-            fpath = '{}/{}.csv'.format(folder, x)
-            fileout = open(fpath, 'w')
-            fileout.write(self.allsidechains[z][y][x].to_csv(sep=',',
-                                                    index=False,
-                                                    na_rep='NaN',
-                                                    float_format='%.4f'))
-            
-            fileout.close()
-        return
+
+if __name__ == '__main__':
+    #x = ExperimentSet(ppp, **user_dict)
+    #x.load_peaklists()
+    #x.coordinates_list()
+    #x.tricicle(x.zz, x.xx, x.yy, x.printt)
+    #a = x.xx
+    #print(x.paths)
+    #print(x.zzref)
+    #print(x.ww)
+    print(a)
