@@ -1,6 +1,8 @@
-Welcome to the FarSeer-NMR wiki!
+**Welcome to the FarSeer-NMR wiki!**
 
-We hope you find here all the necessary information to run, analyse, represent and publish your data with **Farseer-NMR**, saving several days of hard work and performing complex analysis with simple experimental sets.
+Farseer-NMR was developed to improve and facilitate the analysis of BioMolecular NMR data derived from proteins or DNA investigations. Taking a series of 2D-NMR peaklists, automatic analysis, calculation and representation of results in publication-quality plots is possible thanks to Farseer-NMR. You won't need to spend more days of meticulous work in spreadsheets or obviate part of your results because of complexity, Farseer-NMR presents a straightforward manner to extract the most out of your data.
+
+This Wiki page is intended to explain how Farseer-NMR conceptually works, the technical details on how to set a calculation running and how to read and analyse the generated results *(which may be many!)*.
 
 ## Understanding Farseer-NMR
 
