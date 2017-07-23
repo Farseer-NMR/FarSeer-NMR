@@ -35,7 +35,7 @@ from gui.Footer import Footer
 from gui import resources_rc
 
 
-from current06.fslibs.io import json_to_fsuv
+from current.fslibs.io import json_to_fsuv
 
 valuesDict = {
             'x': [],
@@ -47,7 +47,7 @@ peakLists = {}
 
 class TabWidget(QTabWidget):
 
-    def __init__(self, app_dims, gui_settings):
+    def __init__(self, gui_settings):
         QTabWidget.__init__(self, parent=None)
         self.tab1 = QWidget()
         self.tab2 = QWidget()
@@ -684,8 +684,7 @@ class Main(QWidget):
 
     def __init__(self, parent=None, gui_settings=None, **kw):
         QWidget.__init__(self, parent=parent)
-        print(gui_settings)
-        tabWidget = TabWidget(app_dims, gui_settings)
+        tabWidget = TabWidget(gui_settings)
         footer = Footer(self, gui_settings=gui_settings)
 
         layout = QVBoxLayout(self)
@@ -712,18 +711,8 @@ if __name__ == '__main__':
     screen_resolution = app.desktop().screenGeometry()
 
     from gui import gui_utils
-    gui_settings = gui_utils.deliver_settings(screen_resolution)
+    gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
 
-
-    if (screen_resolution.height(), screen_resolution.width()) == (720, 1280):
-        app_dims = screen_resolution.size()
-        stylesheet = open('gui/stylesheet_720p.qss').read()
-        print('720p')
-    # elif (screen_resolution.height(), screen_resolution.width()) == (1440, 2560):
-    #     app_dims = QtCore.QSize(1800, 850)
-    else:
-        app_dims = QtCore.QSize(1600, 1000)
-        stylesheet = open('gui/stylesheet_2k.qss').read()
     ex = Main(gui_settings=gui_settings)
     splash.finish(ex)
     fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'

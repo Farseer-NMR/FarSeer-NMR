@@ -29,15 +29,15 @@ settings_720p = {'peaklistarea_height': 350,
                  'interface_top_height': 150,
                  'footer_height': 60
                  }
-settings_1k = {'peaklistarea_height': 350,
+settings_1k = {'peaklistarea_height': 550,
                  'peaklistarea_width': 920,
                  'scene_width': 910,
-                 'scene_height': 346,
-                 'app_height': 600,
-                 'app_width': 1200,
-                 'sideBar_height': 510,
-                 'interface_top_width': 920,
-                 'interface_top_height': 150,
+                 'scene_height': 580,
+                 'app_height': 900,
+                 'app_width': 1500,
+                 'sideBar_height': 808,
+                 'interface_top_width': 1158,
+                 'interface_top_height': 200,
                  'footer_height': 60
                  }
 settings_2k = {'peaklistarea_height': 640,
@@ -54,10 +54,13 @@ settings_2k = {'peaklistarea_height': 640,
 font_weights = ["ultralight", "light", "normal", "regular", "book", "medium", "roman", "semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
 
 def deliver_settings(resolution):
-    print(resolution.height(), resolution.width())
-    if (resolution.height(), resolution.width()) == (720, 1280):
-        return settings_720p
+
+    if (resolution.height(), resolution.width()) == (1440, 2560):
+        stylesheet = open('gui/stylesheet_2k.qss').read()
+        return settings_2k, stylesheet
     elif (resolution.height(), resolution.width()) == (1080, 1920):
-        return settings_1k
+        stylesheet = open('gui/stylesheet_1k.qss').read()
+        return settings_1k, stylesheet
     else:
-        return settings_2k
+        stylesheet = open('gui/stylesheet_720p.qss').read()
+        return settings_720p, stylesheet

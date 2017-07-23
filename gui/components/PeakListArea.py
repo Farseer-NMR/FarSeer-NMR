@@ -131,14 +131,14 @@ class ConditionLabel(QGraphicsTextItem):
 
   def __init__(self, text, pos=None):
       QGraphicsTextItem.__init__(self)
-      self.setHtml('<div style="color: %s; font-size: 12pt; ">%s</div>' % ('#FAFAF7', text))
+      self.setHtml('<div style="color: %s; font-size: 8pt; ">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
 
 class PeakListLabel(QGraphicsTextItem):
 
   def __init__(self, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
       QGraphicsTextItem.__init__(self)
-      self.setHtml('<div style="color: %s; font-size: 12pt;">%s</div>' % ('#FAFAF7', text))
+      self.setHtml('<div style="color: %s; font-size: 8pt;">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
       self.setAcceptDrops(True)
       self.scene = scene
