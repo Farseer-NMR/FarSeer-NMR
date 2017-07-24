@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QSpinBox, QLabel, QHBoxLayout
 
 class LabelledSpinBox(QWidget):
 
-    def __init__(self, parent, text):
+    def __init__(self, parent, text, callback=None):
 
         QWidget.__init__(self, parent)
 
@@ -16,8 +16,15 @@ class LabelledSpinBox(QWidget):
         self.layout().addWidget(label)
         self.layout().addWidget(self.field)
 
+        if callback:
+            self.set_callback(callback)
+
+
     def setValue(self, value):
         if value:
             self.field.setValue(value)
         else:
             self.field.setValue(0)
+
+    def set_callback(self, callback):
+        self.field.valueChanged.connect(callback)

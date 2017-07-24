@@ -26,6 +26,8 @@ class SideBar(QTreeWidget):
         if not event.mimeData().hasUrls():
 
             item = self.itemAt(event.pos())
+            if not item:
+                pass
             text = item.text(0)
             event.mimeData().setText(text)
 

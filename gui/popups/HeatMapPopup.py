@@ -6,7 +6,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 from functools import partial
 
-from current.default_config import defaults
+from current06.default_config import defaults
 from gui.gui_utils import font_weights
 
 
@@ -30,6 +30,7 @@ class HeatMapPopup(QDialog):
         self.heat_map_x_ticks_rot = LabelledSpinBox(self, "X Tick Rotation")
         self.heat_map_x_ticks_fn = FontComboBox(self, "X Tick Font")
         self.heat_map_x_tick_pad = LabelledSpinBox(self, "X Tick Padding")
+        self.heat_map_x_tick_weight = LabelledCombobox(self, text="X Tick Font Weight", items=font_weights)
         self.heat_map_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
         self.heat_map_y_label_pad = LabelledSpinBox(self, "Y Label Padding")
         self.heat_map_y_label_fn = FontComboBox(self, "Y Label Font")
@@ -47,14 +48,15 @@ class HeatMapPopup(QDialog):
         self.layout().addWidget(self.heat_map_x_ticks_rot, 4, 0)
         self.layout().addWidget(self.heat_map_x_ticks_fn, 5, 0)
         self.layout().addWidget(self.heat_map_x_tick_pad, 6, 0)
-        self.layout().addWidget(self.heat_map_y_label_fs, 7, 0)
-        self.layout().addWidget(self.heat_map_y_label_pad, 0, 1)
-        self.layout().addWidget(self.heat_map_y_label_fn, 1, 1)
-        self.layout().addWidget(self.heat_map_y_label_weight, 2, 1)
-        self.layout().addWidget(self.heat_map_right_margin, 3, 1)
-        self.layout().addWidget(self.heat_map_bottom_margin, 4, 1)
-        self.layout().addWidget(self.heat_map_top_margin, 5, 1)
-        self.layout().addWidget(self.heat_map_cbar_font_size, 6, 1)
+        self.layout().addWidget(self.heat_map_x_tick_weight, 7, 0)
+        self.layout().addWidget(self.heat_map_y_label_fs, 0, 1)
+        self.layout().addWidget(self.heat_map_y_label_pad, 1, 1)
+        self.layout().addWidget(self.heat_map_y_label_fn, 2, 1)
+        self.layout().addWidget(self.heat_map_y_label_weight, 3, 1)
+        self.layout().addWidget(self.heat_map_right_margin, 4, 1)
+        self.layout().addWidget(self.heat_map_bottom_margin, 5, 1)
+        self.layout().addWidget(self.heat_map_top_margin, 6, 1)
+        self.layout().addWidget(self.heat_map_cbar_font_size, 7, 1)
 
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
@@ -75,7 +77,8 @@ class HeatMapPopup(QDialog):
         self.heat_map_x_ticks_fs.setValue(self.default["heat_map_x_ticks_fs"])
         self.heat_map_x_ticks_rot.setValue(self.default["heat_map_x_ticks_rot"])
         self.heat_map_x_ticks_fn.select(self.default["heat_map_x_ticks_fn"])
-        self.heat_map_x_tick_pad.setValue(self.default["heat_map_x_tick_pad"])
+        self.heat_map_x_tick_pad.setValue(self.default["heat_map_x_ticks_pad"])
+        self.heat_map_x_tick_weight.select(self.default["heat_map_x_ticks_weight"])
         self.heat_map_y_label_fs.setValue(self.default["heat_map_y_label_fs"])
         self.heat_map_y_label_pad.setValue(self.default["heat_map_y_label_pad"])
         self.heat_map_y_label_fn.select(self.default["heat_map_y_label_fn"])
@@ -92,7 +95,8 @@ class HeatMapPopup(QDialog):
         self.variables["heat_map_x_ticks_fs"] = self.heat_map_x_ticks_fs.field.value()
         self.variables["heat_map_x_ticks_rot"] = self.heat_map_x_ticks_rot.field.value()
         self.variables["heat_map_x_ticks_fn"] = self.heat_map_x_ticks_fn.fields.currentText()
-        self.variables["heat_map_x_tick_pad"] = self.heat_map_x_tick_pad.field.value()
+        self.variables["heat_map_x_ticks_pad"] = self.heat_map_x_tick_pad.field.value()
+        self.variables["heat_map_x_ticks_weight"] = self.heat_map_x_tick_weight.fields.currentText()
         self.variables["heat_map_y_label_fs"] = self.heat_map_y_label_fs.field.value()
         self.variables["heat_map_y_label_pad"] = self.heat_map_y_label_pad.field.value()
         self.variables["heat_map_y_label_fn"] = self.heat_map_y_label_fn.fields.currentText()
@@ -111,7 +115,8 @@ class HeatMapPopup(QDialog):
         self.heat_map_x_ticks_fs.setValue(self.variables["heat_map_x_ticks_fs"])
         self.heat_map_x_ticks_rot.setValue(self.variables["heat_map_x_ticks_rot"])
         self.heat_map_x_ticks_fn.select(self.variables["heat_map_x_ticks_fn"])
-        self.heat_map_x_tick_pad.setValue(self.variables["heat_map_x_tick_pad"])
+        self.heat_map_x_tick_pad.setValue(self.variables["heat_map_x_ticks_pad"])
+        self.heat_map_x_tick_weight.select(self.variables["heat_map_x_ticks_weight"])
         self.heat_map_y_label_fs.setValue(self.variables["heat_map_y_label_fs"])
         self.heat_map_y_label_pad.setValue(self.variables["heat_map_y_label_pad"])
         self.heat_map_y_label_fn.select(self.variables["heat_map_y_label_fn"])

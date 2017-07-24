@@ -1,32 +1,32 @@
-import farseer_user_variables as fsuv
-
-def write_title(title, onlytitle=False):
-    '''
-    :param onlytitle: False to identify is is only to generate title
-                      or to print to log
-    '''
-    
-    str2write = '\n\n\n{}\n{:^80}\n{}\n'.format(titlesperator,
-                                                title, titlesperator)
-    
-    if onlytitle:
-        return str2write
-        
-    else:
-        write_log(str2write)
-
-def write_log(str2write, mod='a', logfile_name = fsuv.logfile_name):
-    """
-    str, str -> None
-
-    :param logfilename: the string with the name of the output log file
-    :param towrite: the string to write in the log file
-    :return: None
-    """
-    with open(logfile_name, mod) as logfile:
-        logfile.write(str2write)
-
-    print(str2write)
+# # import farseer_user_variables as fsuv
+#
+# def write_title(title, onlytitle=False):
+#     '''
+#     :param onlytitle: False to identify is is only to generate title
+#                       or to print to log
+#     '''
+#
+#     str2write = '\n\n\n{}\n{:^80}\n{}\n'.format(titlesperator,
+#                                                 title, titlesperator)
+#
+#     if onlytitle:
+#         return str2write
+#
+#     else:
+#         write_log(str2write)
+#
+# def write_log(str2write, mod='a', logfile_name = fsuv.logfile_name):
+#     """
+#     str, str -> None
+#
+#     :param logfilename: the string with the name of the output log file
+#     :param towrite: the string to write in the log file
+#     :return: None
+#     """
+#     with open(logfile_name, mod) as logfile:
+#         logfile.write(str2write)
+#
+#     print(str2write)
 
 
 def dim_sperator(item2write, layer):
@@ -143,3 +143,12 @@ def combine_dicts(dictionaries):
     for dictionary in dictionaries:
         tmp_dict.update(dictionary)
     return tmp_dict
+
+from functools import reduce  # forward compatibility for Python 3
+import operator
+
+def getFromDict(dataDict, mapList):
+    return reduce(operator.getitem, mapList, dataDict)
+
+def setInDict(dataDict, mapList, value):
+    getFromDict(dataDict, mapList[:-1])[mapList[-1]] = value

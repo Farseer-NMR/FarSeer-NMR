@@ -9,7 +9,7 @@ from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
 from functools import partial
-from current.default_config import defaults
+from current06.default_config import defaults
 from gui.gui_utils import font_weights
 
 class DPrePopup(QDialog):
@@ -25,6 +25,7 @@ class DPrePopup(QDialog):
             self.variables = variables["dpre_osci_settings"]
         self.default = defaults["dpre_osci_settings"]
 
+        self.dpre_osci_rows = LabelledSpinBox(self, "Number of Rows")
         self.dpre_osci_width = LabelledSpinBox(self, "Scale Factor for Width")
         self.dpre_osci_title_y = LabelledSpinBox(self, "Subplot Title Padding")
         self.dpre_osci_title_fs = LabelledSpinBox(self, "Title Font Size")
@@ -63,6 +64,7 @@ class DPrePopup(QDialog):
         self.layout().addWidget(self.dpre_osci_color_end, 9, 0)
         self.layout().addWidget(self.dpre_osci_x_ticks_fs, 10, 0)
         self.layout().addWidget(self.dpre_osci_x_ticks_fn, 11, 0)
+        self.layout().addWidget(self.dpre_osci_rows, 11, 0)
 
         self.layout().addWidget(self.dpre_osci_y_label_fs, 0, 1)
         self.layout().addWidget(self.dpre_osci_y_label_pad, 1, 1)
@@ -83,12 +85,13 @@ class DPrePopup(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 12, 0, 1, 2)
+        self.layout().addWidget(self.buttonBox, 12, 1, 1, 2)
 
         if variables:
             self.get_values()
 
     def get_defaults(self):
+        self.dpre_osci_rows.setValue(self.default["dpre_osci_rows"])
         self.dpre_osci_width.setValue(self.default["dpre_osci_width"])
         self.dpre_osci_title_y.setValue(self.default["dpre_osci_title_y"])
         self.dpre_osci_title_fs.setValue(self.default["dpre_osci_title_fs"])
@@ -116,28 +119,29 @@ class DPrePopup(QDialog):
 
 
     def set_values(self, variables):
+        self.variables["dpre_osci_rows"] = self.dpre_osci_rows.field.value()
         self.variables["dpre_osci_width"] = self.dpre_osci_width.field.value()
         self.variables["dpre_osci_title_y"] = self.dpre_osci_title_y.field.value()
         self.variables["dpre_osci_title_fs"] = self.dpre_osci_title_fs.field.value()
-        self.variables["dpre_osci_title_fn"] = self.dpre_osci_title_fn.fields.currentText()
+        self.variables["dpre_osci_title_fn"] = str(self.dpre_osci_title_fn.fields.currentText())
         self.variables["dpre_osci_dpre_ms"] = self.dpre_osci_dpre_ms.field.value()
         self.variables["dpre_osci_dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
         self.variables["dpre_osci_smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
-        self.variables["dpre_osci_ref_color"] = self.dpre_osci_ref_color.fields.currentText()
-        self.variables["dpre_osci_color_init"] = self.dpre_osci_color_init.fields.currentText()
-        self.variables["dpre_osci_color_end"] = self.dpre_osci_color_end.fields.currentText()
+        self.variables["dpre_osci_ref_color"] = str(self.dpre_osci_ref_color.fields.currentText())
+        self.variables["dpre_osci_color_init"] = str(self.dpre_osci_color_init.fields.currentText())
+        self.variables["dpre_osci_color_end"] = str(self.dpre_osci_color_end.fields.currentText())
         self.variables["dpre_osci_x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
-        self.variables["dpre_osci_x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
+        self.variables["dpre_osci_x_ticks_fn"] = str(self.dpre_osci_x_ticks_fn.fields.currentText())
         self.variables["dpre_osci_y_label_fs"] = self.dpre_osci_y_label_fs.field.value()
         self.variables["dpre_osci_y_label_pad"] = self.dpre_osci_y_label_pad.field.value()
-        self.variables["dpre_osci_y_label_fn"] = self.dpre_osci_y_label_fn.fields.currentText()
-        self.variables["dpre_osci_y_label_weight"] = self.dpre_osci_y_label_weight.fields.currentText()
+        self.variables["dpre_osci_y_label_fn"] = str(self.dpre_osci_y_label_fn.fields.currentText())
+        self.variables["dpre_osci_y_label_weight"] = str(self.dpre_osci_y_label_weight.fields.currentText())
         self.variables["dpre_osci_y_ticks_len"] = self.dpre_osci_y_ticks_len.field.value()
         self.variables["dpre_osci_y_ticks_fs"] = self.dpre_osci_y_ticks_fs.field.value()
         self.variables["dpre_osci_y_ticks_pad"] = self.dpre_osci_y_ticks_pad.field.value()
-        self.variables["dpre_osci_grid_color"] = self.dpre_osci_grid_color.fields.currentText()
+        self.variables["dpre_osci_grid_color"] = str(self.dpre_osci_grid_color.fields.currentText())
         self.variables["dpre_osci_res_shade"] = self.dpre_osci_res_shade.checkBox.isChecked()
-        self.variables["dpre_osci_res_highlight"] = self.dpre_osci_res_highlight.field.text()
+        self.variables["dpre_osci_res_highlight"] = str(self.dpre_osci_res_highlight.field.text())
         self.variables["dpre_osci_rh_fs"] = self.dpre_osci_rh_fs.field.value()
         self.variables["dpre_osci_rh_y"] = self.dpre_osci_rh_y.field.value()
         variables["dpre_osci_settings"] = self.variables
@@ -145,6 +149,7 @@ class DPrePopup(QDialog):
 
 
     def get_values(self):
+        self.dpre_osci_rows.setValue(self.variables["dpre_osci_rows"])
         self.dpre_osci_width.setValue(self.variables["dpre_osci_width"])
         self.dpre_osci_title_y.setValue(self.variables["dpre_osci_title_y"])
         self.dpre_osci_title_fs.setValue(self.variables["dpre_osci_title_fs"])

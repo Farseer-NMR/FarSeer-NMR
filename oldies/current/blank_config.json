@@ -15,7 +15,9 @@
         "bar_threshold_flag": null, 
         "bar_threshold_linewidth": null, 
         "bar_unassigned_color": null, 
-        "bar_width": null
+        "bar_width": null,
+        "bar_user_marks_dict": null,
+        "bar_user_bar_colors_dict": null
     }, 
     "compact_bar_settings": {
         "comp_bar_color_measured": null, 
@@ -55,7 +57,8 @@
         "cs_scatter_flower_y_ticks_fs": null, 
         "cs_scatter_flower_y_ticks_pad": null, 
         "cs_scatter_flower_y_ticks_rot": null, 
-        "cs_scatter_flower_y_ticks_weight": null
+        "cs_scatter_flower_y_ticks_weight": null,
+        "do_cs_flower": null
     }, 
     "cs_scatter_settings": {
         "cs_scatter_cols_page": null, 
@@ -97,11 +100,10 @@
     }, 
     "dpre_osci_settings": {
         "do_dpre": null, 
-        "dpre_osci_color_end": null, 
-        "dpre_osci_color_init": null, 
-        "dpre_osci_dpre_alpha": null, 
-        "dpre_osci_dpre_ms": null, 
-        "dpre_osci_grid_color": null, 
+        "dpre_osci_rows": null,
+        "dpre_osci_width": null,
+        "dpre_osci_y_label_fs": null,
+        "dpre_osci_y_label_fs": null,
         "dpre_osci_ref_color": null, 
         "dpre_osci_res_highlight": [],
         "dpre_osci_res_shade": null, 
@@ -148,7 +150,8 @@
         "include_user_annotations": null, 
         "perform_comparisons": null, 
         "perform_controls": null, 
-        "perform_resevo_fitting": null
+        "perform_resevo_fitting": null,
+        "yy_scale_nbins": null
     }, 
     "general_settings": {
         "chimera_att_select_format":null, 
@@ -170,10 +173,11 @@
         "heat_map_top_margin": null, 
         "heat_map_vmax": null, 
         "heat_map_vmin": null, 
-        "heat_map_x_tick_pad": null, 
+        "heat_map_x_ticks_pad": null,
         "heat_map_x_ticks_fn": null,
         "heat_map_x_ticks_fs": null,
         "heat_map_x_ticks_rot": null, 
+        "heat_map_x_ticks_weight": null,
         "heat_map_y_label_fn": null,
         "heat_map_y_label_fs": null, 
         "heat_map_y_label_pad": null, 
@@ -266,7 +270,8 @@
         "revo_y_ticks_pad": null, 
         "revo_y_ticks_rot": null, 
         "revo_y_ticks_weight": null,
-        "titration_x_values": []
+        "titration_x_values": [],
+        "do_revo_fit": null
 
     }, 
     "titration_plot_settings": {

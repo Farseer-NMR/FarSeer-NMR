@@ -5,7 +5,7 @@ from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 
-from current.default_config import defaults
+from current06.default_config import defaults
 from gui.gui_utils import font_weights
 from functools import partial
 
@@ -71,10 +71,10 @@ class ExtendedBarPopup(QDialog):
     def set_values(self, variables):
         self.variables["ext_bar_cols_page"] = self.bar_cols.field.value()
         self.variables["ext_bar_rows_page"] = self.bar_rows.field.value()
-        self.variables["ext_bar_x_ticks_fn"] = self.x_tick_font.fields.currentText()
+        self.variables["ext_bar_x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
         self.variables["ext_bar_x_ticks_fs"] = self.x_tick_font_size.field.value()
         self.variables["ext_bar_x_ticks_rot"] = self.x_tick_rotation.field.value()
-        self.variables["ext_bar_x_ticks_weight"] = self.x_tick_font_weight.fields.currentText()
+        self.variables["ext_bar_x_ticks_weight"] = str(self.x_tick_font_weight.fields.currentText())
         self.variables["ext_bar_x_ticks_color_flag"] = self.x_tick_colour.checkBox.isChecked()
         variables["extended_bar_settings"] = self.variables
         self.accept()

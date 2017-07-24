@@ -1,6 +1,6 @@
 from current.fslibs.Peak import Peak
 import platform
-import re, os
+import re, os, csv
 
 ANSIG_PATTERN = re.compile(r'^\s*ANSIG\s.+crosspeak')
 AUTOASSIGN_PATTERN = re.compile(r'^\s*\d+\s+\d+\.\d+\s+\d+\.\d+\s.*\s*\S.+\d+\s\S+\s*')
@@ -11,8 +11,8 @@ SPARKY_PATTERN = re.compile(r'^\s*Assignment\s.* w1 .+')
 SPARKY_SAVE_PATTERN = re.compile(r'^<sparky save file>')
 XEASY_PATTERN = re.compile(r'^#\s+Number of dimensions\s+\d')
 WHITESPACE_AND_NULL = set(['\x00', '\t', '\n', '\r', '\x0b', '\x0c'])
+CCPN_PATTERN = re.compile(r'^Number')
 
-TYPE_DICT = {1:None, 2:'Random noise', 3:'Truncation artifact'}
 DIM_KEYS = (('X_PPM','XW'), ('Y_PPM','YW'), ('Z_PPM','ZW'))
 
 
@@ -45,13 +45,6 @@ def getPeakListFileFormat(filePath):
         fileNames = os.listdir(filePath)
 
     # check not binary
-
-    fileObj = open(filePath, 'rb')
-    firstData = fileObj.read(1024)
-    fileObj.close()
-
-    testData = set([c for c in firstData]) - WHITESPACE_AND_NULL
-
     fileObj = open(filePath, 'r')
 
     for line in fileObj:
@@ -82,14 +75,14 @@ def getPeakListFileFormat(filePath):
         if AUTOASSIGN_PATTERN.search(line):
             return "AUTOASSIGN"
 
+        if CCPN_PATTERN.search(line):
+            return "CCPN"
+
 def parseAnsig(peaklist_file):
     peakList = []
     dimension_count=2
     intensCol = 13*dimension_count
-    specNameCol = intensCol+13
     assnColStart = 3*13+12+7*6
-    lineWidth = None
-    boxWidth = None
     fileObj = open(peaklist_file, 'rU')
     lines = fileObj.readlines()[2:]
     for ii, line in enumerate(lines):
@@ -133,7 +126,6 @@ def parseNmrDraw(peaklist_file):
   fileObj = open(peaklist_file, 'r')
   numDim = 0
   colDict = {}
-  boxWidth = None # Could actually extract this
 
   for line in fileObj:
     line = line.strip()
@@ -168,7 +160,6 @@ def parseNmrDraw(peaklist_file):
 
     height = float(data[colDict['HEIGHT']])
     volume = float(data[colDict['VOL']])
-    details = TYPE_DICT[int(float(data[colDict['TYPE']]))]
     annotations = data[colDict['ASS']].split(';')
     atoms = [anno.split('.')[1] for anno in annotations if anno]
     for dim in range(numDim):
@@ -196,13 +187,10 @@ def parseNmrView(peaklist_file):
     line = fileObj.readline()
     line = line.replace('{', '')
     line = line.replace('}', '')
-    sweepWidths = [float(x) for x in line.strip().split()]
 
     line = fileObj.readline()
     line = line.replace('{', '')
     line = line.replace('}', '')
-    specFreqs = [float(x) for x in line.strip().split()]
-
     headings = fileObj.readline().strip().split()
     dimHeadings = [x.split('.') for x in headings if '.' in x]
     dimHeadings = [x for x in dimHeadings if x[0] in dimNames]
@@ -295,8 +283,6 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
 
   numDim = int(fileObj.readline().strip().split()[-1])
   lineWidth = None
-  boxWidth = None
-  anno = '?'
   annotation_dict = parseProtFile(prot_file, seq_file)
   for line in fileObj:
     line = line.strip()
@@ -314,11 +300,8 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
         continue
     ppms = [0] * numDim
     annotations = [None] * numDim
-    lineWidths = [None] * numDim
-    boxWidths = [None] * numDim
     volume = float(data[numDim+3])
     height = None
-    details = None
 
     for dim in range(numDim):
       ppms[dim] = float(data[dim+1])
@@ -331,6 +314,27 @@ def parseXeasy(peaklist_file, prot_file, seq_file):
 
   fileObj.close()
 
+def parseCcpn(peaklist_file):
+    fileObj = open(peaklist_file, 'rU')
+    next(fileObj)
+    peakList = []
+    reader = csv.reader(fileObj)
+    for row in reader:
+        atoms = []
+        for v in res1to3dict.values():
+            if v in row[4]:
+                a1 = row[4].split(v)[-1]
+                atoms.append(a1)
+            if v in row[5]:
+                a2 = row[5].split(v)[-1]
+                atoms.append(a2)
+        peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
+                    volume=row[7], height=row[6])
+
+        peakList.append(peak)
+
+    fileObj.close()
+    return peakList
 
 def parseSparkyPeakList(peaklist_file):
     peakList = []
@@ -363,7 +367,10 @@ def fixpath(path):
     else:
         path = os.path.normpath(os.path.expanduser(path))
     return path
+
+
 def read_peaklist(fileObj, prot_file=None, seq_file=None):
+
     peaklist_file = fixpath(fileObj)
     file_format = getPeakListFileFormat(peaklist_file)
 
@@ -379,28 +386,6 @@ def read_peaklist(fileObj, prot_file=None, seq_file=None):
         return parseSparkyPeakList(peaklist_file)
     elif file_format == 'XEASY':
         return parseXeasy(peaklist_file, prot_file, seq_file)
-
-def test_xeasy():
-    prot_file = 'cyana.prot'
-    seq_file = 'cyana.seq'
-    peaks = 'cyana.peaks'
-    parseXeasy(peaks, prot_file, seq_file)
-
-def test_nmrview():
-    peaks = 'nmrview.xpk'
-    parseNmrView(peaks)
-
-def test_nmrdraw():
-    peaks = 'nmrdraw.peaks'
-    peaklist = parseNmrDraw(peaks)
-    i=0
-    for line in open(peaks, 'r').readlines()  :
-        l = line.strip()
-        if l:
-            if l[0].isdigit():
-                i+=1
-
-def test_ansig():
-    peaks = 'ansig.peaks'
-    parseAnsig(peaks)
+    elif file_format == 'CCPN':
+        return parseCcpn(peaklist_file)
 

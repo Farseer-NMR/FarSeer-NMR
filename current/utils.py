@@ -5,13 +5,13 @@ def write_title(title, onlytitle=False):
     :param onlytitle: False to identify is is only to generate title
                       or to print to log
     '''
-    
+
     str2write = '\n\n\n{}\n{:^80}\n{}\n'.format(titlesperator,
                                                 title, titlesperator)
-    
+
     if onlytitle:
         return str2write
-        
+
     else:
         write_log(str2write)
 

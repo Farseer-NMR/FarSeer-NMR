@@ -23,7 +23,7 @@ class LabelledCheckbox(QWidget):
         label.setAlignment(QtCore.Qt.AlignLeft)
 
     def setCallback(self, callback):
-        self.connect(self, QtCore.SIGNAL('clicked()'), callback)
+        self.checkBox.stateChanged.connect(callback)
 
     def isChecked(self):
         return self.checkBox.isChecked()

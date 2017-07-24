@@ -8,7 +8,7 @@ from gui.components.FontComboBox import FontComboBox
 
 from gui.gui_utils import font_weights
 
-from current.default_config import defaults
+from current06.default_config import defaults
 from functools import partial
 
 class CompactBarPopup(QDialog):
@@ -78,10 +78,10 @@ class CompactBarPopup(QDialog):
     def set_values(self, variables):
         self.variables["comp_bar_cols_page"] = self.bar_cols.field.value()
         self.variables["comp_bar_rows_page"] = self.bar_rows.field.value()
-        self.variables["comp_bar_x_ticks_fn"] = self.x_tick_font.fields.currentText()
+        self.variables["comp_bar_x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
         self.variables["comp_bar_x_ticks_fs"] = self.x_tick_font_size.field.value()
         self.variables["comp_bar_x_ticks_rot"] = self.x_tick_rotation.field.value()
-        self.variables["comp_bar_x_ticks_weight"] = self.x_tick_weight.fields.currentText()
+        self.variables["comp_bar_x_ticks_weight"] = str(self.x_tick_weight.fields.currentText())
         self.variables["comp_bar_unassigned_shade"] = self.shade_unassigned_checkbox.isChecked()
         self.variables["comp_bar_unassigned_shade_alpha"] = self.unassigned_shade_alpha.field.value()
         variables["comp_bar_settings"] = self.variables

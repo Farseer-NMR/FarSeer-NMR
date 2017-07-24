@@ -7,7 +7,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-from current.default_config import defaults
+from current06.default_config import defaults
 from gui.gui_utils import font_weights
 from functools import partial
 
@@ -168,32 +168,32 @@ class TitrationPlotPopup(QDialog):
 
 
     def set_values(self, variables):
-        self.variables["tplot_subtitle_fn"] = self.tplot_subtitle_fn.fields.currentText()
+        self.variables["tplot_subtitle_fn"] = str(self.tplot_subtitle_fn.fields.currentText())
         self.variables["tplot_subtitle_fs"] = self.tplot_subtitle_fs.field.value()
         self.variables["tplot_subtitle_pad"] = self.tplot_subtitle_pad.field.value()
-        self.variables["tplot_subtitle_weight"] = self.tplot_subtitle_weight.fields.currentText()
-        self.variables["tplot_x_label_fn"] = self.tplot_x_label_fn.fields.currentText()
+        self.variables["tplot_subtitle_weight"] = str(self.tplot_subtitle_weight.fields.currentText())
+        self.variables["tplot_x_label_fn"] = str(self.tplot_x_label_fn.fields.currentText())
         self.variables["tplot_x_label_fs"] = self.tplot_x_label_fs.field.value()
         self.variables["tplot_x_label_pad"] = self.tplot_x_label_pad.field.value()
-        self.variables["tplot_x_label_weight"] = self.tplot_x_label_weight.fields.currentText()
-        self.variables["tplot_y_label_fn"] = self.tplot_y_label_fn.fields.currentText()
+        self.variables["tplot_x_label_weight"] = str(self.tplot_x_label_weight.fields.currentText())
+        self.variables["tplot_y_label_fn"] = str(self.tplot_y_label_fn.fields.currentText())
         self.variables["tplot_y_label_fs"] = self.tplot_y_label_fs.field.value()
         self.variables["tplot_y_label_pad"] = self.tplot_y_label_pad.field.value()
-        self.variables["tplot_y_label_weight"] = self.tplot_y_label_weight.fields.currentText()
+        self.variables["tplot_y_label_weight"] = str(self.tplot_y_label_weight.fields.currentText())
 
         self.variables["tplot_x_ticks_pad"] = self.tplot_x_ticks_pad.field.value()
         self.variables["tplot_x_ticks_len"] = self.tplot_x_ticks_len.field.value()
 
-        self.variables["tplot_y_ticks_fn"] = self.tplot_y_ticks_fn.fields.currentText()
+        self.variables["tplot_y_ticks_fn"] = str(self.tplot_y_ticks_fn.fields.currentText())
         self.variables["tplot_y_ticks_fs"] = self.tplot_y_ticks_fs.field.value()
         self.variables["tplot_y_ticks_rot"] = self.tplot_y_ticks_rot.field.value()
         self.variables["tplot_y_ticks_pad"] = self.tplot_y_ticks_pad.field.value()
 
-        self.variables["tplot_y_ticks_weight"] = self.tplot_y_ticks_weight.fields.currentText()
+        self.variables["tplot_y_ticks_weight"] = str(self.tplot_y_ticks_weight.fields.currentText())
         self.variables["tplot_y_ticks_len"] = self.tplot_y_ticks_len.field.value()
         self.variables["tplot_y_grid_flag"] = self.tplot_y_grid_flag.checkBox.isChecked()
-        self.variables["tplot_y_grid_color"] = self.tplot_y_grid_color.fields.currentText()
-        self.variables["tplot_y_grid_linestyle"] = self.tplot_y_grid_linestyle.fields.currentText()
+        self.variables["tplot_y_grid_color"] = str(self.tplot_y_grid_color.fields.currentText())
+        self.variables["tplot_y_grid_linestyle"] = str(self.tplot_y_grid_linestyle.fields.currentText())
         self.variables["tplot_y_grid_linewidth"] = self.tplot_y_grid_linewidth.field.value()
         self.variables["tplot_y_grid_alpha"] = self.tplot_y_grid_alpha.field.value()
 
