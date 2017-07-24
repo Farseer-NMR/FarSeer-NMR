@@ -53,36 +53,14 @@ class TabWidget(QTabWidget):
         self.tab2 = QWidget()
         self.tab1.setLayout(QGridLayout())
         self.tab2.setLayout(QGridLayout())
-        self.tab3 = QWidget()
-
         self.tab1.layout().addWidget(Settings(gui_settings=gui_settings))
         self.tab2.layout().addWidget(Interface(gui_settings=gui_settings))
-
-
         self.addTab(self.tab2, "PeakList Selection")
         self.addTab(self.tab1, "Settings")
-        self.addTab(self.tab3, "Results")
-
-
         self.tab1.setObjectName("Settings")
-
-        """
-        self.tabButton = QToolButton(self)
-        self.tabButton.setIcon(Icon('icons/header-cogs.png'))
-        self.tabButton.setText('')
-        self.tabButton.setIconSize(self.tabButton.size())
-        self.setAutoFillBackground(True)
-        self.tabButton.setStyleSheet('QIcon {background-color: #001450;}')
-        self.setCornerWidget(self.tabButton)
-
-        """
-
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
         self.tablogo.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-
-
-
 
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
         self.tablogo.setPixmap(pixmap)
