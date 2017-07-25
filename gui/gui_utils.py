@@ -57,10 +57,13 @@ def deliver_settings(resolution):
 
     if (resolution.height(), resolution.width()) == (1440, 2560):
         stylesheet = open('gui/stylesheet_2k.qss').read()
+        print('2k')
         return settings_2k, stylesheet
-    elif (resolution.height(), resolution.width()) == (1080, 1920):
+    elif (resolution.height(), resolution.width()) == (1080, 1920) or 1040 < resolution.height() < 1440:
+        print('1k')
         stylesheet = open('gui/stylesheet_1k.qss').read()
         return settings_1k, stylesheet
     else:
+        print('720p')
         stylesheet = open('gui/stylesheet_720p.qss').read()
         return settings_720p, stylesheet
