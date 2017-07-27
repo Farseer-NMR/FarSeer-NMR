@@ -2,7 +2,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox, QPushButton, QWidget
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from functools import partial
-from current06.default_config import defaults
+from current.default_config import defaults
 
 class UserMarksPopup(QDialog):
 

@@ -8,7 +8,7 @@ from gui.components.FontComboBox import FontComboBox
 
 from gui.gui_utils import font_weights
 
-from current06.default_config import defaults
+from current.default_config import defaults
 from functools import partial
 
 class CompactBarPopup(QDialog):

@@ -7,7 +7,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 
-from current06.default_config import defaults
+from current.default_config import defaults
 from functools import partial
 
 class PreAnalysisPopup(QDialog):

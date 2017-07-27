@@ -7,7 +7,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.FontComboBox import FontComboBox
 from functools import partial
-from current06.default_config import defaults
+from current.default_config import defaults
 from gui.gui_utils import font_weights
 
 

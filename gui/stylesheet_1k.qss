@@ -248,7 +248,4 @@ margin-bottom: 13px;
 padding-left: 5px;
 }
 
-.QGroupBox {
-margin: 2px;
-}
 

@@ -6,7 +6,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from functools import partial
-from current06.default_config import defaults
+from current.default_config import defaults
 
 class ResidueEvolutionPopup(QDialog):
 

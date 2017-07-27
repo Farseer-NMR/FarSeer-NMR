@@ -8,7 +8,7 @@ from gui.components.ColourBox import ColourBox
 
 from gui.popups.UserMarksPopup import UserMarksPopup
 
-from current06.default_config import defaults
+from current.default_config import defaults
 from functools import partial
 
 class BarPlotPopup(QDialog):
