@@ -528,7 +528,7 @@ class Settings(QWidget):
 
     def show_popup(self, popup, variables):
         p = popup(variables=self.variables)
-        p.exec()
+        p.exec_()
         p.raise_()
 
 
@@ -687,6 +687,7 @@ if __name__ == '__main__':
     splash.show()
 
     screen_resolution = app.desktop().screenGeometry()
+    print(screen_resolution)
 
     from gui import gui_utils
     gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)

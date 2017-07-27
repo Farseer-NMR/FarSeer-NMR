@@ -29,13 +29,13 @@ settings_720p = {'peaklistarea_height': 350,
                  'interface_top_height': 150,
                  'footer_height': 60
                  }
-settings_1k = {'peaklistarea_height': 550,
+settings_1k = {'peaklistarea_height': 510,
                  'peaklistarea_width': 920,
                  'scene_width': 910,
-                 'scene_height': 580,
-                 'app_height': 900,
+                 'scene_height': 545,
+                 'app_height': 880,
                  'app_width': 1500,
-                 'sideBar_height': 808,
+                 'sideBar_height': 780,
                  'interface_top_width': 1158,
                  'interface_top_height': 200,
                  'footer_height': 60
@@ -54,6 +54,7 @@ settings_2k = {'peaklistarea_height': 640,
 font_weights = ["ultralight", "light", "normal", "regular", "book", "medium", "roman", "semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
 
 def deliver_settings(resolution):
+    print(resolution)
 
     if (resolution.height(), resolution.width()) == (1440, 2560):
         stylesheet = open('gui/stylesheet_2k.qss').read()

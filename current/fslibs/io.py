@@ -655,5 +655,5 @@ fig_dpi = {}  # Figure resolution
 # if __name__ == '__main__':
 #     import sys
 #     fout = sys.argv[1]
-#     json_to_fsuv(fout, open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current06/default_config.json", 'r'))
+#     json_to_fsuv(fout, open("/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json", 'r'))
 
