@@ -13,10 +13,10 @@ class PeakListArea(QWidget):
         QWidget.__init__(self, parent)
         # self.setStyleSheet("")
         self.scene = QGraphicsScene(self)
-        height = gui_settings['peaklistarea_height']
+        self.height = gui_settings['peaklistarea_height']
         self.scrollContents = QGraphicsView(self.scene, self)
         self.scrollContents.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.scene.setSceneRect(0, 0, width, height)
+        self.scene.setSceneRect(0, 0, width, self.height)
         layout = QGridLayout()
         self.setLayout(layout)
         self.layout().addWidget(self.scrollContents)
@@ -47,10 +47,20 @@ class PeakListArea(QWidget):
         num_y = len(y_conds)
         num_z = len(z_conds)
         total_x = num_x*num_y*num_z
+        if total_x > 10:
+            # self.scene.setHeight(2000)
+            self.scrollContents.setSceneRect(0, 0, width, total_x * 22)
+        else:
+            self.scrollContents.setSceneRect(0, 0, width, self.height)
+
+        self.scrollContents.fitInView(0, 0, width, self.height, QtCore.Qt.KeepAspectRatio)
+
         if total_x < 2:
             x_spacing = self.scene.height()/2
-        else:
+        elif 2 < total_x < 10:
             x_spacing = self.scene.height()/(total_x+1)
+        else:
+            x_spacing = 20
         zz_pos = 0
         yy_pos = self.scene.width()*0.25
         xx_pos = self.scene.width()*0.5

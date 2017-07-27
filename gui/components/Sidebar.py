@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5 import QtCore
-# from parsing import read_peaklist
+from parsing import read_peaklist
 
 
 class SideBar(QTreeWidget):

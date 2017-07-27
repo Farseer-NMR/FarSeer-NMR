@@ -6,8 +6,7 @@ ANSIG_PATTERN = re.compile(r'^\s*ANSIG\s.+crosspeak')
 AUTOASSIGN_PATTERN = re.compile(r'^\s*\d+\s+\d+\.\d+\s+\d+\.\d+\s.*\s*\S.+\d+\s\S+\s*')
 NMRVIEW_PATTERN = re.compile(r'^\d+\s+{.+}\s+\d+\.?\d*\s+\d+\.?\d*\s+\d+\.?\d*')
 NMRDRAW_PATTERN = re.compile(r'^DATA\s+X_AXIS\s+')
-NMRSTAR_PATTERN = re.compile(r'^\s*save_shift_set|save_assigned_chem_shift_list|save_peak_list')
-SPARKY_PATTERN = re.compile(r'^\s*Assignment\s.* w1 .+')
+SPARKY_PATTERN = re.compile(r'^\s*Assignment\s+ w\d .+Height.+')
 SPARKY_SAVE_PATTERN = re.compile(r'^<sparky save file>')
 XEASY_PATTERN = re.compile(r'^#\s+Number of dimensions\s+\d')
 WHITESPACE_AND_NULL = set(['\x00', '\t', '\n', '\r', '\x0b', '\x0c'])
@@ -41,6 +40,7 @@ res1to3dict = {
 }
 
 def getPeakListFileFormat(filePath):
+
     if os.path.isdir(filePath):
         fileNames = os.listdir(filePath)
 
@@ -50,12 +50,9 @@ def getPeakListFileFormat(filePath):
     for line in fileObj:
         if not line.strip():
             continue
-
+        print(line)
         if SPARKY_SAVE_PATTERN.search(line):
             return "SPARKY"
-
-        if NMRSTAR_PATTERN.search(line):
-            return "NMRSTAR"
 
         if ANSIG_PATTERN.search(line):
             return "ANSIG"
@@ -64,6 +61,7 @@ def getPeakListFileFormat(filePath):
             return "XEASY"
 
         if NMRDRAW_PATTERN.search(line):
+            print('nmrDraw')
             return "NMRDRAW"
 
         if NMRVIEW_PATTERN.search(line):
@@ -142,7 +140,7 @@ def parseNmrDraw(peaklist_file):
       isotopes.append(data[2])
       continue
 
-    if line.startswith('VARS'):
+    if line.startswith('VARS') or line.startswith('variables'):
       for i, key in enumerate(data[1:]):
         colDict[key] = i
 
@@ -162,6 +160,7 @@ def parseNmrDraw(peaklist_file):
     volume = float(data[colDict['VOL']])
     annotations = data[colDict['ASS']].split(';')
     atoms = [anno.split('.')[1] for anno in annotations if anno]
+    print(atoms)
     for dim in range(numDim):
       ppmKey, linewidthKey = DIM_KEYS[dim]
       ppms[dim] = float(data[colDict[ppmKey]])
@@ -169,6 +168,7 @@ def parseNmrDraw(peaklist_file):
 
     peak = Peak(peak_number=data[0], assignments=annotations, atoms=atoms, height=height, volume=volume, positions=ppms,
                 linewidths=lineWidths)
+    print(peak)
     peakList.append(peak)
 
   fileObj.close()
