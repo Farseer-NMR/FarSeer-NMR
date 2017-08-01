@@ -91,7 +91,6 @@ class DPrePopup(QDialog):
             self.get_values()
 
     def get_defaults(self):
-        self.dpre_osci_rows.setValue(self.default["dpre_osci_rows"])
         self.dpre_osci_width.setValue(self.default["dpre_osci_width"])
         self.dpre_osci_title_y.setValue(self.default["dpre_osci_title_y"])
         self.dpre_osci_title_fs.setValue(self.default["dpre_osci_title_fs"])
@@ -119,7 +118,6 @@ class DPrePopup(QDialog):
 
 
     def set_values(self, variables):
-        self.variables["dpre_osci_rows"] = self.dpre_osci_rows.field.value()
         self.variables["dpre_osci_width"] = self.dpre_osci_width.field.value()
         self.variables["dpre_osci_title_y"] = self.dpre_osci_title_y.field.value()
         self.variables["dpre_osci_title_fs"] = self.dpre_osci_title_fs.field.value()
@@ -149,7 +147,6 @@ class DPrePopup(QDialog):
 
 
     def get_values(self):
-        self.dpre_osci_rows.setValue(self.variables["dpre_osci_rows"])
         self.dpre_osci_width.setValue(self.variables["dpre_osci_width"])
         self.dpre_osci_title_y.setValue(self.variables["dpre_osci_title_y"])
         self.dpre_osci_title_fs.setValue(self.variables["dpre_osci_title_fs"])

@@ -138,9 +138,9 @@
         "applyFASTA": null
     }, 
     "fitting_settings": {
-        "do_titvar1": null, 
-        "do_titvar2": null, 
-        "do_titvar3": null, 
+        "do_cond1": null, 
+        "do_cond2": null, 
+        "do_cond3": null, 
         "expand_lost_yy": null, 
         "expand_lost_zz": null, 
         "fit_line_color": null, 
@@ -170,10 +170,11 @@
         "heat_map_top_margin": null, 
         "heat_map_vmax": null, 
         "heat_map_vmin": null, 
-        "heat_map_x_tick_pad": null, 
+        "heat_map_x_ticks_pad": null,
         "heat_map_x_ticks_fn": null,
         "heat_map_x_ticks_fs": null,
-        "heat_map_x_ticks_rot": null, 
+        "heat_map_x_ticks_weight": null,
+        "heat_map_x_ticks_rot": null,
         "heat_map_y_label_fn": null,
         "heat_map_y_label_fs": null, 
         "heat_map_y_label_pad": null, 
@@ -181,8 +182,8 @@
     }, 
     "plots_CSP_settings": {
         "calccol_name_CSP": null, 
-        "plots_CSP": null, 
-        "yy_label_CSP": null, 
+        "plots_CSP": null,
+        "yy_label_CSP": null,
         "yy_scale_CSP": null
     }, 
     "plots_Height_ratio_settings": {

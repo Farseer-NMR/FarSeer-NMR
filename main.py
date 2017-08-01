@@ -35,7 +35,7 @@ from gui.Footer import Footer
 from gui import resources_rc
 
 
-from current.fslibs.io import json_to_fsuv
+from current.fslibs.io import json_to_fsuv, fsuv_to_json
 
 valuesDict = {
             'x': [],
@@ -44,6 +44,18 @@ valuesDict = {
         }
 
 peakLists = {}
+
+
+def load_config():
+    import os
+    fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+    if fname[0]:
+        if fname[0].split('.')[1] == 'json':
+            variables = json.load(open(fname[0], 'r'))
+        elif fname[0].split('.')[1] == 'py':
+            variables = fsuv_to_json(open(fname[0], 'r'))
+        return variables
+    return None
 
 class TabWidget(QTabWidget):
 
@@ -69,13 +81,7 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
 
-    def load_config(self):
-        import os
-        fname = QFileDialog.getOpenFileName(self, 'Load Configuration', os.getcwd())
-        if fname[0]:
-            variables = json.load(open(fname[0], 'r'))
-            return variables
-        return None
+
 
     def save_config(self, variables):
 
@@ -436,7 +442,7 @@ class Settings(QWidget):
 
 
     def load_config(self):
-        self.variables = self.parent().parent().load_config()
+        self.variables = load_config()
         if self.variables:
             self.load_variables()
 

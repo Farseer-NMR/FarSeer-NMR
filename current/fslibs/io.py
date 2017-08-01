@@ -1,9 +1,25 @@
 import json, os
 
 def fsuv_to_json(fsuv):
+    new_config = json.load(open('current/blank_config.json', 'r'))
+    variables = {}
+    for line in fsuv.readlines():
+        l = line.strip()
+        if l and not line.startswith('#'):
+            parsed_line = l.split(' #')[0].split('=')
+            variables[parsed_line[0].strip()] = parsed_line[1].strip()
+
+    for val in new_config.values():
+        for k, v in val.items():
+            fsuv_value = variables.get(k)
+            if fsuv_value:
+                val[k] = eval(fsuv_value)
+
+    import pprint
+    pprint.pprint(new_config)
+    return new_config
 
 
-    pass
 
 def json_to_fsuv(fsuv_file_path, json_file=None, variables=None):
 

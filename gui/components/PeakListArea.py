@@ -3,7 +3,6 @@ from PyQt5 import QtCore, QtGui
 import pickle
 
 width = 600
-# height = 660
 
 import math
 
@@ -11,7 +10,6 @@ class PeakListArea(QWidget):
     def __init__(self, parent, valuesDict, gui_settings):
 
         QWidget.__init__(self, parent)
-        # self.setStyleSheet("")
         self.scene = QGraphicsScene(self)
         self.height = gui_settings['peaklistarea_height']
         self.scrollContents = QGraphicsView(self.scene, self)

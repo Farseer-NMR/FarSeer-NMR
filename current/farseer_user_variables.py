@@ -51,11 +51,11 @@ tag_ls='-'
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restraints to Plot:
-calcs_PosF1_delta = False # Plot nuclei 1 shift perturbation data
-calcs_PosF2_delta = False # Plot nuclei 2 shift perturbation data
-calcs_CSP = False  # Plot combined chemical shift perturbation data
-calcs_Height_ratio = True  # Plot Height ratio data
-calcs_Volume_ratio = False  # Plot Volume ratio data
+plots_PosF1_delta = False # Plot nuclei 1 shift perturbation data
+plots_PosF2_delta = False # Plot nuclei 2 shift perturbation data
+plots_CSP = False  # Plot combined chemical shift perturbation data
+plots_Height_ratio = True  # Plot Height ratio data
+plots_Volume_ratio = False  # Plot Volume ratio data
 #
 
 plots_extended_bar = False  # Represent data in Extended Bar Plot style
@@ -79,6 +79,7 @@ calccol_name_CSP = 'CSP'  # column name for combined chemical shift perturbation
 calccol_name_Height_ratio = 'Height_ratio'  # column name for Height Ratio data
 calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 #
+# Y axis scale for each calculated restraint
 # Y axis scale for each calculated restraint
 yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
 yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
@@ -135,28 +136,8 @@ bar_mark_prolines_flag=True  # mark prolines ON/OFF
 bar_mark_prolines_symbol='P'  # symbol to mark prolines
 bar_mark_user_details_flag=False  # mark user details ON/OFF
 bar_color_user_details_flag=False  # color bars according to user detail marks ON/OFF
-bar_user_marks_dict = {
-    'H0': 'H',
-    'V0': 'V',
-    'low':'L',
-    'p1':'1',
-    'p2':'2',
-    'p3':'3',
-    'p4':'4',
-    'p5':'5',
-    'p6':'6',
-    'p7':'7',
-    'p8':'8',
-    'p9':'9',
-    'p10':'10',
-    'z':'z',
-    'Z':'z',
-    'MTSL':'M'
-}  # keys: the string in 'Details' column in input data, value: the character to be drawn
-bar_user_bar_colors_dict = {
-    'H0': 'khaki',
-    'V0': 'khaki',
-    'low':'khaki'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
+bar_user_marks_dict = {'H0': 'H','V0': 'V','low':'L','p1':'1','p2':'2','p3':'3','p4':'4','p5':'5','p6':'6','p7':'7','p8':'8','p9':'9','p10':'10','z':'z','Z':'z','MTSL':'M'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
+bar_user_bar_colors_dict = {'H0': 'khaki','V0': 'khaki','low':'khaki'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
 
 # Specific details for Extended Bar Plot
 ## use a combination of cols_page and rows_page to achieve desired figure ratio
