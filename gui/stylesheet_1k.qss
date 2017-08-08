@@ -2,6 +2,7 @@
 font-family: "Sinkin Sans";
 font-weight: normal;
 font-size: 10pt;
+color: #FAFAF7;
 }
 
 QAbstractSpinBox::selected {
@@ -64,7 +65,7 @@ background-color: #08F2EE;
 border: 1px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
-height: 18px;
+height: 24px;
 margin-right: 16px;
 padding-left: 3px;
 width: 40px;
