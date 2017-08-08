@@ -46,7 +46,6 @@ class PeakListArea(QWidget):
         num_z = len(z_conds)
         total_x = num_x*num_y*num_z
         if total_x > 10:
-            # self.scene.setHeight(2000)
             self.scrollContents.setSceneRect(0, 0, width, total_x * 22)
         else:
             self.scrollContents.setSceneRect(0, 0, width, self.height)
@@ -72,7 +71,6 @@ class PeakListArea(QWidget):
                     for k, x in enumerate(x_conds):
                         xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                         self.scene.addItem(xx)
-                        # self._addConnectingLine(y, x)
                         pl = PeakListLabel('Drop peaklist here', self.scene, [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
                         self.peak_list_objects.append(pl)
                         self.scene.addItem(pl)

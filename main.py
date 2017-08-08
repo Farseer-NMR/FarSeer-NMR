@@ -210,9 +210,7 @@ class Settings(QWidget):
         fasta_groupbox.layout().addWidget(self.fasta_start)
 
 
-        self.x_checkbox = QCheckBox(self)
-        self.y_checkbox = QCheckBox(self)
-        self.z_checkbox = QCheckBox(self)
+
         self.x_checkbox = LabelledCheckbox(self, "x")
         self.y_checkbox = LabelledCheckbox(self, "y")
         self.z_checkbox = LabelledCheckbox(self, "z")
@@ -413,7 +411,7 @@ class Settings(QWidget):
         grid.layout().addWidget(pre_groupbox, 9, 12, 5, 4)
         grid.layout().addWidget(series_plotting_groupbox, 14, 8, 7, 4)
         grid.layout().addWidget(res_evo_groupbox, 14, 12, 7, 4)
-        grid.layout().addWidget(buttons_groupbox, 14, 0, 1, 12)
+        grid.layout().addWidget(buttons_groupbox, 21, 0, 1, 16)
 
 
 
@@ -529,15 +527,12 @@ class Interface(QWidget):
         self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
-        grid2.setHorizontalSpacing(0)
         grid.setAlignment(QtCore.Qt.AlignTop)
         grid.setAlignment(QtCore.Qt.AlignLeft)
         self.setLayout(grid)
         self.setObjectName("Interface")
         self.widget2 = QWidget(self)
         self.widget2.setLayout(grid2)
-        axes_label = QLabel(" Axes    ", self)
-        axes_label.setObjectName("AxesLabel")
         self.widget3 = QWidget(self)
         widget3_layout = QGridLayout()
 
@@ -558,7 +553,7 @@ class Interface(QWidget):
         num_points_label = QLabel("Number of Points", self)
         num_points_label.setObjectName("PointsLabel")
         num_points_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        grid2.layout().addWidget(num_points_label, 0, 2, 1, 12)
+        grid2.layout().addWidget(num_points_label, 0, 0, 1, 13)
 
 
         self.z_combobox = QSpinBox(self)
@@ -592,10 +587,10 @@ class Interface(QWidget):
 
         self.showTreeButton.setObjectName("TreeButton")
 
-        self.widget2.layout().addWidget(self.showTreeButton, 4, 2, 1, 12)
+        self.widget2.layout().addWidget(self.showTreeButton, 4, 2, 1, 11)
         self.peakListArea.setObjectName("PeakListArea")
 
-        self.showTreeButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        self.showTreeButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
         self.widget3.layout().addWidget(self.peakListArea, 3, 0, 1, 2)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
