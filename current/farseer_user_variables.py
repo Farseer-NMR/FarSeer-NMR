@@ -27,7 +27,7 @@ perform_comparisons = True  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
-cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full]
+cs_lost = 'prev'  # how to represent the lost residues in CSPs [prev/full/zero]
 #
 perform_resevo_fit = False  # Fit parameter evolution over titration experiment
 #
