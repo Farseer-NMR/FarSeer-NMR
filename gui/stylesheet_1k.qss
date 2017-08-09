@@ -5,6 +5,9 @@ font-size: 10pt;
 color: #FAFAF7;
 }
 
+QAbstractSpinBox::selected {
+border: 0;
+}
 
 QWidget#MainWidget {
 background-color: #001450;
@@ -91,6 +94,7 @@ border: 2px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
 height: 24px;
+/*    margin-right: 16px;*/
 padding-left: 6px;
 width: 80px;
 }
@@ -110,7 +114,7 @@ background-color: #08F2EE;
 border: 2px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
-height: 24px;
+height: 26px;
 width: 80px;
 }
 
@@ -189,10 +193,9 @@ background-repeat: repeat-x;
 background-color: #08F2EE;
 border: 6px solid #FAFAF7;
 margin-top: 6px;
-margin-left: 6px;
-margin-right: 6px;
+margin-left: 13px;
+margin-right: 12px;
 }
-
 
 
 #PointsLabel {
@@ -203,8 +206,11 @@ color: #001450;
 font-size: 10pt;
 font-weight: 400;
 height: 10px;
+margin-left: 7px;
+padding-left: 10px;
 padding-bottom: 4px;
 padding-top: 2px;
+margin-right: 6px;
 }
 
 

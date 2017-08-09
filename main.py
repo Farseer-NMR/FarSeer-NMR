@@ -411,7 +411,7 @@ class Settings(QWidget):
         grid.layout().addWidget(pre_groupbox, 9, 12, 5, 4)
         grid.layout().addWidget(series_plotting_groupbox, 14, 8, 7, 4)
         grid.layout().addWidget(res_evo_groupbox, 14, 12, 7, 4)
-        grid.layout().addWidget(buttons_groupbox, 21, 0, 1, 16)
+        grid.layout().addWidget(buttons_groupbox, 21, 0, 2, 16)
 
 
 
