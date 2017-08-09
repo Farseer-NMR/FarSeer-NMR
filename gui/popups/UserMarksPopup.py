@@ -65,7 +65,7 @@ class UserMarksPopup(QDialog):
         removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
         # addButton.setFixedWidth(50)
         # removeButton.setFixedWidth(50)
-        self.pairs.append([key, value, addButton, removeButton])
+        self.pairs.append([key, value, colour, addButton, removeButton])
         self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
         self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
         self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
@@ -75,7 +75,7 @@ class UserMarksPopup(QDialog):
         # print(self.pairs)
         print(self.marker_rows)
 
-    def remove_row_to_popup(self, index):
+    def remove_row_to_popup(self, index, pop=True):
 
         print(index, 'remove index number')
         self.marker_rows -= 1
@@ -87,12 +87,13 @@ class UserMarksPopup(QDialog):
                     item.widget().hide()
             self.mainWidget.layout().removeItem(item)
         # if index in self.pairs:
-        self.pairs.pop(index)
+        if pop:
+            self.pairs.pop(index)
 
     def setValuesFromConfig(self):
         for i in range(self.marker_rows):
-            self.remove_row_to_popup(i)
-
+            self.remove_row_to_popup(i, pop=False)
+        self.pairs = []
         self.marker_rows = 0
 
         for key1, value1 in self.variables["user_mark_settings"].items():
@@ -108,7 +109,7 @@ class UserMarksPopup(QDialog):
             removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
             # addButton.setFixedWidth(50)
             # removeButton.setFixedWidth(50)
-            self.pairs.append([key, value, addButton, removeButton])
+            self.pairs.append([key, value, colour, addButton, removeButton])
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
             self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
@@ -119,18 +120,19 @@ class UserMarksPopup(QDialog):
 
 
     def set_defaults(self):
-
+        print(self.marker_rows)
         for i in range(self.marker_rows):
-            self.remove_row_to_popup(i)
+            self.remove_row_to_popup(i, pop=False)
 
         self.marker_rows = 0
+        self.pairs = []
 
         for key1, value1 in defaults["user_mark_settings"].items():
 
             key = LabelledLineEdit(self, text='key')
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
-            color = ColourBox(self, text='colour')
+            colour = ColourBox(self, text='colour')
             value.field.setText(value1)
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
@@ -138,10 +140,10 @@ class UserMarksPopup(QDialog):
             removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
             # addButton.setFixedWidth(100)
             # removeButton.setFixedWidth(100)
-            self.pairs.append([key, value, addButton, removeButton])
+            self.pairs.append([key, value, colour, addButton, removeButton])
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
-            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
             self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
@@ -149,5 +151,9 @@ class UserMarksPopup(QDialog):
 
     def setValues(self, variables):
         user_dict = {pair[0].field.text():pair[1].field.text() for pair in self.pairs}
-        variables["user_mark_settings"] = user_dict
+        user_colours = {pair[0].field.text(): pair[2].fields.currentText() for pair in self.pairs}
+        variables["bar_plot_settings"]["bar_user_marks_dict"] = user_dict
+        variables["bar_plot_settings"]["bar_user_bar_colors_dict"] = user_colours
+        import pprint
+        pprint.pprint(variables["bar_plot_settings"])
         self.accept()
