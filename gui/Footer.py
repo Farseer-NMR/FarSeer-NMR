@@ -63,7 +63,7 @@ class Footer(QWidget):
         self.layout().addWidget(self.versionLabel, 0, 8, 1, 1)
 
         self.ctfpLabel = QLabel('', self)
-        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/footer-ctfp.png'))
+        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/footer-artistic-systems.png'))
         self.ctfpLabel.setPixmap(pixmap)
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
         self.layout().addWidget(self.ctfpLabel, 1, 7, 2, 2)

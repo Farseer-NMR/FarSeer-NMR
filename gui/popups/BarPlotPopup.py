@@ -15,7 +15,7 @@ class BarPlotPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
         super(BarPlotPopup, self).__init__(parent)
-        self.setWindowTitle("Vertical Bar Plot")
+        self.setWindowTitle("Bar Plot")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
@@ -26,7 +26,7 @@ class BarPlotPopup(QDialog):
         self.defaults = defaults["bar_plot_settings"]
 
 
-        self.apply_status = LabelledCheckbox(self, text="Apply Status")
+        self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
         self.lost_bar_colour = ColourBox(self, text="Missing Bar Colour")
         self.unassigned_bar_colour = ColourBox(self, text="Unassigned Bar Colour")
@@ -60,9 +60,10 @@ class BarPlotPopup(QDialog):
         self.layout().addWidget(self.markProlines, 3, 1)
         self.layout().addWidget(self.proline_marker, 4, 1)
         self.layout().addWidget(self.user_details, 5, 1)
-        self.layout().addWidget(self.user_mark_font_size, 6, 1)
-        self.layout().addWidget(self.colour_user_details, 7, 1)
-        self.layout().addWidget(self.user_markers_button, 8, 0)
+        self.layout().addWidget(self.colour_user_details, 6, 1)
+        self.layout().addWidget(self.user_markers_button, 7, 1)
+        self.layout().addWidget(self.user_mark_font_size, 8, 1)
+
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
@@ -70,7 +71,7 @@ class BarPlotPopup(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 8, 1, 1, 1)
+        self.layout().addWidget(self.buttonBox, 9, 1, 1, 1)
 
         if variables:
             self.get_values()
@@ -81,7 +82,6 @@ class BarPlotPopup(QDialog):
         popup = UserMarksPopup(variables=variables)
         popup.exec_()
         popup.raise_()
-        print(variables["user_mark_settings"])
 
     def get_defaults(self):
         self.apply_status.setChecked(self.defaults["bar_status_color_flag"])

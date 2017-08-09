@@ -234,6 +234,10 @@ defaults = {
           "z": "z"
   },
 
+    "user_colour_settings": {
+
+    },
+
   "cs_scatter_settings": {
           "do_cs_scatter": True,
           "cs_scatter_cols_page": 5,

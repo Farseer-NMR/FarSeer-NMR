@@ -1,6 +1,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox, QPushButton, QWidget
 from gui.components.LabelledLineEdit import LabelledLineEdit
+from gui.components.ColourBox import ColourBox
 from functools import partial
 from current.default_config import defaults
 
@@ -8,7 +9,7 @@ class UserMarksPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
         super(UserMarksPopup, self).__init__(parent)
-        self.setWindowTitle("User Defined Plot")
+        self.setWindowTitle("User Defined Bar Plot Settings")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.marker_rows = 0
@@ -35,18 +36,20 @@ class UserMarksPopup(QDialog):
         else:
             key = LabelledLineEdit(self, text='key')
             value = LabelledLineEdit(self, text='value')
+            colour = ColourBox(self, text='colour')
             addButton = QPushButton("Add", self)
             removeButton = QPushButton("Remove", self)
             addButton.clicked.connect(self.add_row_to_popup)
             removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
             addButton.setFixedWidth(50)
             removeButton.setFixedWidth(50)
-            self.pairs.append([key, value, addButton, removeButton])
+            self.pairs.append([key, value, colour, addButton, removeButton])
 
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
-            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
             # self.pairs.append([self.buttonBox])
             self.marker_rows += 1
@@ -55,6 +58,7 @@ class UserMarksPopup(QDialog):
     def add_row_to_popup(self):
         key = LabelledLineEdit(self, text='key')
         value = LabelledLineEdit(self, text='value')
+        colour = ColourBox(self, text='colour')
         addButton = QPushButton("Add", self)
         addButton.clicked.connect(self.add_row_to_popup)
         removeButton = QPushButton("Remove", self)
@@ -65,7 +69,8 @@ class UserMarksPopup(QDialog):
         self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
         self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
         self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
-        self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+        self.mainWidget.layout().addWidget(colour, self.marker_rows, 3)
+        self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
         self.marker_rows += 1
         # print(self.pairs)
         print(self.marker_rows)
@@ -96,6 +101,7 @@ class UserMarksPopup(QDialog):
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
             value.field.setText(value1)
+            colour = ColourBox(self, text='colour')
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
             removeButton = QPushButton("Remove", self)
@@ -105,8 +111,9 @@ class UserMarksPopup(QDialog):
             self.pairs.append([key, value, addButton, removeButton])
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
-            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
             print(self.marker_rows, 'setvalsfromconfig')
 
@@ -123,6 +130,7 @@ class UserMarksPopup(QDialog):
             key = LabelledLineEdit(self, text='key')
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
+            color = ColourBox(self, text='colour')
             value.field.setText(value1)
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
@@ -134,12 +142,12 @@ class UserMarksPopup(QDialog):
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
+            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
 
 
     def setValues(self, variables):
         user_dict = {pair[0].field.text():pair[1].field.text() for pair in self.pairs}
         variables["user_mark_settings"] = user_dict
-        print(variables["user_mark_settings"])
         self.accept()

@@ -20,6 +20,7 @@ from gui.components.Icon import Icon, ICON_DIR
 from gui.popups.BarPlotPopup import BarPlotPopup
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
+from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
 from gui.popups.GeneralResidueEvolution import GeneralResidueEvolution
 from gui.popups.VerticalBar import VerticalBarPopup
 from gui.popups.PreAnalysisPopup import PreAnalysisPopup
@@ -65,14 +66,17 @@ class TabWidget(QTabWidget):
         self.tab2 = QWidget()
         self.tab1.setLayout(QGridLayout())
         self.tab2.setLayout(QGridLayout())
-        self.tab1.layout().addWidget(Settings(gui_settings=gui_settings))
-        self.tab2.layout().addWidget(Interface(gui_settings=gui_settings))
+        self.interface = Interface(gui_settings=gui_settings)
+        self.settings = Settings(gui_settings=gui_settings)
+        self.tab1.layout().addWidget(self.settings)
+        self.tab2.layout().addWidget(self.interface)
         self.addTab(self.tab2, "PeakList Selection")
         self.addTab(self.tab1, "Settings")
         self.tab1.setObjectName("Settings")
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
         self.tablogo.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        print(self.interface.sideBar)
 
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
         self.tablogo.setPixmap(pixmap)
@@ -80,18 +84,21 @@ class TabWidget(QTabWidget):
         self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
-
+    def load_peak_lists(self, path=None):
+        if os.path.exists(path):
+            self.interface.sideBar.load_from_path(path)
 
 
     def save_config(self, variables):
 
         fname = QFileDialog.getSaveFileName(self, 'Save Configuration')
-        with open(fname[0], 'w') as outfile:
-            json.dump(variables, outfile, indent=4, sort_keys=True)
+        if os.path.exists(fname[0]):
+            with open(fname[0], 'w') as outfile:
+                json.dump(variables, outfile, indent=4, sort_keys=True)
 
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
-        spectrum_path = self.tab1.spectrum_path.field.text()
+        spectrum_path = self.tab1.logfile_path.field.text()
         peak_list_objects = self.tab2.peakListArea.peak_list_objects
         # spectrum_dir = os.getcwd()
         create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
@@ -103,8 +110,6 @@ class TabWidget(QTabWidget):
     def write_fsuv(self, file_path):
         variables = self.tab1.variables
         json_to_fsuv(file_path, variables=variables)
-
-
 
 
 
@@ -126,17 +131,25 @@ class Settings(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         from current.default_config import defaults
         # self.variables = None
-        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'blank_config.json'), 'r'))
+        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
         paths_group_box = QGroupBox()
-        paths_groupbox_layout = QVBoxLayout()
+        paths_groupbox_layout = QGridLayout()
         paths_groupbox_layout.setSpacing(2)
         paths_group_box.setLayout(paths_groupbox_layout)
 
-        self.spectrum_path = LabelledLineEdit(self, "Spectrum Path")
-        self.logfile_path = LabelledLineEdit(self, "Log file Path")
+        self.spectrum_path = LabelledLineEdit(self, "Spectrum Path", callback=self.set_spectrum_path_text)
+        self.logfile_path = LabelledLineEdit(self, "Calculation Output Folder", callback=self.set_logfile_path)
 
-        paths_group_box.layout().addWidget(self.spectrum_path)
-        paths_group_box.layout().addWidget(self.logfile_path)
+        self.spectrum_path_browse = QPushButton("...", self)
+        self.logfile_path_browse = QPushButton("...", self)
+
+        self.spectrum_path_browse.clicked.connect(self.set_spectrum_path)
+        self.logfile_path_browse.clicked.connect(self.set_logfile_path)
+
+        paths_group_box.layout().addWidget(self.spectrum_path, 0, 0, 1, 12)
+        paths_group_box.layout().addWidget(self.logfile_path, 1, 0, 1, 12)
+        paths_group_box.layout().addWidget(self.spectrum_path_browse, 0, 13, 1, 1)
+        paths_group_box.layout().addWidget(self.logfile_path_browse, 1, 13, 1, 1)
 
         self.ext_bar_checkbox = LabelledCheckbox(self, "Extended Bar")
         self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
@@ -180,7 +193,7 @@ class Settings(QWidget):
         self.dpre_button = QPushButton("Settings", self)
         self.dpre_button.clicked.connect(partial(self.show_popup, DPrePopup, self.variables))
 
-        self.has_sidechains_checkbox = LabelledCheckbox(self, "Sidechain Peaks?")
+        self.has_sidechains_checkbox = LabelledCheckbox(self, "Are Sidechain Peaks Present?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
@@ -190,8 +203,14 @@ class Settings(QWidget):
         self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
 
         self.figure_width = LabelledDoubleSpinBox(self, "Figure Width")
+        self.figure_width.field.setMinimum(0)
+        self.figure_width.field.setMaximum(100)
         self.figure_height = LabelledDoubleSpinBox(self, "Figure Height")
+        self.figure_height.field.setMinimum(0)
+        self.figure_height.field.setMaximum(100)
         self.figure_dpi = LabelledDoubleSpinBox(self, "Figure DPI")
+        self.figure_dpi.field.setMinimum(0)
+        self.figure_dpi.field.setMaximum(10000)
         self.figure_format = LabelledCombobox(self, "Figure Format", items=['pdf', 'png', 'ps', 'svg'])
 
         sidechains_groupbox = QGroupBox()
@@ -259,8 +278,9 @@ class Settings(QWidget):
         cs_groupbox.setLayout(cs_groupbox_layout)
 
         self.csp_alpha = LabelledDoubleSpinBox(self, text="CSP Alpha")
-        self.csp_lost = LabelledCombobox(self, text="Show Lost Residues", items=['prev', 'full'])
+        self.csp_lost = LabelledCombobox(self, text="Show Lost Residues", items=['prev', 'full', 'zero'])
         self.csp_exceptions = QPushButton("Alpha by residue", self)
+        self.csp_exceptions.clicked.connect(partial(self.show_popup, CSPExceptionsPopup, self.variables))
         cs_groupbox.layout().addWidget(self.csp_alpha)
         cs_groupbox.layout().addWidget(self.csp_lost)
         cs_groupbox.layout().addWidget(self.csp_exceptions)
@@ -405,6 +425,7 @@ class Settings(QWidget):
         grid.layout().addWidget(lost_analysis_groupbox, 3, 0, 4, 4)
         grid.layout().addWidget(series_groupbox, 3, 8, 6, 4)
         grid.layout().addWidget(figure_groupbox, 3, 12, 6, 4)
+        grid.layout().addWidget(figure_groupbox, 3, 12, 6, 4)
 
         grid.layout().addWidget(restraint_groupbox, 11, 0, 10, 8)
         grid.layout().addWidget(cs_groupbox, 9, 8, 5, 4)
@@ -413,9 +434,25 @@ class Settings(QWidget):
         grid.layout().addWidget(res_evo_groupbox, 14, 12, 7, 4)
         grid.layout().addWidget(buttons_groupbox, 21, 0, 2, 16)
 
+        self.load_variables()
+
+    def set_spectrum_path_text(self, path=None):
+        self.spectrum_path.setText(path)
+
+    def set_logfile_path_text(self, path=None):
+        self.logfile_path.setText(path)
+
+    def set_spectrum_path(self, path=None):
+        if not path:
+            path = str(QFileDialog.getExistingDirectory(None, 'Select Directory', os.getcwd()))
+        self.spectrum_path.setText(path)
+        self.parent().parent().parent().load_peak_lists(path)
 
 
-
+    def set_logfile_path(self, path=None):
+        if not path:
+            path = str(QFileDialog.getExistingDirectory(None, 'Select Directory', os.getcwd()))
+        self.logfile_path.setText(path)
 
     def load_config(self):
         self.variables = load_config()
@@ -423,10 +460,10 @@ class Settings(QWidget):
             self.load_variables()
 
     def save_config(self):
-        self.parent().parent().save_config(self.variables)
+        self.parent().parent().parent().save_config(self.variables)
 
     def run_farseer_calculation(self):
-        self.parent().parent().run_farseer_calculation()
+        self.parent().parent().parent().run_farseer_calculation()
 
     def load_variables(self):
 
@@ -522,6 +559,7 @@ class Interface(QWidget):
         self.widget2.setObjectName("InterfaceTop")
         self.gui_settings = gui_settings
         # self.setStyleSheet('.QWidget { border: 1px solid red; margin-top: 0;}')
+        print(self.sideBar)
 
     def initUI(self):
         self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
@@ -559,6 +597,9 @@ class Interface(QWidget):
         self.z_combobox = QSpinBox(self)
         self.y_combobox = QSpinBox(self)
         self.x_combobox = QSpinBox(self)
+        self.z_label = QLabel("z", self)
+        self.y_label = QLabel("y", self)
+        self.x_label = QLabel("x", self)
 
         self.x_combobox.valueChanged.connect(partial(self.update_condition_boxes, 3, 'x'))
         self.y_combobox.valueChanged.connect(partial(self.update_condition_boxes, 2, 'y'))
@@ -567,6 +608,10 @@ class Interface(QWidget):
         grid2.layout().addWidget(self.x_combobox, 3, 2, 1, 1)
         grid2.layout().addWidget(self.y_combobox, 2, 2, 1, 1)
         grid2.layout().addWidget(self.z_combobox, 1, 2, 1, 1)
+
+        grid2.layout().addWidget(self.x_label, 3, 1, 1, 1)
+        grid2.layout().addWidget(self.y_label, 2, 1, 1, 1)
+        grid2.layout().addWidget(self.z_label, 1, 1, 1, 1)
 
         self.z_combobox.setValue(1)
         self.y_combobox.setValue(1)
@@ -583,7 +628,7 @@ class Interface(QWidget):
 
         self.widget3.layout().addWidget(self.widget2, 0, 0, 1, 2)
 
-        self.showTreeButton = QPushButton('Show Parameter Tree', self)
+        self.showTreeButton = QPushButton('Setup Experimental Series', self)
 
         self.showTreeButton.setObjectName("TreeButton")
 

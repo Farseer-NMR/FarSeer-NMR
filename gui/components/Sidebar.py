@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5 import QtCore
 from parsing import read_peaklist
+import os
 
 
 class SideBar(QTreeWidget):
@@ -36,13 +37,30 @@ class SideBar(QTreeWidget):
         if event.mimeData().hasUrls():
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
-                peaklist = read_peaklist(filePath)
-                if peaklist:
-                    item = self.addItem(filePath.split('/')[-1].split('.')[0])
-                    self.peakLists[item.text(0)] = peaklist
-                else:
-                    print("Invalid file: %s" % filePath)
+                self.load_from_path(filePath)
 
+    def load_from_path(self, filePath):
+        if os.path.isdir(filePath):
+            for root, dirs, filenames in os.walk(filePath):
+                for filename in filenames:
+                    try:
+                        path = os.path.join(root, filename)
+                        self.load_peaklist(path)
+                    except IOError:
+                        pass
+            else:
+                self.load_peaklist(filePath)
+
+
+    def load_peaklist(self, filePath):
+        if os.path.isdir(filePath):
+            return
+        peaklist = read_peaklist(filePath)
+        if peaklist:
+            item = self.addItem(filePath.split('/')[-1].split('.')[0])
+            self.peakLists[item.text(0)] = peaklist
+        else:
+            print("Invalid file: %s" % filePath)
 
     def addItem(self, name):
         newItem = QTreeWidgetItem(self)

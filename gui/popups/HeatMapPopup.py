@@ -37,7 +37,6 @@ class HeatMapPopup(QDialog):
         self.heat_map_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
         self.heat_map_right_margin = LabelledDoubleSpinBox(self, "Right Margin")
         self.heat_map_bottom_margin = LabelledDoubleSpinBox(self, "Bottom Margin")
-        self.heat_map_top_margin = LabelledDoubleSpinBox(self, "Top Margin")
         self.heat_map_cbar_font_size = LabelledSpinBox(self, "Colour Bar Font Size")
 
 
@@ -55,8 +54,7 @@ class HeatMapPopup(QDialog):
         self.layout().addWidget(self.heat_map_y_label_weight, 3, 1)
         self.layout().addWidget(self.heat_map_right_margin, 4, 1)
         self.layout().addWidget(self.heat_map_bottom_margin, 5, 1)
-        self.layout().addWidget(self.heat_map_top_margin, 6, 1)
-        self.layout().addWidget(self.heat_map_cbar_font_size, 7, 1)
+        self.layout().addWidget(self.heat_map_cbar_font_size, 6, 1)
 
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
@@ -65,7 +63,7 @@ class HeatMapPopup(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 10, 0, 1, 2)
+        self.layout().addWidget(self.buttonBox, 8, 1, 1, 1)
 
         if self.variables:
             self.get_values()
@@ -85,7 +83,6 @@ class HeatMapPopup(QDialog):
         self.heat_map_y_label_weight.select(self.default["heat_map_y_label_weight"])
         self.heat_map_right_margin.setValue(self.default["heat_map_right_margin"])
         self.heat_map_bottom_margin.setValue(self.default["heat_map_bottom_margin"])
-        self.heat_map_top_margin.setValue(self.default["heat_map_top_margin"])
         self.heat_map_cbar_font_size.setValue(self.default["heat_map_cbar_font_size"])
 
     def set_values(self, variables):
@@ -103,7 +100,6 @@ class HeatMapPopup(QDialog):
         self.variables["heat_map_y_label_weight"] = self.heat_map_y_label_weight.fields.currentText()
         self.variables["heat_map_right_margin"] = self.heat_map_right_margin.field.value()
         self.variables["heat_map_bottom_margin"] = self.heat_map_bottom_margin.field.value()
-        self.variables["heat_map_top_margin"] = self.heat_map_top_margin.field.value()
         self.variables["heat_map_cbar_font_size"] = self.heat_map_cbar_font_size.field.value()
         variables["heat_map_settings"] = self.variables
         self.accept()
@@ -123,6 +119,5 @@ class HeatMapPopup(QDialog):
         self.heat_map_y_label_weight.select(self.variables["heat_map_y_label_weight"])
         self.heat_map_right_margin.setValue(self.variables["heat_map_right_margin"])
         self.heat_map_bottom_margin.setValue(self.variables["heat_map_bottom_margin"])
-        self.heat_map_top_margin.setValue(self.variables["heat_map_top_margin"])
         self.heat_map_cbar_font_size.setValue(self.variables["heat_map_cbar_font_size"])
 

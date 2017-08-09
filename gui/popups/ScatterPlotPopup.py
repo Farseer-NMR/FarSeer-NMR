@@ -29,7 +29,7 @@ class ScatterPlotPopup(QDialog):
         self.cs_scatter_y_label = LabelledLineEdit(self, "Y Label")
         self.cs_scatter_mksize = LabelledSpinBox(self, "Mark Size")
         self.cs_scatter_scale = LabelledDoubleSpinBox(self, "Scale")
-        self.cs_scatter_mk_type = LabelledCombobox(self, text="Y Label Font Weight", items=['color', 'shape'])
+        self.cs_scatter_mk_type = LabelledCombobox(self, text="Mark Type", items=['color', 'shape'])
         self.cs_scatter_mk_start_color = ColourBox(self, "Mark Start Colour")
         self.cs_scatter_mk_end_color = ColourBox(self, "Mark End Colour")
         self.cs_scatter_markers = LabelledLineEdit(self, "Sequential Markers")

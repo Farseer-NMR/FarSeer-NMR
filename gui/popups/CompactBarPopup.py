@@ -66,7 +66,6 @@ class CompactBarPopup(QDialog):
         self.unassigned_shade_alpha.setValue(self.defaults["comp_bar_unassigned_shade_alpha"])
 
     def get_values(self):
-        print(self.variables["comp_bar_unassigned_shade"])
         self.bar_cols.setValue(self.variables["comp_bar_cols_page"])
         self.bar_rows.setValue(self.variables["comp_bar_rows_page"])
         self.x_tick_font_size.setValue(self.variables["comp_bar_x_ticks_fs"])

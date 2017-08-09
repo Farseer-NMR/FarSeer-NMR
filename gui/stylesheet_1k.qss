@@ -124,6 +124,7 @@ border: 2px solid #FAFAF7;
 color: #012C6E;
 font-weight: 400;
 height: 18px;
+min-width: 100px;
 }
 
 QPushButton::hover {
@@ -233,5 +234,4 @@ margin-bottom: 13px;
 .QSplitter {
 padding-left: 5px;
 }
-
 

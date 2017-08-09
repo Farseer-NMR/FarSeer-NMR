@@ -14,7 +14,7 @@ class PreAnalysisPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
         super(PreAnalysisPopup, self).__init__(parent)
-        self.setWindowTitle("Residue Evolution Plot")
+        self.setWindowTitle("PRE Settings")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
