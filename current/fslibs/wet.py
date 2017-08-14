@@ -317,10 +317,10 @@ def end_bad():
 {}
 {}
 {}
-""".format(title(), 
+""".format(bottom(), 
              line('Farseer-NMR aborted'),
              line('Bye :-('),
-             title()))
+             bottom()))
     return
 
 def end_good():

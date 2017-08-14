@@ -404,7 +404,7 @@ def reads_input(exp, fsuv):
     return
 
 def inits_conditions(exp):
-    exp.init_conditions()
+    exp.init_coords()
     return
     
 def identify_residues(exp):

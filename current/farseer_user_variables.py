@@ -15,15 +15,15 @@ has_sidechains = False  # Are there sidechain entries in the peaklists?
 use_sidechains = False  # Do you want to analyse those sidechains?
 #
 expand_lost_yy = False  # Considers lost residue over yy references and xx reference
-expand_lost_zz = True  # Considers lost residue over zz references and xx reference
+expand_lost_zz = False  # Considers lost residue over zz references and xx reference
 ####################################
 
 ### Calculations Setup
 do_cond1 = True  # Analyse data in the first titration condition (dimension)
 do_cond2 = False  # Analyse data in the second titration condition (dimension)
-do_cond3 = True  # Analyse data in the thrid titration condition (dimension)
+do_cond3 = False  # Analyse data in the thrid titration condition (dimension)
 #
-perform_comparisons = True  # Compares data obtained for condition experiment.
+perform_comparisons = False  # Compares data obtained for condition experiment.
 #
 csp_alpha4res = 0.14  # General alpha normalization factor for CSP
 csp_res_exceptions = {'G': 0.2}  # exceptions for the normalization factor
@@ -34,7 +34,7 @@ perform_resevo_fit = False  # Fit parameter evolution over titration experiment
 titration_x_values = [0, 125, 250, 500, 1000, 2000, 4000] # values for the x axis in the fitting procedure (ex. Ligand concentration)
 #
 ## Perform PRE analysis
-apply_PRE_analysis = True
+apply_PRE_analysis = False
 apply_smooth=True
 gaussian_stddev=1
 gauss_x_size=7
@@ -53,8 +53,8 @@ chimera_att_select_format = ':'  # format to select residues in Chimera
 # Restraints to Plot:
 calcs_PosF1_delta = False # Plot nuclei 1 shift perturbation data
 calcs_PosF2_delta = False # Plot nuclei 2 shift perturbation data
-calcs_CSP = False  # Plot combined chemical shift perturbation data
-calcs_Height_ratio = True  # Plot Height ratio data
+calcs_CSP = True  # Plot combined chemical shift perturbation data
+calcs_Height_ratio = False  # Plot Height ratio data
 calcs_Volume_ratio = False  # Plot Volume ratio data
 #
 

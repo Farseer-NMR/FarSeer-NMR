@@ -218,10 +218,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         
         self.log_t('READING INPUT FILES *{}*'.format(filetype))
         
-        if not(any([p.endswith(filetype) for p in self.paths])):
-            self.log_r(fsw.wet9(filetype))
-            fsw.end_bad()
-        
+        self.check_filetype_exists(filetype)
         
         # loads files in nested dictionaries
         # piece of code found in stackoverflow
@@ -237,26 +234,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                 lessparts = parts[-1].split('.')[0]
                 branch[lessparts] = branch.get(parts[-1], f(p))
         
-        ############ WET #8
-        zkeys = list(target.keys())
-        ykeys = list(target[zkeys[0]].keys())
-        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
-        
-        if not(len(zkeys) * len(ykeys) * len(xkeys) == \
-            len([x for x in self.paths if x.endswith(filetype)])):
-            #DO
-            str1 = ''
-            for z, vz in target.items():
-                str1 += z+'/\n'
-                for y, vy in target[z].items():
-                    str1 += \
-                        "\t{}/\t{}\n".format(y, "\t".join(sorted(vy.keys())))
-            
-            self.log_r(fsw.wet8(filetype, str1))
-            fsw.end_bad()
-        else:
-            self.log_r('> All <{}> files found - OK!'.format(filetype))
-        ############
+        self.checks_xy_datapoints_coherency(target, filetype)
         
         return
     
@@ -322,7 +300,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         return df
     
     
-    def init_conditions(self):
+    def init_coords(self):
         """
         Identifies the data points for each titration condition.
         Configures the conditions to be analyzed.
@@ -962,4 +940,82 @@ with data points {}'.format(dim2_pts,
                                                     float_format='%.4f'))
             
             fileout.close()
+        return
+    
+    def check_filetype_exists(self, filetype):
+        """
+        Confirms that file type exists in spectra/ before
+        attempting to load it.
+        
+        If not, call WET#9.
+        """
+        
+        if not(any([p.endswith(filetype) for p in self.paths])):
+            
+            msg = "There are no files in spectra/ with extension {}".\
+                  format(filetype)
+            
+            self.log_r(fsw.gen_wet('ERROR', msg, 9))
+            fsw.end_bad()
+        return
+    
+    def checks_xy_datapoints_coherency(self, target, filetype):
+        """
+        Confirms wether the number of files of <filetype> is the same in every
+        subdirectory of spectra/.
+        
+        Reports missing file and stops run with WET#8.
+        
+        AND
+        
+        Confirms that the files of <filetype> have the same names in all
+        the y datapoints subfolders.
+        
+        Reports names mismatches with WET#10
+        """
+        
+        def get_file(s):
+            return s.split('/')[-1]
+        
+        zkeys = list(target.keys())
+        ykeys = list(target[zkeys[0]].keys())
+        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
+        
+        ### WET#8
+        key_len = len(zkeys) * len(ykeys) * len(xkeys)
+        
+        if key_len != \
+                len([x for x in self.paths if x.endswith(filetype)]):
+            #DO
+            msg =  'The no. of files of type {} is not the same for every \
+series folder. Check for the missing ones!\n'.format(filetype)
+            
+            self.log_r(fsw.gen_wet('ERROR', msg, 8))
+            fsw.end_bad()
+        
+        ### WET#11
+        all_y_folders = set(\
+            [y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
+        
+        if len(set(all_y_folders)) > len(ykeys):
+            msg = "\
+Y axis folder names are not coherent. Names must be equal accross every Z\
+axis datapoint folder."
+            self.log_r(fsw.gen_wet('ERROR', msg, 11))
+            fsw.end_bad()
+        
+        ### WET#10
+        all_x_files = set(\
+            [x.split('/')[-1] for x in self.paths if x.endswith(filetype)])
+        
+        if len(set(all_x_files)) > len(xkeys):
+            msg = "\
+X axis datapoints file names are not coherent. Names must be equal accross\ every Y axis datapoint folder.".format(filetype)
+            self.log_r(fsw.gen_wet('ERROR', msg, 10))
+            fsw.end_bad()
+        
+        else:
+            self.log_r('> All <{}> files found and correct- OK!'.\
+                        format(filetype))
+        
         return

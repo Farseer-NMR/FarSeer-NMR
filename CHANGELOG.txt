@@ -1,2 +1,6 @@
 # version 0.7.0
 
+* added function FarseerSet.check_xy_datapoints_coherency()
+* added function FarseerSet.check_filetype_exists()
+* added additional WETs: 10, 11.
+* added general wet formatting message.
