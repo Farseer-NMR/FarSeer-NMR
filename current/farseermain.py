@@ -56,51 +56,6 @@ def init_log(logfile_name, mod='a', state='STARTED'):
         logfile.write(log_title)
     return
 
-def close_log(farseerset=False, 
-              backbone_titration=False,
-              sidechain_titration=False,
-              backbone_comparison=False,
-              sidechain_comparison=False,
-              logfile_name='farseer.log',
-              mod='a'):
-    
-    def tdictcycle(td):
-        """:td: titration dictionary"""
-        for cond in sorted(td.keys()):
-            # for each point in the corresponding second dimension/condition
-            for dim2_pt in sorted(td[cond].keys()):
-                # for each point in the corresponding first dimension/condition
-                for dim1_pt in sorted(td[cond][dim2_pt].keys()):
-                    
-                    td[cond][dim2_pt][dim1_pt].\
-                        write_log(mod=mod, path=logfile_name)
-        return
-    
-    
-    if farseerset:
-        farseerset.write_log(mod=mod, path=logfile_name)
-    
-    if backbone_titration:
-        tdictcycle(backbone_titration)
-    
-    if sidechain_titration:
-        tdictcycle(sidechain_titration)
-    
-    if backbone_comparison:
-        for cond in sorted(backbone_comparison.keys()):
-            #backbone_comparison[cond].transfer_log()
-            backbone_comparison[cond].write_log(mod=mod, path=logfile_name)
-    
-    if sidechain_comparison:
-        for cond in sorted(sidechain_comparison.keys()):
-            #sidechain_comparison[cond].transfer_log()
-            sidechain_comparison[cond].write_log(mod=mod, path=logfile_name)
-    
-    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    init_log(logfile_name, state='ENDED')
-    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    return
-
 def init_params(fsuv):
     """Reads user defined variables and converts them to 
     organized dicitonaries or DataFrames.
@@ -1305,14 +1260,7 @@ def run_farseer(spectra_path, fsuv):
                                     ppp=pre_plot_params,
                                     reso_type='Sidechains')
     
-    # writes all the logs to a txt file.
-    #close_log(farseerset=exp, 
-              #backbone_titration=Farseer_titration_dict,
-              #sidechain_titration=Farseer_SD_titrations_dict,
-              #backbone_comparison=comparison_dict,
-              #sidechain_comparison=comparison_dict_SD,
-              #logfile_name=fsuv.logfile_name,
-              #mod='a')
+    init_log(fsuv.logfile_name, state='ENDED')
     
     return
 
