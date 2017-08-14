@@ -33,74 +33,17 @@ def gen_wet(t, s, n):
            bottom())
     return ws
 
-def wet1(pre_flag, c3_flag, plot_h_flag, plot_v_flag, comp_flag):
-
-    input("""
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-""".format(title(' WARNING '),
-           line(""),
-           line('PRE Analaysis is set to <{}>'.format(pre_flag)),
-           line('and it depends on the following variables:'),
-           line(),
-           line('do_cond3 :: {}'.format(c3_flag)),
-           line('calcs_Height_ratio :: {}'.format(plot_h_flag)),
-           line('calcs_Volume_ratio :: {}'.format(plot_v_flag)),
-           line('perform_comparisons :: {}'.format(comp_flag)),
-           line(),
-           referwet(1),
-           title()))
+def continue_abort():
+    """ Asks user to decide behaviour. """
+    choice = 'z'
+    while not(choice in ['A', 'C']):
+        choice = \
+            input('> What do you want to do? [C]ontinue or [A]bort? ').upper()
     
-    return
-
-def wet2(cond1, cond2, cond3):
-    strwet = """
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-{}
-""".format(title(' WARNING '),
-           line(),
-           line('All possible Farseer data analysis routines'),
-           line('are set to <False>'),
-           line('in the farseer_user_variables file:'),
-           line(),
-           line('condition 1 :: <{}>'.format(cond1)),
-           line('condition 2 :: <{}>'.format(cond2)),
-           line('condition 3 :: <{}>'.format(cond3)),
-           line(),
-           line('There is nothing to calculate or plot.'),
-           line('Confirm that this is actually what you want'),
-           line(),
-           referwet(2),
-           line(),
-           line('Parsed Peaklists have been exported.'),
-           title())
-    
-    return strwet
+    if choice == 'A':
+        end_bad()
+    elif choice == 'C':
+        return 'Continuing...'
 
 def wet3():
     strwet = """

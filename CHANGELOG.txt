@@ -1,5 +1,7 @@
 # version 0.7.0
 
+* added farseermain.logs
+* adjusted WET messages in farseermain.py
 * added WET #13
 * changed log structure
    * FarseerSet and Titration now internally record log with option to on-the-fly export of log to external file. This option is False by default and set to True by farseermain.

@@ -33,7 +33,7 @@ def read_user_variables(path):
     return fsuv, cwd
 
 def copy_Farseer_version(cwd, file_name='farseer_version',
-                         compress_type='zip'):
+                              compress_type='zip'):
     """MAKES COPY OF THE RUNNING VERSION"""
     
     script_wd = os.path.dirname(os.path.realpath(__file__))
@@ -56,20 +56,31 @@ def init_log(logfile_name, mod='a', state='STARTED'):
         logfile.write(log_title)
     return
 
+def logs(s, logfile_name):
+    with open(logfile_name, 'a') as logfile:
+        logfile.write(s)
+
 def init_params(fsuv):
     """Reads user defined variables and converts them to 
     organized dicitonaries or DataFrames.
     """
     
+    # checks PRE Analysis Flags
     if fsuv.apply_PRE_analysis \
         and not(fsuv.do_cond3 \
                 and (fsuv.calcs_Height_ratio or fsuv.calcs_Volume_ratio) \
                 and fsuv.perform_comparisons):
         #DO
-        fsw.wet1(fsuv.apply_PRE_analysis, fsuv.do_cond3,
-                 fsuv.calcs_Height_ratio, fsuv.calcs_Volume_ratio,
-                 fsuv.perform_comparisons)
-        pass
+        msg = "PRE Analaysis is set to <{}> and depends on the following variables: do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || perform_comparisons :: <{}>. All these variables should be set to True for PRE Analysis to be executed.".\
+            format(fsuv.apply_PRE_analysis,
+                   fsuv.do_cond3,
+                   fsuv.calcs_Height_ratio or fsuv.calcs_Volume_ratio,
+                   fsuv.perform_comparisons)
+           
+        logs(fsw.gen_wet('WARNING', msg, 1), fsuv.logfile_name)
+        fsw.continue_abort()
+        #DONE
+    ###
     
     general_variables = {}
     general_variables['txv'] = sorted(fsuv.titration_x_values)
@@ -533,55 +544,60 @@ def gen_titration_dicts(exp, data_hyper_cube,
     # titrations experiments we are going to analyse will be stored 
     # in a dictionary
     titrations_dict = {}
-
-    # creates the titrations for the first condition (1D)
-    if exp.hasxx and cond1:
-        titrations_dict['cond1'] = \
-            exp.gen_titration_dict(\
-                                data_hyper_cube,
-                                'cond1', 
-                                exp.xxcoords,
-                                exp.yycoords,
-                                exp.zzcoords,
-                                titration_class,
-                                titration_kwargs)
-    
-    # creates the titrations for the second condition (2D)
-    if exp.hasyy and cond2:
-        titrations_dict['cond2'] = \
-            exp.gen_titration_dict(\
-                                data_hyper_cube.transpose(2,0,1,3,4),
-                                'cond2',
-                                exp.yycoords,
-                                exp.zzcoords,
-                                exp.xxcoords,
-                                titration_class,
-                                titration_kwargs)
-
-    # creates the titrations for the third condition (3D)  
-    if exp.haszz and cond3:
-        titrations_dict['cond3'] = \
-            exp.gen_titration_dict(\
-                                data_hyper_cube.transpose(1,2,0,3,4),
-                                'cond3',
-                                exp.zzcoords,
-                                exp.xxcoords,
-                                exp.yycoords,
-                                titration_class,
-                                titration_kwargs)
-    
-    for cond in sorted(titrations_dict.keys()):
-        for dim2_pt in sorted(titrations_dict[cond].keys()):
-            for dim1_pt in sorted(titrations_dict[cond][dim2_pt].keys()):
-                titrations_dict[cond][dim2_pt][dim1_pt].log_outside = True
-                titrations_dict[cond][dim2_pt][dim1_pt].\
-                log_external_file_name = logfile
     
     if not(cond1 or cond2 or cond3):
+        # if there are no analysis to perform...
         exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
                      exp.exports_parsed_pkls,
-                     title='EXPORTED PARSED PEAKLISTS')
-        exp.log_r(fsw.wet2(cond1, cond2, cond3))
+                     title='EXPORTING PARSED PEAKLISTS')
+        
+        msg = "Analysis over X, Y or Z axes are all turned off. There is nothing to calculate or plot. Confirm this is actually what you want. Nevertheless, I have exported peaklists in their parsed format with 'lost' and 'unassigned' residues identified."
+        
+        exp.log_r(fsw.gen_wet('NOTE', msg, 2))
+    
+    else:
+        # creates the titrations for the first condition (1D)
+        if exp.hasxx and cond1:
+            titrations_dict['cond1'] = \
+                exp.gen_titration_dict(\
+                                    data_hyper_cube,
+                                    'cond1', 
+                                    exp.xxcoords,
+                                    exp.yycoords,
+                                    exp.zzcoords,
+                                    titration_class,
+                                    titration_kwargs)
+        
+        # creates the titrations for the second condition (2D)
+        if exp.hasyy and cond2:
+            titrations_dict['cond2'] = \
+                exp.gen_titration_dict(\
+                                    data_hyper_cube.transpose(2,0,1,3,4),
+                                    'cond2',
+                                    exp.yycoords,
+                                    exp.zzcoords,
+                                    exp.xxcoords,
+                                    titration_class,
+                                    titration_kwargs)
+    
+        # creates the titrations for the third condition (3D)  
+        if exp.haszz and cond3:
+            titrations_dict['cond3'] = \
+                exp.gen_titration_dict(\
+                                    data_hyper_cube.transpose(1,2,0,3,4),
+                                    'cond3',
+                                    exp.zzcoords,
+                                    exp.xxcoords,
+                                    exp.yycoords,
+                                    titration_class,
+                                    titration_kwargs)
+                                    
+        for cond in sorted(titrations_dict.keys()):
+            for dim2_pt in sorted(titrations_dict[cond].keys()):
+                for dim1_pt in sorted(titrations_dict[cond][dim2_pt].keys()):
+                    titrations_dict[cond][dim2_pt][dim1_pt].log_outside = True
+                    titrations_dict[cond][dim2_pt][dim1_pt].\
+                    log_external_file_name = logfile
     
     return titrations_dict
 

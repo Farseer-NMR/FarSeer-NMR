@@ -936,6 +936,10 @@ with data points {}'.format(dim2_pts,
                                                 index=False,
                                                 na_rep='NaN',
                                                 float_format='%.4f'))
+        fileout.close()
+        
+        msg = "**Saved:** {}".format(fpath)
+        self.log_r(msg)
         
         if self.has_sidechains:
             folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
@@ -949,6 +953,10 @@ with data points {}'.format(dim2_pts,
                                                     float_format='%.4f'))
             
             fileout.close()
+            
+            msg = "**Saved:** {}".format(fpath)
+            self.log_r(msg)
+            
         return
     
     def check_filetype_exists(self, filetype):
