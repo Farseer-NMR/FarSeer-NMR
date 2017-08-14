@@ -1,13 +1,37 @@
 import sys
+import textwrap
 
 def title(s=''):
-    return "    {:@^62}  ".format(s)
+    return "    {:@^72}  ".format(" " + s + " ")
+
+def bottom():
+    return "    {:@^72}  ".format('')
 
 def line(s=''):
-    return "    @{:^60}@  ".format(s)
+    return "    @{:^70}@  ".format(s)
 
 def referwet(n):
     return line("+ Refer to WET #{} +".format(n))
+
+def format_msg(string):
+    return "    @{:^70}@  ".format(string)
+
+def gen_wet(t, s, n):
+    
+    ws = """
+{}
+{}
+{}
+{}
+{}
+{}
+""".format(title(t),
+           line(),
+           "\n".join(map(format_msg, textwrap.wrap(s, width=67))),
+           line(),
+           referwet(n),
+           bottom())
+    return ws
 
 def wet1(pre_flag, c3_flag, plot_h_flag, plot_v_flag, comp_flag):
 
