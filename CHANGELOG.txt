@@ -1,5 +1,11 @@
 # version 0.7.0
 
+* added WET #13
+* changed log structure
+   * FarseerSet and Titration now internally record log with option to on-the-fly export of log to external file. This option is False by default and set to True by farseermain.
+   * removed farseermainn.close()
+   * FarseerSet and Titration change to .export_log
+   * FarseerSet and Titration, .log_t merged with .log_r
 * added function FarseerSet.check_xy_datapoints_coherency()
 * added function FarseerSet.check_filetype_exists()
 * added additional WETs: 10, 11.

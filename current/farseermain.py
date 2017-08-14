@@ -378,11 +378,16 @@ def init_params(fsuv):
     return calculated_params, param_settings,\
            general_plot_params, pre_plot_params, general_variables
 
-def init_farseer(path, has_sidechains=False, FASTAstart=1):
+def init_farseer(path, has_sidechains=False,
+                       FASTAstart=1,
+                       logfile='Farseer_log.md'):
     '''Initiates the Farseer data set.'''
     exp = fset.FarseerSet(path,
                           has_sidechains=has_sidechains,
                           FASTAstart=FASTAstart)
+    
+    exp.log_outside = True
+    exp.log_external_file_name = logfile
     
     return exp
 
@@ -463,8 +468,9 @@ def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
     
     
     if dim == 'y':
-        exp.log_t(\
-        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()))
+        exp.log_r(\
+        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
+        istitle = True)
         # expands to yy (cond2) condition
         for a in acoords:
             #do
@@ -477,8 +483,9 @@ def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
                                fill_na_lost('lost'),
                                refscoords=refscoords)
     if dim == 'z':
-        exp.log_t(\
-        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()))
+        exp.log_r(\
+        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
+        istitle = True)
         # expands to yy (cond2) condition
         for a in acoords:
             #do
@@ -554,7 +561,8 @@ def gen_titration_dicts(exp, data_hyper_cube,
                         cond2=False,
                         cond3=False,
                         titration_class=None,
-                        titration_kwargs={}):
+                        titration_kwargs={},
+                        logfile='Farseer_log.md'):
     """
     Returns a dictionary containing all the titrations to be analysed.
     
@@ -607,6 +615,13 @@ def gen_titration_dicts(exp, data_hyper_cube,
                                 titration_class,
                                 titration_kwargs)
     
+    for cond in sorted(titrations_dict.keys()):
+        for dim2_pt in sorted(titrations_dict[cond].keys()):
+            for dim1_pt in sorted(titrations_dict[cond][dim2_pt].keys()):
+                titrations_dict[cond][dim2_pt][dim1_pt].log_outside = True
+                titrations_dict[cond][dim2_pt][dim1_pt].\
+                log_external_file_name = logfile
+    
     if not(cond1 or cond2 or cond3):
         exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
                      exp.exports_parsed_pkls,
@@ -641,7 +656,8 @@ def eval_titrations(titration_dict,
         for dim2_pt in sorted(titration_dict[cond].keys()):
             # for each point in the corresponding first dimension/condition
             for dim1_pt in sorted(titration_dict[cond][dim2_pt].keys()):
-                titration_dict[cond][dim2_pt][dim1_pt].log_t('ANALYZING... ')
+                titration_dict[cond][dim2_pt][dim1_pt].\
+                    log_r('ANALYZING... ', istitle=True)
                 # DO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 # performs the calculations
                 perform_calcs(titration_dict[cond][dim2_pt][dim1_pt],
@@ -1084,7 +1100,8 @@ def analyse_comparisons(exp, titration_dict, fsuv,
                 
                 for dim1_pt in sorted(c.allClabels[dim2_pt].keys()):
                     
-                    c.allClabels[dim2_pt][dim1_pt].log_t('COMPARING...')
+                    c.allClabels[dim2_pt][dim1_pt].log_t('COMPARING...',
+                                                         istitle=True)
                     
                     run_comparative(c.allClabels[dim2_pt][dim1_pt])
                     
@@ -1096,7 +1113,8 @@ def analyse_comparisons(exp, titration_dict, fsuv,
             for dim2_pt in sorted(c.allCcool.keys()):
                 
                 for dim1_pt in sorted(c.allCcool[dim2_pt].keys()):
-                    c.allCcool[dim2_pt][dim1_pt].log_t('COMPARING...')
+                    c.allCcool[dim2_pt][dim1_pt].log_r('COMPARING...',
+                                                       istitle=True)
                     run_comparative(c.allCcool[dim2_pt][dim1_pt])
                     c.log += c.allCcool[dim2_pt][dim1_pt].log
         
@@ -1123,7 +1141,8 @@ def run_farseer(spectra_path, fsuv):
     # Initiates Farseer
     exp = init_farseer(spectra_path,
                        has_sidechains=fsuv.has_sidechains,
-                       FASTAstart=fsuv.FASTAstart)
+                       FASTAstart=fsuv.FASTAstart,
+                       logfile = fsuv.logfile_name)
         
     # reads input
     reads_input(exp, fsuv)
@@ -1224,7 +1243,8 @@ def run_farseer(spectra_path, fsuv):
             titration_kwargs=\
                 titration_kwargs(fsuv,
                                  rt='Backbone',
-                                 cp=calculated_params))
+                                 cp=calculated_params),
+            logfile=fsuv.logfile_name)
     
     # evaluates the titrations and plots the data
     eval_titrations(Farseer_titration_dict,
@@ -1247,7 +1267,8 @@ def run_farseer(spectra_path, fsuv):
                 titration_kwargs=\
                     titration_kwargs(fsuv,
                                      rt='Sidechains',
-                                     cp=calculated_params))
+                                     cp=calculated_params),
+                logfile = fsuv.logfile_name)
         
         
         eval_titrations(Farseer_SD_titrations_dict,
@@ -1285,13 +1306,13 @@ def run_farseer(spectra_path, fsuv):
                                     reso_type='Sidechains')
     
     # writes all the logs to a txt file.
-    close_log(farseerset=exp, 
-              backbone_titration=Farseer_titration_dict,
-              sidechain_titration=Farseer_SD_titrations_dict,
-              backbone_comparison=comparison_dict,
-              sidechain_comparison=comparison_dict_SD,
-              logfile_name=fsuv.logfile_name,
-              mod='a')
+    #close_log(farseerset=exp, 
+              #backbone_titration=Farseer_titration_dict,
+              #sidechain_titration=Farseer_SD_titrations_dict,
+              #backbone_comparison=comparison_dict,
+              #sidechain_comparison=comparison_dict_SD,
+              #logfile_name=fsuv.logfile_name,
+              #mod='a')
     
     return
 

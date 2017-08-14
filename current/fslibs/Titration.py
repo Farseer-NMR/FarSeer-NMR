@@ -32,13 +32,14 @@ class Titration(pd.Panel):
     # dictionary to store dataframes with information on fitting results
     fitdf = {}
     # prepares dictionary that stores alpha values to use in CSPs calculations
-
+    
+    
     
     def create_titration_attributes(self, titration_type='cond',
                                           owndim_pts=['foo'],
                                           dim1_pts='bar',
                                           dim2_pts='zoo',
-                                          dim_comparison='not applied',
+                                          dim_comparison='not_applied',
                                           resonance_type='Backbone',
                                           csp_alpha4res=0.14,
                                           csp_res_exceptions={'G':0.2},
@@ -71,6 +72,7 @@ class Titration(pd.Panel):
             self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
         self.calculated_params = calculated_params
         self.log = ''
+        self.log_outside = False
         
         # defines the path to store the calculations
         # if stores the result of a calculation
@@ -88,6 +90,8 @@ class Titration(pd.Panel):
                                                         self.dim_comparison,
                                                         self.dim2_pts,
                                                         self.dim1_pts)
+        
+        self.log_external_file_name = self.calc_path.replace('/', '_')
         
         # Create all the folder necessary to store the data.
         # folders are created here when generating the object to avoind having
@@ -116,28 +120,32 @@ class Titration(pd.Panel):
         # because Titration inherits a pd.Panel.
         return Titration
         
-    def log_r(self, logstr):
+    def log_r(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
         
-        :logstring: the string to be registered in the log
+        :logstr: the string to be registered in the log
+        :istitle: flag to format logstr as a title
         """
-        logstr = '{}  \n'.format(logstr)
+        if istitle:
+            logstr = """
+{0}  
+{1}  
+{0}  
+""".format('*'*79, logstr)
+        else:
+            logstr += '  \n'
+        
         print(logstr)
         self.log += logstr
+        
+        # appends log to external file on the fly
+        if self.log_outside:
+            with open(self.log_external_file_name, 'a') as logfile:
+                logfile.write(logstr)
         return
     
-    def log_t(self, titlestr):
-        """Formats a title for log."""
-        log_title = \
-        '\n{0}  \n### {1}  {2}  \n{0}  \n'.format('*'*79,
-                                                 titlestr.upper(),
-                                                 self.calc_path)
-        print(log_title)
-        self.log += log_title
-        return
-    
-    def write_log(self, mod='a', path='farseer.log'):
+    def exports_log(self, mod='a', path='farseer.log'):
         with open(path, mod) as logfile:
             logfile.write(self.log)
         return

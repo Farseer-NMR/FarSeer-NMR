@@ -70,19 +70,18 @@ class FarseerSet:
         self.hasxx = False
         
         self.log = ''  # all log goes here
+        self.log_outside = False
+        self.log_external_file_name = 'FarseerSet_log.md'
         
-        #self.log_t('Farseer Set initiated in {}'.format(spectra_path))
-        self.log_t('Initiates Farseer Set')
+        self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
 """path: {}  
 side chains: {}  
-FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.FASTAstart)
+FASTA starting residue: {}  """.format(spectra_path,
+                                       self.has_sidechains,
+                                       self.FASTAstart)
         
         self.log_r(input_log)
-        
-        # Runs __init__ functions
-        #self.load_experiments()
-        #self.coordinates_list()
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(\
             klass_name='Panel5D',
@@ -137,24 +136,34 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
                         "Y": "Tyr",
                         "V": "Val"}
     
-    def log_t(self, titlestr):
-        """Formats a title for log."""
-        log_title = '\n{0}  \n### {1}  \n{0}  \n'.format('*'*79, titlestr.upper())
-        self.log_r(log_title)
-        return
-    
-    def log_r(self, logstr):
+    def log_r(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
         
-        :logstring: the string to be registered in the log
+        :logstr: the string to be registered in the log
+        :istitle: flag to format logstr as a title
         """
+        if istitle:
+            logstr = """
+{0}  
+{1}  
+{0}  
+""".format('*'*79, logstr)
+        else:
+            logstr += '  \n'
+        
         print(logstr)
-        self.log += logstr+'  \n'
+        self.log += logstr
+        
+        # appends log to external file on the fly
+        if self.log_outside:
+            with open(self.log_external_file_name, 'a') as logfile:
+                logfile.write(logstr)
         return
     
-    def write_log(self, mod='a', path='farseer.log'):
-        with open(path, mod) as logfile:
+    def exports_log(self, mod='w', logfile_name='series_log.md'):
+        """ Exports log to external file. """
+        with open(logfile_name, mod) as logfile:
             logfile.write(self.log)
         return
     
@@ -216,7 +225,8 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         ---> seq.fasta
         """
         
-        self.log_t('READING INPUT FILES *{}*'.format(filetype))
+        self.log_r('READING INPUT FILES *{}*'.format(filetype),
+                    istitle=True)
         
         self.check_filetype_exists(filetype)
         
@@ -308,7 +318,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         returns: output log string.
         """
         
-        self.log_t('IDENTIFIED TITRATION VARIABLES')
+        self.log_r('IDENTIFIED TITRATION VARIABLES', istitle=True)
         
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
@@ -359,7 +369,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         # helper variable. Some function return variables that are used in the
         # next cycle.
         tmp_vars = {}
-        self.log_t(title)
+        self.log_r(title, istitle=True)
         
         for z in zz:
             for y in yy:
@@ -830,7 +840,7 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         are treated separately from the backbone atoms.
         """
         
-        self.log_t('INITIATING FARSEER CUBE')
+        self.log_r('INITIATING FARSEER CUBE', istitle=True)
         self.peaklists_p5d = self.p5d(self.allpeaklists)
         self.log_r('> Created cube for all the backbone peaklists - OK!')
         
@@ -883,9 +893,8 @@ FASTA starting residue: {}  """.format(spectra_path, self.has_sidechains, self.F
         dimension/condition.
         '''
         
-        self.log_t(\
-            'GENERATING DICTIONARY OF TITRATIONS FOR {}'.format(\
-                titration_type))
+        self.log_r('GENERATING DICTIONARY OF TITRATIONS FOR {}'.\
+                    format(titration_type), istitle=True)
         
         # initiates dictionary
         D = {}
@@ -948,7 +957,15 @@ with data points {}'.format(dim2_pts,
         attempting to load it.
         
         If not, call WET#9.
+        
+        If file not .csv or .fasta, call WET#13.
         """
+        
+        if not(filetype in ['.csv', '.fasta']):
+            msg = "File type {} not recognized. Why you want to read these files if Farseer-NMR can't do nothing with them? :-)".\
+                format(filetype)
+            self.log_r(fsw.gen_wet('ERROR', msg, 13))
+            fsw.end_bad()
         
         if not(any([p.endswith(filetype) for p in self.paths])):
             
@@ -974,48 +991,52 @@ with data points {}'.format(dim2_pts,
         Reports names mismatches with WET#10
         """
         
-        def get_file(s):
-            return s.split('/')[-1]
-        
         zkeys = list(target.keys())
         ykeys = list(target[zkeys[0]].keys())
         xkeys = list(target[zkeys[0]][ykeys[0]].keys())
         
-        ### WET#8
         key_len = len(zkeys) * len(ykeys) * len(xkeys)
         
-        if key_len != \
-                len([x for x in self.paths if x.endswith(filetype)]):
-            #DO
-            msg =  'The no. of files of type {} is not the same for every \
-series folder. Check for the missing ones!\n'.format(filetype)
-            
-            self.log_r(fsw.gen_wet('ERROR', msg, 8))
-            fsw.end_bad()
-        
-        ### WET#11
+        ### Checks coherency of y folders
         all_y_folders = set(\
             [y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
         
         if len(set(all_y_folders)) > len(ykeys):
-            msg = "\
-Y axis folder names are not coherent. Names must be equal accross every Z\
-axis datapoint folder."
+            msg = "Y axis folder names are not coherent. Names must be equal accross every Z axis datapoint folder."
             self.log_r(fsw.gen_wet('ERROR', msg, 11))
             fsw.end_bad()
         
-        ### WET#10
-        all_x_files = set(\
-            [x.split('/')[-1] for x in self.paths if x.endswith(filetype)])
+        if filetype == '.fasta':
+            all_fasta_files = \
+                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+            
+            
+            if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
+                msg = "There are too many or missing {0} files. Confirm there is only ONE {0} file for each Y datapoint folder.".format(filetype)
+                self.log_r(fsw.gen_wet('ERROR', msg, 12))
+                fsw.end_bad()
         
-        if len(set(all_x_files)) > len(xkeys):
-            msg = "\
-X axis datapoints file names are not coherent. Names must be equal accross\ every Y axis datapoint folder.".format(filetype)
-            self.log_r(fsw.gen_wet('ERROR', msg, 10))
-            fsw.end_bad()
+        ### Checks coherency of x files
+        elif filetype == '.csv':
+            
+            if key_len != \
+                len([x for x in self.paths if x.endswith(filetype)]):
+                #DO
+                msg =  'The no. of files of type {} is not the same for every series folder. Check for the missing ones!'.format(filetype)
+                
+                self.log_r(fsw.gen_wet('ERROR', msg, 8))
+                fsw.end_bad()
+            
+            x_files_names = set(\
+                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)])
+            
+            if (len(x_files_names) > len(xkeys)):
+                msg = "X axis datapoints file names are not coherent. Names must be equal accross every Y axis datapoint folder.".\
+                format(filetype)
+                self.log_r(fsw.gen_wet('ERROR', msg, 10))
+                fsw.end_bad()
         
-        else:
-            self.log_r('> All <{}> files found and correct- OK!'.\
-                        format(filetype))
+        # writes confirmation message
+        self.log_r('> All <{}> files found and correct- OK!'.format(filetype))
         
         return
