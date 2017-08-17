@@ -161,7 +161,7 @@ FASTA starting residue: {}  """.format(spectra_path,
                 logfile.write(logstr)
         return
     
-    def exports_log(self, mod='w', logfile_name='series_log.md'):
+    def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
         """ Exports log to external file. """
         with open(logfile_name, mod) as logfile:
             logfile.write(self.log)

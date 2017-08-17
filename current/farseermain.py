@@ -217,7 +217,8 @@ def config_user_variables(fsuv):
         'fit_perform':fsuv.perform_resevo_fit,
         'fit_line_color':fsuv.res_evo_fit_line_color,
         'fit_line_width':fsuv.res_evo_fit_line_width,
-        'fit_line_style':fsuv.res_evo_fit_line_style
+        'fit_line_style':fsuv.res_evo_fit_line_style,
+        'titration_x_values':fsuv.txv
         }
     
     fsuv.cs_scatter_par_dict = {

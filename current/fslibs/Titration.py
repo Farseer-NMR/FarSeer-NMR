@@ -151,6 +151,11 @@ class Titration(pd.Panel):
             logfile.write(self.log)
         return
     
+    def abort(self):
+        self.log_r(fsw.abort_string)
+        fsw.abort()
+        return
+    
     
     def hex_to_RGB(self, hexx):
         ''' http://bsou.io/posts/color-gradients-with-python
@@ -1198,7 +1203,7 @@ recipient: residues
             # do
             if len(titration_x_values) != len(self.items):
                 self.log_r(fsw.wet5(titration_x_values, self.items))
-                fsw.end_bad()
+                self.abort()
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
             
