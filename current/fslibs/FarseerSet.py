@@ -70,8 +70,8 @@ class FarseerSet:
         self.hasxx = False
         
         self.log = ''  # all log goes here
-        self.log_outside = False
-        self.log_external_file_name = 'FarseerSet_log.md'
+        self.log_export_onthefly = False
+        self.log_export_name = 'FarseerSet_log.md'
         
         self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
@@ -156,8 +156,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.log += logstr
         
         # appends log to external file on the fly
-        if self.log_outside:
-            with open(self.log_external_file_name, 'a') as logfile:
+        if self.log_export_onthefly:
+            with open(self.log_export_name, 'a') as logfile:
                 logfile.write(logstr)
         return
     
@@ -165,6 +165,11 @@ FASTA starting residue: {}  """.format(spectra_path,
         """ Exports log to external file. """
         with open(logfile_name, mod) as logfile:
             logfile.write(self.log)
+        return
+    
+    def abort(self):
+        self.log_r(fsw.abort_string)
+        fsw.abort()
         return
     
     def load_experiments(self,
@@ -228,7 +233,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.log_r('READING INPUT FILES *{}*'.format(filetype),
                     istitle=True)
         
-        self.check_filetype_exists(filetype)
+        self.check_filetype(filetype)
         
         # loads files in nested dictionaries
         # piece of code found in stackoverflow
@@ -310,7 +315,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         return df
     
     
-    def init_coords(self):
+    def init_coords_names(self):
         """
         Identifies the data points for each titration condition.
         Configures the conditions to be analyzed.
@@ -625,7 +630,7 @@ FASTA starting residue: {}  """.format(spectra_path,
                          target_seq_dict,
                          fillna_dict,
                          refscoords=None,
-                         atomtype='Backbone'):
+                         resonance_type='Backbone'):
         """
         Expands the 'Res#' columns of a target peaklist (seq)
         according to a reference peaklist (seq).
@@ -649,7 +654,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         # reads the reference key
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
-        if atomtype=='Sidechain':
+        if resonance_type=='Sidechain':
             
             ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
                 ref_seq_dict[z][y][ref_key].loc[:,['Res#', 'ATOM']].\
@@ -692,7 +697,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         target_seq_dict[z][y][x].loc[:,'Assign F1'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'Assign F1']
         
-        if atomtype=='Sidechain':
+        if resonance_type=='Sidechain':
             
             target_seq_dict[z][y][x].loc[:,'ATOM'] = \
                 ref_seq_dict[refcz][refcy][ref_key].loc[:,'ATOM']
@@ -959,7 +964,7 @@ with data points {}'.format(dim2_pts,
             
         return
     
-    def check_filetype_exists(self, filetype):
+    def check_filetype(self, filetype):
         """
         Confirms that file type exists in spectra/ before
         attempting to load it.
@@ -969,19 +974,22 @@ with data points {}'.format(dim2_pts,
         If file not .csv or .fasta, call WET#13.
         """
         
+        # check filetype fits usable formats
         if not(filetype in ['.csv', '.fasta']):
             msg = "File type {} not recognized. Why you want to read these files if Farseer-NMR can't do nothing with them? :-)".\
                 format(filetype)
             self.log_r(fsw.gen_wet('ERROR', msg, 13))
-            fsw.end_bad()
+            self.abort()
         
+        # checks if files exists
         if not(any([p.endswith(filetype) for p in self.paths])):
             
             msg = "There are no files in spectra/ with extension {}".\
                   format(filetype)
             
             self.log_r(fsw.gen_wet('ERROR', msg, 9))
-            fsw.end_bad()
+            self.abort()
+            
         return
     
     def checks_xy_datapoints_coherency(self, target, filetype):
@@ -1012,7 +1020,7 @@ with data points {}'.format(dim2_pts,
         if len(set(all_y_folders)) > len(ykeys):
             msg = "Y axis folder names are not coherent. Names must be equal accross every Z axis datapoint folder."
             self.log_r(fsw.gen_wet('ERROR', msg, 11))
-            fsw.end_bad()
+            self.abort()
         
         if filetype == '.fasta':
             all_fasta_files = \
@@ -1022,7 +1030,7 @@ with data points {}'.format(dim2_pts,
             if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
                 msg = "There are too many or missing {0} files. Confirm there is only ONE {0} file for each Y datapoint folder.".format(filetype)
                 self.log_r(fsw.gen_wet('ERROR', msg, 12))
-                fsw.end_bad()
+                self.abort()
         
         ### Checks coherency of x files
         elif filetype == '.csv':
@@ -1033,7 +1041,7 @@ with data points {}'.format(dim2_pts,
                 msg =  'The no. of files of type {} is not the same for every series folder. Check for the missing ones!'.format(filetype)
                 
                 self.log_r(fsw.gen_wet('ERROR', msg, 8))
-                fsw.end_bad()
+                self.abort()
             
             x_files_names = set(\
                 [x.split('/')[-1] for x in self.paths if x.endswith(filetype)])
@@ -1042,7 +1050,7 @@ with data points {}'.format(dim2_pts,
                 msg = "X axis datapoints file names are not coherent. Names must be equal accross every Y axis datapoint folder.".\
                 format(filetype)
                 self.log_r(fsw.gen_wet('ERROR', msg, 10))
-                fsw.end_bad()
+                self.abort()
         
         # writes confirmation message
         self.log_r('> All <{}> files found and correct- OK!'.format(filetype))

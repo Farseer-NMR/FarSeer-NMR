@@ -10,7 +10,7 @@ class Comparisons:
                  dimension_dict,
                  selfdim='cond',
                  other_dim_keys=['condy','condz'],
-                 reso_type='Backbone'):
+                 resonance_type='Backbone'):
         """
         :dimension_dict: is a dictionary containing all the titrations
                          for that dimension.
@@ -40,7 +40,7 @@ class Comparisons:
         self.other_dim_keys = other_dim_keys
         
         # resonance typel. Either Backbone or Sidechain.
-        self.reso_type = reso_type
+        self.resonance_type = resonance_type
         
         # the dictionaries containing the fst.Titrations of the dimensions
         # along which to be compared.
@@ -109,7 +109,7 @@ class Comparisons:
                         dim1_pts=dim1_pt,
                         dim2_pts=dim2_pt,
                         dim_comparison=self.other_dim_keys[0],
-                        resonance_type=self.reso_type)
+                        resonance_type=self.resonance_type)
                     
                     self.allClabels[dim2_pt].setdefault(dim1_pt, comparison)
                     
@@ -150,7 +150,7 @@ class Comparisons:
                         dim1_pts=dim1_pt,
                         dim2_pts=dim2_pt,
                         dim_comparison=self.other_dim_keys[1],
-                        resonance_type=self.reso_type)
+                        resonance_type=self.resonance_type)
                     
                     self.allCcool[dim2_pt].setdefault(dim1_pt, comparison)
             

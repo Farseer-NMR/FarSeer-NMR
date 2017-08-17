@@ -72,7 +72,8 @@ class Titration(pd.Panel):
             self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
         self.calculated_params = calculated_params
         self.log = ''
-        self.log_outside = False
+        self.log_export_onthefly = False
+        self.log_export_name = 'FarseerSet_log.md'
         
         # defines the path to store the calculations
         # if stores the result of a calculation
@@ -140,8 +141,8 @@ class Titration(pd.Panel):
         self.log += logstr
         
         # appends log to external file on the fly
-        if self.log_outside:
-            with open(self.log_external_file_name, 'a') as logfile:
+        if self.log_export_onthefly:
+            with open(self.log_export_name, 'a') as logfile:
                 logfile.write(logstr)
         return
     
@@ -354,7 +355,7 @@ with window size {} and stdev {}'.\
             format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
         return
     
-    def write_table(self, folder, tablecol, atomtype='Backbone'):
+    def write_table(self, folder, tablecol, resonance_type='Backbone'):
         '''
         Writes to a tsv file the values of a specific column
         along the titration.
@@ -363,7 +364,7 @@ with window size {} and stdev {}'.\
         table = pd.concat([self.res_info.iloc[0,:,[0]],
                            self.loc[:,:,tablecol].astype(float)], axis=1)
         
-        if atomtype == 'Sidechains':
+        if resonance_type == 'Sidechains':
             table.loc[:,'Res#'] = \
                 table.loc[:,'Res#'] + self.ix[0,:,'ATOM']
         
@@ -484,9 +485,8 @@ recipient: residues
     
     def export_titration(self):
         """
-        Exports the titration experiments (measured and
-        calculated data) to .tsv files. These files are stored
-        in the folder 'full_peaklists'.
+        Exports the experimental series with measured and
+        calculated data to .tsv files.
         """
         
         for item in self.items:
@@ -497,7 +497,7 @@ recipient: residues
                                                 na_rep='NaN',
                                                 float_format='%.4f'))
             self.log_r(\
-            '**Exported peaklist** {}'.format(file_path))
+            '**Exported parsed peaklist** {}'.format(file_path))
             fileout.close()
         
         return
@@ -2044,7 +2044,7 @@ recipient: residues
                      hspace=0.5,
                      rows_per_page=5,
                      cols_per_page=1,
-                     atomtype='Backcone',
+                     resonance_type='Backcone',
                      fig_height=11.69,
                      fig_width=8.69,
                      fig_file_type='pdf',
@@ -2143,9 +2143,10 @@ recipient: residues
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
         
-        self.write_plot(fig, plot_style, folder, calccol, fig_file_type, fig_dpi)
+        self.write_plot(fig, plot_style, folder, calccol,
+                        fig_file_type, fig_dpi)
         if not(plot_style in ['cs_scatter', 'cs_scatter_flower']):
-            self.write_table(folder, calccol, atomtype=atomtype)
+            self.write_table(folder, calccol, resonance_type=resonance_type)
         plt.close('all')
         return
     
