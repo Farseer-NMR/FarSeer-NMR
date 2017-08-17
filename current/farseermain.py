@@ -66,9 +66,10 @@ def config_user_variables(fsuv):
         fsuv.calccol_name_Height_ratio,
         fsuv.calccol_name_Volume_ratio]
     
+    fsuv.calc_flags = any(fsuv.calculated_params)
     
     fsuv.param_settings_d = {
-    'plot_param_flag':    [fsuv.calcs_PosF1_delta,
+    'calcs_restraint':    [fsuv.calcs_PosF1_delta,
                            fsuv.calcs_PosF2_delta,
                            fsuv.calcs_CSP,
                            fsuv.calcs_Height_ratio,
@@ -377,7 +378,8 @@ def checks_PRE_analysis_flags(fsuv):
     Depends on:
     fsuv.PRE_analysis_flags
     """
-    
+    # if all the flags upon which aplly_PRE_analysis depends on are
+    # turned off:
     if not(fsuv.PRE_analysis_flags):
         #DO
         msg = "PRE Analaysis is set to <{}> and depends on the following variables: do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || perform_comparisons :: <{}>. All these variables should be set to True for PRE Analysis to be executed.".\
@@ -411,10 +413,10 @@ def checks_plotting_flags(fsuv):
     """Checks whether any plotting flag is activated."""
     
     if not(fsuv.plotting_flags):
-        # DO ++++
+        # DO ++++ export calculation tables
         for calculated_parameter in fsuv.param_settings.index:
-        # if the user wants to plot this parameter
-            if fsuv.param_settings.loc[calculated_parameter,'plot_param_flag']:
+        # if the user calculated this restraint
+            if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
                 titration_panel.write_table(calculated_parameter,
                                             calculated_parameter,
                                             resonance_type=resonance_type)
@@ -424,6 +426,46 @@ def checks_plotting_flags(fsuv):
         titration_panel.log_r(fsw.gen_wet('NOTE', msg, 3))
         # DONE ++++
     
+    return
+
+def checks_calculation_flags(fsuv):
+    """Checks if the user wants to calculate any restraints."""
+    ######## WET#14
+    if not(fsuv.calculated_params):
+        #DO
+        msg = "All restraints calculation routines are deactivated. Nothing will be calculated."
+        
+        logs(fsw.gen_wet('WARNING', msg, 14), fsuv.logfile_name)
+        #DONE
+    ########
+    return
+
+def checks_fit_input(fsuv):
+    """Checks whether required fit data and settings are provided correctly."""
+    
+    ######## WET#5, WET#6, WET#7
+    if not(all([True if x>0 else False for x in fsuv.txv])):
+        # DO
+        msg = 'There are negative values in titration_x_values variable. Fitting to the Hill Equation does not accept negative values. Please revisit your input'
+        
+        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 6))
+        titration_panel.abort()
+        # DONE
+    
+    elif len(txv) != len(titration_panel.items):
+        # DO
+        msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}].".format(txv, titration_panel.items)
+        
+        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 5))
+        titration_panel.abort()
+        # DONE
+        
+    else:
+        # DO
+        msg = "The number of coordinate values for data fitting along X axis equals the number of input peaklists, and no negative value was found. Data fit to the Hill Equation will be performed with the following values: {}.".format(txv)
+        
+        titration_panel.log_r(fsw.gen_wet('NOTE', msg, 7))
+        # DONE
     return
 
 def creates_farseer_dataset(fsuv):
@@ -461,7 +503,7 @@ def reads_peaklists(exp, fsuv):
                                     filetype='.fasta')
     
     # even if the user does no want to analyse sidechains, Farseer-NMR
-    # has to parse them out from the input peaklist
+    # has to parse them out from the input peaklist if they exist
     if exp.has_sidechains:
         # str() is passed as a dummy function
         exp.load_experiments(target=exp.allsidechains,
@@ -491,7 +533,7 @@ def identify_residues(exp):
 
 def correct_shifts(exp, resonance_type='Backbone'):
     """
-    Corrects chemical shifts of all the peaklists to a reference peak
+    Corrects chemical shifts for all the peaklists to a reference peak
     in the (0,0,0) Farseer-NMR Cube coordinate.
     
     Depends on:
@@ -571,19 +613,19 @@ def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
     
     return
 
-def add_lost(exp, refdata, targetdata,
+def add_lost(exp, reference, target,
              peak_status='lost',
              ref='REFERENCE',
              kwargs={}):
     """
     Uses seq_expand method of FarseerSet.py.
-    Expands a target peaklist to the index of a reference peaklist.
+    Expands a <target> peaklist to the index of a <reference> peaklist.
     """
     
     ctitle = 'ADDS LOST RESIDUES BASED ON THE {}'.format(ref)
     
     exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, exp.seq_expand,
-                 args=[refdata, targetdata, fill_na_lost(peak_status)],
+                 args=[reference, target, fill_na_lost(peak_status)],
                  kwargs=kwargs,
                  title=ctitle)
     
@@ -727,7 +769,7 @@ def gen_titration_dicts(exp, farseer_nmr_cube, fsuv,
 def eval_titrations(titration_dict, fsuv, resonance_type='Backbone'):
     """
     Executes the Farseer-NMR Analysis Routines over all the series of
-    all the activated Farseer-NMR Cube Axes.
+    the activated Farseer-NMR Cube Axes.
     
     :titration_dict: the dictionary containing all the series of an axis.
     :fsuv: a module containing all the variables.
@@ -761,11 +803,14 @@ def eval_titrations(titration_dict, fsuv, resonance_type='Backbone'):
                 # EXPORTS FULLY PARSED PEAKLISTS
                 exports_titration(titration_dict[cond][dim2_pt][dim1_pt])
                 
-                # EXPORTS CALCULATIONS
-                exports_data_tables(titration_dict[cond][dim2_pt][dim1_pt],
-                                    fsuv)
+                # EXPORTS CHIMERA FILES
+                exports_chimera_att_files(\
+                    titration_dict[cond][dim2_pt][dim1_pt], fsuv)
                 
                 # PLOTS TITRATION DATA
+                # plots data are exported together with the plots in
+                # fsT.plot_base(), but can be used separatly with
+                # fsT.write_table()
                 plots_data(titration_dict[cond][dim2_pt][dim1_pt],
                            fsuv, resonance_type=resonance_type)
                 
@@ -790,15 +835,7 @@ def perform_calcs(titration_panel, fsuv):
     fsuv.calccol_name_Volume_ratio
     """
     
-    ######## WET#14
-    if not(any([fsuv.calcs_CSP, fsuv.calcs_PosF1_delta, fsuv.calcs_PosF2_delta,
-               fsuv.calcs_Height_ratio, fsuv.calcs_Volume_ratio])):
-        #DO
-        msg = "All restraints calculation routines are deactivated. Nothing will be calculated."
-        
-        logs(fsw.gen_wet('WARNING', msg, 14), fsuv.logfile_name)
-        #DONE
-    ########
+    checks_calculation_flags(fsuv)
     
     # if the user wants to calculate combined Chemical Shift Perturbations
     if fsuv.calcs_CSP:
@@ -846,29 +883,11 @@ def perform_fits(titration_panel, fsuv):
            and titration_panel.titration_type == 'cond1'):
         return
     
-    ######## WET#5, WET#6, WET#7
-    if not(all([True if x>0 else False for x in fsuv.txv])):
-        msg = 'There are negative values in titration_x_values variable. Fitting to the Hill Equation does not accept negative values. Please revisit your input'
-        
-        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 6))
-        titration_panel.abort()
-    
-    elif len(txv) != len(titration_panel.items):
-        
-        msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}].".format(txv, titration_panel.items)
-        
-        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 5))
-        titration_panel.abort()
-    else:
-        
-        msg = "The number of coordinate values for data fitting along X axis equals the number of input peaklists, and no negative value was found. Data fit to the Hill Equation will be performed with the following values: {}.".format(txv)
-        
-        titration_panel.log_r(fsw.gen_wet('NOTE', msg, 7))
-    ########
+    checks_fit_input(fsuv)
     
     for calculated_parameter in fsuv.param_settings.index[:3]:
         
-        if fsuv.param_settings.loc[calculated_parameter, 'plot_param_flag']:
+        if fsuv.param_settings.loc[calculated_parameter, 'calcs_restraint']:
             
             titration_panel.perform_fit(calccol = calculated_parameter,
                                         x_values=fsuv.txv)
@@ -890,7 +909,7 @@ def PRE_analysis(titration_panel, fsuv):
                                         ['Hgt_DPRE', 'Vol_DPRE']):
         
             # only in the parameters allowed by the user
-            if fsuv.param_settings.loc[sourcecol, 'plot_param_flag']:
+            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
                 titration_panel.calc_Delta_PRE(sourcecol, targetcol,
                                          gaussian_stddev=fsuv.gaussian_stddev,
                                          guass_x_size=fsuv.gauss_x_size)
@@ -910,7 +929,7 @@ def PRE_analysis(titration_panel, fsuv):
                                          'Vol_DPRE_smooth']):
             
             # only for the parameters allowed by the user
-            if fsuv.param_settings.loc[sourcecol, 'plot_param_flag']:
+            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
                 
                 titration_panel.plot_base(targetcol, 'exp', 'heat_map',
                     fsuv.heat_map_dict,
@@ -935,7 +954,7 @@ def PRE_analysis(titration_panel, fsuv):
         
         for sourcecol, targetcols in zip(fsuv.param_settings.index[3:],
                                          ['Hgt_DPRE', 'Vol_DPRE']):
-            if fsuv.param_settings.loc[sourcecol, 'plot_param_flag']:
+            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
                 titration_panel.plot_base(targetcols, 'exp', 'delta_osci',
                     {**fsuv.tplot_general_dict,**fsuv.delta_osci_dict},
                     par_ylims=(0,fsuv.dpre_osci_ymax),
@@ -953,7 +972,7 @@ def exports_titration(titration_panel):
     titration_panel.export_titration()
     return
 
-def exports_data_tables(titration_panel, fsuv):
+def exports_chimera_att_files(titration_panel, fsuv):
     """
     Exports tables with calculated restraints.
     
@@ -964,7 +983,7 @@ def exports_data_tables(titration_panel, fsuv):
     
     for calculated_parameter in fsuv.param_settings.index:
         # if the user wants to plot this parameter
-        if fsuv.param_settings.loc[calculated_parameter,'plot_param_flag']:
+        if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
             # do export chimera attribute files
             titration_panel.write_Chimera_attributes(\
                     calculated_parameter,
@@ -1001,8 +1020,8 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
         
     # PLOTS DATA
     for calculated_parameter in fsuv.param_settings.index:
-        # if the user wants to plot this parameter
-        if fsuv.param_settings.loc[calculated_parameter,'plot_param_flag']:
+        # if the user has calculated this restraint
+        if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
             if titration_panel.resonance_type == 'Backbone':
                 
                 # Plot Extended Bar Plot
