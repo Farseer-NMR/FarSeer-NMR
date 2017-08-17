@@ -909,10 +909,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         titration_kwargs['owndim_pts'] = owndim_pts
         
         for dim2_pts in nextdims2:
-            #fsut.write_log(fsut.dim_sperator(dim2_pts, 'top'))
             D.setdefault(dim2_pts, {})
             for dim1_pts in nextdims1:
-                #fsut.write_log(fsut.dim_sperator(dim1_pts, 'midle'))
                 titration_kwargs['dim2_pts'] = dim2_pts
                 titration_kwargs['dim1_pts'] = dim1_pts
                 D[dim2_pts][dim1_pts] = \
@@ -923,8 +921,6 @@ FASTA starting residue: {}  """.format(spectra_path,
 with data points {}'.format(dim2_pts,
                        dim1_pts,
                        list(D[dim2_pts][dim1_pts].items)))
-                
-                #fsut.write_log(str(D[dim2_pts][dim1_pts])+'\n')
         
         return D
     

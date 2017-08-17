@@ -49,7 +49,36 @@ def config_user_variables(fsuv):
     Stores everything under fsuv module.
     """
     
+    # does the user want to perform any analysis on the Farseer-NMR cube?
     fsuv.any_axis = any([fsuv.do_cond1, fsuv.do_cond2, fsuv.do_cond3])
+    
+    # sorted values to be used as x coordinates in the fitting routine
+    fsuv.txv = sorted(fsuv.titration_x_values)
+    
+    # ORDERED names of the restraints that can be calculated
+    fsuv.restraint_names = [fsuv.calccol_name_PosF1_delta,
+                            fsuv.calccol_name_PosF2_delta,
+                            fsuv.calccol_name_CSP,
+                            fsuv.calccol_name_Height_ratio,
+                            fsuv.calccol_name_Volume_ratio]
+    
+    # ORDERED calculation restraints flags
+    fsuv.restraint_flags = [fsuv.calcs_PosF1_delta,
+                            fsuv.calcs_PosF2_delta,
+                            fsuv.calcs_CSP,
+                            fsuv.calcs_Height_ratio,
+                            fsuv.calcs_Volume_ratio]
+    
+    # does the user want to calculate any restraint?
+    fsuv.calc_flags = any(fsuv.restraint_flags)
+    
+    # does the user want to draw any plot?
+    fsuv.plotting_flags = any([fsuv.plots_extended_bar,
+                               fsuv.plots_compacted_bar,
+                               fsuv.plots_vertical_bar,
+                               fsuv.plots_residue_evolution,
+                               fsuv.plots_cs_scatter,
+                               fsuv.plots_cs_scatter_flower])
     
     # flags which fsuv.apply_PRE_analysis deppends on
     fsuv.PRE_analysis_flags = \
@@ -57,50 +86,30 @@ def config_user_variables(fsuv):
                 (fsuv.calcs_Height_ratio or fsuv.calcs_Volume_ratio) and \
                 fsuv.perform_comparisons
     
-    fsuv.txv = sorted(fsuv.titration_x_values)
-    
-    fsuv.calculated_params = \
-        [fsuv.calccol_name_PosF1_delta,
-        fsuv.calccol_name_PosF2_delta,
-        fsuv.calccol_name_CSP,
-        fsuv.calccol_name_Height_ratio,
-        fsuv.calccol_name_Volume_ratio]
-    
-    fsuv.calc_flags = any(fsuv.calculated_params)
-    
-    fsuv.param_settings_d = {
-    'calcs_restraint':    [fsuv.calcs_PosF1_delta,
-                           fsuv.calcs_PosF2_delta,
-                           fsuv.calcs_CSP,
-                           fsuv.calcs_Height_ratio,
-                           fsuv.calcs_Volume_ratio],
-                           
-    'plot_yy_axis_label': [fsuv.yy_label_PosF1_delta,
-                           fsuv.yy_label_PosF2_delta,
-                           fsuv.yy_label_CSP,
-                           fsuv.yy_label_Height_ratio,
-                           fsuv.yy_label_Volume_ratio],
-                           
-    'plot_yy_axis_scale': [(-fsuv.yy_scale_PosF1_delta, fsuv.yy_scale_PosF1_delta),
-                           (-fsuv.yy_scale_PosF2_delta, fsuv.yy_scale_PosF2_delta),
-                           (0, fsuv.yy_scale_CSP),
-                           (0, fsuv.yy_scale_Height_ratio),
-                           (0, fsuv.yy_scale_Volume_ratio)]
-                           }
+    restraint_settings_dct = {
+        'calcs_restraint_flg'   : fsuv.restraint_flags,
+                               
+        'plt_y_axis_lbl': [fsuv.yy_label_PosF1_delta,
+                               fsuv.yy_label_PosF2_delta,
+                               fsuv.yy_label_CSP,
+                               fsuv.yy_label_Height_ratio,
+                               fsuv.yy_label_Volume_ratio],
+                               
+        'plt_y_axis_scl': [(-fsuv.yy_scale_PosF1_delta,
+                                 fsuv.yy_scale_PosF1_delta),
+                               (-fsuv.yy_scale_PosF2_delta,
+                                 fsuv.yy_scale_PosF2_delta),
+                               (0, fsuv.yy_scale_CSP),
+                               (0, fsuv.yy_scale_Height_ratio),
+                               (0, fsuv.yy_scale_Volume_ratio)]
+                               }
     
     # A pd.DataFrame that organizes settings for each calculated restraint.
     # Index are the calculated params labels
-    fsuv.param_settings = pd.DataFrame(fsuv.param_settings_d,
-                                       index=fsuv.calculated_params)
+    fsuv.restraint_settings = pd.DataFrame(restraint_settings_dct,
+                                           index=fsuv.restraint_names)
     
-    
-    fsuv.plotting_flags = any([fsuv.plots_extended_bar,
-                             fsuv.plots_compacted_bar,
-                            fsuv.plots_vertical_bar,
-                            fsuv.plots_residue_evolution,
-                            fsuv.plots_cs_scatter,
-                            fsuv.plots_cs_scatter_flower])
-    
+    # configures dictionaries to be passed to plotting functions.
     fsuv.tplot_general_dict = {
         'subtitle_fn':fsuv.tplot_subtitle_fn,
         'subtitle_fs':fsuv.tplot_subtitle_fs,
@@ -310,16 +319,16 @@ def config_user_variables(fsuv):
         'res_highlight_y':fsuv.dpre_osci_rh_y,
         }
     
-    fsuv.general_plot_params = [fsuv.tplot_general_dict,
-                                fsuv.bar_plot_general_dict,
-                                fsuv.bar_ext_par_dict,
-                                fsuv.comp_bar_par_dict,
-                                fsuv.revo_plot_general_dict, 
-                                fsuv.res_evo_par_dict,
-                                fsuv.cs_scatter_par_dict,
-                                fsuv.cs_scatter_flower_dict]
-    
-    fsuv.pre_plot_params = [fsuv.heat_map_dict, fsuv.delta_osci_dict]
+    #fsuv.general_plot_params = [fsuv.tplot_general_dict,
+    #                            fsuv.bar_plot_general_dict,
+    #                            fsuv.bar_ext_par_dict,
+    #                            fsuv.comp_bar_par_dict,
+    #                            fsuv.revo_plot_general_dict, 
+    #                            fsuv.res_evo_par_dict,
+    #                            fsuv.cs_scatter_par_dict,
+    #                            fsuv.cs_scatter_flower_dict]
+    # 
+    #fsuv.pre_plot_params = [fsuv.heat_map_dict, fsuv.delta_osci_dict]
     
     
     return fsuv
@@ -415,11 +424,11 @@ def checks_plotting_flags(fsuv):
     
     if not(fsuv.plotting_flags):
         # DO ++++ export calculation tables
-        for calculated_parameter in fsuv.param_settings.index:
+        for restraint in fsuv.restraint_settings.index:
         # if the user calculated this restraint
-            if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
-                titration_panel.write_table(calculated_parameter,
-                                            calculated_parameter,
+            if fsuv.restraint_settings.loc[restraint,'calcs_restraint_flg']:
+                titration_panel.write_table(restraint,
+                                            restraint,
                                             resonance_type=resonance_type)
         
         msg = "All potting flags are turned off. No plots will be drawn. Confirm in the Settings menu if this is the desired configuration. I won't leave you with empty hands though, all calculated restraints have been exported in nicely formated tables ;-)"
@@ -432,7 +441,7 @@ def checks_plotting_flags(fsuv):
 def checks_calculation_flags(fsuv):
     """Checks if the user wants to calculate any restraints."""
     ######## WET#14
-    if not(fsuv.calculated_params):
+    if not(fsuv.calc_flags):
         #DO
         msg = "All restraints calculation routines are deactivated. Nothing will be calculated."
         
@@ -663,16 +672,22 @@ def init_fs_cube(exp, fsuv):
     
     return
 
-def titration_kwargs(fsuv, rt='Backbone', cp=None):
+def titration_kwargs(fsuv, rt='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
     the Titration class object.
+    
+    Depends on:
+    fsuv.csp_alpha4res
+    fsuv.csp_res_exceptions
+    fsuv.cs_lost
+    fsuv.restraint_names
     """
     dd = {'resonance_type':rt,
           'csp_alpha4res':fsuv.csp_alpha4res,
           'csp_res_exceptions':fsuv.csp_res_exceptions,
           'cs_lost':fsuv.cs_lost,
-          'calculated_params':cp}
+          'restraint_names':fsuv.restraint_names}
     
     return dd
 
@@ -874,7 +889,7 @@ def perform_fits(titration_panel, fsuv):
     
     Depends on:
     fsuv.perform_resevo_fit
-    fsuv.param_settings
+    fsuv.restraint_settings
     fsuv.txv
     """
     # runs only for CSPs, 1H and 15N.
@@ -886,11 +901,11 @@ def perform_fits(titration_panel, fsuv):
     
     checks_fit_input(fsuv)
     
-    for calculated_parameter in fsuv.param_settings.index[:3]:
+    for restraint in fsuv.restraint_settings.index[:3]:
         
-        if fsuv.param_settings.loc[calculated_parameter, 'calcs_restraint']:
+        if fsuv.restraint_settings.loc[restraint, 'calcs_restraint_flg']:
             
-            titration_panel.perform_fit(calccol = calculated_parameter,
+            titration_panel.perform_fit(calccol = restraint,
                                         x_values=fsuv.txv)
     return
 
@@ -906,11 +921,11 @@ def PRE_analysis(titration_panel, fsuv):
         titration_panel.load_theoretical_PRE(fsuv.spectra_path,
                                              titration_panel.dim2_pts)
         
-        for sourcecol, targetcol in zip(fsuv.param_settings.index[3:],\
+        for sourcecol, targetcol in zip(fsuv.restraint_settings.index[3:],\
                                         ['Hgt_DPRE', 'Vol_DPRE']):
         
             # only in the parameters allowed by the user
-            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
+            if fsuv.restraint_settings.loc[sourcecol, 'calcs_restraint_flg']:
                 titration_panel.calc_Delta_PRE(sourcecol, targetcol,
                                          gaussian_stddev=fsuv.gaussian_stddev,
                                          guass_x_size=fsuv.gauss_x_size)
@@ -923,21 +938,22 @@ def PRE_analysis(titration_panel, fsuv):
                     or titration_panel.dim1_pts == 'para')):
         
         # do
-        for sourcecol, targetcol in zip(list(fsuv.param_settings.index[3:])*2,
+        for sourcecol, targetcol in \
+            zip(list(fsuv.restraint_settings.index[3:])*2,
                                         ['Hgt_DPRE',
                                          'Vol_DPRE',
                                          'Hgt_DPRE_smooth',
                                          'Vol_DPRE_smooth']):
             
             # only for the parameters allowed by the user
-            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
+            if fsuv.restraint_settings.loc[sourcecol, 'calcs_restraint_flg']:
                 
                 titration_panel.plot_base(targetcol, 'exp', 'heat_map',
                     fsuv.heat_map_dict,
                     par_ylims=\
-                    fsuv.param_settings.loc[sourcecol,'plot_yy_axis_scale'],
+                    fsuv.restraint_settings.loc[sourcecol,'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv.param_settings.loc[sourcecol,'plot_yy_axis_label'],
+                    fsuv.restraint_settings.loc[sourcecol,'plt_y_axis_lbl'],
                     cols_per_page=1,
                     rows_per_page=fsuv.heat_map_rows,
                     fig_height=fsuv.fig_height,
@@ -953,9 +969,9 @@ def PRE_analysis(titration_panel, fsuv):
             or titration_panel.dim1_pts == 'para'):
         
         
-        for sourcecol, targetcols in zip(fsuv.param_settings.index[3:],
+        for sourcecol, targetcols in zip(fsuv.restraint_settings.index[3:],
                                          ['Hgt_DPRE', 'Vol_DPRE']):
-            if fsuv.param_settings.loc[sourcecol, 'calcs_restraint']:
+            if fsuv.restraint_settings.loc[sourcecol, 'calcs_restraint_flg']:
                 titration_panel.plot_base(targetcols, 'exp', 'delta_osci',
                     {**fsuv.tplot_general_dict,**fsuv.delta_osci_dict},
                     par_ylims=(0,fsuv.dpre_osci_ymax),
@@ -978,16 +994,16 @@ def exports_chimera_att_files(titration_panel, fsuv):
     Exports tables with calculated restraints.
     
     Depends on:
-    fsuv.param_settings
+    fsuv.restraint_settings
     fsuv.chimera_att_select_format
     """
     
-    for calculated_parameter in fsuv.param_settings.index:
+    for restraint in fsuv.restraint_settings.index:
         # if the user wants to plot this parameter
-        if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
+        if fsuv.restraint_settings.loc[restraint,'calcs_restraint_flg']:
             # do export chimera attribute files
             titration_panel.write_Chimera_attributes(\
-                    calculated_parameter,
+                    restraint,
                     resformat=fsuv.chimera_att_select_format)
     
     return
@@ -1004,7 +1020,7 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
     fsuv.plots_residue_evolution
     fsuv.plots_cs_scatter
     fsuv.plots_cs_scatter_flower
-    fsuv.param_settings
+    fsuv.restraint_settings
     fsuv.tplot_general_dict
     fsuv.bar_plot_general_dict
     fsuv.bar_ext_par_dict
@@ -1020,24 +1036,24 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
     checks_plotting_flags(fsuv)
         
     # PLOTS DATA
-    for calculated_parameter in fsuv.param_settings.index:
+    for restraint in fsuv.restraint_settings.index:
         # if the user has calculated this restraint
-        if fsuv.param_settings.loc[calculated_parameter,'calcs_restraint']:
+        if fsuv.restraint_settings.loc[restraint,'calcs_restraint_flg']:
             if titration_panel.resonance_type == 'Backbone':
                 
                 # Plot Extended Bar Plot
                 if fsuv.plots_extended_bar:
                     titration_panel.plot_base(
-                        calculated_parameter, 'exp', 'bar_extended',
+                        restraint, 'exp', 'bar_extended',
                         {**fsuv.tplot_general_dict,
                          **fsuv.bar_plot_general_dict,
                          **fsuv.bar_ext_par_dict},
                         par_ylims=\
-                        fsuv.param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_scale'],
+                        fsuv.restraint_settings.loc[restraint,
+                                                 'plt_y_axis_scl'],
                         ylabel=\
-                        fsuv.param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_label'],
+                        fsuv.restraint_settings.loc[restraint,
+                                                 'plt_y_axis_lbl'],
                         hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.ext_bar_cols_page,
                         rows_per_page=fsuv.ext_bar_rows_page,
@@ -1050,16 +1066,16 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
                 if fsuv.plots_compacted_bar:
                     
                     titration_panel.plot_base(\
-                        calculated_parameter, 'exp', 'bar_compacted',
+                        restraint, 'exp', 'bar_compacted',
                         {**fsuv.tplot_general_dict,
                          **fsuv.bar_plot_general_dict,
                          **fsuv.comp_bar_par_dict},
                         par_ylims=\
-                        param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_scale'],
+                        restraint_settings.loc[restraint,
+                                                 'plt_y_axis_scl'],
                         ylabel=\
-                        param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_label'],
+                        restraint_settings.loc[restraint,
+                                                 'plt_y_axis_lbl'],
                         hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.comp_bar_cols_page,
                         rows_per_page=fsuv.comp_bar_rows_page,
@@ -1071,16 +1087,16 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
                 # Plot Vertical Bar Plot
                 if fsuv.plots_vertical_bar:
                     titration_panel.plot_base(
-                        calculated_parameter, 'exp', 'bar_vertical',
+                        restraint, 'exp', 'bar_vertical',
                         {**fsuv.tplot_general_dict,
                          **fsuv.bar_plot_general_dict,
                          **fsuv.bar_ext_par_dict},
                         par_ylims=\
-                        fsuv.param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_scale'],
+                        fsuv.restraint_settings.loc[restraint,
+                                                 'plt_y_axis_scl'],
                         ylabel=\
-                        fsuv.param_settings.loc[calculated_parameter,
-                                                 'plot_yy_axis_label'],
+                        fsuv.restraint_settings.loc[restraint,
+                                                 'plt_y_axis_lbl'],
                         cols_per_page=fsuv.vert_bar_cols_page,
                         rows_per_page=fsuv.vert_bar_rows_page,
                         fig_height=fsuv.fig_height,
@@ -1093,16 +1109,16 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
                 and (fsuv.plots_extended_bar or fsuv.plots_compacted_bar):
                 # DO ++++
                 titration_panel.plot_base(
-                    calculated_parameter, 'exp', 'bar_extended',
+                    restraint, 'exp', 'bar_extended',
                     {**fsuv.tplot_general_dict,
                      **fsuv.bar_plot_general_dict,
                      **fsuv.bar_ext_par_dict},
                     par_ylims=\
-                    fsuv.param_settings.loc[calculated_parameter,
-                                             'plot_yy_axis_scale'],
+                    fsuv.restraint_settings.loc[restraint,
+                                             'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv.param_settings.loc[calculated_parameter,
-                                             'plot_yy_axis_label'],
+                    fsuv.restraint_settings.loc[restraint,
+                                             'plt_y_axis_lbl'],
                     hspace=fsuv.tplot_vspace,
                     cols_per_page=fsuv.ext_bar_cols_page,
                     rows_per_page=fsuv.ext_bar_rows_page,
@@ -1116,14 +1132,14 @@ def plots_data(titration_panel, fsuv, resonance_type='Backbone'):
             # Plots Parameter Evolution Plot
             if fsuv.plots_residue_evolution:
                 titration_panel.plot_base(\
-                    calculated_parameter, 'res', 'res_evo',
+                    restraint, 'res', 'res_evo',
                     {**fsuv.revo_plot_general_dict, **fsuv.res_evo_par_dict},
                     par_ylims=  
-                    fsuv.param_settings.loc[calculated_parameter,
-                                             'plot_yy_axis_scale'],
+                    fsuv.restraint_settings.loc[restraint,
+                                             'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv.param_settings.loc[calculated_parameter,
-                                             'plot_yy_axis_label'],
+                    fsuv.restraint_settings.loc[restraint,
+                                             'plt_y_axis_lbl'],
                     cols_per_page=fsuv.res_evo_cols_page,
                     rows_per_page=fsuv.res_evo_rows_page,
                     fig_height=fsuv.fig_height,
@@ -1173,13 +1189,13 @@ def analyse_comparisons(exp, titration_dict, fsuv,
         exports_titration(comp_panel)
     
         # EXPORTS CALCULATIONS
-        exports_data_tables(comp_panel, param_settings=ps, fsuv=fsuv)
+        exports_data_tables(comp_panel, restraint_settings=ps, fsuv=fsuv)
         
         # performs pre analysis
-        PRE_analysis(comp_panel, fsuv, gpp[0], *ppp, param_settings=ps)
+        PRE_analysis(comp_panel, fsuv, gpp[0], *ppp, restraint_settings=ps)
         
         # plots data
-        plots_data(comp_panel, fsuv, *gpp, param_settings=ps)
+        plots_data(comp_panel, fsuv, *gpp, restraint_settings=ps)
         
         return
         
@@ -1314,7 +1330,7 @@ def run_farseer(fsuv):
             titration_kwargs=\
                 titration_kwargs(fsuv,
                                  rt='Backbone',
-                                 cp=fsuv.calculated_params))
+                                 cp=fsuv.restraint_names))
     
     # evaluates the titrations and plots the data
     eval_titrations(Farseer_titration_dict, fsuv)
@@ -1329,7 +1345,7 @@ def run_farseer(fsuv):
                 titration_kwargs=\
                     titration_kwargs(fsuv,
                                      rt='Sidechains',
-                                     cp=fsuv.calculated_params))
+                                     cp=fsuv.restraint_names))
         
         
         eval_titrations(Farseer_SD_titrations_dict,
@@ -1345,7 +1361,7 @@ def run_farseer(fsuv):
                                 Farseer_titration_dict,
                                 fsuv,
                                 gpp=general_plot_params,
-                                ps=param_settings,
+                                ps=restraint_settings,
                                 ppp=pre_plot_params,
                                 resonance_type='Backbone')
         
@@ -1356,7 +1372,7 @@ def run_farseer(fsuv):
                                     Farseer_SD_titrations_dict,
                                     fsuv,
                                     gpp=general_plot_params,
-                                    ps=param_settings,
+                                    ps=restraint_settings,
                                     ppp=pre_plot_params,
                                     resonance_type='Sidechains')
     

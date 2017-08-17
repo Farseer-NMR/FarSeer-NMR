@@ -44,11 +44,11 @@ class Titration(pd.Panel):
                                           csp_alpha4res=0.14,
                                           csp_res_exceptions={'G':0.2},
                                           cs_lost='prev',
-                                          calculated_params=['H1_delta',
-                                                             'N15_delta',
-                                                             'CSP',
-                                                             'Height_ratio',
-                                                             'Vol_ratio']):
+                                          restraint_list=['H1_delta',
+                                                          'N15_delta',
+                                                          'CSP',
+                                                          'Height_ratio',
+                                                          'Vol_ratio']):
                                                                  
         # I think I created this function because I couldn't initialise all
         # these parameters with the init()
@@ -70,7 +70,13 @@ class Titration(pd.Panel):
         self.resonance_type = resonance_type
         self.res_info = \
             self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
-        self.calculated_params = calculated_params
+        
+        # a list of the restraints that can be calculated
+        # this list organizes restraints so that functionally flags
+        # can be used with descrimination
+        self.restraint_list = restraint_list
+        
+        # log related variables
         self.log = ''
         self.log_export_onthefly = False
         self.log_export_name = 'FarseerSet_log.md'
@@ -887,7 +893,7 @@ recipient: residues
                               zorder=0)
                               
         # Adds red line to identify significant changes.
-        if threshold_flag and (calccol in self.calculated_params[:3]):
+        if threshold_flag and (calccol in self.restraint_list[:3]):
             self.plot_threshold(axs[i], self.loc[experiment,:,calccol],
                                 threshold_color,
                                 threshold_linewidth,
@@ -914,7 +920,7 @@ recipient: residues
             self.set_item_colors(bars, self.loc[experiment,:,'Details'],
                                   user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.calculated_params[3:]):
+        if PRE_flag and (calccol in self.restraint_list[3:]):
             self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.05,
                               bartype='h',
                               pre_color=pre_color,
@@ -1096,7 +1102,7 @@ recipient: residues
                               zorder=0)
         
         # Adds red line to identify significant changes.
-        if threshold_flag and (calccol in self.calculated_params[:3]):
+        if threshold_flag and (calccol in self.restraint_list[:3]):
             self.plot_threshold(axs[i],
                                 self.loc[experiment,:,calccol],
                                 threshold_color,
@@ -1128,7 +1134,7 @@ recipient: residues
                                  self.loc[experiment,:,'Details'],
                                  user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.calculated_params[3:]):
+        if PRE_flag and (calccol in self.restraint_list[3:]):
             self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.1,
                               bartype='v',
                               pre_color=pre_color,
@@ -1311,7 +1317,7 @@ recipient: residues
         
         if fit_perform \
                 and self.titration_type == 'cond1'\
-                and (calccol in self.calculated_params[:3])\
+                and (calccol in self.restraint_list[:3])\
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
             
             # plot fit
