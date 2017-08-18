@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 from current.fslibs import wet as fsw
 
-class FarseerSet:
+class FarseerCube:
     """
-    FarseerSet contains the information regarding all the titration
+    FarseerSet contains the information regarding all the acquired
     experiments. The FarseerSet object contains several nested
     dictionaries that have the same hierarchy of the spectra/ folder
     and store the information on the .csv and .fasta files,
@@ -16,7 +16,7 @@ class FarseerSet:
         -allsidechains - contains .csv peaklists data for sidechains that
                          was extrated from allpeaklists
         -allFASTA - stores information on the FASTA sequence referent
-                    to that titration experiment
+                    to that series of experiments
     """
     def __init__(self, spectra_path, has_sidechains=False,
                                      applyFASTA=False,
@@ -25,8 +25,8 @@ class FarseerSet:
         Initiates the object,
         
         :spectra_path: the path where the spectra (.csv files) are located.
-                       spectra/ folder has to have the titration logical
-                       hirarchy
+                       spectra/ folder has to have the logical hierarchy
+                       of the experimental series
         :has_sidechains: bool whether the .csv contain information on
                          sidechains residues
         :applyFASTA: bool whether to complete the sequence according to
@@ -62,7 +62,7 @@ class FarseerSet:
         self.xxcoords = None
         
         # Flags if there are more than 1 data point in each axis
-        # (a.k.a. titration condition)
+        # (a.k.a. condition)
         # if no more than 1 data point is found,
         # there is no activity on that dimension
         self.haszz = False
@@ -317,13 +317,13 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def init_coords_names(self):
         """
-        Identifies the data points for each titration condition.
-        Configures the conditions to be analyzed.
+        Identifies coordinate names (conditions measured) for the
+        Farseer-NMR Cube.
         
         returns: output log string.
         """
         
-        self.log_r('IDENTIFIED TITRATION VARIABLES', istitle=True)
+        self.log_r('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
         
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
@@ -346,9 +346,9 @@ FASTA starting residue: {}  """.format(spectra_path,
             self.hasxx = True
         
         logs = '''\
-* 1st titration variables (cond1): {}
-* 2nd titration variables (cond2): {}
-* 3rd titration variables (cond3): {}
+* Farseer Cube X axis variables (cond1): {}
+* Farseer Cube Y axis variables (cond2): {}
+* Farseer Cube Z axis variables (cond3): {}
 '''.format(self.xxcoords, self.yycoords, self.zzcoords)
         
         self.log_r(logs)
@@ -838,7 +838,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         """
         Creates a pd.Panel5D with the information of all
         the parsed peaklists from this panel, the information will
-        be accessed and used to create the titration objects,
+        be accessed and used to create the FarseerSeries objects,
         upon each the calculations will be performed.
         
         If there are sidechains, creates a Panel5D for the sidechains, which
@@ -898,11 +898,11 @@ FASTA starting residue: {}  """.format(spectra_path,
         else:
             raise ValueError('Not a valid <along_axis> option.')
         
-        self.log_r('GENERATING DICTIONARY OF TITRATIONS FOR {}'.\
+        self.log_r('GENERATING DICTIONARY OF SERIES FOR {}'.\
                     format(series_type), istitle=True)
         
         # builds kwargs
-        series_kwargs['titration_type'] = series_type
+        series_kwargs['series_axis'] = series_type
         series_kwargs['owndim_pts'] = owndim_pts
         
         # prepares dictionary
@@ -920,32 +920,32 @@ FASTA starting residue: {}  """.format(spectra_path,
                 
                 # initiates series
                 series_dct[dp2][dp1] = \
-                    self.gen_titration(fscube.loc[dp2, dp1, :, :, :],
+                    self.gen_series(fscube.loc[dp2, dp1, :, :, :],
                                        series_class,
                                        series_kwargs)
                 
                 # writes to log
                 self.log_r(\
-                '**Titration [{}][{}]** with data points {}'.\
+                '**Experimental Series [{}][{}] ** with data points {}'.\
                     format(dp2, dp1, list(series_dct[dp2][dp1].items)))
                 
                 # DONE
         
         return series_dct
     
-    def gen_titration(self, series_panel, series_class, sc_kwargs):
-        """Creates a titration object fsT.Titration."""
+    def gen_series(self, series_panel, series_class, sc_kwargs):
+        """Creates a Series object of class <series_class>."""
         
-        titration_panel = \
+        series_panel = \
             series_class(np.array(series_panel),
                             items=series_panel.items,
                             minor_axis=series_panel.minor_axis,
                             major_axis=series_panel.major_axis)
              
-        # activates the titration attibutes
-        titration_panel.create_titration_attributes(**sc_kwargs)
+        # activates the series attibutes
+        series_panel.create_attributes(**sc_kwargs)
         #
-        return titration_panel
+        return series_panel
     
     def exports_parsed_pkls(self, z, y, x, args):
         """

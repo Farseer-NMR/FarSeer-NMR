@@ -13,11 +13,11 @@ from current.fslibs import wet as fsw
 
 class FarseerSeries(pd.Panel):
     """
-    The titration object inherits a pd.Panel.
+    The FarseerSeries object inherits a pd.Panel.
     Is a panel where each item is an experiment,
-    and the progression along Items is the evolution of the titration.
+    and the progression along Items is the evolution of the Series.
     """
-    # folder to store titration calculations
+    # folder to store calculations
     calc_folder = 'Calculations'  
     # folder to store comparisons among calculations
     comparison_folder = 'Comparisons'  
@@ -33,22 +33,22 @@ class FarseerSeries(pd.Panel):
     
     
     
-    def create_titration_attributes(self, titration_type='cond',
-                                          owndim_pts=['foo'],
-                                          dim1_pts='bar',
-                                          dim2_pts='zoo',
-                                          dim_comparison='not_applied',
-                                          resonance_type='Backbone',
-                                          csp_alpha4res=0.14,
-                                          csp_res_exceptions={'G':0.2},
-                                          cs_lost='prev',
-                                          restraint_list=['H1_delta',
-                                                          'N15_delta',
-                                                          'CSP',
-                                                          'Height_ratio',
-                                                          'Vol_ratio'],
-                                          log_export_onthefly=False,
-                                          log_export_name='FarseerSet_log.md'):
+    def create_attributes(self, series_axis='cond',
+                                  owndim_pts=['foo'],
+                                  dim1_pts='bar',
+                                  dim2_pts='zoo',
+                                  dim_comparison='not_applied',
+                                  resonance_type='Backbone',
+                                  csp_alpha4res=0.14,
+                                  csp_res_exceptions={'G':0.2},
+                                  cs_lost='prev',
+                                  restraint_list=['H1_delta',
+                                                  'N15_delta',
+                                                  'CSP',
+                                                  'Height_ratio',
+                                                  'Vol_ratio'],
+                                  log_export_onthefly=False,
+                                  log_export_name='FarseerSet_log.md'):
                                                                  
         # I think I created this function because I couldn't initialise all
         # these parameters with the init()
@@ -62,7 +62,7 @@ class FarseerSeries(pd.Panel):
             self.csp_alpha4res[k] = v
         
         # variables that store characteristics of the titration.
-        self.titration_type = titration_type
+        self.series_axis = series_axis
         self.att_dict = owndim_pts
         self.dim1_pts = dim1_pts
         self.dim2_pts = dim2_pts
@@ -83,17 +83,17 @@ class FarseerSeries(pd.Panel):
         
         # defines the path to store the calculations
         # if stores the result of a calculation
-        if titration_type.startswith('cond'):
+        if series_axis.startswith('cond'):
             self.calc_path = '{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                      self.calc_folder,
-                                                     self.titration_type,
+                                                     self.series_axis,
                                                      self.dim2_pts,
                                                      self.dim1_pts)
         # if stores comparisons among calculations
-        elif titration_type.startswith('C'):
+        elif series_axis.startswith('C'):
             self.calc_path = '{}/{}/{}/{}/{}/{}'.format(self.resonance_type,
                                                         self.comparison_folder,
-                                                        self.titration_type,
+                                                        self.series_axis,
                                                         self.dim_comparison,
                                                         self.dim2_pts,
                                                         self.dim1_pts)
@@ -125,7 +125,7 @@ class FarseerSeries(pd.Panel):
     @property
     def _constructor(self):
         # because Titration inherits a pd.Panel.
-        return Titration
+        return FarseerSeries
         
     def log_r(self, logstr, istitle=False):
         """
@@ -213,7 +213,7 @@ class FarseerSeries(pd.Panel):
     
     def calc_cs_diffs(self, calccol, sourcecol):
         '''
-        Calculates the difference between two columns along a Titration 
+        Calculates the difference between two columns along a Series 
         using as reference the column from the reference experiment, 
         which is always stored in Item=0.
         
@@ -245,7 +245,7 @@ class FarseerSeries(pd.Panel):
     
     def calc_ratio(self, calccol, sourcecol):
         '''
-        Calculates the ration between two columns along a Titration
+        Calculates the ration between two columns along a Series
         using as reference the column from the reference experiment, 
         which is always stored in Item=0.
         
@@ -369,7 +369,7 @@ with window size {} and stdev {}'.\
     def write_table(self, folder, tablecol, resonance_type='Backbone'):
         '''
         Writes to a tsv file the values of a specific column
-        along the titration.
+        along the series.
         '''
         # concatenates the values of the table with the residues numbers
         table = pd.concat([self.res_info.iloc[0,:,[0]],
@@ -388,26 +388,26 @@ with window size {} and stdev {}'.\
         
         fileout = open(file_path, 'w')
         
-        if self.titration_type.startswith('cond'):
+        if self.series_axis.startswith('cond'):
             header = \
 """# Table for '{0}' resonances.
-# A titration results for variable '{1}'
+# The results for variable '{1}'
 # ranging datapoints '{2}', where:
 # conditions '{3}' and '{4}' are kept constants.
 # {5} data.
-""".format(self.resonance_type, self.titration_type, list(self.att_dict),
+""".format(self.resonance_type, self.series_axis, list(self.att_dict),
            self.dim2_pts, self.dim1_pts, tablecol)
         
-        elif self.titration_type.startswith('C'):
+        elif self.series_axis.startswith('C'):
             header = \
 """# Table for '{0}' resonances.
 # The comparison '{1}': for the results obtained for titrations 'cond{7}'
 # across variable '{2}' which ranges datapoints '{3}', where:
 # conditions '{4}' and '{5}' are kept constants.
 # {6} data.
-""".format(self.resonance_type, self.titration_type, self.dim_comparison,
+""".format(self.resonance_type, self.series_axis, self.dim_comparison,
            list(self.att_dict), self.dim2_pts, self.dim1_pts, tablecol,
-           self.titration_type[-1])
+           self.series_axis[-1])
         
         fileout.write(header)
         fileout.write(table.to_csv(sep='\t', index=False,
@@ -430,7 +430,7 @@ with window size {} and stdev {}'.\
         to be written to chimera.
         
         Writes one Chimera Attribute file to each calculated parameter
-        and for each titration point. Generated files are stored in the folder
+        and for each series point. Generated files are stored in the folder
         'ChimeraAttributeFiles'.
         
         This function was written this way because it
@@ -494,7 +494,7 @@ recipient: residues
             self.log_r('**Exported Chimera Att** {}'.format(file_name))
         return
     
-    def export_titration(self):
+    def export_series_to_tsv(self):
         """
         Exports the experimental series with measured and
         calculated data to .tsv files.
@@ -600,8 +600,8 @@ recipient: residues
                       tag_lw=0.1
                       ):
         
-        if (self.titration_type == 'cond3' and exp == 'para') \
-            or (self.titration_type == 'C3' \
+        if (self.series_axis == 'cond3' and exp == 'para') \
+            or (self.series_axis == 'C3' \
                 and ( self.dim1_pts == 'para' or self.dim2_pts == 'para')):
             # plot theoretical PRE
             if bartype == 'v':
@@ -1205,7 +1205,7 @@ recipient: residues
         # if the user wants to represent the condition in the x axis
         # for the first dimension
         if set_x_values and \
-            (self.titration_type == 'cond1' or self.dim_comparison == 'cond1'):
+            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
             # do
             if len(titration_x_values) != len(self.items):
                 self.log_r(fsw.wet5(titration_x_values, self.items))
@@ -1214,7 +1214,7 @@ recipient: residues
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
-        elif (self.titration_type in ['cond2', 'cond3']) \
+        elif (self.series_axis in ['cond2', 'cond3']) \
             or (self.dim_comparison in ['cond2', 'cond3']):
             #do
             x = np.arange(0, len(y))
@@ -1236,7 +1236,7 @@ recipient: residues
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
         if set_x_values and \
-            (self.titration_type == 'cond1' or self.dim_comparison == 'cond1'):
+            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
                 #do
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
             xlabels = [int(n) for n in axs[i].get_xticks()]
@@ -1316,7 +1316,7 @@ recipient: residues
                                 facecolor=fill_color, alpha=fill_alpha)
         
         if fit_perform \
-                and self.titration_type == 'cond1'\
+                and self.series_axis == 'cond1'\
                 and (calccol in self.restraint_list[:3])\
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
             
@@ -1464,7 +1464,7 @@ recipient: residues
                      hide_lost=False):
         """
         Represents the peak evolution in chemical
-        shift change along the titration.
+        shift change along the series.
         """
         def set_tick_labels():
             # adjust the ticks to a maximum of 4.
