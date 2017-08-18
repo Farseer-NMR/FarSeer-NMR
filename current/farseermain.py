@@ -1189,9 +1189,12 @@ def analyse_comparisons(series_dct, fsuv,
                         resonance_type='Backbone'):
     """Algorythm to perform data comparisons over analysed conditions."""
     
+    # kwargs passed to the parsed series of class fss.FarseerSeries
     comp_kwargs = {'log_export_onthefly':True,
                    'log_export_name':fsuv.logfile_name}
     
+    # ORDERED relation between dimension names
+    # self: [next, prev]
     series_dim_keys = {'cond1':['cond2','cond3'],
                        'cond2':['cond3','cond1'],
                        'cond3':['cond1','cond2']}
@@ -1210,7 +1213,7 @@ def analyse_comparisons(series_dct, fsuv,
                         selfdim=dimension,
                         other_dim_keys=series_dim_keys[dimension],
                         resonance_type=resonance_type)
-                        
+        
         c.log_export_onthefly = True
         c.log_export_name = fsuv.logfile_name
         ###
@@ -1221,7 +1224,7 @@ def analyse_comparisons(series_dct, fsuv,
         # generates set of PARSED FarseerSeries along the
         # next and previous dimensions
         c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
-        c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
+        
         
         if c.has_points_next_dim:
             for dp2 in sorted(c.all_next_dim.keys()):
@@ -1231,7 +1234,7 @@ def analyse_comparisons(series_dct, fsuv,
                     # writes log
                     c.all_next_dim[dp2][dp1].log_r(\
                         'COMPARING... [{}][{}] - [{}]'.format(\
-                            dp2, dp1, c.hyper_panel.labels),
+                            dp2, dp1, list(c.hyper_panel.labels)),
                         istitle=True)
                     
                     # performs ploting routines
@@ -1241,6 +1244,8 @@ def analyse_comparisons(series_dct, fsuv,
                     
                     #c.log += c.all_next_dim[dim2_pt][dim1_pt].log
         
+        c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
+        
         if c.has_points_prev_dim:
             for dp2 in sorted(c.all_prev_dim.keys()):
                 
@@ -1249,7 +1254,7 @@ def analyse_comparisons(series_dct, fsuv,
                     # writes log
                     c.all_prev_dim[dp2][dp1].log_r(\
                         'COMPARING... [{}][{}] - [{}]'.format(\
-                            dp2, dp1, c.hyper_panel.cool),
+                            dp2, dp1, list(c.hyper_panel.cool)),
                         istitle=True)
                     
                     comparison_analysis_routines(\
@@ -1328,8 +1333,7 @@ def run_farseer(fsuv):
     organize_columns(exp, exp.allpeaklists, fsuv)
     
     if exp.has_sidechains and fsuv.use_sidechains:
-        organize_columns(exp, exp.allsidechains, fsuv,
-                         sidechains=True)
+        organize_columns(exp, exp.allsidechains, fsuv, sidechains=True)
     
     init_fs_cube(exp, fsuv)
     
@@ -1337,7 +1341,7 @@ def run_farseer(fsuv):
     # along all the conditions.
     farseer_series_dct = \
         gen_series_dcts(exp, fss.FarseerSeries, fsuv,
-                            resonance_type='Backbone')
+                        resonance_type='Backbone')
     
     # evaluates the series and plots the data
     eval_series(farseer_series_dct, fsuv)
@@ -1348,8 +1352,8 @@ def run_farseer(fsuv):
             gen_series_dcts(exp, fss.FarseerSeries, fsuv,
                                 resonance_type='Sidechains')
         
-        eval_series(farseer_series_SD_dict,
-                        fsuv, resonance_type='Sidechains')
+        eval_series(farseer_series_SD_dict, fsuv,
+                    resonance_type='Sidechains')
         # DONE
     
     # Representing the results comparisons

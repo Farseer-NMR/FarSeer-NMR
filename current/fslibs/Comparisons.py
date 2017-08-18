@@ -103,8 +103,10 @@ class Comparisons:
         """
         
         self.log_r(\
-            'GENERATING COMPARISONS FOR **{}** ALONG LABELS: {}'.format(\
-                    self.dimension, list(self.hyper_panel.labels)),
+            'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(\
+                    self.dimension,
+                    self.other_dim_keys[0],
+                    list(self.hyper_panel.labels)),
             istitle=True)
         
         if len(self.hyper_panel.labels) > 1:
@@ -151,8 +153,10 @@ class Comparisons:
         """
         
         self.log_r(\
-            'GENERATING COMPARISONS FOR **{}** ALONG COOLs: {}'.format(\
-                    self.dimension, list(self.hyper_panel.cool)),
+            'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(\
+                    self.dimension,
+                    self.other_dim_keys[1],
+                    list(self.hyper_panel.cool)),
             istitle=True)
         
         if len(self.hyper_panel.cool) > 1:
