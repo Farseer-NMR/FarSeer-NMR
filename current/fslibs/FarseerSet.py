@@ -233,7 +233,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.log_r('READING INPUT FILES *{}*'.format(filetype),
                     istitle=True)
         
-        self.check_filetype(filetype)
+        self.checks_filetype(filetype)
         
         # loads files in nested dictionaries
         # piece of code found in stackoverflow
@@ -856,73 +856,96 @@ FASTA starting residue: {}  """.format(spectra_path,
             
         return
     
-    def gen_titration(self, titration_panel, titration_class, titration_kwargs):
+    def export_series_dict_over_axis(self, series_class,
+                                           along_axis='x',
+                                           resonance_type='Backbone',
+                                           series_kwargs={}):
+        """
+        Exports a dictionary containing all the series of experiments
+        along a specific axis of the Farseer-NMR Cube.
+        
+        The series of experiments are initiated as <series_class> object.
+        <series_class> object has to be coordinated with this function.
+        
+        :sc_kwargs: kwargs to be passed to the series_class.
+        """
+        
+        if resonance_type == 'Backbone':
+            fscube = self.peaklists_p5d
+        elif resonance_type == 'Sidechains':
+            fscube = self.sidechains_p5d
+        else:
+            raise ValueError('Not a valid <resonance_type> option.')
+        
+        # transposes the Farseer-NMR cube according to the desired axis
+        if along_axis=='x':
+            series_type='cond1'
+            owndim_pts=self.xxcoords
+            next_axis = self.yycoords
+            next_axis_2 = self.zzcoords
+        elif along_axis=='y':
+            series_type='cond2'
+            fscube = fscube.transpose(2,0,1,3,4, copy=True)
+            owndim_pts=self.yycoords
+            next_axis = self.zzcoords
+            next_axis_2 = self.xxcoords
+        elif along_axis=='z':
+            series_type='cond3'
+            fscube = fscube.transpose(1,2,0,3,4, copy=True)
+            owndim_pts=self.zzcoords
+            next_axis = self.xxcoords
+            next_axis_2 = self.yycoords
+        else:
+            raise ValueError('Not a valid <along_axis> option.')
+        
+        self.log_r('GENERATING DICTIONARY OF TITRATIONS FOR {}'.\
+                    format(series_type), istitle=True)
+        
+        # builds kwargs
+        series_kwargs['titration_type'] = series_type
+        series_kwargs['owndim_pts'] = owndim_pts
+        
+        # prepares dictionary
+        series_dct = {}
+        
+        # assembles dictionary
+        for dp2 in next_axis_2:
+            series_dct.setdefault(dp2, {})
+            for dp1 in next_axis:
+                # DO
+                
+                # builds kwargs
+                series_kwargs['dim2_pts'] = dp2
+                series_kwargs['dim1_pts'] = dp1
+                
+                # initiates series
+                series_dct[dp2][dp1] = \
+                    self.gen_titration(fscube.loc[dp2, dp1, :, :, :],
+                                       series_class,
+                                       series_kwargs)
+                
+                # writes to log
+                self.log_r(\
+                '**Titration [{}][{}]** with data points {}'.\
+                    format(dp2, dp1, list(series_dct[dp2][dp1].items)))
+                
+                # DONE
+        
+        return series_dct
+    
+    def gen_titration(self, series_panel, series_class, sc_kwargs):
         """Creates a titration object fsT.Titration."""
         
         titration_panel = \
-            titration_class(np.array(titration_panel),
-                            items=titration_panel.items,
-                            minor_axis=titration_panel.minor_axis,
-                            major_axis=titration_panel.major_axis)
+            series_class(np.array(series_panel),
+                            items=series_panel.items,
+                            minor_axis=series_panel.minor_axis,
+                            major_axis=series_panel.major_axis)
              
         # activates the titration attibutes
-        titration_panel.create_titration_attributes(**titration_kwargs)
+        titration_panel.create_titration_attributes(**sc_kwargs)
         #
         return titration_panel
-    
-    def gen_titration_dict(self, panelT,
-                                 titration_type,
-                                 owndim_pts,
-                                 nextdims1,
-                                 nextdims2,
-                                 titration_class,
-                                 titration_kwargs):
-        '''
-        :panelT: the pd.Panel5D storing all the information of the
-                 titration set transposed so that the items are the
-                 observed dimension.
-        :tittype: defines whether we are analysing the first,
-                  the 2nd o the 3rd dim/condition.
-        :owndim_pts: the points in the titype dimension.
-        :nextdims1: the points in the next dimension of the titype.
-        :nextdims2: the points in the 2nd next dimension.
-        :res_type: whether is backbone or sidechain.
-        
-        
-        Generates a dictionary that stores the titrations corresponding to the
-        analysis of a given condition (1D, 2D or 3D).
-        The generated dictionary has main key equal to the 2nd next dimension,
-        subkey equal to the next dimension and stores a Titration object fsT.
-        
-        Therefore the dictionary[1D] stores all the experiments along the first
-        dimension/condition.
-        '''
-        
-        self.log_r('GENERATING DICTIONARY OF TITRATIONS FOR {}'.\
-                    format(titration_type), istitle=True)
-        
-        # initiates dictionary
-        D = {}
-        
-        # initiates attributes that will be pased as kwargs
-        titration_kwargs['titration_type'] = titration_type
-        titration_kwargs['owndim_pts'] = owndim_pts
-        
-        for dim2_pts in nextdims2:
-            D.setdefault(dim2_pts, {})
-            for dim1_pts in nextdims1:
-                titration_kwargs['dim2_pts'] = dim2_pts
-                titration_kwargs['dim1_pts'] = dim1_pts
-                D[dim2_pts][dim1_pts] = \
-                    self.gen_titration(panelT.loc[dim2_pts, dim1_pts, :, :, :],
-                                       titration_class, titration_kwargs)
-                #
-                self.log_r('**Titration [{}][{}]** \
-with data points {}'.format(dim2_pts,
-                       dim1_pts,
-                       list(D[dim2_pts][dim1_pts].items)))
-        
-        return D
     
     def exports_parsed_pkls(self, z, y, x, args):
         """
@@ -960,7 +983,7 @@ with data points {}'.format(dim2_pts,
             
         return
     
-    def check_filetype(self, filetype):
+    def checks_filetype(self, filetype):
         """
         Confirms that file type exists in spectra/ before
         attempting to load it.

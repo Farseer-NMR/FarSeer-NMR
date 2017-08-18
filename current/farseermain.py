@@ -450,31 +450,31 @@ def checks_calculation_flags(fsuv):
     ########
     return
 
-def checks_fit_input(fsuv):
+def checks_fit_input(series, fsuv):
     """Checks whether required fit data and settings are provided correctly."""
     
     ######## WET#5, WET#6, WET#7
-    if not(all([True if x>0 else False for x in fsuv.txv])):
+    if not(all([True if x>=0 else False for x in fsuv.txv])):
         # DO
         msg = 'There are negative values in titration_x_values variable. Fitting to the Hill Equation does not accept negative values. Please revisit your input'
         
-        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 6))
-        titration_panel.abort()
+        series.log_r(fsw.gen_wet('ERROR', msg, 6))
+        series.abort()
         # DONE
     
-    elif len(txv) != len(titration_panel.items):
+    elif len(fsuv.txv) != len(series.items):
         # DO
-        msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}].".format(txv, titration_panel.items)
+        msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}].".format(txv, series.items)
         
-        titration_panel.log_r(fsw.gen_wet('ERROR', msg, 5))
-        titration_panel.abort()
+        series.log_r(fsw.gen_wet('ERROR', msg, 5))
+        series.abort()
         # DONE
         
     else:
         # DO
-        msg = "The number of coordinate values for data fitting along X axis equals the number of input peaklists, and no negative value was found. Data fit to the Hill Equation will be performed with the following values: {}.".format(txv)
+        msg = "The number of coordinate values for data fitting along X axis equals the number of input peaklists, and no negative value was found. Data fit to the Hill Equation will be performed with the following values: {}.".format(fsuv.txv)
         
-        titration_panel.log_r(fsw.gen_wet('NOTE', msg, 7))
+        series.log_r(fsw.gen_wet('NOTE', msg, 7))
         # DONE
     return
 
@@ -541,7 +541,7 @@ def identify_residues(exp):
     
     return
 
-def correct_shifts(exp, resonance_type='Backbone'):
+def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     """
     Corrects chemical shifts for all the peaklists to a reference peak
     in the (0,0,0) Farseer-NMR Cube coordinate.
@@ -569,10 +569,10 @@ def correct_shifts(exp, resonance_type='Backbone'):
                      title=ctitle)
     return
 
-def fill_na_lost(peak_status, merit=0, details='None'):
+def fill_na(peak_status, merit=0, details='None'):
     """
     A dictionary that configures how the fields of the
-    lost residues are fill.
+    added rows for missing residues are fill.
     """
     d = {
     'Peak Status': peak_status,
@@ -635,7 +635,7 @@ def add_lost(exp, reference, target,
     ctitle = 'ADDS LOST RESIDUES BASED ON THE {}'.format(ref)
     
     exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, exp.seq_expand,
-                 args=[reference, target, fill_na_lost(peak_status)],
+                 args=[reference, target, fill_na(peak_status)],
                  kwargs=kwargs,
                  title=ctitle)
     
@@ -675,7 +675,7 @@ def init_fs_cube(exp, fsuv):
 def titration_kwargs(fsuv, rt='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
-    the Titration class object.
+    the Titration class object based on the user defined preferences.
     
     Depends on:
     fsuv.csp_alpha4res
@@ -687,18 +687,18 @@ def titration_kwargs(fsuv, rt='Backbone'):
           'csp_alpha4res':fsuv.csp_alpha4res,
           'csp_res_exceptions':fsuv.csp_res_exceptions,
           'cs_lost':fsuv.cs_lost,
-          'restraint_names':fsuv.restraint_names}
+          'restraint_list':fsuv.restraint_names,
+          'log_export_onthefly':True,
+          'log_export_name':fsuv.logfile_name}
     
     return dd
 
-def gen_titration_dicts(exp, farseer_nmr_cube, fsuv,
-                        titration_class=None,
-                        titration_kwargs={}):
+def gen_titration_dicts(exp, series_class, fsuv, resonance_type='Backbone'):
     """
     Returns a nested dictionary containing a first level key for each
     Farseer-NMR Cube's axis. Each of these keys contains a second
-    nested dictionary enclosing all the experimental series to be
-    analysed along that axis.
+    nested dictionary enclosing all the experimental series along that axis
+    as extracted from the Farseer-NMR Cube.
     
     The first level keys of the experimental series are the "next axis"
     datapoints, and the second level keys are the "previous axis" datapoints.
@@ -720,9 +720,8 @@ def gen_titration_dicts(exp, farseer_nmr_cube, fsuv,
                 Y1
                 Y2
     
-    :farseer_nmr_cube: The Farseer-NMR Cube data structure.
-                       This variable is used because func can receive
-                       'Backbone' or 'Sidechain' Cubes.
+    :series_class: The class that will initiate the series, normally
+                   fslibs/Titration.py
     
     Depends on:
     fsuv.do_cond1
@@ -739,48 +738,31 @@ def gen_titration_dicts(exp, farseer_nmr_cube, fsuv,
         # creates the titrations for the first condition (1D)
         if exp.hasxx and fsuv.do_cond1:
             titrations_dict['cond1'] = \
-                exp.gen_titration_dict(\
-                                    farseer_nmr_cube,
-                                    'cond1', 
-                                    exp.xxcoords,
-                                    exp.yycoords,
-                                    exp.zzcoords,
-                                    titration_class,
-                                    titration_kwargs)
+                exp.export_series_dict_over_axis(\
+                    series_class,
+                    along_axis='x',
+                    resonance_type=resonance_type,
+                    series_kwargs=titration_kwargs(fsuv, rt=resonance_type))
         
         # creates the titrations for the second condition (2D)
         if exp.hasyy and fsuv.do_cond2:
             titrations_dict['cond2'] = \
-                exp.gen_titration_dict(\
-                                    farseer_nmr_cube.transpose(2,0,1,3,4),
-                                    'cond2',
-                                    exp.yycoords,
-                                    exp.zzcoords,
-                                    exp.xxcoords,
-                                    titration_class,
-                                    titration_kwargs)
+                exp.export_series_dict_over_axis(\
+                    series_class,
+                    along_axis='y',
+                    resonance_type=resonance_type,
+                    series_kwargs=titration_kwargs(fsuv, rt=resonance_type))
     
         # creates the titrations for the third condition (3D)  
         if exp.haszz and fsuv.do_cond3:
             titrations_dict['cond3'] = \
-                exp.gen_titration_dict(\
-                                    farseer_nmr_cube.transpose(1,2,0,3,4),
-                                    'cond3',
-                                    exp.zzcoords,
-                                    exp.xxcoords,
-                                    exp.yycoords,
-                                    titration_class,
-                                    titration_kwargs)
-                                    
-        for cond in sorted(titrations_dict.keys()):
-            for dim2_pt in sorted(titrations_dict[cond].keys()):
-                for dim1_pt in sorted(titrations_dict[cond][dim2_pt].keys()):
-                    titrations_dict[cond][dim2_pt][dim1_pt].\
-                        log_export_onthefly = True
-                    titrations_dict[cond][dim2_pt][dim1_pt].\
-                        log_export_name = fsuv.logfile_name
+                exp.export_series_dict_over_axis(\
+                    series_class,
+                    along_axis='z',
+                    resonance_type=resonance_type,
+                    series_kwargs=titration_kwargs(fsuv, rt=resonance_type))
     
-    return titrations_dict, fsuv
+    return titrations_dict
 
 def eval_titrations(titration_dict, fsuv, resonance_type='Backbone'):
     """
@@ -899,7 +881,7 @@ def perform_fits(titration_panel, fsuv):
            and titration_panel.titration_type == 'cond1'):
         return
     
-    checks_fit_input(fsuv)
+    checks_fit_input(titration_panel, fsuv)
     
     for restraint in fsuv.restraint_settings.index[:3]:
         
@@ -1321,16 +1303,9 @@ def run_farseer(fsuv):
     
     # initiates a dictionary that contains all the titration to be evaluated
     # along all the conditions.
-    Farseer_titration_dict, fsuv = \
-        gen_titration_dicts(\
-            exp,
-            exp.peaklists_p5d,
-            fsuv,
-            titration_class=fst.Titration,
-            titration_kwargs=\
-                titration_kwargs(fsuv,
-                                 rt='Backbone',
-                                 cp=fsuv.restraint_names))
+    Farseer_titration_dict = \
+        gen_titration_dicts(exp, fst.Titration, fsuv,
+                            resonance_type='Backbone')
     
     # evaluates the titrations and plots the data
     eval_titrations(Farseer_titration_dict, fsuv)
@@ -1342,10 +1317,7 @@ def run_farseer(fsuv):
                 exp.sidechains_p5d,
                 fsuv,
                 titration_class=fst.Titration,
-                titration_kwargs=\
-                    titration_kwargs(fsuv,
-                                     rt='Sidechains',
-                                     cp=fsuv.restraint_names))
+                titration_kwargs=titration_kwargs(fsuv, rt='Sidechains'))
         
         
         eval_titrations(Farseer_SD_titrations_dict,

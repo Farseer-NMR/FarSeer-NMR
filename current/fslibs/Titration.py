@@ -48,7 +48,9 @@ class Titration(pd.Panel):
                                                           'N15_delta',
                                                           'CSP',
                                                           'Height_ratio',
-                                                          'Vol_ratio']):
+                                                          'Vol_ratio'],
+                                          log_export_onthefly=False,
+                                          log_export_name='FarseerSet_log.md'):
                                                                  
         # I think I created this function because I couldn't initialise all
         # these parameters with the init()
@@ -78,8 +80,8 @@ class Titration(pd.Panel):
         
         # log related variables
         self.log = ''
-        self.log_export_onthefly = False
-        self.log_export_name = 'FarseerSet_log.md'
+        self.log_export_onthefly = log_export_onthefly
+        self.log_export_name = log_export_name
         
         # defines the path to store the calculations
         # if stores the result of a calculation
