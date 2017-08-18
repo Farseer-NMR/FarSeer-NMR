@@ -617,7 +617,7 @@ def expand_lost(exp, titration_set, acoords, bcoords, refcoord, dim='z'):
                 exp.seq_expand(b, a, exp.xxref, 'expanding',
                                titration_set, 
                                titration_set,
-                               fill_na_lost('lost'),
+                               fill_na('lost'),
                                refscoords=refscoords)
     
     

@@ -11,14 +11,12 @@ from current.fslibs import wet as fsw
 #from matplotlib.colors import colorConverter
 #from math import ceil as mceil
 
-class Titration(pd.Panel):
+class FarseerSeries(pd.Panel):
     """
     The titration object inherits a pd.Panel.
     Is a panel where each item is an experiment,
     and the progression along Items is the evolution of the titration.
     """
-    # how to represent lost values
-    calc_parameters_list = 0
     # folder to store titration calculations
     calc_folder = 'Calculations'  
     # folder to store comparisons among calculations
