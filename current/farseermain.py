@@ -23,6 +23,12 @@ def read_user_variables(path):
     # I placed this here as a draft to make it work for now.
     # Simon: for sure with the JSON you will make it work differently :-P
     cwd =  os.path.abspath(path)
+    
+    # changes current directory to the directory where
+    # farseer_user_variables is. In this way, output from calculations is
+    # stored in that same directory
+    os.chdir(cwd)
+    
     spec = \
         importlib.util.spec_from_file_location(\
                             "farseer_user_variables",
@@ -333,12 +339,12 @@ def config_user_variables(fsuv):
     
     return fsuv
 
-def copy_Farseer_version(cwd, file_name='farseer_version',
+def copy_Farseer_version(fsuv, file_name='farseer_version',
                               compress_type='zip'):
     """Makes a copy of the running version."""
     
     script_wd = os.path.dirname(os.path.realpath(__file__))
-    shutil.make_archive('{}/{}'.format(cwd, file_name),
+    shutil.make_archive('{}/{}'.format(fsuv.cwd, file_name),
                         compress_type,
                         script_wd)
     
@@ -419,7 +425,7 @@ def checks_cube_axes_flags(fsuv):
         # DONE
     return
 
-def checks_plotting_flags(fsuv):
+def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     """Checks whether any plotting flag is activated."""
     
     if not(fsuv.plotting_flags):
@@ -489,11 +495,10 @@ def creates_farseer_dataset(fsuv):
     fsuv.logfile_name
     """
     exp = fcube.FarseerCube(fsuv.spectra_path,
-                            fsuv.has_sidechains,
-                            fsuv.FASTAstart)
-    
-    exp.log_export_onthefly = True
-    exp.log_export_name = fsuv.logfile_name
+                            has_sidechains=fsuv.has_sidechains,
+                            FASTAstart=fsuv.FASTAstart,
+                            log_export_onthefly=True,
+                            log_export_name=fsuv.logfile_name)
     
     return exp
 
@@ -812,6 +817,11 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
                 # plots data are exported together with the plots in
                 # fsT.plot_base(), but can be used separatly with
                 # fsT.write_table()
+                
+                checks_plotting_flags(\
+                    series_dct[cond][dim2_pt][dim1_pt],
+                    fsuv, resonance_type)
+                
                 plots_data(series_dct[cond][dim2_pt][dim1_pt],
                            fsuv, resonance_type=resonance_type)
                 
@@ -1018,7 +1028,7 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     # checks if there are any plot flags activated
     # and if not outputs eh respective message.
     
-    checks_plotting_flags(fsuv)
+    
         
     # PLOTS DATA
     for restraint in fsuv.restraint_settings.index:
@@ -1056,10 +1066,10 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                          **fsuv.bar_plot_general_dict,
                          **fsuv.comp_bar_par_dict},
                         par_ylims=\
-                        restraint_settings.loc[restraint,
+                        fsuv.restraint_settings.loc[restraint,
                                                  'plt_y_axis_scl'],
                         ylabel=\
-                        restraint_settings.loc[restraint,
+                        fsuv.restraint_settings.loc[restraint,
                                                  'plt_y_axis_lbl'],
                         hspace=fsuv.tplot_vspace,
                         cols_per_page=fsuv.comp_bar_cols_page,
@@ -1162,73 +1172,92 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
         # DONE ++++
     return
 
-def analyse_comparisons(exp, series_dct, fsuv,
-                        gpp=[],
-                        ppp=[],
-                        ps=[],
+def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
+        """The set of routines that are run for each comparative series."""
+        # EXPORTS FULLY PARSED PEAKLISTS
+        exports_series(comp_panel)
+        
+        # performs pre analysis
+        PRE_analysis(comp_panel, fsuv)
+        
+        # plots data
+        plots_data(comp_panel, fsuv, resonance_type='Backbone')
+        
+        return
+
+def analyse_comparisons(series_dct, fsuv,
                         resonance_type='Backbone'):
     """Algorythm to perform data comparisons over analysed conditions."""
     
-    def run_comparative(comp_panel):
-        # EXPORTS FULLY PARSED PEAKLISTS
-        exports_titration(comp_panel)
+    comp_kwargs = {'log_export_onthefly':True,
+                   'log_export_name':fsuv.logfile_name}
     
-        # EXPORTS CALCULATIONS
-        exports_data_tables(comp_panel, restraint_settings=ps, fsuv=fsuv)
-        
-        # performs pre analysis
-        PRE_analysis(comp_panel, fsuv, gpp[0], *ppp, restraint_settings=ps)
-        
-        # plots data
-        plots_data(comp_panel, fsuv, *gpp, restraint_settings=ps)
-        
-        return
-        
     series_dim_keys = {'cond1':['cond2','cond3'],
-                          'cond2':['cond3','cond1'],
-                          'cond3':['cond1','cond2']}
+                       'cond2':['cond3','cond1'],
+                       'cond3':['cond1','cond2']}
     
-    cp = {} # dictionary stored comparisons over dimensions
+    # stores all the comparison variables.
+    comp_dct = {}
     
+    # creates a Comparison object for each dimension that was evaluated
+    # previously with fsuv.do_cond1, fsuv.do_cond2, fsuv.do_cond3
     for dimension in sorted(series_dct.keys()):
-        # this send, cond1, cond2, cond3 ...
+        # sends, cond1, cond2 and cond3.
+        # DO
+        
+        # creates comparison
         c = fsc.Comparisons(series_dct[dimension].copy(),
                         selfdim=dimension,
                         other_dim_keys=series_dim_keys[dimension],
                         resonance_type=resonance_type)
-        
+                        
+        c.log_export_onthefly = True
+        c.log_export_name = fsuv.logfile_name
+        ###
+                
         # stores comparison in a dictionary
-        cp.setdefault(dimension, c)
+        comp_dct.setdefault(dimension, c)
         
-        c.gen_comparison_labels(fst.Titration)
+        # generates set of PARSED FarseerSeries along the
+        # next and previous dimensions
+        c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
+        c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
         
-        #print(c.allClabels)
-        #input('dimension {}'.format(dimension))
-        
-        if c.haslabels:
-            for dim2_pt in sorted(c.allClabels.keys()):
+        if c.has_points_next_dim:
+            for dp2 in sorted(c.all_next_dim.keys()):
                 
-                for dim1_pt in sorted(c.allClabels[dim2_pt].keys()):
+                for dp1 in sorted(c.all_next_dim[dp2].keys()):
                     
-                    c.allClabels[dim2_pt][dim1_pt].log_t('COMPARING...',
-                                                         istitle=True)
+                    # writes log
+                    c.all_next_dim[dp2][dp1].log_r(\
+                        'COMPARING... [{}][{}] - [{}]'.format(\
+                            dp2, dp1, c.hyper_panel.labels),
+                        istitle=True)
                     
-                    run_comparative(c.allClabels[dim2_pt][dim1_pt])
+                    # performs ploting routines
+                    comparison_analysis_routines(\
+                        c.all_next_dim[dp2][dp1],
+                        fsuv, resonance_type)
                     
-                    c.log += c.allClabels[dim2_pt][dim1_pt].log
+                    #c.log += c.all_next_dim[dim2_pt][dim1_pt].log
         
-        c.gen_comparison_cool(fst.Titration)
-        
-        if c.hascool:
-            for dim2_pt in sorted(c.allCcool.keys()):
+        if c.has_points_prev_dim:
+            for dp2 in sorted(c.all_prev_dim.keys()):
                 
-                for dim1_pt in sorted(c.allCcool[dim2_pt].keys()):
-                    c.allCcool[dim2_pt][dim1_pt].log_r('COMPARING...',
-                                                       istitle=True)
-                    run_comparative(c.allCcool[dim2_pt][dim1_pt])
-                    c.log += c.allCcool[dim2_pt][dim1_pt].log
+                for dp1 in sorted(c.all_prev_dim[dp2].keys()):
+                    
+                    # writes log
+                    c.all_prev_dim[dp2][dp1].log_r(\
+                        'COMPARING... [{}][{}] - [{}]'.format(\
+                            dp2, dp1, c.hyper_panel.cool),
+                        istitle=True)
+                    
+                    comparison_analysis_routines(\
+                        c.all_prev_dim[dp2][dp1],
+                        fsuv, resonance_type)
+                    #c.log += c.allCcool[dim2_pt][dim1_pt].log
         
-    return cp
+    return comp_dct
 
 def run_farseer(fsuv):
     """
@@ -1328,22 +1357,14 @@ def run_farseer(fsuv):
         
         # analyses comparisons.
         comparison_dict = \
-            analyse_comparisons(exp,
-                                farseer_series_dct,
+            analyse_comparisons(farseer_series_dct,
                                 fsuv,
-                                gpp=general_plot_params,
-                                ps=restraint_settings,
-                                ppp=pre_plot_params,
                                 resonance_type='Backbone')
         
         if exp.has_sidechains and fsuv.use_sidechains:
             comparison_dict_SD = \
-                analyse_comparisons(exp,
-                                    Farseer_SD_series_dct,
+                analyse_comparisons(farseer_series_SD_dict,
                                     fsuv,
-                                    gpp=general_plot_params,
-                                    ps=restraint_settings,
-                                    ppp=pre_plot_params,
                                     resonance_type='Sidechains')
     
     
@@ -1356,7 +1377,7 @@ if __name__ == '__main__':
     
     fsuv = read_user_variables(sys.argv[1])
     
-    copy_Farseer_version(fsuv.cwd)
+    copy_Farseer_version(fsuv)
     
     # path evaluations now consider the absolute path, always.
     # in this way the user can run farseer from any folder taking the

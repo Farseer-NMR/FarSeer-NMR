@@ -42,134 +42,162 @@ class Comparisons:
         # resonance typel. Either Backbone or Sidechain.
         self.resonance_type = resonance_type
         
-        # the dictionaries containing the fst.Titrations of the dimensions
+        # the dictionaries containing the fss.FarseerSeries of the dimensions
         # along which to be compared.
-        self.allClabels = {}
-        self.allCcool = {}
+        self.all_next_dim = {}
+        self.all_prev_dim = {}
         
         # initially considers that there are no points to compare with
         # in the labels and cool dimensions
         # becomes true after gen_comparison_*()
-        self.haslabels = False
-        self.hascool = False
+        self.has_points_next_dim = False
+        self.has_points_prev_dim = False
         
-        # registers log
-        self.log = ''
+
+        self.log = ''  # all log goes here
+        self.log_export_onthefly = False
+        self.log_export_name = 'Comparison_log.md'
     
     
-    def log_r(self, logstr):
+    def log_r(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
         
-        :logstring: the string to be registered in the log
+        :logstr: the string to be registered in the log
+        :istitle: flag to format logstr as a title
         """
-        logstr = '{}\n'.format(logstr)
+        if istitle:
+            logstr = """
+{0}  
+{1}  
+{0}  
+""".format('*'*79, logstr)
+        else:
+            logstr += '  \n'
+        
         print(logstr)
         self.log += logstr
+        
+        # appends log to external file on the fly
+        if self.log_export_onthefly:
+            with open(self.log_export_name, 'a') as logfile:
+                logfile.write(logstr)
         return
     
-    def log_t(self, titlestr):
-        """Formats a title for log."""
-        log_title = \
-            '\n\n{0} {1}\n'.format('*'*5, titlestr)
-        print(log_title)
-        self.log += log_title
-        return
-    
-    def write_log(self, mod='a', path='farseer.log'):
-        with open(path, mod) as logfile:
+    def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
+        """ Exports log to external file. """
+        with open(logfile_name, mod) as logfile:
             logfile.write(self.log)
         return
+    
+    def abort(self):
+        self.log_r(fsw.abort_string)
+        fsw.abort()
+        return
         
-    def gen_comparison_labels(self, titration_class):
+    def gen_next_dim(self, series_class, comp_kwargs):
         """
-        Generates dictionary with all the comparisons over the labels.
+        Generates dictionary with the Series parsed along the next dimension
+        of the <self.selfdim>. Series are of class <series_class>, usually
+        fss.FarseerSeries.
         """
         
-        self.log_t(\
+        self.log_r(\
             'GENERATING COMPARISONS FOR **{}** ALONG LABELS: {}'.format(\
-                    self.dimension, list(self.hyper_panel.labels)))
+                    self.dimension, list(self.hyper_panel.labels)),
+            istitle=True)
         
         if len(self.hyper_panel.labels) > 1:
-            for dim2_pt in self.hyper_panel.items:
-                self.allClabels.setdefault(dim2_pt, {})
-                for dim1_pt in self.hyper_panel.cool:
-                    
+            # DO
+            for dp2 in self.hyper_panel.items:
+                self.all_next_dim.setdefault(dp2, {})
+                for dp1 in self.hyper_panel.cool:
+                    # DO
                     comparison = \
-                        titration_class(\
+                        series_class(\
                             np.array(\
-                                self.hyper_panel.loc[dim1_pt,:,dim2_pt,:,:]),
+                                self.hyper_panel.loc[dp1,:,dp2,:,:]),
                             items=self.hyper_panel.labels,
                             minor_axis=self.hyper_panel.minor_axis,
                             major_axis=self.hyper_panel.major_axis)
                     
-                    comparison.create_titration_attributes(\
-                        titration_type='C{}'.format(self.dimension[-1]), 
+                    comparison.create_attributes(\
+                        series_axis='C{}'.format(self.dimension[-1]), 
                         owndim_pts=self.hyper_panel.labels, 
-                        dim1_pts=dim1_pt,
-                        dim2_pts=dim2_pt,
+                        dim1_pts=dp1,
+                        dim2_pts=dp2,
                         dim_comparison=self.other_dim_keys[0],
-                        resonance_type=self.resonance_type)
+                        resonance_type=self.resonance_type,
+                        **comp_kwargs)
                     
-                    self.allClabels[dim2_pt].setdefault(dim1_pt, comparison)
-                    
+                    self.all_next_dim[dp2].setdefault(dp1, comparison)
+                    # DONE
+            
             self.log_r('** Generated comparison dictionary')
             
-            self.haslabels = True
-            
+            self.has_points_next_dim = True
+            # DONE
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare for {}\n'.\
+            self.log_r('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[0]))
                     
         return
     
-    def gen_comparison_cool(self, titration_class):
+    def gen_prev_dim(self, series_class, comp_kwargs):
         """
-        Generates dictionary with all the comparisons over the cools.
+        Generates dictionary with the Series parsed along the previrous
+        dimension of the <self.selfdim>. Series are of class <series_class>, 
+        usually fss.FarseerSeries.
         """
         
-        self.log_t('GENERATING COMPARISONS FOR **{}** ALONG COOLs: {}'.format(\
-                    self.dimension, list(self.hyper_panel.cool)))
+        self.log_r(\
+            'GENERATING COMPARISONS FOR **{}** ALONG COOLs: {}'.format(\
+                    self.dimension, list(self.hyper_panel.cool)),
+            istitle=True)
         
         if len(self.hyper_panel.cool) > 1:
-            for dim2_pt in self.hyper_panel.labels:
-                self.allCcool.setdefault(dim2_pt, {})
-                for dim1_pt in self.hyper_panel.items:
+            for dp2 in self.hyper_panel.labels:
+                self.all_prev_dim.setdefault(dp2, {})
+                for dp1 in self.hyper_panel.items:
                     
                     comparison = \
-                        titration_class(\
+                        series_class(\
                             np.array(\
-                                self.hyper_panel.loc[:,dim2_pt,dim1_pt,:,:]),
+                                self.hyper_panel.loc[:,dp2,dp1,:,:]),
                             items=self.hyper_panel.cool,
                             minor_axis=self.hyper_panel.minor_axis,
                             major_axis=self.hyper_panel.major_axis)
                     
-                    comparison.create_titration_attributes(\
-                        titration_type='C{}'.format(self.dimension[-1]), 
+                    comparison.create_attributes(\
+                        series_axis='C{}'.format(self.dimension[-1]), 
                         owndim_pts=self.hyper_panel.cool, 
-                        dim1_pts=dim1_pt,
-                        dim2_pts=dim2_pt,
+                        dim1_pts=dp1,
+                        dim2_pts=dp2,
                         dim_comparison=self.other_dim_keys[1],
-                        resonance_type=self.resonance_type)
+                        resonance_type=self.resonance_type,
+                        **comp_kwargs)
                     
-                    self.allCcool[dim2_pt].setdefault(dim1_pt, comparison)
+                    self.all_prev_dim[dp2].setdefault(dp1, comparison)
             
             self.log_r('** Generated comparison dictionary')
             
-            self.hascool = True
+            self.has_points_prev_dim = True
             
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare for {}\n'.\
+            self.log_r('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[1]))
                     
         return
     
     def transfer_log(self):
-        if self.haslabels:
-            for dim2_pt in sorted(self.allClabels.keys()):
-                for dim1_pt in sorted(self.allClabels[dim2_pt].keys()):
-                    self.log += self.allClabels[dim2_pt][dim1_pt].log
-        if self.hascool:
-            for dim2_pt in sorted(self.allCcool.keys()):
-                for dim1_pt in sorted(self.allCcool[dim2_pt].keys()):
-                    self.log += self.allCcool[dim2_pt][dim1_pt].log
+        """
+        Transfers logs from the comparison Series to the main class object.
+        """
+        if self.has_points_next_dim:
+            for dim2_pt in sorted(self.all_next_dim.keys()):
+                for dim1_pt in sorted(self.all_next_dim[dim2_pt].keys()):
+                    self.log += self.all_next_dim[dim2_pt][dim1_pt].log
+        if self.has_points_prev_dim:
+            for dim2_pt in sorted(self.all_prev_dim.keys()):
+                for dim1_pt in sorted(self.all_prev_dim[dim2_pt].keys()):
+                    self.log += self.all_prev_dim[dim2_pt][dim1_pt].log

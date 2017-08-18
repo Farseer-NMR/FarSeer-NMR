@@ -20,6 +20,8 @@ class FarseerCube:
     """
     def __init__(self, spectra_path, has_sidechains=False,
                                      applyFASTA=False,
+                                     log_export_onthefly=False,
+                                     log_export_name='FarseerCube_log.md',
                                      FASTAstart=1):
         """
         Initiates the object,
@@ -70,8 +72,8 @@ class FarseerCube:
         self.hasxx = False
         
         self.log = ''  # all log goes here
-        self.log_export_onthefly = False
-        self.log_export_name = 'FarseerSet_log.md'
+        self.log_export_onthefly = log_export_onthefly
+        self.log_export_name = log_export_name
         
         self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
