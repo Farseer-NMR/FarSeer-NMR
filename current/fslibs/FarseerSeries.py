@@ -384,19 +384,30 @@ class FarseerSeries(pd.Panel):
         tag = tagf.readline().strip().strip('#')
         
         try:
-            int(tag)
+            tag_num = int(tag)
         except ValueError:
             msg = "Theoretical PRE file incomplete. Header with tag number is missing."
             self.log_r(fsw.gen_wet('ERROR', msg, 15))
             self.abort()
+        
+        # check tag residue
+        if not(any(self.loc['para',:,'Res#'].isin([tag]))):
+            # DO
+            msg = 'The residue number where the tag is placed according to the \*.pre file ({}) is not part of the protein sequence ({}-{}).'.\
+            format(tag_num,
+                   int(self.res_info.iloc[0,0,0]),
+                   int(self.res_info.iloc[0,:,0].tail(n=1)))
+            self.log_r(fsw.gen_wet('ERROR', msg, 17))
+            self.abort()
+            # DONE check
         
         self.loc['para',:,'tag'] = ''
         tagmask = self.loc['para',:,'Res#'] == tag
         self.loc['para',tagmask,'tag'] = '*'
         tagf.close()
         self.log_r(\
-            '**Tag position found** at residue {}'.format(\
-                int(self.loc['para',tagmask,'Res#'])))
+            '**Tag position found** at residue {}'.format(tag_num))
+        
         return
         
     def calc_Delta_PRE(self, sourcecol, targetcol,
