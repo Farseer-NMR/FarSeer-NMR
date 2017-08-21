@@ -1024,7 +1024,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         # builds kwargs
         series_kwargs['series_axis'] = series_type
-        series_kwargs['owndim_pts'] = owndim_pts
+        series_kwargs['series_dps'] = owndim_pts
         
         # prepares dictionary
         series_dct = {}
@@ -1036,8 +1036,8 @@ FASTA starting residue: {}  """.format(spectra_path,
                 # DO
                 
                 # builds kwargs
-                series_kwargs['dim2_pts'] = dp2
-                series_kwargs['dim1_pts'] = dp1
+                series_kwargs['prev_dim'] = dp2
+                series_kwargs['next_dim'] = dp1
                 
                 # initiates series
                 series_dct[dp2][dp1] = \

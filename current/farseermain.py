@@ -434,7 +434,7 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
             # DO export calculation tables
             if fsuv.restraint_settings.loc[restraint,'calcs_restraint_flg']:
                 farseer_series.write_table(restraint,
-                                            restraint,
+                                           restraint,
                                             resonance_type=resonance_type)
             # DONE
         
@@ -684,7 +684,7 @@ def init_fs_cube(exp, fsuv):
 def series_kwargs(fsuv, rt='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
-    the Titration class object based on the user defined preferences.
+    the FarseerSeries object based on the user defined preferences.
     
     Depends on:
     fsuv.csp_alpha4res
@@ -916,7 +916,7 @@ def PRE_analysis(farseer_series, fsuv):
     # if analysing cond3: performs calculations.
     if farseer_series.series_axis == 'cond3':
         farseer_series.load_theoretical_PRE(fsuv.spectra_path,
-                                             farseer_series.dim2_pts)
+                                             farseer_series.prev_dim)
         
         for sourcecol, targetcol in zip(fsuv.restraint_settings.index[3:],\
                                         ['Hgt_DPRE', 'Vol_DPRE']):
@@ -931,8 +931,8 @@ def PRE_analysis(farseer_series, fsuv):
     # for cond3 and for comparison C3.
     if farseer_series.series_axis == 'cond3' \
             or (farseer_series.series_axis == 'C3' \
-                and (farseer_series.dim2_pts == 'para'\
-                    or farseer_series.dim1_pts == 'para')):
+                and (farseer_series.prev_dim == 'para'\
+                    or farseer_series.next_dim == 'para')):
         
         # do
         for sourcecol, targetcol in \
@@ -962,8 +962,8 @@ def PRE_analysis(farseer_series, fsuv):
     # because DeltaPRE oscilation represents the results obtained only
     # for paramagnetic ('para') data.
     if farseer_series.series_axis == 'C3' \
-        and (farseer_series.dim2_pts == 'para' \
-            or farseer_series.dim1_pts == 'para'):
+        and (farseer_series.prev_dim == 'para' \
+            or farseer_series.next_dim == 'para'):
         
         
         for sourcecol, targetcols in zip(fsuv.restraint_settings.index[3:],
@@ -1195,8 +1195,7 @@ def analyse_comparisons(series_dct, fsuv,
     """Algorythm to perform data comparisons over analysed conditions."""
     
     # kwargs passed to the parsed series of class fss.FarseerSeries
-    comp_kwargs = {'log_export_onthefly':True,
-                   'log_export_name':fsuv.logfile_name}
+    comp_kwargs = series_kwargs(fsuv, rt=resonance_type)
     
     # ORDERED relation between dimension names
     # self: [next, prev]

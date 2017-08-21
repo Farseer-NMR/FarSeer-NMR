@@ -177,8 +177,8 @@ class Comparisons:
                     comparison.create_attributes(\
                         series_axis='C{}'.format(self.dimension[-1]), 
                         owndim_pts=self.hyper_panel.labels, 
-                        dim1_pts=dp1,
-                        dim2_pts=dp2,
+                        next_dim=dp1,
+                        prev_dim=dp2,
                         dim_comparison=self.other_dim_keys[0],
                         resonance_type=self.resonance_type,
                         **comp_kwargs)
@@ -234,8 +234,8 @@ class Comparisons:
                     comparison.create_attributes(\
                         series_axis='C{}'.format(self.dimension[-1]), 
                         owndim_pts=self.hyper_panel.cool, 
-                        dim1_pts=dp1,
-                        dim2_pts=dp2,
+                        next_dim=dp1,
+                        prev_dim=dp2,
                         dim_comparison=self.other_dim_keys[1],
                         resonance_type=self.resonance_type,
                         **comp_kwargs)
