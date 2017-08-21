@@ -54,8 +54,7 @@ class Comparisons:
     def __init__(self,
                  dimension_dict,
                  selfdim='cond',
-                 other_dim_keys=['condy','condz'],
-                 resonance_type='Backbone'):
+                 other_dim_keys=['condy','condz']):
         """
         dimension_dict (dict): is a dictionary containing all the series
             for the main dimension.
@@ -81,9 +80,6 @@ class Comparisons:
         # stores the dimension keys over which the comparisons
         # will be performed
         self.other_dim_keys = other_dim_keys
-        
-        # resonance typel. Either Backbone or Sidechain.
-        self.resonance_type = resonance_type
         
         # the dictionaries containing the fss.FarseerSeries of the dimensions
         # along which to be compared.
@@ -176,11 +172,10 @@ class Comparisons:
                     
                     comparison.create_attributes(\
                         series_axis='C{}'.format(self.dimension[-1]), 
-                        owndim_pts=self.hyper_panel.labels, 
+                        series_dps=self.hyper_panel.labels, 
                         next_dim=dp1,
                         prev_dim=dp2,
                         dim_comparison=self.other_dim_keys[0],
-                        resonance_type=self.resonance_type,
                         **comp_kwargs)
                     
                     self.all_next_dim[dp2].setdefault(dp1, comparison)
@@ -233,11 +228,10 @@ class Comparisons:
                     
                     comparison.create_attributes(\
                         series_axis='C{}'.format(self.dimension[-1]), 
-                        owndim_pts=self.hyper_panel.cool, 
+                        series_dps=self.hyper_panel.cool, 
                         next_dim=dp1,
                         prev_dim=dp2,
                         dim_comparison=self.other_dim_keys[1],
-                        resonance_type=self.resonance_type,
                         **comp_kwargs)
                     
                     self.all_prev_dim[dp2].setdefault(dp1, comparison)

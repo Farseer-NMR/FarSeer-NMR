@@ -78,6 +78,7 @@ class FarseerCube:
         .exports_parsed_pkls()
         .checks_filetype()
         .checks_xy_datapoints_coherency()
+        .check_ref_res()
     """
     def __init__(self, spectra_path, has_sidechains=False,
                                      applyFASTA=False,
@@ -638,6 +639,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         ref_data (pd.DataFrame): the reference peaklist
         ref_res (integer as string): The residue of reference.
         """
+        
+        self.check_ref_res(self.allpeaklists[z][y][x].loc[:,'Res#'], ref_res)
         
         dp_res_mask = self.allpeaklists[z][y][x].loc[:,'Res#'] == ref_res
         dp_F1_cs = self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F1']
@@ -1200,4 +1203,21 @@ FASTA starting residue: {}  """.format(spectra_path,
         # writes confirmation message
         self.log_r('> All <{}> files found and correct- OK!'.format(filetype))
         
+        return
+    
+    def check_ref_res(self, series, ref_res):
+        """
+        Checks if the reference residue is part of the protein sequence.
+        
+        Args:
+            series (pd.Series): the protein primary sequence.
+            
+            ref_res (int): the residue number.
+        """
+        if any(series.isin([ref_res])):
+            return
+        else:
+            msg = 'The reference residue you selected is not part of the protein sequence or is an <unassigned> or <lost> residue. Correct the reference residue in the Settings Menu.'
+            self.log_r(fsw.gen_wet('ERROR', msg, 16))
+            self.abort()
         return

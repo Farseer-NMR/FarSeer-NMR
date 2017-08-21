@@ -1216,8 +1216,7 @@ def analyse_comparisons(series_dct, fsuv,
         # creates comparison
         c = fsc.Comparisons(series_dct[dimension].copy(),
                         selfdim=dimension,
-                        other_dim_keys=series_dim_keys[dimension],
-                        resonance_type=resonance_type)
+                        other_dim_keys=series_dim_keys[dimension])
         
         c.log_export_onthefly = True
         c.log_export_name = fsuv.logfile_name
