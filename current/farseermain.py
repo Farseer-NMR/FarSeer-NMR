@@ -407,6 +407,7 @@ def checks_PRE_analysis_flags(fsuv):
         logs(fsw.gen_wet('WARNING', msg, 1), fsuv.logfile_name)
         fsw.continue_abort()
         #DONE
+    
     return
 
 def checks_cube_axes_flags(fsuv):

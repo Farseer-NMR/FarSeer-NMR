@@ -63,7 +63,7 @@ def end_good():
     
     return s
 
-abort_string = """
+abort_msg = """
 {}
 {}
 {}

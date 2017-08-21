@@ -237,7 +237,7 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def abort(self):
         """Aborts run with message."""
-        self.log_r(fsw.abort_string)
+        self.log_r(fsw.abort_msg)
         fsw.abort()
         return
     

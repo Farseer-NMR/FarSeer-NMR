@@ -134,7 +134,7 @@ class Comparisons:
         return
     
     def abort(self):
-        self.log_r(fsw.abort_string)
+        self.log_r(fsw.abort_msg)
         fsw.abort()
         return
         

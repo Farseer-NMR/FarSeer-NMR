@@ -196,7 +196,7 @@ class FarseerSeries(pd.Panel):
     
     def abort(self):
         """Aborts run with message."""
-        self.log_r(fsw.abort_string)
+        self.log_r(fsw.abort_msg)
         fsw.abort()
         return
     
@@ -361,7 +361,7 @@ class FarseerSeries(pd.Panel):
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
         if len(pre_file) > 1:
-            raise ValueError(   
+            raise ValueError(\
                 '@@@ There are more than one .pre file in the folder {}'.\
                 format(target_folder))
         elif len(pre_file) < 1:
@@ -382,6 +382,14 @@ class FarseerSeries(pd.Panel):
         # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
+        
+        try:
+            int(tag)
+        except ValueError:
+            msg = "Theoretical PRE file incomplete. Header with tag number is missing."
+            self.log_r(fsw.gen_wet('ERROR', msg, 15))
+            self.abort()
+        
         self.loc['para',:,'tag'] = ''
         tagmask = self.loc['para',:,'Res#'] == tag
         self.loc['para',tagmask,'tag'] = '*'
