@@ -47,7 +47,7 @@ def continue_abort():
         return 'Continuing...'
 
 def abort():
-    sys.exit(abort_string)
+    sys.exit()
     return
 
 def end_good():

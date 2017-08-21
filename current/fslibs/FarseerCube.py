@@ -5,35 +5,96 @@ from current.fslibs import wet as fsw
 
 class FarseerCube:
     """
-    FarseerSet contains the information regarding all the acquired
-    experiments. The FarseerSet object contains several nested
-    dictionaries that have the same hierarchy of the spectra/ folder
-    and store the information on the .csv and .fasta files,
-    which are loaded as pd.DataFrames.
+    The Farseer-NMR Data set.
     
-    There are three nested dictionaries:
-        -allpeaklists - stores .csv peaklists regarding backbone peaks
-        -allsidechains - contains .csv peaklists data for sidechains that
-                         was extrated from allpeaklists
-        -allFASTA - stores information on the FASTA sequence referent
-                    to that series of experiments
+    Reads all the experimental input peaklists to a hierarchycal nested
+    dictionary where the hierarchy is dictated by the acquisition schedule
+    of the different measured variables (temperature, ligand ratio, etc...).
+    Peaklists should be stored in a spectra/ folder.
+    
+    Peaklists in dicitonary are read as pd.DataFrames.
+    
+    Formats all the peaklists to the same size.
+    
+    Generates the Farseer-NMR Cube: a 5-dimension Panel containing the
+    whole data set.
+    
+    Args:
+        paths (list): absolute paths of all the input peaklists
+        
+        allpeaklists (dict): nested dictionary created from spectra/. Stores
+            all the peaklists (.csv) in pd.DataFrame format. Only data
+            regarding Backbone atoms.
+        
+        allsidechains (dict): same as allpeaklists but only Sidechains parsed
+            data.
+        
+        allFASTA (dict): nested dictionary containing the FASTA information
+            for each Y data point as a pd.DataFrame.
+        
+        FASTAstart (int): The number of the first residue of the FASTA
+            secuence.
+        
+        has_sidechains (bool): True if input peaklists have Sidechains
+            information.
+        
+        xxcoords, yycoords, zzcoords (list): the Farseer-NMR Cube axes 
+        coordinate names.
+        
+        hasxx, hasyy, haszz (bool): True if there are more than 1 data point
+            along that dimension. False otherwise (default).
+        
+        log (str): stores the whole log.
+        
+        log_export_onthefly (bool): Flag that activates on-the-fly log
+            on an external file.
+        
+        log_export_name (str): the name of the external log file that is
+            written on-the-fly.
+        
+        p5d (pandas.Panel): a 5-dimension pandas.Panel.
+        
+        aal3tol1, aal1tol3 (dict): translate between 3-letter and 1-letter
+            aminoacid codes.
+        
+        tmp_vars (dict): stored temporary variables useful for functions.
+        
+    Methods:
+        .log_r()
+        .exports_log()
+        .abort()
+        .load_experiments()
+        .read_FASTA()
+        .init_coords_names()
+        .tricicle()
+        .split_res_info()
+        .correct_shifts_backbone()
+        .correct_shifts_sidechains()
+        .seq_expand()
+        .organize_cols()
+        .init_Farseer_cube()
+        .export_series_dict_over_axis()
+        .gen_series()
+        .exports_parsed_pkls()
+        .checks_filetype()
+        .checks_xy_datapoints_coherency()
     """
     def __init__(self, spectra_path, has_sidechains=False,
                                      applyFASTA=False,
-                                     log_export_onthefly=False,
-                                     log_export_name='FarseerCube_log.md',
                                      FASTAstart=1):
         """
         Initiates the object,
         
-        :spectra_path: the path where the spectra (.csv files) are located.
-                       spectra/ folder has to have the logical hierarchy
-                       of the experimental series
-        :has_sidechains: bool whether the .csv contain information on
-                         sidechains residues
-        :applyFASTA: bool whether to complete the sequence according to
-                     a FASTA file
-        :FASTAstart: the number of the first residue in the FASTA file
+        spectra_path (str): the path where the spectra (.csv files)
+            are located.
+        
+        has_sidechains (bool): True if the peaklists contain information 
+            on Sidechains residues. False otherwise (default).
+        
+        applyFASTA (bool): True to complete sequence with FASTA information.
+            Defaults to False.
+        
+        FASTAstart (int): The first residue in the FASTA file.
         """
         
         # Decomposing the spectra/ path
@@ -50,7 +111,6 @@ class FarseerCube:
         self.allFASTA = {}
         
         # Initiates helper variables
-        self.trikeys = []
         self.tmp_vars = {}
         
         # loads information into the object
@@ -72,8 +132,8 @@ class FarseerCube:
         self.hasxx = False
         
         self.log = ''  # all log goes here
-        self.log_export_onthefly = log_export_onthefly
-        self.log_export_name = log_export_name
+        self.log_export_onthefly = False
+        self.log_export_name = 'FarseerNMR_Cube_log.md'
         
         self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
@@ -140,11 +200,12 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def log_r(self, logstr, istitle=False):
         """
-        Registers the log and prints to the user.
+        Registers the log string and prints it.
         
-        :logstr: the string to be registered in the log
-        :istitle: flag to format logstr as a title
+        logstr (str): the string to be registered in the log.
+        istitle (bool): flag to format logstr as a title.
         """
+        # formats logstr
         if istitle:
             logstr = """
 {0}  
@@ -154,6 +215,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         else:
             logstr += '  \n'
         
+        # prints and registers
         print(logstr)
         self.log += logstr
         
@@ -164,12 +226,17 @@ FASTA starting residue: {}  """.format(spectra_path,
         return
     
     def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
-        """ Exports log to external file. """
+        """Exports log to external file.
+        
+        mod (str): python.open() arg mode.
+        logfile_name (str): the external log file name.
+        """
         with open(logfile_name, mod) as logfile:
             logfile.write(self.log)
         return
     
     def abort(self):
+        """Aborts run with message."""
         self.log_r(fsw.abort_string)
         fsw.abort()
         return
@@ -179,13 +246,22 @@ FASTA starting residue: {}  """.format(spectra_path,
                          filetype='.csv',
                          f=pd.read_csv):
         """
-        Loads the <filetype> files in self.paths folder into nested
-        dictionaries as pd.DataFrames.
+        Loads the <filetype> files in self.paths into nested dictionaries as 
+        pd.DataFrames.
         
         It is necessary that the names of the data points for
-        one dimension (condition) are the same in the other dimensions.
+        one dimension (condition) are the same in every dimension.
         
-        Example of a mandatory file hierarchy:
+        Args:
+            target (dict): a dictionary where files converted to 
+                pd.DataFrames will be stored.
+            
+            filetype (str): the file extension.
+            
+            f (function): the function that reads the files.
+        
+        
+        Example of a mandatory hierarchy folder:
         
         :3rd dimension: para/ and dia/ 
         :2nd dimension: 278/, 285/ and 298/
@@ -249,29 +325,32 @@ FASTA starting residue: {}  """.format(spectra_path,
             if parts[-1].lower().endswith(filetype):
                 self.log_r('* {}'.format(p))
                 lessparts = parts[-1].split('.')[0]
-                branch[lessparts] = branch.get(parts[-1], f(p))
+                try:
+                    branch[lessparts] = branch.get(parts[-1], f(p))
+                except pd.errors.EmptyDataError:
+                    msg = "The file {} is empty. To introduce an empty data point, add the header.".format(filetype)
+                    self.log_r(fsw.gen_wet('ERROR', msg, 14))
+                    self.abort()
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
         return
     
-    
     def read_FASTA(self, FASTApath):
         """
-         str -> pd.DataFrame
+        Reads a FASTA file to a pd.DataFrame.
+        
+        Args:
+            FASTApath (str): the FASTA file path.
 
-        :param FASTApath: the FASTA file path
-        :param start: the residue number of the first residue in the
-                      FASTA file
-        :return: pd.DataFrame containing the information in
-                 the FASTA file
-
-        PROCEDURE:
+        Procedure:
 
         Reads the FASTA file and generates a 5 column DataFrame
         with the information ready to be incorporated in the peaklists
         dataframes.
-
+        
+        Returns:
+            pd.DataFrame
         """
         # Opens the FASTA file, which is a string of capital letters
         # 1-letter residue code that can be split in several lines.
@@ -316,13 +395,18 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         return df
     
-    
     def init_coords_names(self):
         """
         Identifies coordinate names (conditions measured) for the
         Farseer-NMR Cube.
         
-        returns: output log string.
+        Modify:
+            self.xxcoords
+            self.yycoords
+            self.zzcoords
+            self.xxref (str): the name of the first data point along axis.
+            self.yyref (str): idem
+            self.zzref (str): idem
         """
         
         self.log_r('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
@@ -394,8 +478,10 @@ FASTA starting residue: {}  """.format(spectra_path,
 
     def split_res_info(self, z, y ,x, tmp_vars):
         """
-        Receives a DataFrame with the original information
-        of the peaklist and adds four columns to this DataFrame:
+        Splits assignment information.
+        
+        Receives a DataFrame with the original assignment information
+        (AssignF1) and adds four columns to the DataFrame:
 
         ['Res#', '1-letter', '3-letter', 'Peak Status']
 
@@ -408,7 +494,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         - 'Peak Status', assigns string 'measured' to identify the
           peaks present in this peaklist as experimentally measured.
 
-        PROCEDURE:
+        Procedure:
 
         1. Extracts residue information from 'Assigned F1' column,
         separating the residue name from the residue number. This creates
@@ -420,8 +506,10 @@ FASTA starting residue: {}  """.format(spectra_path,
         In the same pd.DataFrame. 
         
         3. Concatenates the new generated pd.DataFrame with the input
-        peaklist pd.Dataframe. And adds columns 'Peak Status' with value
+        peaklist pd.Dataframe. And adds column 'Peak Status' with value
         'measured'.
+        
+            3.1 if peaklist is empty adds all dummy rows of type <lost>.
         
         4. Sorts the peaklist according to 'Res#' just in case the original
         .CSV file was not sorted. For correct sorting 'Res#' as to be set
@@ -429,27 +517,20 @@ FASTA starting residue: {}  """.format(spectra_path,
 
         (conditional). If sidechains are present in the peaklist:
         identifies the sidechains entries (rows) and counts the number of
-        sidechain entries. Adds the letter 'a' or 'b' to the columns
-        '1-letter' and '3-letter' to identify the two sidechains resonances.
+        sidechain entries. Adds the letter 'a' or 'b' to new column
+        'ATOM' to identify the two sidechains resonances.
         """
-        
-        
-        # Step 1)
-        # extracts residue information from "Assign F1" column.
+        # Step 1
         resInfo = self.allpeaklists[z][y][x].\
             loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
         
         resInfo.columns = ['Res#', '3-letter']
 
-        # Step 2)
-        # generates 1-letter code column
+        # Step 2
         resInfo.loc[:,'1-letter'] = \
             resInfo.loc[:,"3-letter"].map(self.aal3tol1.get)
         
-        # Step 3)
-        # concatenates the original peaklist DataFrame and the new
-        # generated dataframe contained the information
-        # ['Res#', '1-letter', '3-letter']
+        # Step 3
         self.allpeaklists[z][y][x] = \
             pd.concat([self.allpeaklists[z][y][x], resInfo], axis=1)
         
@@ -462,7 +543,9 @@ FASTA starting residue: {}  """.format(spectra_path,
         try:
             self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
         except ValueError:
-            self.allpeaklists[z][y][x] = self.allpeaklists[z][y][self.xxref].copy()
+            # if the peaklist is an empty file containing only the header.
+            self.allpeaklists[z][y][x] = \
+                self.allpeaklists[z][y][self.xxref].copy()
             self.allpeaklists[z][y][x].loc[:,['Peak Status',
                                               'Merit',
                                               'Position F1',
@@ -472,12 +555,8 @@ FASTA starting residue: {}  """.format(spectra_path,
                                               'Line Width F1 (Hz)',
                                               'Line Width F2 (Hz)']] =\
                 ['lost',np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]
-            #print(self.allpeaklists[z][y][x])
-            #input('')
         
-        # Step 6)
-        # sorts the peaklist.
-        # just in case the original .csv file was created unsorted.
+        # Step 4
         self.allpeaklists[z][y][x].loc[:,'Res#'] = \
         self.allpeaklists[z][y][x]['Res#'].astype(int)
         
@@ -551,11 +630,13 @@ FASTA starting residue: {}  """.format(spectra_path,
     def correct_shifts_backbone(self, z, y, x, ref_data,
                        ref_res='1'):
         """
-        Corrects Chemical Shifts in a peaklist DataFrame according
-        to an internal reference peak which is chosen by user. This
-        function operates only in the first dimension (xx).
+        Corrects Chemical Shifts in a peaklist according to an internal 
+        reference peak.
         
-        :ref_res: string with the number of the reference residue
+        This function operates only along the X axis and for Backbone entries.
+        
+        ref_data (pd.DataFrame): the reference peaklist
+        ref_res (integer as string): The residue of reference.
         """
         
         dp_res_mask = self.allpeaklists[z][y][x].loc[:,'Res#'] == ref_res
@@ -612,9 +693,14 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def correct_shifts_sidechains(self):
         """
-        Corrects the chemical shifts of the sidechains residues
-        based on the correction values previously obtained for the
-        backbone residues.
+        Corrects Chemical Shifts in a peaklist according to an internal 
+        reference peak.
+        
+        This function operates only along the X axis and for Sidechains
+        entries.
+        
+        ref_data (pd.DataFrame): the reference peaklist
+        ref_res (integer as string): The residue of reference.
         """
         self.allsidechains[z][y][x].loc[:,'Position F1'] = \
             self.allsidechains[z][y][x].loc[:,'Position F1'].sub(\
@@ -634,15 +720,32 @@ FASTA starting residue: {}  """.format(spectra_path,
                          refscoords=None,
                          resonance_type='Backbone'):
         """
-        Expands the 'Res#' columns of a target peaklist (seq)
-        according to a reference peaklist (seq).
-        Usually, the reference peaklist is the reference experiment.
+        Expands a <target> peaklist to the number of rows of a reference
+        peaklist.
         
-        This function is used to identify the lost residues. That is, residues
-        that are in the reference peaklists but not in the target peaklist.
+        Expands based on the 'Res#' column. Usually, the reference peaklist 
+        is the reference experiment for each combination of [Y][Z].
         
-        It can also be used to expand the target peaklist to the complete
-        FASTA sequence to identify the unassigned residues.
+        This function is used to identify the <lost> or <unassigned> 
+        esidues. That is, residues that are in the reference peaklists but 
+        not in the target peaklist.
+        
+        Args:
+            ref_seq_dict (dict): nested dictionary containing the reference
+                peaklists.
+            
+            target_seq_dict (dict): nested dictionary containing the target
+                peaklists.
+            
+            fillna_dict (dict): a dictionary of kwargs that define the column
+                values of the newly generated rows.
+            
+            refscoords (dict): contains reference coordinates for each axis.
+            
+            resonance_type (str): either 'Backbone' or 'Sidechains'.
+        
+        Modify:
+            The values in self.allpeaklists or self.allsidechains.
         """
         # expanding to other dimensions
         if tmp_vars == 'expanding':
@@ -656,7 +759,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         # reads the reference key
         ref_key = sorted(ref_seq_dict[refcz][refcy].keys())[0]
         
-        if resonance_type=='Sidechain':
+        if resonance_type=='Sidechains':
             
             ref_seq_dict[z][y][ref_key].loc[:,'Res#'] = \
                 ref_seq_dict[z][y][ref_key].loc[:,['Res#', 'ATOM']].\
@@ -666,8 +769,6 @@ FASTA starting residue: {}  """.format(spectra_path,
             target_seq_dict[z][y][x].loc[:,'Res#'] = \
                 target_seq_dict[z][y][x].loc[:,['Res#', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1)
-        
-        
         
         # reads new index from the Res# column of the reference peaklist
         ind = ref_seq_dict[refcz][refcy][ref_key].loc[:,'Res#']
@@ -699,7 +800,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         target_seq_dict[z][y][x].loc[:,'Assign F1'] = \
             ref_seq_dict[refcz][refcy][ref_key].loc[:,'Assign F1']
         
-        if resonance_type=='Sidechain':
+        if resonance_type=='Sidechains':
             
             target_seq_dict[z][y][x].loc[:,'ATOM'] = \
                 ref_seq_dict[refcz][refcy][ref_key].loc[:,'ATOM']
@@ -729,12 +830,14 @@ FASTA starting residue: {}  """.format(spectra_path,
                          performed_cs_correction=False,
                          sidechains=False):
         """
-        pd.DataFrame -> pd.DataFrame(ordered columns):
-
-        Receives a pd.dataframe and
-        organizes the columns for better visualization.
-
-        Returns the organized dataframe.
+        Orders columns in DataFrames for better visualization.
+        
+        peaklist (pd.DataFrame): the peaklist to be ordered
+        
+        performed_cs_correction (bool): if chemical shift correction was 
+        previously performed ordered columns differ.
+        
+        sidechains (bool): True if organizing sidechains peaklists.
         """
         
         if performed_cs_correction and not(sidechains):
@@ -838,13 +941,15 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def init_Farseer_cube(self, use_sidechains=False):
         """
-        Creates a pd.Panel5D with the information of all
-        the parsed peaklists from this panel, the information will
-        be accessed and used to create the FarseerSeries objects,
-        upon each the calculations will be performed.
+        Initiates the 5D Farseer-NMR Cube.
+        
+        Uses self.p5d to create a 5D matrix with the information of all the 
+        peaklists in the experimental dataset. The Cube will be accessed and 
+        used later to create the FarseerSeries objects, upon each the Farseer 
+        Analysis routines will be performed.
         
         If there are sidechains, creates a Panel5D for the sidechains, which
-        are treated separately from the backbone atoms.
+        are treated separately from the backbone residues.
         """
         
         self.log_r('INITIATING FARSEER CUBE', istitle=True)
@@ -863,13 +968,27 @@ FASTA starting residue: {}  """.format(spectra_path,
                                            resonance_type='Backbone',
                                            series_kwargs={}):
         """
-        Exports a dictionary containing all the series of experiments
-        along a specific axis of the Farseer-NMR Cube.
+        Creates a nested dictionary containing all the experimental series
+        along a given Farseer-NMR Cube axis.
         
         The series of experiments are initiated as <series_class> object.
         <series_class> object has to be coordinated with this function.
         
-        :sc_kwargs: kwargs to be passed to the series_class.
+        Example:
+        
+            If along_axis='x', the nested dictionary will contain first level
+            keys zzcoods and second level keys yycoords, and values 
+            FarseerSeries.
+        
+        along_axis (str): {'x', 'y', 'z'} the axis along which series will be
+            generated.
+        
+        series_class (class): Farseer Series class
+        
+        series_kwargs (dict): kwargs to be passed to the series_class.__init__.
+        
+        Returns:
+            The nested dictionary of Farseer Series objects.
         """
         
         if resonance_type == 'Backbone':
@@ -936,7 +1055,14 @@ FASTA starting residue: {}  """.format(spectra_path,
         return series_dct
     
     def gen_series(self, series_panel, series_class, sc_kwargs):
-        """Creates a Series object of class <series_class>."""
+        """
+        Creates a Series object of class <series_class>.
+        
+        Argument initiation has to be synchronized with the class needs.
+        
+        Returns:
+            The series_class object.
+        """
         
         series_panel = \
             series_class(np.array(series_panel),
@@ -950,9 +1076,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         return series_panel
     
     def exports_parsed_pkls(self, z, y, x, args):
-        """
-        Exports the parsed peaklists.
-        """
+        """Exports the parsed peaklists."""
+        
         folder = 'spectra_parsed/{}/{}'.format(z,y)
         if not(os.path.exists(folder)):
             os.makedirs(folder)
@@ -987,8 +1112,7 @@ FASTA starting residue: {}  """.format(spectra_path,
     
     def checks_filetype(self, filetype):
         """
-        Confirms that file type exists in spectra/ before
-        attempting to load it.
+        Confirms that file type exists in spectra/ before loading.
         
         If not, call WET#9.
         

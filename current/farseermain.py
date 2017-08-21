@@ -499,9 +499,10 @@ def creates_farseer_dataset(fsuv):
     """
     exp = fcube.FarseerCube(fsuv.spectra_path,
                             has_sidechains=fsuv.has_sidechains,
-                            FASTAstart=fsuv.FASTAstart,
-                            log_export_onthefly=True,
-                            log_export_name=fsuv.logfile_name)
+                            FASTAstart=fsuv.FASTAstart)
+    
+    exp.log_export_onthefly=True
+    exp.log_export_name=fsuv.logfile_name
     
     return exp
 
