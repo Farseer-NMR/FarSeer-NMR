@@ -429,20 +429,23 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     """Checks whether any plotting flag is activated."""
     
     if not(fsuv.plotting_flags):
-        # DO ++++ export calculation tables
+        # DO ++++
         for restraint in fsuv.restraint_settings.index:
-        # if the user calculated this restraint
+            # DO export calculation tables
             if fsuv.restraint_settings.loc[restraint,'calcs_restraint_flg']:
                 farseer_series.write_table(restraint,
                                             restraint,
                                             resonance_type=resonance_type)
+            # DONE
         
         msg = "All potting flags are turned off. No plots will be drawn. Confirm in the Settings menu if this is the desired configuration. I won't leave you with empty hands though, all calculated restraints have been exported in nicely formated tables ;-)"
         
         farseer_series.log_r(fsw.gen_wet('NOTE', msg, 3))
+        
+        return False
         # DONE ++++
     
-    return
+    return True
 
 def checks_calculation_flags(fsuv):
     """Checks if the user wants to calculate any restraints."""
@@ -818,9 +821,7 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
                 # fsT.plot_base(), but can be used separatly with
                 # fsT.write_table()
                 
-                checks_plotting_flags(\
-                    series_dct[cond][dim2_pt][dim1_pt],
-                    fsuv, resonance_type)
+                
                 
                 plots_data(series_dct[cond][dim2_pt][dim1_pt],
                            fsuv, resonance_type=resonance_type)
@@ -1025,11 +1026,12 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     fsuv.cs_scatter_par_dict
     fsuv.cs_scatter_flower_dict
     """
-    # checks if there are any plot flags activated
-    # and if not outputs eh respective message.
     
+    are_plots = checks_plotting_flags(farseer_series, fsuv, resonance_type)
     
-        
+    if not(are_plots):
+        return
+    
     # PLOTS DATA
     for restraint in fsuv.restraint_settings.index:
         # if the user has calculated this restraint
@@ -1179,6 +1181,8 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
         
         # performs pre analysis
         PRE_analysis(comp_panel, fsuv)
+        
+        exports_chimera_att_files(comp_panel, fsuv)
         
         # plots data
         plots_data(comp_panel, fsuv, resonance_type='Backbone')
