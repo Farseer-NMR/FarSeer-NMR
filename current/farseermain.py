@@ -705,7 +705,8 @@ def fill_na(peak_status, merit=0, details='None'):
     }
     return d
 
-def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
+#def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
+def expand_lost(exp, resonance_type='Backbone', dim='z'):
     """
     Checks for 'lost' residues accross the reference experiments and
     along other axes (y or z).
@@ -726,36 +727,39 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
         fsuv (module): contains all the user defined variables.
     """
     
-    if dim == 'y':
-        exp.log_r(\
-        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
-        istitle = True)
-        # expands to yy (cond2) condition
-        for a in acoords:
-            #do
-            for b in bcoords:
-                #do
-                refscoords = {'z': a, 'y': refcoord}
-                exp.finds_missing(a, b, exp.xxref, 'expanding',
-                               dataset_dct, 
-                               dataset_dct,
-                               fill_na_lost('lost'),
-                               refscoords=refscoords)
-    if dim == 'z':
-        exp.log_r(\
-        'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
-        istitle = True)
-        # expands to yy (cond2) condition
-        for a in acoords:
-            #do
-            for b in bcoords:
-                #do
-                refscoords = {'z': refcoord, 'y': a}
-                exp.finds_missing(b, a, exp.xxref, 'expanding',
-                               dataset_dct, 
-                               dataset_dct,
-                               fill_na('lost'),
-                               refscoords=refscoords)
+    exp.compares_references(fill_na('lost'), along_axis=dim,
+                            resonance_type=resonance_type)
+    
+    #if dim == 'y':
+        #exp.log_r(\
+        #'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
+        #istitle = True)
+        ## expands to yy (cond2) condition
+        #for a in acoords:
+            ##do
+            #for b in bcoords:
+                ##do
+                #refscoords = {'z': a, 'y': refcoord}
+                #exp.finds_missing(a, b, exp.xxref, 'expanding',
+                               #dataset_dct, 
+                               #dataset_dct,
+                               #fill_na_lost('lost'),
+                               #refscoords=refscoords)
+    #if dim == 'z':
+        #exp.log_r(\
+        #'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
+        #istitle = True)
+        ## expands to yy (cond2) condition
+        #for a in acoords:
+            ##do
+            #for b in bcoords:
+                ##do
+                #refscoords = {'z': refcoord, 'y': a}
+                #exp.finds_missing(b, a, exp.xxref, 'expanding',
+                               #dataset_dct, 
+                               #dataset_dct,
+                               #fill_na('lost'),
+                               #refscoords=refscoords)
     
     return
 
@@ -1544,20 +1548,16 @@ def run_farseer(fsuv):
     
     # expands lost residues to other dimensions
     if fsuv.expand_lost_yy:
-        expand_lost(exp, exp.allpeaklists, exp.zzcoords, exp.yycoords,
-                    exp.yyref, dim='y')
+        expand_lost(exp, dim='y')
         
         if exp.has_sidechains and fsuv.use_sidechains:
-            expand_lost(exp, exp.allsidechains, exp.zzcoords, exp.yycoords,
-                        exp.yyref, dim='y')
+            expand_lost(exp, dim='y', resonance_type='Sidechains')
     
     if fsuv.expand_lost_zz:
-        expand_lost(exp, exp.allpeaklists, exp.yycoords, exp.zzcoords,
-                    exp.zzref, dim='z')
+        expand_lost(exp, dim='z')
         
         if exp.has_sidechains and fsuv.use_sidechains:
-            expand_lost(exp, exp.allsidechains, exp.yycoords, exp.zzcoords,
-                        exp.zzref, dim='z')
+            expand_lost(exp, dim='z', resonance_type='Sidechains')
     
     ## identifies lost residues
     add_missing(exp, peak_status='lost')

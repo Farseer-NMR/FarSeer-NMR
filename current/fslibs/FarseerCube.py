@@ -775,6 +775,158 @@ residues.'.format(z, y, x)
         
         return
     
+    def seq_expand(self, ref_pkl, target_pkl, resonance_type, fillna, x, y, z):
+        """
+        Expands a <target> peaklist to the size of the <reference>.
+        Adds rows of missing residues.
+        
+        Args:
+            ref_pkl (pd.DataFrame): the reference peaklist
+            
+            target_pkl (pd.DataFrame): the target peaklist
+            
+            resonance_type (str):
+            
+            fillna (dict): a dictionary of kwargs that define the column
+                values of the newly generated rows. Example:
+                    {'Peak Status': <missing>,
+                     'Merit': 0.0,
+                     'Details': 'None'}
+            
+            x,y,z (str): keys of experiments' nested dictionary 
+                (self.allpeaklists or self.allsidechains)
+        
+        Returns:
+            The expanded pd.DataFrame
+            A list with information on the peaklist length evolution
+                [target initial length, ref length, target final length]
+        """
+        # merges Res# and ATOM cols to keep sorted
+        if resonance_type=='Sidechains':
+            # DO merge res and atom
+            ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,['Res#', 'ATOM']].\
+                apply(lambda x: ''.join(x), axis=1)
+        
+            target_pkl.loc[:,'Res#'] = \
+                target_pkl.loc[:,['Res#', 'ATOM']].\
+                    apply(lambda x: ''.join(x), axis=1)
+            # DONE
+        
+        # creates an index based on the residue numbers of the reference
+        # peaklist
+        ind = ref_pkl.loc[:,'Res#']
+        
+        # reads size of reference index
+        length_ind = ind.size 
+        
+        # reads size of target peaklist
+        target_ind_init_len = target_pkl.shape[0]
+        
+        # expands the target peaklist to the new index
+        target_pkl = \
+            target_pkl.set_index('Res#').\
+                             reindex(ind).\
+                             reset_index().\
+                             fillna(fillna)
+        
+        # reads length of the expanded peaklist
+        target_ind_final_len = target_pkl.shape[0]
+        
+        
+        # transfers information of the different columns
+        # from the reference to the expanded peaklist
+        target_pkl.loc[:,'3-letter'] = ref_pkl.loc[:,'3-letter']
+        target_pkl.loc[:,'1-letter'] = ref_pkl.loc[:,'1-letter']
+        target_pkl.loc[:,'Assign F1'] = ref_pkl.loc[:,'Assign F1']
+        target_pkl.loc[:,'Assign F2'] = ref_pkl.loc[:,'Assign F2']
+        
+        # reverts previous merge
+        if resonance_type=='Sidechains':
+            target_pkl.loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
+            target_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+            ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+        
+        return target_pkl, [target_ind_init_len, length_ind, 
+                            target_ind_final_len]
+    
+    def compares_references(self, fillna_dict, along_axis='z',
+                                               resonance_type='Backbone'):
+        """
+        Compares reference experiments along Y and Z axis and adds missing
+        residues considering [xxref][yyref][zzref] as the main reference.
+        
+        Args:
+            fillna_dict (dict): a dictionary of kwargs that define the column
+                values of the newly generated rows. Example:
+                    {'Peak Status': <missing>,
+                     'Merit': 0.0,
+                     'Details': 'None'}
+            
+            along_axis (str): {'y', 'z'}, defaults 'z'.
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}, defaults 
+                'Backbone'.
+        """
+        title = 'adds lost residues along axis {}'.format(along_axis)
+        self.log_r(title, istitle=True)
+        
+        if resonance_type == 'Backbone':
+            target = self.allpeaklists
+        elif resonance_type == 'Sidechains':
+            target = self.allsidechains
+        else:
+            msg = 'Argument <resonance_type> is not valid.'
+            self.log_r(msg)
+            return
+        
+        if not(along_axis in ['y', 'z']):
+            msg = 'Argument <along_axis> is not valid.'
+            self.log_r(msg)
+            return
+        elif along_axis == 'z':
+            for y, z in it.product(self.yycoords, self.zzcoords):
+                # DO
+                if z == self.zzref:
+                    ref_pkl = target[z][y][self.xxref]
+                    refz = z
+                    refy = y
+        
+                target[z][y][self.xxref], popi = \
+                    self.seq_expand(ref_pkl, target[z][y][self.xxref],
+                        resonance_type, fillna_dict, self.xxref, y, z)
+            
+                logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+| Target Initial Length :: {} \
+| Template Length :: {} \
+| Target final length :: {}".format(z, y , self.xxref,
+                                    refz, refy, self.xxref,
+                                    popi[0], popi[1], popi[2])
+                self.log_r(logs)
+                # DONE
+        
+        elif along_axis == 'y':
+            for z, y in it.product(self.zzcoords, self.yycoords):
+                # DO Y
+                if y == self.yyref:
+                    ref_pkl = target[z][y][self.xxref]
+                    refz = z
+                    refy = y
+        
+                target[z][y][self.xxref], popi = \
+                    self.seq_expand(ref_pkl, target[z][y][self.xxref],
+                        resonance_type, fillna_dict, self.xxref, y, z)
+                
+                logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+| Target Initial Length :: {} \
+| Template Length :: {} \
+| Target final length :: {}".format(z, y, self.xxref,
+                                    refz, refy, self.xxref,
+                                    popi[0], popi[1], popi[2])
+                self.log_r(logs)
+                # DONE Y
+        
+        return
+    
     def finds_missing(self, fillna_dict, 
                          missing='lost',
                          resonance_type='Backbone'):
@@ -825,68 +977,85 @@ residues.'.format(z, y, x)
                                   self.yycoords,
                                   self.xxcoords):
             # DO
-            
             # sets the reference peaklist
             if x == self.xxref and missing == 'lost':
                 ref_pkl = target[z][y][x]
+                refz = z
+                refy = y
+                refx = x
             elif x == self.xxref and missing == 'unassigned':
                 ref_fasta_key = list(self.allfasta[z][y].keys())[0]
                 ref_pkl = self.allfasta[z][y][ref_fasta_key]
+                refz = z
+                refy = y
+                refx = ref_fasta_key
             
-            # merges Res# and ATOM cols to keep sorted
-            if resonance_type=='Sidechains':
-                # DO merge res and atom
-                ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,['Res#', 'ATOM']].\
-                    apply(lambda x: ''.join(x), axis=1)
-            
-                target[z][y][x].loc[:,'Res#'] = \
-                    target[z][y][x].loc[:,['Res#', 'ATOM']].\
-                        apply(lambda x: ''.join(x), axis=1)
-                # DONE
-            
-            # creates an index based on the residue numbers of the reference
-            # peaklist
-            ind = ref_pkl.loc[:,'Res#']
-            
-            # reads size of reference index
-            length_ind = ind.size 
-            
-            # reads size of target peaklist
-            target_ind_init_len = target[z][y][x].shape[0]
-            
-            # expands the target peaklist to the new index
-            target[z][y][x] = \
-                target[z][y][x].set_index('Res#').\
-                                 reindex(ind).\
-                                 reset_index().\
-                                 fillna(fillna_dict)
-            
-            # reads length of the expanded peaklist
-            target_ind_final_len = target[z][y][x].shape[0]
-            
-            
-            # transfers information of the different columns
-            # from the reference to the expanded peaklist
-            target[z][y][x].loc[:,'3-letter'] = ref_pkl.loc[:,'3-letter']
-            target[z][y][x].loc[:,'1-letter'] = ref_pkl.loc[:,'1-letter']
-            target[z][y][x].loc[:,'Assign F1'] = ref_pkl.loc[:,'Assign F1']
-            target[z][y][x].loc[:,'Assign F2'] = ref_pkl.loc[:,'Assign F2']
-            
-            # reverts previous merge
-            if resonance_type=='Sidechains':
-                target[z][y][x].loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-                target[z][y][x].loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
-                ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+            target[z][y][x], popi = \
+                self.seq_expand(ref_pkl, target[z][y][x],
+                                resonance_type, fillna_dict, x, y, z)
             
             logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
-| Target final length :: {}".format(z,y,x,
-                                    z, y, self.xxref,
-                                    target_ind_init_len,
-                                    length_ind,
-                                    target_ind_final_len)
+| Target final length :: {}".format(z, y, x,
+                                    refz, refy, refx,
+                                    popi[0], popi[1], popi[2])
             self.log_r(logs)
+            
+            ## merges Res# and ATOM cols to keep sorted
+            #if resonance_type=='Sidechains':
+                ## DO merge res and atom
+                #ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,['Res#', 'ATOM']].\
+                    #apply(lambda x: ''.join(x), axis=1)
+            
+                #target[z][y][x].loc[:,'Res#'] = \
+                    #target[z][y][x].loc[:,['Res#', 'ATOM']].\
+                        #apply(lambda x: ''.join(x), axis=1)
+                ## DONE
+            
+            ## creates an index based on the residue numbers of the reference
+            ## peaklist
+            #ind = ref_pkl.loc[:,'Res#']
+            
+            ## reads size of reference index
+            #length_ind = ind.size 
+            
+            ## reads size of target peaklist
+            #target_ind_init_len = target[z][y][x].shape[0]
+            
+            ## expands the target peaklist to the new index
+            #target[z][y][x] = \
+                #target[z][y][x].set_index('Res#').\
+                                 #reindex(ind).\
+                                 #reset_index().\
+                                 #fillna(fillna_dict)
+            
+            ## reads length of the expanded peaklist
+            #target_ind_final_len = target[z][y][x].shape[0]
+            
+            
+            ## transfers information of the different columns
+            ## from the reference to the expanded peaklist
+            #target[z][y][x].loc[:,'3-letter'] = ref_pkl.loc[:,'3-letter']
+            #target[z][y][x].loc[:,'1-letter'] = ref_pkl.loc[:,'1-letter']
+            #target[z][y][x].loc[:,'Assign F1'] = ref_pkl.loc[:,'Assign F1']
+            #target[z][y][x].loc[:,'Assign F2'] = ref_pkl.loc[:,'Assign F2']
+            
+            ## reverts previous merge
+            #if resonance_type=='Sidechains':
+                #target[z][y][x].loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
+                #target[z][y][x].loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+                #ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+            
+            #logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+#| Target Initial Length :: {} \
+#| Template Length :: {} \
+#| Target final length :: {}".format(z,y,x,
+                                    #z, y, self.xxref,
+                                    #target_ind_init_len,
+                                    #length_ind,
+                                    #target_ind_final_len)
+            #self.log_r(logs)
             
         return
         
