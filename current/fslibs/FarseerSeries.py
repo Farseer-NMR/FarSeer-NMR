@@ -646,6 +646,7 @@ recipient: residues
         """
         
         for item in self.items:
+            
             file_path = '{}/{}.tsv'.format(self.export_series_folder, item)
             fileout = open(file_path, 'w')
             fileout.write(self.loc[item].to_csv(sep='\t',

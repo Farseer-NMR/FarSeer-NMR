@@ -27,7 +27,7 @@ Methods:
     .correct_shifts()
     .fill_na()
     .expand_lost()
-    .add_lost()
+    .add_missing()
     .organize_columns()
     .init_fs_cube()
     .series_kwargs()
@@ -634,31 +634,28 @@ def reads_peaklists(exp, fsuv):
     fsuv.applyFASTA
     """
     
-    exp.load_experiments(target=exp.allpeaklists)
+    exp.load_experiments()
     
     if fsuv.applyFASTA:
-        exp.load_experiments(target=exp.allFASTA,
-                                    f=exp.read_FASTA,
-                                    filetype='.fasta')
+        exp.load_experiments(filetype='.fasta')
     
     # even if the user does no want to analyse sidechains, Farseer-NMR
     # has to parse them out from the input peaklist if they exist
     if exp.has_sidechains:
         # str() is passed as a dummy function
-        exp.load_experiments(target=exp.allsidechains,
-                                    f=str,
-                                    filetype='.csv')
+        exp.load_experiments(resonance_type='Sidechains')
+    
     return
 
-def inits_coords_names(exp):
-    """
-    Initiates coordinate names of the Farseer-NMR Cube Axes.
+#def inits_coords_names(exp):
+    #"""
+    #Initiates coordinate names of the Farseer-NMR Cube Axes.
     
-    Args:
-        exp (FarseerCube class instance): contains all peaklist data.
-    """
-    exp.init_coords_names()
-    return
+    #Args:
+        #exp (FarseerCube class instance): contains all peaklist data.
+    #"""
+    #exp.init_coords_names()
+    #return
     
 def identify_residues(exp):
     """
@@ -667,12 +664,14 @@ def identify_residues(exp):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
     """
-    exp.tricicle(exp.zzcoords,
-                 exp.yycoords,
-                 exp.xxcoords,
-                 exp.split_res_info,
-                 title=\
-                    'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN')
+    #exp.tricicle(exp.zzcoords,
+                 #exp.yycoords,
+                 #exp.xxcoords,
+                 #exp.split_res_info,
+                 #title=\
+                    #'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN')
+    
+    exp.split_res_info()
     
     return
 
@@ -694,22 +693,24 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     """
     
     if resonance_type == 'Backbone':
-        ctitle = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
-        exp.tricicle(exp.zzcoords, 
-                     exp.yycoords, 
-                     exp.xxcoords, 
-                     exp.correct_shifts_backbone,
-                     kwargs={'ref_res':str(fsuv.cs_correction_res_ref)},
-                     title=ctitle)
+        exp.correct_shifts_backbone(fsuv.cs_correction_res_ref)
+        #ctitle = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
+        #exp.tricicle(exp.zzcoords, 
+                     #exp.yycoords, 
+                     #exp.xxcoords, 
+                     #exp.correct_shifts_backbone,
+                     #kwargs={'ref_res':str(fsuv.cs_correction_res_ref)},
+                     #title=ctitle)
     
     elif resonance_type=='Sidechains':
-        ctitle = \
-            'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
-        exp.tricicle(exp.zzcoords, 
-                     exp.yycoords, 
-                     exp.xxcoords, 
-                     exp.correct_shifts_sidechains,
-                     title=ctitle)
+        exp.correct_shifts_sidechains()
+        #ctitle = \
+            #'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
+        #exp.tricicle(exp.zzcoords, 
+                     #exp.yycoords, 
+                     #exp.xxcoords, 
+                     #exp.correct_shifts_sidechains,
+                     #title=ctitle)
     return
 
 def fill_na(peak_status, merit=0, details='None'):
@@ -788,30 +789,26 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
     
     return
 
-def add_lost(exp, reference, target,
-             peak_status='lost',
-             ref='REFERENCE',
-             kwargs={}):
+def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
     Uses seq_expand method of FarseerSet.py.
     
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
-    
+        
+        peak_status (str): {'lost', 'unassigned'} the peak status of the new
+            generated entries for missing peaks.
+        
+        resonance_type (str): {'Backbone', 'Sidechains'}
     """
     
-    ctitle = 'ADDS LOST RESIDUES BASED ON THE {}'.format(ref)
-    
-    exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, exp.seq_expand,
-                 args=[reference, target, fill_na(peak_status)],
-                 kwargs=kwargs,
-                 title=ctitle)
+    exp.seq_expand(fill_na(peak_status), missing=peak_status,
+                                         resonance_type=resonance_type)
     
     return
 
-def organize_columns(exp, dataset_dct, fsuv,
-                     sidechains=False):
+def organize_columns(exp, fsuv, resonance_type='Backbone'):
     """
     Uses FarseerSet.organize_cols().
     
@@ -820,18 +817,15 @@ def organize_columns(exp, dataset_dct, fsuv,
         
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
+        
+        resonance_type (str): {'Backbone','Sidechains'}
     
     Depends on:
     fsuv.perform_cs_correction
     """
     
-    ctitle = "ORGANIZING PEAKLIST COLUMNS' ORDER"
-    exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords, 
-                 exp.organize_cols,
-                 args=[dataset_dct],
-                 kwargs={'performed_cs_correction':fsuv.perform_cs_correction,
-                         'sidechains':sidechains},
-                 title=ctitle)
+    exp.organize_cols(performed_cs_correction=fsuv.perform_cs_correction,
+                      resonance_type=resonance_type)
     
     return
 
@@ -1566,7 +1560,7 @@ def run_farseer(fsuv):
     # reads input
     reads_peaklists(exp, fsuv)
     
-    inits_coords_names(exp)
+    #inits_coords_names(exp)
     
     # identify residues
     identify_residues(exp)
@@ -1596,26 +1590,20 @@ def run_farseer(fsuv):
                         exp.zzref, dim='z')
     
     ## identifies lost residues
-    add_lost(exp, exp.allpeaklists, exp.allpeaklists,
-             peak_status='lost',
-             ref='REFERENCE')
+    add_missing(exp, peak_status='lost')
     
     if exp.has_sidechains and fsuv.use_sidechains:
-        add_lost(exp, exp.allsidechains, exp.allsidechains,
-                       peak_status='lost',
-                       ref='REFERENCE FOR SIDECHAINS',
-                       kwargs={'resonance_type':'Sidechain'})
+        add_missing(exp, peak_status='lost', resonance_type='Sidechains')
     
     # adds fasta
     if fsuv.applyFASTA:
-        add_lost(exp, exp.allFASTA, exp.allpeaklists,
-                 peak_status='unassigned', ref='FASTA')
+        add_missing(exp, peak_status='unassigned')
     
     #organize peaklist columns
-    organize_columns(exp, exp.allpeaklists, fsuv)
+    organize_columns(exp, fsuv)
     
     if exp.has_sidechains and fsuv.use_sidechains:
-        organize_columns(exp, exp.allsidechains, fsuv, sidechains=True)
+        organize_columns(exp, fsuv, resonance_type='Sidechains')
     
     init_fs_cube(exp, fsuv)
     
@@ -1626,13 +1614,7 @@ def run_farseer(fsuv):
                         resonance_type='Backbone')
     
     if not(farseer_series_dct):
-        # DO exports pkls
-        ctitle = 'EXPORTS PARSED PEAKLISTS FROM FARSEER-NMR CUBE'
-    
-        exp.tricicle(exp.zzcoords, exp.yycoords, exp.xxcoords,
-                     exp.exports_parsed_pkls,
-                     title=ctitle)
-        # DONE
+        exp.exports_parsed_pkls()
     else:
         # evaluates the series and plots the data
         eval_series(farseer_series_dct, fsuv)
@@ -1643,8 +1625,9 @@ def run_farseer(fsuv):
             gen_series_dcts(exp, fss.FarseerSeries, fsuv,
                                 resonance_type='Sidechains')
         
-        eval_series(farseer_series_SD_dict, fsuv,
-                    resonance_type='Sidechains')
+        if (farseer_series_SD_dict):
+            eval_series(farseer_series_SD_dict, fsuv,
+                        resonance_type='Sidechains')
         # DONE
     
     # Representing the results comparisons
