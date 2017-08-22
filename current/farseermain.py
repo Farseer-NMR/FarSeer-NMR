@@ -710,7 +710,7 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
     Checks for 'lost' residues accross the reference experiments and
     along other axes (y or z).
     
-    Uses FarseerCube.seq_expand.
+    Uses FarseerCube.finds_missing.
     
     Compares reference peaklists along Y and Z axis of the Farseer-NMR
     Cube and generates the corresponding 'lost' residues.
@@ -736,7 +736,7 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
             for b in bcoords:
                 #do
                 refscoords = {'z': a, 'y': refcoord}
-                exp.seq_expand(a, b, exp.xxref, 'expanding',
+                exp.finds_missing(a, b, exp.xxref, 'expanding',
                                dataset_dct, 
                                dataset_dct,
                                fill_na_lost('lost'),
@@ -751,7 +751,7 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
             for b in bcoords:
                 #do
                 refscoords = {'z': refcoord, 'y': a}
-                exp.seq_expand(b, a, exp.xxref, 'expanding',
+                exp.finds_missing(b, a, exp.xxref, 'expanding',
                                dataset_dct, 
                                dataset_dct,
                                fill_na('lost'),
@@ -762,7 +762,7 @@ def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
 def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
-    Uses seq_expand method of FarseerSet.py.
+    Uses finds_missing method of FarseerSet.py.
     
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
@@ -773,7 +773,7 @@ def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
         resonance_type (str): {'Backbone', 'Sidechains'}
     """
     
-    exp.seq_expand(fill_na(peak_status), missing=peak_status,
+    exp.finds_missing(fill_na(peak_status), missing=peak_status,
                                          resonance_type=resonance_type)
     
     return

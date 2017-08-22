@@ -79,7 +79,7 @@ class FarseerCube:
             .split_res_info()
             .correct_shifts_backbone()
             .correct_shifts_sidechains()
-            .seq_expand()
+            .finds_missing()
             .organize_cols()
         
         Explore the Farseer-NMR Cube:
@@ -406,7 +406,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         FASTAfile.close()
 
         # Res# is kept as str() to allow reindexing
-        # later on the seq_expand function.
+        # later on the finds_missing function.
         #
         dd = {}
         dd["Res#"] = [str(i) for i in range(self.FASTAstart,
@@ -775,19 +775,19 @@ residues.'.format(z, y, x)
         
         return
     
-    def seq_expand(self, fillna_dict, 
+    def finds_missing(self, fillna_dict, 
                          missing='lost',
                          resonance_type='Backbone'):
         """
-        Expands a <target> peaklist to the number of rows of a reference
-        peaklist.
+        Finds missing residues.
         
-        Expands based on the 'Res#' column. Usually, the reference peaklist 
-        is the reference experiment for each combination of [Y][Z].
+        Expands a target peaklist to the number of rows of a reference
+        peaklist based on the 'Res#' column. Runs along the X axis, the 
+        reference peaklist is the reference experiment for each combination 
+        of [Y][Z], and a loop runs over the differen X data points.
         
         This function is used to identify the <lost> or <unassigned> 
-        esidues. That is, residues that are in the reference peaklists but 
-        not in the target peaklist.
+        residues.
         
         Args:
             fillna_dict (dict): a dictionary of kwargs that define the column
