@@ -94,7 +94,7 @@ class FarseerSeries(pd.Panel):
                 .set_item_colors()
                 .text_marker()
                 .plot_threshold()
-                .plot_pre_theo()
+                .plot_theo_pre()
                     
                     Helper functions:
                         .hex_to_RGB()
@@ -1141,7 +1141,7 @@ recipient: residues
                                   user_bar_colors_dict)
         
         if PRE_flag and (calccol in self.restraint_list[3:]):
-            self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.05,
+            self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.05,
                               bartype='h',
                               pre_color=pre_color,
                               pre_lw=pre_lw,
@@ -1363,7 +1363,7 @@ recipient: residues
                                  user_bar_colors_dict)
         
         if PRE_flag and (calccol in self.restraint_list[3:]):
-            self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.1,
+            self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
                               bartype='v',
                               pre_color=pre_color,
                               pre_lw=pre_lw,
@@ -2062,7 +2062,7 @@ recipient: residues
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
         
-        self.plot_pre_theo(axs[i], experiment, 2,
+        self.plot_theo_pre(axs[i], experiment, 2,
                            bartype = 'hm',
                            tag_color=tag_color,
                            tag_ls=tag_ls,
@@ -2313,7 +2313,7 @@ recipient: residues
                             ha='center', va='center',
                             fontsize=res_highlight_fs)
         
-        self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.1,
+        self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
                            bartype = 'osci',
                            tag_color=tag_color,
                            tag_ls=tag_ls,
