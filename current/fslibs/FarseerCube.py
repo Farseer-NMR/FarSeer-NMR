@@ -60,25 +60,36 @@ class FarseerCube:
         tmp_vars (dict): stored temporary variables useful for functions.
         
     Methods:
-        .log_r()
-        .exports_log()
-        .abort()
-        .load_experiments()
-        .read_FASTA()
-        .init_coords_names()
-        .tricicle()
-        .split_res_info()
-        .correct_shifts_backbone()
-        .correct_shifts_sidechains()
-        .seq_expand()
-        .organize_cols()
-        .init_Farseer_cube()
-        .export_series_dict_over_axis()
-        .gen_series()
-        .exports_parsed_pkls()
-        .checks_filetype()
-        .checks_xy_datapoints_coherency()
-        .check_ref_res()
+    
+        Initiates:
+            .log_r()
+            .exports_log()
+            .abort()
+        
+        Loading data:
+            .load_experiments()
+            .read_FASTA()
+            .init_coords_names()
+        
+        Data treatment:
+            .split_res_info()
+            .correct_shifts_backbone()
+            .correct_shifts_sidechains()
+            .seq_expand()
+            .organize_cols()
+        
+        Explore the Farseer-NMR Cube:
+            .init_Farseer_cube()
+            .export_series_dict_over_axis()
+            .gen_series()
+        
+        Exporting:
+            .exports_parsed_pkls()
+        
+        Checking Routines:
+            .checks_filetype()
+            .checks_xy_datapoints_coherency()
+            .check_ref_res()
     """
     def __init__(self, spectra_path, has_sidechains=False,
                                      applyFASTA=False,

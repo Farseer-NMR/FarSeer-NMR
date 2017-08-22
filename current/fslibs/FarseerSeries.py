@@ -60,6 +60,56 @@ class FarseerSeries(pd.Panel):
             used for each residue in the CSP calculation formula.
         
         fitdf (dict): stored pd.DataFrames with information on fitting.
+    
+    Methods:
+        
+        Initiates:
+            .create_attributes()
+            .log_r()
+            .exports_log()
+            .abort()
+        
+        Calculation:
+            .calc_ratio()
+            .calc_cs_diffs()
+            .calc_csp()
+                .csp_willi()
+            .perform_fit()
+            .load_theoretical_PRE()
+            .calc_Delta_PRE()
+        
+        Creates Plot:
+            .plot_base()
+        
+            Subplot routines:
+                .plot_bar_horizontal()
+                .plot_bar_vertical()
+                .plot_res_evo()
+                .plot_cs_scatter()
+                .plot_cs_scatter_flower()
+                .plot_DPRE_heatmap()
+                .plot_delta_osci()
+            
+            Subplot add-ons:
+                .set_item_colors()
+                .text_marker()
+                .plot_threshold()
+                .plot_pre_theo()
+                    
+                    Helper functions:
+                        .hex_to_RGB()
+                        .RGB_to_hex()
+                        .color_dict()
+                        .linear_gradient()
+            
+            Plot finishing:
+                .clean_subplots()
+                .write_plot()
+        
+        Exporting resuts:
+            .write_table()
+            .write_Chimera_attributes()
+            .export_series_to_tsv()
     """
     # folder names
     calc_folder = 'Calculations'  
@@ -108,7 +158,7 @@ class FarseerSeries(pd.Panel):
         self.restraint_list = restraint_list
         
         # dictionary to store dataframes with information on fitting results
-        fitdf = {}
+        self.fitdf = {}
         
         # log related variables
         self.log = ''
@@ -206,7 +256,6 @@ class FarseerSeries(pd.Panel):
         """
         # Pass 16 to the integer function for change of base
         return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
-
 
     def RGB_to_hex(self, RGB):
         """
@@ -524,12 +573,14 @@ with window size {} and stdev {}'.\
                                  colformat='{:.5f}'):
         """
         Exports values in column to Chimera Attribute files.
+        http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
         
         One file is exported for each experiment in the Series.
         
         Args:
             resformat (str): the formating options for the 'Res#' column. 
-            This must match the residue selection command in Chimera. See:
+            This must match the residue selection command in Chimera.
+            See:
             www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
             this is defined in the Chimera_ATT_Res_format variable in
             farseer_user_variables.
@@ -727,7 +778,7 @@ recipient: residues
         
         return
     
-    def theo_pre_plot(self, axs, exp, y,
+    def plot_theo_pre(self, axs, exp, y,
                       bartype='h',
                       pre_color='lightblue',
                       pre_lw=1,
@@ -1090,7 +1141,7 @@ recipient: residues
                                   user_bar_colors_dict)
         
         if PRE_flag and (calccol in self.restraint_list[3:]):
-            self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.05,
+            self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.05,
                               bartype='h',
                               pre_color=pre_color,
                               pre_lw=pre_lw,
@@ -1312,7 +1363,7 @@ recipient: residues
                                  user_bar_colors_dict)
         
         if PRE_flag and (calccol in self.restraint_list[3:]):
-            self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.1,
+            self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.1,
                               bartype='v',
                               pre_color=pre_color,
                               pre_lw=pre_lw,
@@ -2011,7 +2062,7 @@ recipient: residues
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
         
-        self.theo_pre_plot(axs[i], experiment, 2,
+        self.plot_pre_theo(axs[i], experiment, 2,
                            bartype = 'hm',
                            tag_color=tag_color,
                            tag_ls=tag_ls,
@@ -2262,7 +2313,7 @@ recipient: residues
                             ha='center', va='center',
                             fontsize=res_highlight_fs)
         
-        self.theo_pre_plot(axs[i], experiment, y_lims[1]*0.1,
+        self.plot_pre_theo(axs[i], experiment, y_lims[1]*0.1,
                            bartype = 'osci',
                            tag_color=tag_color,
                            tag_ls=tag_ls,

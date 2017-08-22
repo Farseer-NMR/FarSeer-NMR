@@ -1,3 +1,6 @@
+"""
+Functions that format error messages.
+"""
 import sys
 import textwrap
 

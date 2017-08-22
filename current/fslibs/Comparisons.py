@@ -49,7 +49,6 @@ class Comparisons:
         .gen_next_dim()
         .gen_prev_dim()
         .transfer_log()
-        
     """
     def __init__(self,
                  dimension_dict,
