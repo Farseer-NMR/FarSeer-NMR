@@ -1,3 +1,49 @@
+"""
+Optimal algorythm to run the Farseer-NMR method.
+
+Usage as main script:
+
+    python <path-to>/farseermain.py <path-to>/farseer-user-variables.py
+
+Can be used as imported module. Contains several functions that aid in
+managing the Farseer-NMR analysis routines.
+
+Methods:
+    .read_user_variables()
+        .config_user_variables()
+    .copy_Farseer_version()
+    .log_time_stamp()
+    .logs()
+    .initial_checks()
+    .checks_PRE_analysis_flags()
+    .checks_cube_axes_flags()
+    .checks_plotting_flags()
+    .checks_calculation_flags()
+    .checks_fit_input()
+    .creates_farseer_dataset()
+    .reads_peaklists()
+    .inits_coords_names()
+    .identify_residues()
+    .correct_shifts()
+    .fill_na()
+    .expand_lost()
+    .add_lost()
+    .organize_columns()
+    .init_fs_cube()
+    .series_kwargs()
+    .gen_series_dcts()
+    .eval_series()
+    .perform_calcs()
+    .perform_fits()
+    .PRE_analysis()
+    .exports_series()
+    .exports_chimera_att_files()
+    .plots_data()
+    .comparison_analysis_routines()
+    .analyse_comparisons()
+    .run_farseer()
+"""
+
 #  
 import importlib.util
 import sys
@@ -13,11 +59,13 @@ from current.fslibs import wet as fsw
 
 def read_user_variables(path):
     """
-    Reads user defined preferences from file.
+    Reads user defined preferences from file and prepares the module of 
+    variables necessary for Farseermain.
     
-    and prepares the module of variables necessary for Farseermain.
+    Args:
+        path (str): path to farseer_user_variables.py.
     
-    Return
+    Returns:
         fsuv (module): contains the user preferences.
     """
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -339,7 +387,8 @@ def copy_Farseer_version(fsuv, file_name='farseer_version',
     Makes a copy of the running version.
     
     Args:
-        fsuv (module): contains user preferences
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.cwd
@@ -387,6 +436,10 @@ def initial_checks(fsuv):
     Performs checks that are useful to be executed at the beginning of the
     Farseer-NMR calculation run.
     
+    Args:
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
+    
     Depends on:
     fsuv.apply_PRE_analysis
     """
@@ -400,6 +453,10 @@ def initial_checks(fsuv):
 def checks_PRE_analysis_flags(fsuv):
     """
     Checks flag compatibility in PRE Analysis routines.
+    
+    Args:
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.PRE_analysis_flags
@@ -427,6 +484,10 @@ def checks_cube_axes_flags(fsuv):
     Checks if the user wants to perform any analysis
     on the Farseer-NMR Cube.
     
+    Args:
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
+    
     Depends on:
     fsuv.any_axis
     fsuv.logfile_name
@@ -450,7 +511,8 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
         farseer_series (FarseerSeries instance): contains the experiments
             of the series.
         
-        fsuv (module): where the user preferences are stored.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
         
         resonance_type (str): {'Backbone', 'Sidechains'}
      
@@ -483,7 +545,8 @@ def checks_calculation_flags(fsuv):
     Checks if the user wants to calculate any restraints.
     
     Args:
-        fsuv (module): where the user preferences are stored.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     """
     ######## WET#14
     if not(fsuv.calc_flags):
@@ -502,7 +565,8 @@ def checks_fit_input(series, fsuv):
     Args:
         series (FarseerSeries instance):
         
-        fsuv (module): where user variables are stored.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     """
     
     ######## WET#5, WET#6, WET#7
@@ -535,7 +599,8 @@ def creates_farseer_dataset(fsuv):
     Creates a Farseer-NMR dataset.
     
     Args:
-        fsuv (module): contains user preferences.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Returns:
         exp (FarseerCube class instance): contains all peaklist data.
@@ -562,7 +627,8 @@ def reads_peaklists(exp, fsuv):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        fsuv (module): contains user preferences.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.applyFASTA
@@ -620,7 +686,8 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
     
-        fsuv (module): contains all the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.cs_correction_res_ref
@@ -649,6 +716,16 @@ def fill_na(peak_status, merit=0, details='None'):
     """
     A dictionary that configures how the fields of the
     added rows for missing residues are fill.
+    
+    Args:
+        peak_status (str): {'lost', 'unassigned'}, how to fill 'Peak Status' column.
+        
+        merit (int/str): how to fill the 'Merit' column.
+        
+        details (str): how to fill the details column.
+        
+    Return:
+        Dictionary of kwargs.
     """
     d = {
     'Peak Status': peak_status,
@@ -716,8 +793,12 @@ def add_lost(exp, reference, target,
              ref='REFERENCE',
              kwargs={}):
     """
-    Uses seq_expand method of FarseerSet.py.
     Expands a <target> peaklist to the index of a <reference> peaklist.
+    Uses seq_expand method of FarseerSet.py.
+    
+    Args:
+        exp (FarseerCube class instance): contains all peaklist data.
+    
     """
     
     ctitle = 'ADDS LOST RESIDUES BASED ON THE {}'.format(ref)
@@ -736,6 +817,9 @@ def organize_columns(exp, dataset_dct, fsuv,
     
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
+        
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.perform_cs_correction
@@ -759,7 +843,8 @@ def init_fs_cube(exp, fsuv):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        fsuv (module): contains user preferences.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.use_sidechains
@@ -774,9 +859,10 @@ def series_kwargs(fsuv, rt='Backbone'):
     the FarseerSeries object based on the user defined preferences.
     
     Args:
-        fsuv (module): contains user preferences.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
         
-        rt (stg): {'Backbone', 'Sidechains'}, whether data corresponds to
+        rt (str): {'Backbone', 'Sidechains'}, whether data corresponds to
             one or another.
     
     Depends on:
@@ -806,7 +892,8 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
         series_class (FarseerSeries class): The class that will 
             initiate the series, normally fslibs/FarseerSeries.py
         
-        fsuv (module): contains all the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
         
         resonance_type OPT (stg): {'Backbone', 'Sidechains'} depending on
             data in <exp>.
@@ -889,7 +976,8 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
         series_dct (dict): a nested dictionary containing the FarseerSeries
             for every axis of the Farseer-NMR Cube.
         
-        fsuv (module): contains all the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
         resonance_type OPT (str): {'Backbone', 'Sidechains'} whether the data 
             in <series_dct> corresponds to backbone or sidechain resonances.
@@ -945,7 +1033,8 @@ def perform_calcs(farseer_series, fsuv):
             containing all the experiments along a series previously
             selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.calcs_PosF1_delta
@@ -1001,7 +1090,8 @@ def perform_fits(farseer_series, fsuv):
             containing all the experiments along a series previously
             selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.perform_resevo_fit
@@ -1032,7 +1122,8 @@ def PRE_analysis(farseer_series, fsuv):
             containing all the experiments along a series previously
             selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.apply_PRE_analysis
@@ -1142,7 +1233,8 @@ def exports_chimera_att_files(farseer_series, fsuv):
         farseer_series (FarseerSeries instance): contains all the experiments
             of a Farseer-NMR Cube extracted series.
         
-        fsuv (module): contains user preferences.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.restraint_settings
@@ -1168,7 +1260,8 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
         farseer_series (FarseerSeries class): contains all the experiments
             of a Farseer-NMR Cube extracted series.
         
-        fsuv (module): contains the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Depends on:
     fsuv.plots_extended_bar
@@ -1344,7 +1437,8 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
                 Comparisons.gen_next_dim or gen_prev_dim): contains all the 
                 experiments parsed along an axis and for a specific Farseer-NMR Cube's coordinates.
             
-            fsuv (module): contains the user preferences.
+            fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
             
             resonance_type (str): {'Backbone', 'Sidechains'}, depending on
                 data type.
@@ -1371,7 +1465,8 @@ def analyse_comparisons(series_dct, fsuv,
         series_dct (dict): a nested dictionary containing the FarseerSeries
             for every axis of the Farseer-NMR Cube.
         
-        fsuv (module): contains all the user defined variables.
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     
     Returns:
         comp_dct (dict): a dictionary containing all the comparison objects 
@@ -1411,7 +1506,6 @@ def analyse_comparisons(series_dct, fsuv,
         # generates set of PARSED FarseerSeries along the
         # next and previous dimensions
         c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
-        
         
         if c.has_points_next_dim:
             for dp2 in sorted(c.all_next_dim.keys()):
@@ -1455,8 +1549,9 @@ def run_farseer(fsuv):
     """
     Runs the whole Farseer-NMR standard algorithm.
     
-    Depends on:
-    fsuv, a module containing all the required variables.
+    Args:
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
     """
     
     # Initiates the log
