@@ -485,41 +485,6 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.log_r(logs)
         
         return
-    
-    def tricicle(self, zz, yy, xx, exec_func, args=[],
-                 title='TRICILES', kwargs={}):
-        """
-        Executes a function over the nested dictionary.
-        FarseerSet() functions operate on each pd.DataFrame,
-        therefore tricicle() is a way to perform an action over
-        all the DataFrames (spectra).
-        
-        :zz, yy, xx: the lists of condition data points
-        :exec_func: the name of the function to executed
-        :args: a list to be passed as *args to the exec_func
-        :kwargs: a dict to be passed as *kwargs to the exec_func
-        
-        All functions in FarseerSet() are writen such that tricicle() can
-        operate them.
-        """
-        # helper variable. Some function return variables that are used in the
-        # next cycle.
-        tmp_vars = {}
-        self.log_r(title, istitle=True)
-        
-        for z in zz:
-            for y in yy:
-                for x in xx:
-                    # tmp_vars is a helper variable that is useful for
-                    # some functions
-                    #
-                    # The exec_func that operates on the pd.DataFrame,
-                    # therefore, x, y and x are
-                    # passed to the function so that the pd.DataFrame
-                    # can be indexed in the dictionary.
-                    tmp_vars = exec_func(z, y, x, tmp_vars, *args, **kwargs)
-        
-        return
 
     def split_res_info(self):
         """

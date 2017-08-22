@@ -646,16 +646,6 @@ def reads_peaklists(exp, fsuv):
         exp.load_experiments(resonance_type='Sidechains')
     
     return
-
-#def inits_coords_names(exp):
-    #"""
-    #Initiates coordinate names of the Farseer-NMR Cube Axes.
-    
-    #Args:
-        #exp (FarseerCube class instance): contains all peaklist data.
-    #"""
-    #exp.init_coords_names()
-    #return
     
 def identify_residues(exp):
     """
@@ -664,13 +654,6 @@ def identify_residues(exp):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
     """
-    #exp.tricicle(exp.zzcoords,
-                 #exp.yycoords,
-                 #exp.xxcoords,
-                 #exp.split_res_info,
-                 #title=\
-                    #'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN')
-    
     exp.split_res_info()
     
     return
@@ -694,23 +677,10 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     
     if resonance_type == 'Backbone':
         exp.correct_shifts_backbone(fsuv.cs_correction_res_ref)
-        #ctitle = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
-        #exp.tricicle(exp.zzcoords, 
-                     #exp.yycoords, 
-                     #exp.xxcoords, 
-                     #exp.correct_shifts_backbone,
-                     #kwargs={'ref_res':str(fsuv.cs_correction_res_ref)},
-                     #title=ctitle)
     
     elif resonance_type=='Sidechains':
         exp.correct_shifts_sidechains()
-        #ctitle = \
-            #'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON A REFERENCE PEAK'
-        #exp.tricicle(exp.zzcoords, 
-                     #exp.yycoords, 
-                     #exp.xxcoords, 
-                     #exp.correct_shifts_sidechains,
-                     #title=ctitle)
+    
     return
 
 def fill_na(peak_status, merit=0, details='None'):
