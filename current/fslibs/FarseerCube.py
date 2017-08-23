@@ -337,6 +337,11 @@ FASTA starting residue: {}  """.format(spectra_path,
             main_peaklists=True
             
         elif filetype == '.fasta' and resonance_type == 'Backbone':
+            #if not(any([self.hasxx, self.hasyy, self.haszz])):
+                #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
+                #self.log_r(fsw.gen_wet('ERROR', msg, 21))
+                #self.abort()
+            
             f = self.read_FASTA
             target = self.allfasta
             
@@ -887,6 +892,13 @@ residues.'.format(z, y, x)
             msg = 'Argument <along_axis> is not valid.'
             self.log_r(msg)
             return
+        elif (along_axis == 'y' and not(self.hasyy)) \
+            or (along_axis == 'z' and not(self.haszz)):
+            # DO
+            msg = 'There are no data points along dimension {}. This function has no effect.'.format(along_axis.upper())
+            self.log_r(fsw.gen_wet('NOTE', msg, 19))
+            return
+            # DONE
         elif along_axis == 'z':
             for y, z in it.product(self.yycoords, self.zzcoords):
                 # DO
@@ -1206,6 +1218,7 @@ residues.'.format(z, y, x)
             next_axis = self.yycoords
             next_axis_2 = self.zzcoords
         elif along_axis=='y':
+            self.compare_fastas()
             series_type='cond2'
             fscube = fscube.transpose(2,0,1,3,4, copy=True)
             owndim_pts=self.yycoords
@@ -1464,10 +1477,25 @@ residues.'.format(z, y, x)
         if df.shape[0] < \
             self.allpeaklists[self.zzref][self.yyref][self.xxref].shape[0]:
             # DO
-            msg = 'The .fasta file in {} is has less residue entries than the protein sequence of the reference experiment [{}][{}][{}]'.\
+            msg = 'The .fasta file in {} has less residue entries than the protein sequence of the reference experiment [{}][{}][{}]'.\
                 format(fasta_path, self.zzref, self.yyref, self.xxref)
             
             self.log_r(fsw.gen_wet('ERROR', msg, 18))
             self.abort()
             # DONE
         return
+
+    def compare_fastas(self):
+        """
+        Compares all .fasta files to confirm they have the same size.
+        Farseer cannot operate fasta of different lengths if analysing on 
+        the y dimension.
+        """
+        a = self.p5d(self.allfasta)
+        if (a.isnull().values.any()):
+            msg = '.fasta files have not the same size and they should have the same size when performing calculations along the Y axis. Please correct your .fasta files.'
+            self.log_r(fsw.gen_wet('ERROR', msg, 21))
+            self.abort()
+        return
+        
+        

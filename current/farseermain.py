@@ -594,6 +594,27 @@ def checks_fit_input(series, fsuv):
         # DONE
     return
 
+def checks_axis_coherency(dim, fsuv):
+    """
+    Warns in case the axis the user activates for calculation actually has
+    no data points to create a series.
+    
+    Args:
+        dim (str): the dimension to warn about.
+        
+        fsuv (module): contains user defined variables (preferences) after
+            .read_user_variables().
+    
+    Depends on:
+    fsuv.logfile_name
+    """
+    
+    msg = 'You have activated the analysis along dimension/axis {}. However, there are no datapoints along this axis so that a series could not be created and analysed. Confirm the axis analysis flags are correctly set in the Run Settings.'.format(dim)
+    
+    logs(fsw.gen_wet('WARNING', msg, 20), fsuv.logfile_name)
+    
+    return
+    
 def creates_farseer_dataset(fsuv):
     """
     Creates a Farseer-NMR dataset.
@@ -919,9 +940,13 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     
     # initiates dictionary
     series_dct = {}
+    xx = False
+    yy = False
+    zz = False
     
     # creates set of series for the first condition (1D)
     if exp.hasxx and fsuv.do_cond1:
+        xx = True
         series_dct['cond1'] = \
             exp.export_series_dict_over_axis(\
                 series_class,
@@ -929,9 +954,12 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 resonance_type=resonance_type,
                 series_kwargs=series_kwargs(fsuv,
                                             resonance_type=resonance_type))
+    elif not(exp.hasxx) and fsuv.do_cond1:
+        checks_axis_coherency('x', fsuv)
     
     # creates set of series for the second condition (2D)
     if exp.hasyy and fsuv.do_cond2:
+        yy = True
         series_dct['cond2'] = \
             exp.export_series_dict_over_axis(\
                 series_class,
@@ -939,9 +967,12 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 resonance_type=resonance_type,
                 series_kwargs=series_kwargs(fsuv,
                                             resonance_type=resonance_type))
+    elif not(exp.hasyy) and fsuv.do_cond2:
+        checks_axis_coherency('y', fsuv)
 
     # creates set of series for the third condition (3D)  
     if exp.haszz and fsuv.do_cond3:
+        zz = True
         series_dct['cond3'] = \
             exp.export_series_dict_over_axis(\
                 series_class,
@@ -949,6 +980,12 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 resonance_type=resonance_type,
                 series_kwargs=series_kwargs(fsuv,
                                             resonance_type=resonance_type))
+    elif not(exp.haszz) and fsuv.do_cond3:
+        checks_axis_coherency('z', fsuv)
+    
+    if not(any([xx, yy, zz])):
+        msg = 'The overall combination of data and calculation flags is not coherent and any series set was created along an axis. Nothing will be calculated.'
+        logs(fsw.gen_wet('WARNING', msg, 20), fsuv.logfile_name)
     
     return series_dct
 
