@@ -438,6 +438,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         self.log_r(logs)
         
+        self.check_fasta(df, FASTApath)
+        
         return df
     
     def init_coords_names(self):
@@ -775,7 +777,7 @@ residues.'.format(z, y, x)
         
         return
     
-    def seq_expand(self, ref_pkl, target_pkl, resonance_type, fillna, x, y, z):
+    def seq_expand(self, ref_pkl, target_pkl, resonance_type, fillna):
         """
         Expands a <target> peaklist to the size of the <reference>.
         Adds rows of missing residues.
@@ -792,9 +794,6 @@ residues.'.format(z, y, x)
                     {'Peak Status': <missing>,
                      'Merit': 0.0,
                      'Details': 'None'}
-            
-            x,y,z (str): keys of experiments' nested dictionary 
-                (self.allpeaklists or self.allsidechains)
         
         Returns:
             The expanded pd.DataFrame
@@ -855,6 +854,8 @@ residues.'.format(z, y, x)
         Compares reference experiments along Y and Z axis and adds missing
         residues considering [xxref][yyref][zzref] as the main reference.
         
+        Uses .seq_expand().
+        
         Args:
             fillna_dict (dict): a dictionary of kwargs that define the column
                 values of the newly generated rows. Example:
@@ -866,6 +867,9 @@ residues.'.format(z, y, x)
             
             resonance_type (str): {'Backbone', 'Sidechains'}, defaults 
                 'Backbone'.
+        
+        Modifies:
+            The values in self.allpeaklists or self.allsidechains.
         """
         title = 'adds lost residues along axis {}'.format(along_axis)
         self.log_r(title, istitle=True)
@@ -893,7 +897,7 @@ residues.'.format(z, y, x)
         
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(ref_pkl, target[z][y][self.xxref],
-                        resonance_type, fillna_dict, self.xxref, y, z)
+                                    resonance_type, fillna_dict)
             
                 logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
@@ -914,7 +918,7 @@ residues.'.format(z, y, x)
         
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(ref_pkl, target[z][y][self.xxref],
-                        resonance_type, fillna_dict, self.xxref, y, z)
+                                    resonance_type, fillna_dict)
                 
                 logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
@@ -928,18 +932,15 @@ residues.'.format(z, y, x)
         return
     
     def finds_missing(self, fillna_dict, 
-                         missing='lost',
-                         resonance_type='Backbone'):
+                            missing='lost',
+                            resonance_type='Backbone'):
         """
         Finds missing residues.
         
-        Expands a target peaklist to the number of rows of a reference
-        peaklist based on the 'Res#' column. Runs along the X axis, the 
-        reference peaklist is the reference experiment for each combination 
-        of [Y][Z], and a loop runs over the differen X data points.
+        Runs over each X axis series and finds the missing residues comparing
+        each data point to the reference experiment on that series.
         
-        This function is used to identify the <lost> or <unassigned> 
-        residues.
+        Missing residues can be of type 'lost' or 'unassigned'.
         
         Args:
             fillna_dict (dict): a dictionary of kwargs that define the column
@@ -952,7 +953,7 @@ residues.'.format(z, y, x)
             
             resonance_type (str): either 'Backbone' or 'Sidechains'.
         
-        Modify:
+        Modifies:
             The values in self.allpeaklists or self.allsidechains.
         """
         
@@ -992,7 +993,7 @@ residues.'.format(z, y, x)
             
             target[z][y][x], popi = \
                 self.seq_expand(ref_pkl, target[z][y][x],
-                                resonance_type, fillna_dict, x, y, z)
+                                resonance_type, fillna_dict)
             
             logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
@@ -1001,61 +1002,6 @@ residues.'.format(z, y, x)
                                     refz, refy, refx,
                                     popi[0], popi[1], popi[2])
             self.log_r(logs)
-            
-            ## merges Res# and ATOM cols to keep sorted
-            #if resonance_type=='Sidechains':
-                ## DO merge res and atom
-                #ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,['Res#', 'ATOM']].\
-                    #apply(lambda x: ''.join(x), axis=1)
-            
-                #target[z][y][x].loc[:,'Res#'] = \
-                    #target[z][y][x].loc[:,['Res#', 'ATOM']].\
-                        #apply(lambda x: ''.join(x), axis=1)
-                ## DONE
-            
-            ## creates an index based on the residue numbers of the reference
-            ## peaklist
-            #ind = ref_pkl.loc[:,'Res#']
-            
-            ## reads size of reference index
-            #length_ind = ind.size 
-            
-            ## reads size of target peaklist
-            #target_ind_init_len = target[z][y][x].shape[0]
-            
-            ## expands the target peaklist to the new index
-            #target[z][y][x] = \
-                #target[z][y][x].set_index('Res#').\
-                                 #reindex(ind).\
-                                 #reset_index().\
-                                 #fillna(fillna_dict)
-            
-            ## reads length of the expanded peaklist
-            #target_ind_final_len = target[z][y][x].shape[0]
-            
-            
-            ## transfers information of the different columns
-            ## from the reference to the expanded peaklist
-            #target[z][y][x].loc[:,'3-letter'] = ref_pkl.loc[:,'3-letter']
-            #target[z][y][x].loc[:,'1-letter'] = ref_pkl.loc[:,'1-letter']
-            #target[z][y][x].loc[:,'Assign F1'] = ref_pkl.loc[:,'Assign F1']
-            #target[z][y][x].loc[:,'Assign F2'] = ref_pkl.loc[:,'Assign F2']
-            
-            ## reverts previous merge
-            #if resonance_type=='Sidechains':
-                #target[z][y][x].loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-                #target[z][y][x].loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
-                #ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
-            
-            #logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
-#| Target Initial Length :: {} \
-#| Template Length :: {} \
-#| Target final length :: {}".format(z,y,x,
-                                    #z, y, self.xxref,
-                                    #target_ind_init_len,
-                                    #length_ind,
-                                    #target_ind_final_len)
-            #self.log_r(logs)
             
         return
         
@@ -1232,13 +1178,16 @@ residues.'.format(z, y, x)
             keys zzcoods and second level keys yycoords, and values 
             FarseerSeries.
         
-        along_axis (str): {'x', 'y', 'z'} the axis along which series will be
-            generated.
+        Args:
+            series_class (class): Farseer Series class.
+            
+            along_axis (str): {'x', 'y', 'z'} the axis along which series 
+                will be generated.
+            
+            series_kwargs (dict): kwargs to be passed to the 
+                series_class.__init__.
         
-        series_class (class): Farseer Series class
-        
-        series_kwargs (dict): kwargs to be passed to the series_class.__init__.
-        
+            resonance_type (str): {'Backbone', 'Sidechains'}
         Returns:
             The nested dictionary of Farseer Series objects.
         """
@@ -1312,6 +1261,15 @@ residues.'.format(z, y, x)
         
         Argument initiation has to be synchronized with the class needs.
         
+        Args:
+            series_panel (pd.Panel): contains the series to be converted to 
+                series_class instance.
+            
+            series_class (class): Farseer Series class.
+            
+            series_kwargs (dict): kwargs to be passed to the 
+                series_class.__init__.
+        
         Returns:
             The series_class object.
         """
@@ -1362,9 +1320,9 @@ residues.'.format(z, y, x)
                                                         index=False,
                                                         na_rep='NaN',
                                                         float_format='%.4f'))
-            
+                
                 fileout.close()
-            
+                
                 msg = "**Saved:** {}".format(fpath)
                 self.log_r(msg)
                 # DONE sidechains
@@ -1378,6 +1336,9 @@ residues.'.format(z, y, x)
         If not, call WET#9.
         
         If file not .csv or .fasta, call WET#13.
+        
+        Args:
+            filytype (str): {'.csv', '.fasta'}
         """
         
         # check filetype fits usable formats
@@ -1411,6 +1372,11 @@ residues.'.format(z, y, x)
         the y datapoints subfolders.
         
         Reports names mismatches with WET#10
+        
+        Args:
+            target (dict): nested dictionary representing the tree in spectra/
+            
+            filetype (str): {'.csv', '.fasta'}
         """
         
         zkeys = list(target.keys())
@@ -1479,4 +1445,29 @@ residues.'.format(z, y, x)
             format(ref_res)
             self.log_r(fsw.gen_wet('ERROR', msg, 16))
             self.abort()
+        return
+
+    def check_fasta(self, df, fasta_path):
+        """
+        Checks if loaded FASTA file has more residues than the reference
+        experiment.
+        
+        FASTA cannot has less rows than the reference experiment.
+        WET#18
+        
+        Args:
+            df (pd.DataFrame): contains the FASTA loaded data in DataFrame 
+                format as prepared by .read_FASTA().
+            
+            fasta_path (srt): the .fasta file path.
+        """
+        if df.shape[0] < \
+            self.allpeaklists[self.zzref][self.yyref][self.xxref].shape[0]:
+            # DO
+            msg = 'The .fasta file in {} is has less residue entries than the protein sequence of the reference experiment [{}][{}][{}]'.\
+                format(fasta_path, self.zzref, self.yyref, self.xxref)
+            
+            self.log_r(fsw.gen_wet('ERROR', msg, 18))
+            self.abort()
+            # DONE
         return

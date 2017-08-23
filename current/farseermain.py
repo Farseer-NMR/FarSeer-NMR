@@ -622,7 +622,9 @@ def creates_farseer_dataset(fsuv):
 
 def reads_peaklists(exp, fsuv):
     """
-    Loads Peaklist's Tree.
+    Loads Peaklist's Tree from spectra/ folder.
+    
+    Uses FarseerCube.load_experiments().
     
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
@@ -670,6 +672,8 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
+        
+        resonance_type (str): {'Backbone', 'Sidechains'}
     
     Depends on:
     fsuv.cs_correction_res_ref
@@ -681,15 +685,19 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     elif resonance_type=='Sidechains':
         exp.correct_shifts_sidechains()
     
+    else:
+        logs('Choose a valid <resonance_type> argument.', fsuv.logfile_name)
+    
     return
 
 def fill_na(peak_status, merit=0, details='None'):
     """
-    A dictionary that configures how the fields of the
-    added rows for missing residues are fill.
+    A dictionary that configures how the fields of the added rows for 
+    missing residues are fill.
     
     Args:
-        peak_status (str): {'lost', 'unassigned'}, how to fill 'Peak Status' column.
+        peak_status (str): {'lost', 'unassigned'}, how to fill 'Peak Status' 
+            column.
         
         merit (int/str): how to fill the 'Merit' column.
         
@@ -698,6 +706,11 @@ def fill_na(peak_status, merit=0, details='None'):
     Return:
         Dictionary of kwargs.
     """
+    if not(peak_status in ['lost', 'unassigned']):
+        input(\
+            'Choose a valid <peak_status> argument. Press Enter to continue.')
+        return
+    
     d = {
     'Peak Status': peak_status,
     'Merit': merit,
@@ -708,10 +721,10 @@ def fill_na(peak_status, merit=0, details='None'):
 #def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
 def expand_lost(exp, resonance_type='Backbone', dim='z'):
     """
-    Checks for 'lost' residues accross the reference experiments and
-    along other axes (y or z).
+    Checks for 'lost' residues accross the reference experiments
+    for Y and Z axes.
     
-    Uses FarseerCube.finds_missing.
+    Uses FarseerCube.finds_missing().
     
     Compares reference peaklists along Y and Z axis of the Farseer-NMR
     Cube and generates the corresponding 'lost' residues.
@@ -721,61 +734,46 @@ def expand_lost(exp, resonance_type='Backbone', dim='z'):
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        dataset_dct (attribute of <exp>): the peaklist data set where effects
-            take place.
-    
-        fsuv (module): contains all the user defined variables.
+        dim (str): {'y', 'z'}, defaults to 'z'. The dimension along which 
+            references will be compared.
+        
+        resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
+            'Backbone'.
     """
+    
+    if not(dim in ['y', 'z']):
+        input('Choose a valid <dim> argument. Press Enter to continue.')
+        return
     
     exp.compares_references(fill_na('lost'), along_axis=dim,
                             resonance_type=resonance_type)
-    
-    #if dim == 'y':
-        #exp.log_r(\
-        #'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
-        #istitle = True)
-        ## expands to yy (cond2) condition
-        #for a in acoords:
-            ##do
-            #for b in bcoords:
-                ##do
-                #refscoords = {'z': a, 'y': refcoord}
-                #exp.finds_missing(a, b, exp.xxref, 'expanding',
-                               #dataset_dct, 
-                               #dataset_dct,
-                               #fill_na_lost('lost'),
-                               #refscoords=refscoords)
-    #if dim == 'z':
-        #exp.log_r(\
-        #'EXPANDS LOST RESIDUES TO CONDITIONS {}'.format(dim.upper()),
-        #istitle = True)
-        ## expands to yy (cond2) condition
-        #for a in acoords:
-            ##do
-            #for b in bcoords:
-                ##do
-                #refscoords = {'z': refcoord, 'y': a}
-                #exp.finds_missing(b, a, exp.xxref, 'expanding',
-                               #dataset_dct, 
-                               #dataset_dct,
-                               #fill_na('lost'),
-                               #refscoords=refscoords)
     
     return
 
 def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
-    Uses finds_missing method of FarseerSet.py.
+    Uses FarseerCube.finds_missing().
     
     Args:
         exp (FarseerCube class instance): contains all peaklist data.
         
         peak_status (str): {'lost', 'unassigned'} the peak status of the new
-            generated entries for missing peaks.
+            generated entries for missing peaks. Defaults to 'lost'.
         
-        resonance_type (str): {'Backbone', 'Sidechains'}
+        resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
+            'Backbone'.
     """
+    
+    if not(peak_status in ['lost', 'unassigned']):
+        input(\
+            'Choose a valid <peak_status> argument. Press Enter to continue.')
+        return
+    
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
     
     exp.finds_missing(fill_na(peak_status), missing=peak_status,
                                          resonance_type=resonance_type)
@@ -792,11 +790,17 @@ def organize_columns(exp, fsuv, resonance_type='Backbone'):
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
         
-        resonance_type (str): {'Backbone','Sidechains'}
+        resonance_type (str): {'Backbone','Sidechains'}, defaults to 
+            'Backbone'.
     
     Depends on:
     fsuv.perform_cs_correction
     """
+    
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
     
     exp.organize_cols(performed_cs_correction=fsuv.perform_cs_correction,
                       resonance_type=resonance_type)
@@ -821,7 +825,7 @@ def init_fs_cube(exp, fsuv):
     
     return
 
-def series_kwargs(fsuv, rt='Backbone'):
+def series_kwargs(fsuv, resonance_type='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
     the FarseerSeries object based on the user defined preferences.
@@ -830,8 +834,8 @@ def series_kwargs(fsuv, rt='Backbone'):
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
         
-        rt (str): {'Backbone', 'Sidechains'}, whether data corresponds to
-            one or another.
+        resonance_type (str): {'Backbone', 'Sidechains'}, whether data 
+            corresponds to one or another.
     
     Depends on:
     fsuv.csp_alpha4res
@@ -839,7 +843,13 @@ def series_kwargs(fsuv, rt='Backbone'):
     fsuv.cs_lost
     fsuv.restraint_names
     """
-    dd = {'resonance_type':rt,
+    
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
+    
+    dd = {'resonance_type':resonance_type,
           'csp_alpha4res':fsuv.csp_alpha4res,
           'csp_res_exceptions':fsuv.csp_res_exceptions,
           'cs_lost':fsuv.cs_lost,
@@ -899,6 +909,10 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     fsuv.do_cond2
     fsuv.do_cond3
     """
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
     
     if not(checks_cube_axes_flags(fsuv)):
         return None
@@ -913,7 +927,8 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 series_class,
                 along_axis='x',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(fsuv, rt=resonance_type))
+                series_kwargs=series_kwargs(fsuv,
+                                            resonance_type=resonance_type))
     
     # creates set of series for the second condition (2D)
     if exp.hasyy and fsuv.do_cond2:
@@ -922,7 +937,8 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 series_class,
                 along_axis='y',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(fsuv, rt=resonance_type))
+                series_kwargs=series_kwargs(fsuv,
+                                            resonance_type=resonance_type))
 
     # creates set of series for the third condition (3D)  
     if exp.haszz and fsuv.do_cond3:
@@ -931,7 +947,8 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 series_class,
                 along_axis='z',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(fsuv, rt=resonance_type))
+                series_kwargs=series_kwargs(fsuv,
+                                            resonance_type=resonance_type))
     
     return series_dct
 
@@ -950,6 +967,11 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
         resonance_type OPT (str): {'Backbone', 'Sidechains'} whether the data 
             in <series_dct> corresponds to backbone or sidechain resonances.
     """
+    
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
     
     # for each kind of titration (cond{1,2,3})
     for cond in sorted(series_dct.keys()):
@@ -1249,6 +1271,11 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     fsuv.cs_scatter_flower_dict
     """
     
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
+    
     are_plots = checks_plotting_flags(farseer_series, fsuv, resonance_type)
     
     if not(are_plots):
@@ -1397,32 +1424,37 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     return
 
 def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
-        """
-        The set of routines that are run for each comparative series.
+    """
+    The set of routines that are run for each comparative series.
+    
+    Args:
+        comp_panel (FarseerSeries instance generated from 
+            Comparisons.gen_next_dim or gen_prev_dim): contains all the 
+            experiments parsed along an axis and for a specific Farseer-NMR Cube's coordinates.
         
-        Args:
-            comp_panel (FarseerSeries instance generated from 
-                Comparisons.gen_next_dim or gen_prev_dim): contains all the 
-                experiments parsed along an axis and for a specific Farseer-NMR Cube's coordinates.
-            
-            fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
-            
-            resonance_type (str): {'Backbone', 'Sidechains'}, depending on
-                data type.
-        """
-        # EXPORTS FULLY PARSED PEAKLISTS
-        exports_series(comp_panel)
+        fsuv (module): contains user defined variables (preferences) after
+        .read_user_variables().
         
-        # performs pre analysis
-        PRE_analysis(comp_panel, fsuv)
-        
-        exports_chimera_att_files(comp_panel, fsuv)
-        
-        # plots data
-        plots_data(comp_panel, fsuv, resonance_type='Backbone')
-        
+        resonance_type (str): {'Backbone', 'Sidechains'}, depending on
+            data type. Detaults to 'Backbone'.
+    """
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
         return
+    
+    # EXPORTS FULLY PARSED PEAKLISTS
+    exports_series(comp_panel)
+    
+    # performs pre analysis
+    PRE_analysis(comp_panel, fsuv)
+    
+    exports_chimera_att_files(comp_panel, fsuv)
+    
+    # plots data
+    plots_data(comp_panel, fsuv, resonance_type='Backbone')
+    
+    return
 
 def analyse_comparisons(series_dct, fsuv,
                         resonance_type='Backbone'):
@@ -1441,8 +1473,13 @@ def analyse_comparisons(series_dct, fsuv,
             created.
     """
     
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
+    
     # kwargs passed to the parsed series of class fss.FarseerSeries
-    comp_kwargs = series_kwargs(fsuv, rt=resonance_type)
+    comp_kwargs = series_kwargs(fsuv, resonance_type=resonance_type)
     
     # ORDERED relation between dimension names
     # self: [next, prev]
