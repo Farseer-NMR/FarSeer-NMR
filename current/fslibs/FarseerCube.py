@@ -408,6 +408,14 @@ FASTA starting residue: {}  """.format(spectra_path,
             else:
                 FASTA += i.replace(' ', '').replace('\n', '').upper()
         
+        if ''.join(c for c in FASTA if c.isdigit()):
+            msg = 'We found digits in your FASTA string coming from file {}. Be aware of mistakes resulting from wrong FASTA file. You may wish to abort and correct the file. If you choose continue, Farseer-NMR will parse out the digits.'.\
+                format(FASTApath)
+            self.log_r(fsw.gen_wet('WARNING', msg, 22))
+            fsw.continue_abort()
+            
+            FASTA = ''.join(c for c in FASTA if not c.isdigit())
+        
         FASTAfile.close()
 
         # Res# is kept as str() to allow reindexing
@@ -1438,7 +1446,7 @@ residues.'.format(z, y, x)
                 self.abort()
         
         # writes confirmation message
-        self.log_r('> All <{}> files found and correct- OK!'.format(filetype))
+        self.log_r('> All <{}> files found and correct - OK!'.format(filetype))
         
         return
     
@@ -1491,8 +1499,22 @@ residues.'.format(z, y, x)
         Farseer cannot operate fasta of different lengths if analysing on 
         the y dimension.
         """
-        a = self.p5d(self.allfasta)
-        if (a.isnull().values.any()):
+        l = []
+        is_bigger = False
+        for z in self.zzcoords:
+            # DO
+            for y in self.yycoords:
+                # DO
+                key = list(self.allfasta[z][y].keys())[0]
+                l.append(self.allfasta[z][y][key].shape[0])
+                # DONE
+            
+            if len(set(l)) > 1:
+                is_bigger = True
+            l = []
+            # DONE
+        
+        if is_bigger:
             msg = '.fasta files have not the same size and they should have the same size when performing calculations along the Y axis. Please correct your .fasta files.'
             self.log_r(fsw.gen_wet('ERROR', msg, 21))
             self.abort()

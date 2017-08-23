@@ -45,12 +45,12 @@ def continue_abort():
             input('> What do you want to do? [C]ontinue or [A]bort? ').upper()
     
     if choice == 'A':
-        end_bad()
+        abort(abort_msg)
     elif choice == 'C':
         return 'Continuing...'
 
-def abort():
-    sys.exit()
+def abort(m=''):
+    sys.exit(m)
     return
 
 def end_good():
