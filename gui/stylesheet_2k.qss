@@ -2,13 +2,18 @@
 font-family: "Sinkin Sans";
 font-weight: normal;
 font-size: 10pt;
-color: #FAFAF7;
+}
 
+QGroupBox {
+color: #FAFAF7;
 }
 
 QWidget#MainWidget {
 background-color: #001450;
 }
+
+
+
 
 QTabWidget  {
 border-top: 1px solid #036D8F;
@@ -122,6 +127,7 @@ color: #012C6E;
 font-size: 10pt;
 font-weight: 400;
 height: 24px;
+min-width: 120px;
 }
 
 QPushButton::hover {
@@ -217,7 +223,6 @@ border-top: 1px solid #07AFF8;
 color: #001450;
 font-size: 10pt;
 font-weight: 400;
-
 height: 26px;
 padding-bottom: 6px;
 padding-top: 8px;
@@ -247,6 +252,9 @@ background-repeat: repeat-x;
 background-color: #08F2EE;
 }
 
+QDialog QFileDialog {
+color: red;
+}
 
 QSplitter {
 padding-left: 12px;

@@ -1,4 +1,4 @@
-import farseer_user_variables as fsuv
+from current import farseer_user_variables as fsuv
 
 def write_title(title, onlytitle=False):
     '''

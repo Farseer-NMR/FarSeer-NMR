@@ -56,7 +56,7 @@ class CSPExceptionsPopup(QDialog):
         for key, value in self.value_dict.items():
             if value.field.value() > 0:
                 tmp_dict[aal3tol1[key]] = value.field.value()
-        variables["csp_settings"]["csp_res_exceptions"] = unicode(tmp_dict)
+        variables["csp_settings"]["csp_res_exceptions"] = str(tmp_dict)
         self.accept()
 
     def get_values(self):

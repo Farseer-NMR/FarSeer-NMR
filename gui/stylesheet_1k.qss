@@ -2,6 +2,9 @@
 font-family: "Sinkin Sans";
 font-weight: normal;
 font-size: 10pt;
+}
+
+QGroupBox {
 color: #FAFAF7;
 }
 
