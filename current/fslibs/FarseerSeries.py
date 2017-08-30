@@ -367,7 +367,7 @@ class FarseerSeries(pd.Panel):
         characterise ligand binding. Prog. Nuc. Magn. Res. Spect.
         73, 1–16 (2013). SEE CORRIGENDUM
         """
-        return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2]**2)))
+        return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2])**2))
     
     def calc_csp(self, calccol='CSP',
                        pos1='PosF1_delta',
