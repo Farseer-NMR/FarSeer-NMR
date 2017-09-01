@@ -94,10 +94,11 @@ class TabWidget(QTabWidget):
     def save_config(self, variables):
 
         fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
-        with open(fname[0], 'w') as outfile:
-            if fname[0].endswith('.json'):
-                json.dump(variables, outfile, indent=4, sort_keys=True)
-            print('Configuration saved to %s' % outfile)
+        if fname[0]:
+            with open(fname[0], 'w') as outfile:
+                if fname[0].endswith('.json'):
+                    json.dump(variables, outfile, indent=4, sort_keys=True)
+                print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
@@ -464,6 +465,91 @@ class Settings(QWidget):
             self.load_variables()
 
     def save_config(self):
+
+        general = self.variables["general_settings"]
+        fitting = self.variables["fitting_settings"]
+        cs = self.variables["cs_settings"]
+        csp = self.variables["csp_settings"]
+        fasta = self.variables["fasta_settings"]
+        plots_f1 = self.variables["plots_PosF1_settings"]
+        plots_f2 = self.variables["plots_PosF2_settings"]
+        plots_csp = self.variables["plots_CSP_settings"]
+        plots_height = self.variables["plots_Height_ratio_settings"]
+        plots_volume = self.variables["plots_Volume_ratio_settings"]
+
+        # General Settings
+
+        general["spectrum_path"] = self.spectrum_path.field.text()
+        general["logfile_name"] = self.logfile_path.field.text()
+        general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
+        general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
+        general["fig_height"] = self.figure_height.field.value()
+        general["fig_width"] = self.figure_width.field.value()
+        general["fig_dpi"] = self.figure_dpi.field.value()
+        general["fig_file_type"] = self.figure_format.fields.currentText()
+
+
+        # Fitting Settings
+        fitting["expand_lost_yy"] = self.expand_lost_yy.isChecked()
+        fitting["expand_lost_zz"] = self.expand_lost_zz.isChecked()
+        fitting["perform_comparisons"] = self.perform_comparisons_checkbox.isChecked()
+        fitting["do_titvar1"] = self.x_checkbox.isChecked()
+        fitting["do_titvar2"] = self.y_checkbox.isChecked()
+        fitting["do_titvar3"] = self.z_checkbox.isChecked()
+
+        # CS Settings
+        cs["perform_cs_correction"] = self.cs_correction.isChecked()
+        cs["cs_correction_res_ref"] = self.cs_correction_res_ref.field.value()
+
+        # CSP Settings
+        csp["csp_res4alpha"] = self.csp_alpha.field.value()
+        csp["cs_lost"] = self.csp_lost.fields.currentText()
+
+        # FASTA Settings
+        fasta["applyFASTA"] = self.apply_fasta_checkbox.isChecked()
+        fasta["FASTAstart"] = self.fasta_start.field.value()
+
+        # Plot F1 Settings
+        plots_f1["plots_PosF1_delta"] = self.plot_F1_data.isChecked()
+        plots_f1["yy_label_PosF1_delta"] = self.plot_F1_y_label.field.text()
+        plots_f1["yy_scale_PosF1_delta"] = self.plot_F1_y_scale.field.value()
+        plots_f1["calccol_name_PosF1_delta"] = self.plot_F1_calccol.field.text()
+
+        # Plot F2 Settings
+        plots_f2["plots_PosF2_delta"] = self.plot_F2_data.isChecked()
+        plots_f2["yy_label_PosF2_delta"] = self.plot_F2_y_label.field.text()
+        plots_f2["yy_scale_PosF2_delta"] = self.plot_F2_y_scale.field.value()
+        plots_f2["calccol_name_PosF2_delta"] = self.plot_F2_calccol.field.text()
+
+
+        # Plot CSP Settings
+        plots_csp["plots_CSP"] = self.plot_CSP.isChecked()
+        plots_csp["yy_label_CSP"] =self.plot_CSP_y_label.field.text()
+        plots_csp["yy_scale_CSP"] = self.plot_CSP_y_scale.field.value()
+        plots_csp["calccol_name_CSP"] = self.plot_CSP_calccol.field.text()
+
+        # Plot Height Settings
+        plots_height["plots_Height_ratio"] = self.plot_height_ratio.isChecked()
+        plots_height["yy_label_Height_ratio"] = self.plot_height_y_label.field.text()
+        plots_height["yy_scale_Height_ratio"] =self.plot_height_y_scale.field.value()
+        plots_height["calccol_name_Height_ratio"] = self.plot_height_calccol.field.text()
+
+        # Plot Volume Settings
+        plots_volume["plots_Volume_ratio"] = self.plot_volume_ratio.isChecked()
+        plots_volume["yy_label_Volume_ratio"] = self.plot_volume_y_label.field.text()
+        plots_volume["yy_scale_Volume_ratio"] = self.plot_volume_y_scale.field.value()
+        plots_volume["calccol_name_Volume_ratio"] = self.plot_volume_calccol.field.text()
+
+        # Plot Booleans
+        self.variables["extended_bar_settings"]["do_ext_bar"] = self.ext_bar_checkbox.isChecked()
+        self.variables["compact_bar_settings"]["do_comp_bar"] = self.comp_bar_checkbox.isChecked()
+        self.variables["vert_bar_settings"]["do_vert_bar"] = self.vert_bar_checkbox.isChecked()
+        self.variables["res_evo_settings"]["do_res_evo"] = self.res_evo_checkbox.isChecked()
+        self.variables["cs_scatter_settings"]["do_cs_scatter"] = self.scatter_checkbox.isChecked()
+        self.variables["heat_map_settings"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
+        self.variables["dpre_osci_settings"]["do_dpre"] = self.dpre_checkbox.isChecked()
+        import pprint
+        pprint.pprint(self.variables)
         self.parent().parent().parent().save_config(self.variables)
 
     def run_farseer_calculation(self):
