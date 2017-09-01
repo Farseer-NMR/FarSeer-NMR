@@ -1,7 +1,7 @@
 {
     "bar_plot_settings": {
         "bar_measured_color":null,
-        "bar_status_color_flag":null
+        "bar_status_color_flag":null,
         "bar_lost_color":null,
         "bar_unassigned_color":null,
         "bar_width":null,
@@ -15,10 +15,10 @@
         "bar_mark_fontsize":null,
         "bar_mark_prolines_flag":null,
         "bar_mark_prolines_symbol":null,
-        "bar_mark_user_details_flag"null,
+        "bar_mark_user_details_flag":null,
         "bar_color_user_details_flag":null,
         "bar_user_marks_dict":null,
-        "bar_user_bar_colors_dict":null,
+        "bar_user_bar_colors_dict":null
     }, 
     "compact_bar_settings": {
         "comp_bar_cols_page":null,
@@ -56,7 +56,7 @@
         "cs_scatter_flower_y_ticks_fs":null,
         "cs_scatter_flower_y_ticks_pad":null,
         "cs_scatter_flower_y_ticks_weight":null,
-        "cs_scatter_flower_y_ticks_rot":null,
+        "cs_scatter_flower_y_ticks_rot":null
     }, 
     "cs_scatter_settings": {
         "cs_scatter_cols_page": null, 
