@@ -35,7 +35,7 @@ titration_x_values = [0, 125, 250, 500, 1000, 2000, 4000] # values for the x axi
 #
 ## Perform PRE analysis
 apply_PRE_analysis = False
-apply_smooth=True
+apply_smooth=False
 gaussian_stddev=1
 gauss_x_size=7
 pre_color='green'  # theoretical PRE line color
@@ -58,8 +58,8 @@ calcs_Height_ratio = False  # Plot Height ratio data
 calcs_Volume_ratio = False  # Plot Volume ratio data
 #
 
-plots_extended_bar = False  # Represent data in Extended Bar Plot style
-plots_compacted_bar = True  # Represent data in Compacted Bar Plot style
+plots_extended_bar = True  # Represent data in Extended Bar Plot style
+plots_compacted_bar = False  # Represent data in Compacted Bar Plot style
 plots_vertical_bar = False # Represent data in Vertical Bar Plot style
 plots_residue_evolution = False  # Represent Data Evolution per Residue style
 plots_cs_scatter = False  # Represent chemical shift scatter data
@@ -84,8 +84,8 @@ calccol_name_Volume_ratio = 'Vol_ratio'  # column name for Volume Ratio data
 yy_scale_PosF1_delta = 0.2  # y axis sacle for nuclei 1
 yy_scale_PosF2_delta = 1 # y axis scale for nuclei 2
 yy_scale_CSP = 0.3  # y axis sacle for combined chemical shift
-yy_scale_Height_ratio = 1.5 # y axis scale for height ratio
-yy_scale_Volume_ratio = 1.5 # y axis scale for volume ratio
+yy_scale_Height_ratio = 1.1 # y axis scale for height ratio
+yy_scale_Volume_ratio = 1.1 # y axis scale for volume ratio
 yy_scale_nbins=5  # adjusted number of ticks
 #####################################
 #
@@ -136,8 +136,8 @@ bar_mark_prolines_flag=True  # mark prolines ON/OFF
 bar_mark_prolines_symbol='P'  # symbol to mark prolines
 bar_mark_user_details_flag=False  # mark user details ON/OFF
 bar_color_user_details_flag=False  # color bars according to user detail marks ON/OFF
-bar_user_marks_dict = {'H0': 'H','V0': 'V','low':'L','p1':'1','p2':'2','p3':'3','p4':'4','p5':'5','p6':'6','p7':'7','p8':'8','p9':'9','p10':'10','z':'z','Z':'z','MTSL':'M'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
-bar_user_bar_colors_dict = {'H0': 'khaki','V0': 'khaki','low':'khaki'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
+bar_user_marks_dict = {'mark': 'm'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
+bar_user_bar_colors_dict = {'mark': 'khaki'}  # keys: the string in 'Details' column in input data, value: the character to be drawn
 
 # Specific details for Extended Bar Plot
 ## use a combination of cols_page and rows_page to achieve desired figure ratio
@@ -183,9 +183,9 @@ dpre_osci_x_ticks_pad = 0.5
 dpre_osci_x_ticks_weight = 'normal'
 dpre_osci_grid_color='grey'  # grid color
 dpre_osci_shade = False  # applies shade to regions
-dpre_osci_shade_regions = [(23,37),(0,0),(0,0)]  # defines shade regions
+dpre_osci_shade_regions = [(23,37)]  # defines shade regions
 dpre_osci_res_highlight=True  # flags residue highlight
-dpre_osci_res_hl_list=[25,32,54,64,66,47]  # residues to highlight (res, shade width)
+dpre_osci_res_hl_list=[1, 2]  # residues to highlight (res, shade width)
 dpre_osci_rh_fs=4  # font size for residue highlight
 dpre_osci_rh_y=0.9  # y position for residue 1-letter representation
 #
@@ -297,6 +297,6 @@ heat_map_cbar_font_size=4  # font size of color map legend
 ### Figure Details
 fig_width = 8.69  # Figure width in inches
 fig_height = 11.69  # Figure height in inches
-fig_file_type = 'png'  # Figure file type
+fig_file_type = 'pdf'  # Figure file type
 fig_dpi = 300  # Figure resolution
 #s
