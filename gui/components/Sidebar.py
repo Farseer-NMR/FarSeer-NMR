@@ -66,8 +66,8 @@ class SideBar(QTreeWidget):
             if not name in self.peakLists.keys():
                 pl_name = name
             else:
-                if name+'_' in self.peakLists.keys():
-                    number = int(pl_name.split('_')[1])+1
+                if any([name+'_' in x for x in self.peakLists.keys()]):
+                    number = int(self.peakLists.keys()[-1].split('_')[1])+1
                     pl_name = name+'_%s' % number
                 else:
                     pl_name = name + '_1'

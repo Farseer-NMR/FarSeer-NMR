@@ -86,6 +86,7 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
     def load_peak_lists(self, path=None):
+        print(path)
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
 
@@ -439,6 +440,7 @@ class Settings(QWidget):
 
     def set_spectrum_path_text(self, path=None):
         self.spectrum_path.setText(path)
+        self.parent().parent().parent().load_peak_lists(path)
 
     def set_logfile_path_text(self, path=None):
         self.logfile_path.setText(path)
@@ -446,8 +448,8 @@ class Settings(QWidget):
     def set_spectrum_path(self, path=None):
         if not path:
             path = str(QFileDialog.getExistingDirectory(None, 'Select Directory', os.getcwd()))
-        self.spectrum_path.setText(path)
-        self.parent().parent().parent().load_peak_lists(path)
+        self.set_spectrum_path_text(path)
+
 
 
     def set_logfile_path(self, path=None):
