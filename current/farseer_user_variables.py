@@ -5,7 +5,7 @@ logfile_name = 'farseer_log.md' #  the name of the log file
 ####################################
 
 ### Input Data Setup
-applyFASTA = True  # complete the sequence with a FASTA file?
+applyFASTA = False  # complete the sequence with a FASTA file?
 FASTAstart = 1  # Residue number for the first residue in the FASTA file?
 #
 perform_cs_correction = False  # Aligns peaklists to a specific residue in the reference spectra
@@ -184,7 +184,7 @@ dpre_osci_x_ticks_weight = 'normal'
 dpre_osci_grid_color='grey'  # grid color
 dpre_osci_shade = False  # applies shade to regions
 dpre_osci_shade_regions = [(23,37)]  # defines shade regions
-dpre_osci_res_highlight=True  # flags residue highlight
+dpre_osci_res_highlight=False  # flags residue highlight
 dpre_osci_res_hl_list=[1, 2]  # residues to highlight (res, shade width)
 dpre_osci_rh_fs=4  # font size for residue highlight
 dpre_osci_rh_y=0.9  # y position for residue 1-letter representation
@@ -205,12 +205,12 @@ revo_y_label_weight='normal'  # y label weight
 revo_x_ticks_fn='Arial'  # x ticks font
 revo_x_ticks_fs=5  # x ticks font size
 revo_x_ticks_pad=1  # x ticks pad
-revo_x_ticks_weight=1  # x ticks font style
+revo_x_ticks_weight='normal'  # x ticks font style
 revo_x_ticks_rot=30  # ticks label rotation
 revo_y_ticks_fn='Arial'  # x ticks font
 revo_y_ticks_fs=5  # x ticks font size
 revo_y_ticks_pad=1  # x ticks pad
-revo_y_ticks_weight=1  # x ticks font style
+revo_y_ticks_weight='normal'  # x ticks font style
 revo_y_ticks_rot=0
 #
 # Specific details for Residue Evolution Plot
@@ -267,7 +267,7 @@ cs_scatter_flower_y_label_weight='normal'  # y label weight
 cs_scatter_flower_x_ticks_fn='Arial'  # x ticks font
 cs_scatter_flower_x_ticks_fs=8  # x ticks font size
 cs_scatter_flower_x_ticks_pad=1  # x ticks pad
-cs_scatter_flower_x_ticks_weight=1  # x ticks font style
+cs_scatter_flower_x_ticks_weight='normal'  # x ticks font style
 cs_scatter_flower_x_ticks_rot=0  # ticks label rotation
 cs_scatter_flower_y_ticks_fn='Arial'  # x ticks font
 cs_scatter_flower_y_ticks_fs=8  # x ticks font size
