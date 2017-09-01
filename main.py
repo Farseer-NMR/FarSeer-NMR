@@ -2,6 +2,7 @@ import sys
 from functools import partial
 import json
 import os
+from collections import OrderedDict
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
     QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem
@@ -44,7 +45,7 @@ valuesDict = {
             'z': []
         }
 
-peakLists = {}
+peakLists = OrderedDict()
 
 
 def load_config():
