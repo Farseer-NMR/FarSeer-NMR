@@ -2,12 +2,16 @@
 font-family: "Sinkin Sans";
 font-weight: normal;
 font-size: 10pt;
+}
+
+QGroupBox {
 color: #FAFAF7;
 }
 
 QAbstractSpinBox::selected {
 border: 0;
 }
+
 
 QWidget#MainWidget {
 background-color: #001450;

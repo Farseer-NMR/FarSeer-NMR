@@ -4,6 +4,10 @@ font-weight: normal;
 font-size: 8pt;
 }
 
+QGroupBox {
+color: #FAFAF7;
+}
+
 QWidget#MainWidget {
 background-color: #001450;
 }

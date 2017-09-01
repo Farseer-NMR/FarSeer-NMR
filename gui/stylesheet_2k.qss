@@ -2,8 +2,11 @@
 font-family: "Sinkin Sans";
 font-weight: normal;
 font-size: 10pt;
-color: #FAFAF7;
+font-size: 10pt;
+}
 
+QGroupBox {
+color: #FAFAF7;
 }
 
 QWidget#MainWidget {
