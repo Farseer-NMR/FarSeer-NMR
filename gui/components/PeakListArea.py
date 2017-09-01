@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem
+from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem, QMessageBox
 from PyQt5 import QtCore, QtGui
 import pickle
 
@@ -24,6 +24,7 @@ class PeakListArea(QWidget):
 
         self.valuesDict = valuesDict
         self.setEvents()
+        self.updateClicks = 0
 
 
     def setEvents(self):
@@ -33,7 +34,20 @@ class PeakListArea(QWidget):
         event.accept()
 
 
+    def show_update_warning(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Reset Experimental Series")
+        msg.setInformativeText("Do you want to all peaklists from the Experimental Series and re-draw the series?")
+        msg.setWindowTitle("Reset Experimental Series")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+        retval = msg.exec_()
+        return retval
+
     def updateTree(self):
+        if self.updateClicks > 0:
+            self.show_update_warning()
         self.peak_list_objects = []
         self.show()
         self.parent().parent().parent().sideBar.addLists()
@@ -64,6 +78,8 @@ class PeakListArea(QWidget):
         pl_pos = self.scene.width()*0.75
         xx_vertical = x_spacing
         num = 0
+
+
         for i, z in enumerate(z_conds):
                 y_markers = []
                 for j, y in enumerate(y_conds):
@@ -97,6 +113,7 @@ class PeakListArea(QWidget):
                 for x_marker in y_markers:
                     self._addConnectingLine(zz, x_marker)
 
+        self.updateClicks += 1
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():

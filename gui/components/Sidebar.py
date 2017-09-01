@@ -33,8 +33,9 @@ class SideBar(QTreeWidget):
             event.mimeData().setText(text)
 
     def dropEvent(self, event):
-        event.accept()
+
         if event.mimeData().hasUrls():
+            event.accept()
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
                 self.load_from_path(filePath)
@@ -48,8 +49,9 @@ class SideBar(QTreeWidget):
                         self.load_peaklist(path)
                     except IOError:
                         pass
-            else:
-                self.load_peaklist(filePath)
+        else:
+            print(filePath)
+            self.load_peaklist(filePath)
 
 
     def load_peaklist(self, filePath):

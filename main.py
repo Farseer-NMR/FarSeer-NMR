@@ -543,7 +543,6 @@ class Settings(QWidget):
         self.scatter_checkbox.setChecked(self.variables["cs_scatter_settings"]["do_cs_scatter"])
         self.heat_map_checkbox.setChecked(self.variables["heat_map_settings"]["do_heat_map"])
         self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
-        # self.user_details_checkbox.setChecked(fitting["include_user_annotations"])
 
     def show_popup(self, popup, variables):
         p = popup(variables=self.variables)
