@@ -295,11 +295,11 @@ class Settings(QWidget):
         restraint_groupbox_layout = QGridLayout()
         restraint_groupbox.setLayout(restraint_groupbox_layout)
 
-        self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
-        self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
-        self.plot_CSP = LabelledCheckbox(self, text="Plot CSPs")
-        self.plot_height_ratio = LabelledCheckbox(self, text="Plot Height Ratio")
-        self.plot_volume_ratio = LabelledCheckbox(self, text="Plot Volume Ratio")
+        self.plot_F1_data = LabelledCheckbox(self, text="F1 data")
+        self.plot_F2_data = LabelledCheckbox(self, text="F2 data")
+        self.plot_CSP = LabelledCheckbox(self, text="CSPs")
+        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio")
+        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio")
 
         self.plot_F1_y_label = LabelledLineEdit(self, text='')
         self.plot_F2_y_label = LabelledLineEdit(self, text='')
