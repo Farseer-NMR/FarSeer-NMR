@@ -100,8 +100,8 @@ class TabWidget(QTabWidget):
 
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
-        spectrum_path = self.tab1.logfile_path.field.text()
-        peak_list_objects = self.tab2.peakListArea.peak_list_objects
+        spectrum_path = self.settings.spectrum_path.field.text()
+        peak_list_objects = self.interface.peakListArea.peak_list_objects
         # spectrum_dir = os.getcwd()
         create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
         self.write_fsuv(spectrum_path)
@@ -110,7 +110,7 @@ class TabWidget(QTabWidget):
         run_farseer('{}/spectra'.format(cwd), fsuv)
 
     def write_fsuv(self, file_path):
-        variables = self.tab1.variables
+        variables = self.settings.variables
         json_to_fsuv(file_path, variables=variables)
 
 
@@ -482,7 +482,10 @@ class Settings(QWidget):
         plots_volume = self.variables["plots_Volume_ratio_settings"]
 
         # General Settings
-        self.spectrum_path.field.setText(general["spectrum_path"])
+        if os.path.exists(general["spectrum_path"]):
+            self.spectrum_path.field.setText(general["spectrum_path"])
+        else:
+            self.spectrum_path.field.setText(os.getcwd())
         self.logfile_path.field.setText(general["logfile_name"])
         self.has_sidechains_checkbox.setChecked(general["has_sidechains"])
         self.use_sidechains_checkbox.setChecked(general["use_sidechains"])
