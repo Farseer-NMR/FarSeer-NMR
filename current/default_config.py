@@ -145,7 +145,7 @@ defaults = {
         "res_evo_fit_line_style": '-'
     }, 
     "cs_scatter_settings": {
-        "do_cs_scatter": null,
+        "do_cs_scatter": False,
         "cs_scatter_cols_page": 5, 
         "cs_scatter_rows_page": 7, 
         "cs_scatter_markers": [
