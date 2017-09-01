@@ -15,7 +15,7 @@ def fsuv_to_json(fsuv):
             if fsuv_value:
                 val[k] = eval(fsuv_value)
 
-    return new_config
+    return variables
 
 
 
