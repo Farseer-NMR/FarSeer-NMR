@@ -93,10 +93,11 @@ class TabWidget(QTabWidget):
 
     def save_config(self, variables):
 
-        fname = QFileDialog.getSaveFileName(self, 'Save Configuration')
-        if os.path.exists(fname[0]):
-            with open(fname[0], 'w') as outfile:
+        fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
+        with open(fname[0], 'w') as outfile:
+            if fname[0].endswith('.json'):
                 json.dump(variables, outfile, indent=4, sort_keys=True)
+            print('Configuration saved to %s' % outfile)
 
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
