@@ -633,7 +633,7 @@ class artifset():
         
         #https://stackoverflow.com/questions/3685265/how-to-write-a-multidimensional-array-to-a-text-file
         
-        header = 'Assign F1,Assign F2,Merit,Details,Fit Method,Vol. Method,Number,#,Position F1,Position F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz)'
+        header = 'Number,#,Position F1,Position F2,Assign F1,Assign F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz),Merit,Details,Fit Method,Vol. Method'
         
         self.remove_prolines()
         
@@ -661,6 +661,15 @@ class artifset():
                     
                     tmp = np.concatenate([array_s, array_f], axis = 1)
                     
+                    # https://stackoverflow.com/questions/4857927/swapping-columns-in-a-numpy-array
+                    print(tmp.shape)
+                    tmp[:,list(range(14))] = \
+                        tmp[:,[6,7,8,9,0,1,10,11,12,13,2,3,4,5]]
+                    
+                    
+                    
+                    #tmp = np.moveaxis(tmp, [range(14)], [6,7,8,9,0,1,10,11,12,13,2,3,4,5])
+                    #print(tmp[0,:])
                     
                     folder = 'spectra/{}/{}'.format(zz, yy)
                     if not(os.path.exists(folder)):

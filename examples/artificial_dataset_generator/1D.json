@@ -1,0 +1,15 @@
+{
+    "plen": 100,
+    "zdata": ["dia"],
+    "ydata": ["L1"],
+    "xdata": [0, 125, 250],
+    "regions" : {"L1":{"r1":[20,20],
+                       "r2":[60,14],
+                       "r3":[80,10]
+                              }
+                },
+    "tag_position": 75,
+    "pre_interaction":{"L1":20},
+    "tag_size": 40
+}
+
