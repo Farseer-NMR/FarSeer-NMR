@@ -20,7 +20,7 @@ class LabelledDoubleSpinBox(QWidget):
         if min:
             self.field.setMinimum(min)
         if max:
-            self.field.setMinimum(max)
+            self.field.setMaximum(max)
         if step:
             self.field.setSingleStep(step)
 

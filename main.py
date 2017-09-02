@@ -77,8 +77,6 @@ class TabWidget(QTabWidget):
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
         self.tablogo.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        print(self.interface.sideBar)
-
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
         self.tablogo.setPixmap(pixmap)
         self.tablogo.setContentsMargins(9, 0, 0, 6)
@@ -86,7 +84,6 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
     def load_peak_lists(self, path=None):
-        print(path)
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
 
@@ -130,11 +127,7 @@ class Settings(QWidget):
         self.layout().addWidget(newWidget)
 
         grid.setAlignment(QtCore.Qt.AlignTop)
-        # grid.setSpacing(3)
-        # grid.setVerticalSpacing(0)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        from current.default_config import defaults
-        # self.variables = None
         self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QGridLayout()
@@ -308,11 +301,11 @@ class Settings(QWidget):
         self.plot_height_calccol = LabelledLineEdit(self, text="")
         self.plot_volume_calccol = LabelledLineEdit(self, text="")
 
-        self.plot_F1_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
-        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
-        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
-        self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
-        self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
+        self.plot_F1_y_scale = LabelledDoubleSpinBox(self, text="", min=0, step=1)
+        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="", min=0, step=1)
+        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self, text="", min=0, step=1)
+        self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="", min=0, step=1)
+        self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="", min=0, step=1)
 
         restraint_label = QLabel("Restraint Name")
         axis_label = QLabel("Y Axis Label")
