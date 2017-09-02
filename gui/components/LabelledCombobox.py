@@ -11,8 +11,9 @@ class LabelledCombobox(QWidget):
         self.setLayout(layout)
         label = QLabel(text)
         self.fields = QComboBox()
+        self.texts = []
         if items:
-            self.fields.addItems(items)
+            [self.addItem(item) for item in items]
 
         self.layout().addWidget(label)
         self.layout().addWidget(self.fields)
@@ -25,5 +26,12 @@ class LabelledCombobox(QWidget):
         if index >= 0:
             self.fields.setCurrentIndex(index)
 
+
+
     def set_callback(self, callback):
         self.fields.currentTextChanged.connect(callback)
+
+    def addItem(self, text,):
+
+        self.fields.addItem(text)
+        self.texts.append(text)

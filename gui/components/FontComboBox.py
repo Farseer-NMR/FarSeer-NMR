@@ -179,8 +179,7 @@ class FontComboBox(LabelledCombobox):
     def __init__(self, parent, text=None):
         LabelledCombobox.__init__(self, parent, text, fonts)
 
-    def select(self, text):
-        font = get_font_from_file(matplotlib.font_manager.findfont(text))
-        index = self.fields.findText(font, QtCore.Qt.MatchFixedString)
-        if index >= 0:
-            self.fields.setCurrentIndex(index)
+    def select(self, item):
+        index = list(self.texts).index(item)
+        if index:
+         self.fields.setCurrentIndex(index)
