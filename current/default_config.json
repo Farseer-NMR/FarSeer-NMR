@@ -203,6 +203,7 @@
         "cs_scatter_flower_y_ticks_rot":0
     }, 
     "heat_map_settings": {
+        "do_heat_map": false,
         "heat_map_rows": 20, 
         "heat_map_vmin": 0.05, 
         "heat_map_vmax": 1.0, 
