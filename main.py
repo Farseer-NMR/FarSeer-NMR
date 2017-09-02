@@ -282,6 +282,8 @@ class Settings(QWidget):
         cs_groupbox.setLayout(cs_groupbox_layout)
 
         self.csp_alpha = LabelledDoubleSpinBox(self, text="CSP Alpha")
+        self.csp_alpha.field.setMaximum(1)
+        self.csp_alpha.field.setSingleStep(0.01)
         self.csp_lost = LabelledCombobox(self, text="Show Lost Residues", items=['prev', 'full', 'zero'])
         self.csp_exceptions = QPushButton("Alpha by residue", self)
         self.csp_exceptions.clicked.connect(partial(self.show_popup, CSPExceptionsPopup, self.variables))
@@ -642,7 +644,7 @@ class Settings(QWidget):
         self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
 
     def show_popup(self, popup, variables):
-        p = popup(variables=self.variables)
+        p = popup(self, variables=self.variables)
         p.exec_()
         p.raise_()
 

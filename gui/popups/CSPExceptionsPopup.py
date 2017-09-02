@@ -20,18 +20,19 @@ class CSPExceptionsPopup(QDialog):
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         self.variables = None
-
+        self.alpha_value = self.parent().csp_alpha.field.value()
+        print('alpha', self.alpha_value)
         if variables:
             self.variables = eval(variables["csp_settings"]["csp_res_exceptions"])
-            self.alpha_value = variables["csp_settings"]["csp_res4alpha"]
+
             # self.user_variables = variables["user_mark_settings"]
         self.defaults = eval(defaults["csp_settings"]["csp_res_exceptions"])
-        print(self.variables, type(self.variables))
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):
             self.value_dict[res] = LabelledDoubleSpinBox(self, text=res)
             self.value_dict[res].field.setMaximum(1)
             self.value_dict[res].field.setMinimum(0)
+            self.value_dict[res].field.setSingleStep(0.01)
             if ii < 5:
                 self.layout().addWidget(self.value_dict[res], ii, 0)
             elif 5 <= ii < 10:
@@ -74,4 +75,4 @@ class CSPExceptionsPopup(QDialog):
             if aal3tol1[key] in self.defaults.keys():
                 value.field.setValue(self.variables[aal3tol1[key]])
             else:
-                value.field.setValue(0)
+                value.field.setValue(self.alpha_value)
