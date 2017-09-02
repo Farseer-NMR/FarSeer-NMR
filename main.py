@@ -103,11 +103,12 @@ class TabWidget(QTabWidget):
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
         spectrum_path = self.settings.spectrum_path.field.text()
+        output_path = self.settings.logfile_path.field.text()
         peak_list_objects = self.interface.peakListArea.peak_list_objects
-        create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
-        self.write_fsuv(spectrum_path)
+        create_directory_structure(output_path, valuesDict, peak_list_objects, peakLists)
+        self.write_fsuv(output_path)
         from current.farseermain import read_user_variables, run_farseer
-        fsuv = read_user_variables(spectrum_path)
+        fsuv = read_user_variables(output_path)
         run_farseer(fsuv)
 
     def write_fsuv(self, file_path):
