@@ -1,7 +1,11 @@
 * {
 font-family: "Sinkin Sans";
 font-weight: normal;
-font-size: 8pt;
+font-size: 10pt;
+}
+
+QGroupBox {
+color: #FAFAF7;
 }
 
 QGroupBox {

@@ -492,9 +492,9 @@ class Settings(QWidget):
         fitting["expand_lost_yy"] = self.expand_lost_yy.isChecked()
         fitting["expand_lost_zz"] = self.expand_lost_zz.isChecked()
         fitting["perform_comparisons"] = self.perform_comparisons_checkbox.isChecked()
-        fitting["do_titvar1"] = self.x_checkbox.isChecked()
-        fitting["do_titvar2"] = self.y_checkbox.isChecked()
-        fitting["do_titvar3"] = self.z_checkbox.isChecked()
+        fitting["do_cond1"] = self.x_checkbox.isChecked()
+        fitting["do_cond2"] = self.y_checkbox.isChecked()
+        fitting["do_cond3"] = self.z_checkbox.isChecked()
 
         # CS Settings
         cs["perform_cs_correction"] = self.cs_correction.isChecked()
@@ -584,6 +584,10 @@ class Settings(QWidget):
         self.expand_lost_yy.setChecked(fitting["expand_lost_yy"])
         self.expand_lost_zz.setChecked(fitting["expand_lost_zz"])
         self.perform_comparisons_checkbox.setChecked(fitting["perform_comparisons"])
+        self.x_checkbox.setChecked(fitting["do_cond1"])
+        self.y_checkbox.setChecked(fitting["do_cond2"])
+        self.z_checkbox.setChecked(fitting["do_cond3"])
+
 
         # CS Settings
         self.cs_correction.setChecked(cs["perform_cs_correction"])

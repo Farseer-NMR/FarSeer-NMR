@@ -68,8 +68,8 @@ class UserMarksPopup(QDialog):
         self.pairs.append([key, value, colour, addButton, removeButton])
         self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
         self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
-        self.mainWidget.layout().addWidget(addButton, self.marker_rows, 2)
-        self.mainWidget.layout().addWidget(colour, self.marker_rows, 3)
+        self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
+        self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
         self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
         self.marker_rows += 1
         # print(self.pairs)
