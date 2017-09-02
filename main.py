@@ -308,11 +308,11 @@ class Settings(QWidget):
         self.plot_height_calccol = LabelledLineEdit(self, text="")
         self.plot_volume_calccol = LabelledLineEdit(self, text="")
 
-        self.plot_F1_y_scale = LabelledDoubleSpinBox(self, text="")
-        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="")
-        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self, text="")
-        self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="")
-        self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="")
+        self.plot_F1_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
+        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
+        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
+        self.plot_height_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
+        self.plot_volume_y_scale = LabelledDoubleSpinBox(self, text="", min=0, max=1, step=0.1)
 
         restraint_label = QLabel("Restraint Name")
         axis_label = QLabel("Y Axis Label")
