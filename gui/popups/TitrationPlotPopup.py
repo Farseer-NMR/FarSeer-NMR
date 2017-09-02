@@ -73,7 +73,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_grid_color = ColourBox(self, "Y Grid Colour")
         self.tplot_y_grid_linestyle = LabelledCombobox(self, text="Y Grid Line Style", items=['-', '--', '-.', ':'])
         self.tplot_y_grid_linewidth = LabelledDoubleSpinBox(self, "Y Grid Line Width")
-        self.tplot_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Alpha")
+        self.tplot_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Alpha", min=0, max=1, step=0.1)
         self.tplot_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing")
 
 

@@ -33,7 +33,7 @@ class ResidueEvolutionPopup(QDialog):
         self.res_evo_plot_marker_size = LabelledSpinBox(self, 'Marker Size')
         self.res_evo_plot_fill_between = LabelledCheckbox(self, text="Draw Data Shade")
         self.res_evo_plot_fill_colour = ColourBox(self, text="Shade Colour")
-        self.res_evo_fill_alpha = LabelledSpinBox(self, text="Shade Transparency")
+        self.res_evo_fill_alpha = LabelledSpinBox(self, text="Shade Transparency", min=0, max=1, step=0.1)
         self.res_evo_fit_line_colour = ColourBox(self, text="Fit Line Colour")
         self.res_evo_fit_line_width = LabelledSpinBox(self, text="Fit Line Width")
         self.res_evo_fit_line_style = LabelledCombobox(self, text="Fit Line Style", items=['-', '--', '-.', ':', 'o'])

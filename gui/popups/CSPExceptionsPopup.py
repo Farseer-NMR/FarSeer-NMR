@@ -29,10 +29,7 @@ class CSPExceptionsPopup(QDialog):
         self.defaults = eval(defaults["csp_settings"]["csp_res_exceptions"])
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):
-            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res)
-            self.value_dict[res].field.setMaximum(1)
-            self.value_dict[res].field.setMinimum(0)
-            self.value_dict[res].field.setSingleStep(0.01)
+            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, min=0, max=1, step=0.01)
             if ii < 5:
                 self.layout().addWidget(self.value_dict[res], ii, 0)
             elif 5 <= ii < 10:
