@@ -93,7 +93,7 @@
         "dpre_osci_x_ticks_weight": "'normal'", 
         "dpre_osci_grid_color": "'grey'", 
         "dpre_osci_shade": false, 
-        "dpre_osci_shade_regions": "'write a list of tupples'", 
+        "dpre_osci_shade_regions": "'write a list of tuples'",
         "dpre_osci_res_highlight": false, 
         "dpre_osci_res_hl_list": [
             1, 
@@ -227,7 +227,7 @@
     "csp_settings": {
         "cs_lost": "'prev'", 
         "csp_res4alpha": 0.14, 
-        "csp_res_exceptions": {"'G'":0.2}
+        "csp_res_exceptions": "{'G': 0.2}"
     }, 
     "fasta_settings": {
         "FASTAstart": 1, 

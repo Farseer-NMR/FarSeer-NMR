@@ -20,8 +20,10 @@ class CSPExceptionsPopup(QDialog):
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         self.variables = None
+
         if variables:
             self.variables = eval(variables["csp_settings"]["csp_res_exceptions"])
+            self.alpha_value = variables["csp_settings"]["csp_res4alpha"]
             # self.user_variables = variables["user_mark_settings"]
         self.defaults = eval(defaults["csp_settings"]["csp_res_exceptions"])
         print(self.variables, type(self.variables))
@@ -63,6 +65,8 @@ class CSPExceptionsPopup(QDialog):
         for key, value in self.value_dict.items():
             if aal3tol1[key] in self.variables.keys():
                 value.field.setValue(self.variables[aal3tol1[key]])
+            else:
+                value.field.setValue(self.alpha_value)
 
 
     def get_defaults(self):

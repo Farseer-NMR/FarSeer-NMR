@@ -224,7 +224,7 @@ defaults = {
     "csp_settings": {
         "cs_lost": 'prev', 
         "csp_res4alpha": 0.14, 
-        "csp_res_exceptions": {'G':0.2}
+        "csp_res_exceptions": "{'G': 0.2}"
     }, 
     "fasta_settings": {
         "FASTAstart": 1, 

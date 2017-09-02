@@ -140,7 +140,7 @@
           "dpre_osci_y_ticks_fs": 4,
           "dpre_osci_y_ticks_pad": 1,
           "dpre_osci_grid_color": "grey",
-          "dpre_osci_res_shade": False,
+          "dpre_osci_res_shade": false,
           "dpre_osci_res_highlight": [
             [
               24,
