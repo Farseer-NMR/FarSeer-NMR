@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem
+from PyQt5.QtWidgets import QWidget, QGridLayout, QGraphicsScene, QGraphicsView, QGraphicsLineItem, QGraphicsTextItem, QMessageBox, QMenu
 from PyQt5 import QtCore, QtGui
 import pickle
 
@@ -18,12 +18,12 @@ class PeakListArea(QWidget):
         layout = QGridLayout()
         self.setLayout(layout)
         self.layout().addWidget(self.scrollContents)
-        # self.scrollContents.setMaximumSize(1100, height)
         self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
 
         self.valuesDict = valuesDict
         self.setEvents()
+        self.updateClicks = 0
 
 
     def setEvents(self):
@@ -33,10 +33,26 @@ class PeakListArea(QWidget):
         event.accept()
 
 
+    def sideBar(self):
+        return self.parent().parent().parent().sideBar
+
+    def show_update_warning(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Reset Experimental Series")
+        msg.setInformativeText("Do you want to all peaklists from the Experimental Series and re-draw the series?")
+        msg.setWindowTitle("Reset Experimental Series")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+        retval = msg.exec_()
+        return retval
+
     def updateTree(self):
+        if self.updateClicks > 0:
+            self.show_update_warning()
         self.peak_list_objects = []
         self.show()
-        self.parent().parent().parent().sideBar.addLists()
+        self.sideBar().refresh_sidebar()
         self.scene.clear()
         z_conds = self.valuesDict['z']
         y_conds = self.valuesDict['y']
@@ -64,6 +80,8 @@ class PeakListArea(QWidget):
         pl_pos = self.scene.width()*0.75
         xx_vertical = x_spacing
         num = 0
+
+
         for i, z in enumerate(z_conds):
                 y_markers = []
                 for j, y in enumerate(y_conds):
@@ -97,6 +115,7 @@ class PeakListArea(QWidget):
                 for x_marker in y_markers:
                     self._addConnectingLine(zz, x_marker)
 
+        self.updateClicks += 1
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():
@@ -137,14 +156,14 @@ class ConditionLabel(QGraphicsTextItem):
 
   def __init__(self, text, pos=None):
       QGraphicsTextItem.__init__(self)
-      self.setHtml('<div style="color: %s; font-size: 8pt; ">%s</div>' % ('#FAFAF7', text))
+      self.setHtml('<div style="color: %s; font-size: 10pt; ">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
 
 class PeakListLabel(QGraphicsTextItem):
 
   def __init__(self, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
       QGraphicsTextItem.__init__(self)
-      self.setHtml('<div style="color: %s; font-size: 8pt;">%s</div>' % ('#FAFAF7', text))
+      self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
       self.setAcceptDrops(True)
       self.scene = scene
@@ -152,6 +171,28 @@ class PeakListLabel(QGraphicsTextItem):
       self.y_cond = y_cond
       self.z_cond = z_cond
       self.peak_list = None
+
+  def mousePressEvent(self, event):
+
+      if event.button() == QtCore.Qt.RightButton:
+          print('right button clicked')
+          if self.peak_list:
+            self._raiseContextMenu(event)
+
+
+  def _raiseContextMenu(self, event):
+      contextMenu = QMenu()
+      contextMenu.addAction('Delete', self.removeItem)
+      print('poppy poppy')
+      contextMenu.exec_(event.screenPos())
+
+  def removeItem(self):
+      print(self.peak_list)
+      print(self.scene.parent().sideBar().addItem(self.peak_list))
+      self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', "Drop peaklist here"))
+
+
+
 
   def dragEnterEvent(self, event):
     event.accept()
@@ -162,7 +203,7 @@ class PeakListLabel(QGraphicsTextItem):
   def dropEvent(self, event):
 
     mimeData = event.mimeData()
-    self.setPlainText(mimeData.text())
+    self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', mimeData.text()))
     self.peak_list = mimeData.text()
     event.accept()
 

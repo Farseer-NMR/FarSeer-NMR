@@ -15,9 +15,7 @@ def fsuv_to_json(fsuv):
             if fsuv_value:
                 val[k] = eval(fsuv_value)
 
-    import pprint
-    pprint.pprint(new_config)
-    return new_config
+    return variables
 
 
 

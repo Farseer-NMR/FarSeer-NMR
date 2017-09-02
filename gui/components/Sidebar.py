@@ -14,13 +14,9 @@ class SideBar(QTreeWidget):
         self.acceptDrops()
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
-
         self.setFixedHeight(gui_settings['sideBar_height'])
-        self.addLists()
         self.peakLists = peakLists
-
-    def addLists(self):
-        pass
+        self.setSortingEnabled(True)
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -33,8 +29,9 @@ class SideBar(QTreeWidget):
             event.mimeData().setText(text)
 
     def dropEvent(self, event):
-        event.accept()
+
         if event.mimeData().hasUrls():
+            event.accept()
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
                 self.load_from_path(filePath)
@@ -48,16 +45,33 @@ class SideBar(QTreeWidget):
                         self.load_peaklist(path)
                     except IOError:
                         pass
-            else:
-                self.load_peaklist(filePath)
+        else:
+            self.load_peaklist(filePath)
 
+
+
+
+    def refresh_sidebar(self):
+        self.clear()
+        for peaklist in self.peakLists.keys():
+            self.addItem(peaklist)
 
     def load_peaklist(self, filePath):
         if os.path.isdir(filePath):
             return
         peaklist = read_peaklist(filePath)
+
         if peaklist:
-            item = self.addItem(filePath.split('/')[-1].split('.')[0])
+            name = filePath.split('/')[-1].split('.')[0]
+            if not name in self.peakLists.keys():
+                pl_name = name
+            else:
+                if any([name+'_' in x for x in self.peakLists.keys()]):
+                    number = int(self.peakLists.keys()[-1].split('_')[1])+1
+                    pl_name = name+'_%s' % number
+                else:
+                    pl_name = name + '_1'
+            item = self.addItem(pl_name)
             self.peakLists[item.text(0)] = peaklist
         else:
             print("Invalid file: %s" % filePath)
@@ -66,4 +80,5 @@ class SideBar(QTreeWidget):
         newItem = QTreeWidgetItem(self)
         newItem.setFlags(newItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
         newItem.setText(0, name)
+        self.sortByColumn(0, QtCore.Qt.AscendingOrder)
         return newItem

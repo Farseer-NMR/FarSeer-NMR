@@ -2,6 +2,7 @@ import sys
 from functools import partial
 import json
 import os
+from collections import OrderedDict
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
     QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem
@@ -44,7 +45,7 @@ valuesDict = {
             'z': []
         }
 
-peakLists = {}
+peakLists = OrderedDict()
 
 
 def load_config():
@@ -85,22 +86,24 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
 
     def load_peak_lists(self, path=None):
+        print(path)
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
 
 
     def save_config(self, variables):
 
-        fname = QFileDialog.getSaveFileName(self, 'Save Configuration')
-        if os.path.exists(fname[0]):
+        fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
+        if fname[0]:
             with open(fname[0], 'w') as outfile:
-                json.dump(variables, outfile, indent=4, sort_keys=True)
+                if fname[0].endswith('.json'):
+                    json.dump(variables, outfile, indent=4, sort_keys=True)
+                print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
         from current.setup_farseer_calculation import create_directory_structure
-        spectrum_path = self.tab1.logfile_path.field.text()
-        peak_list_objects = self.tab2.peakListArea.peak_list_objects
-        # spectrum_dir = os.getcwd()
+        spectrum_path = self.settings.spectrum_path.field.text()
+        peak_list_objects = self.interface.peakListArea.peak_list_objects
         create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
         self.write_fsuv(spectrum_path)
         from current.farseermain import read_user_variables, run_farseer
@@ -108,7 +111,7 @@ class TabWidget(QTabWidget):
         run_farseer('{}/spectra'.format(cwd), fsuv)
 
     def write_fsuv(self, file_path):
-        variables = self.tab1.variables
+        variables = self.settings.variables
         json_to_fsuv(file_path, variables=variables)
 
 
@@ -292,11 +295,11 @@ class Settings(QWidget):
         restraint_groupbox_layout = QGridLayout()
         restraint_groupbox.setLayout(restraint_groupbox_layout)
 
-        self.plot_F1_data = LabelledCheckbox(self, text="Plot F1 data")
-        self.plot_F2_data = LabelledCheckbox(self, text="Plot F2 data")
-        self.plot_CSP = LabelledCheckbox(self, text="Plot CSPs")
-        self.plot_height_ratio = LabelledCheckbox(self, text="Plot Height Ratio")
-        self.plot_volume_ratio = LabelledCheckbox(self, text="Plot Volume Ratio")
+        self.plot_F1_data = LabelledCheckbox(self, text="F1 data")
+        self.plot_F2_data = LabelledCheckbox(self, text="F2 data")
+        self.plot_CSP = LabelledCheckbox(self, text="CSPs")
+        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio")
+        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio")
 
         self.plot_F1_y_label = LabelledLineEdit(self, text='')
         self.plot_F2_y_label = LabelledLineEdit(self, text='')
@@ -438,6 +441,7 @@ class Settings(QWidget):
 
     def set_spectrum_path_text(self, path=None):
         self.spectrum_path.setText(path)
+        self.parent().parent().parent().load_peak_lists(path)
 
     def set_logfile_path_text(self, path=None):
         self.logfile_path.setText(path)
@@ -445,8 +449,8 @@ class Settings(QWidget):
     def set_spectrum_path(self, path=None):
         if not path:
             path = str(QFileDialog.getExistingDirectory(None, 'Select Directory', os.getcwd()))
-        self.spectrum_path.setText(path)
-        self.parent().parent().parent().load_peak_lists(path)
+        self.set_spectrum_path_text(path)
+
 
 
     def set_logfile_path(self, path=None):
@@ -460,6 +464,91 @@ class Settings(QWidget):
             self.load_variables()
 
     def save_config(self):
+
+        general = self.variables["general_settings"]
+        fitting = self.variables["fitting_settings"]
+        cs = self.variables["cs_settings"]
+        csp = self.variables["csp_settings"]
+        fasta = self.variables["fasta_settings"]
+        plots_f1 = self.variables["plots_PosF1_settings"]
+        plots_f2 = self.variables["plots_PosF2_settings"]
+        plots_csp = self.variables["plots_CSP_settings"]
+        plots_height = self.variables["plots_Height_ratio_settings"]
+        plots_volume = self.variables["plots_Volume_ratio_settings"]
+
+        # General Settings
+
+        general["spectrum_path"] = self.spectrum_path.field.text()
+        general["logfile_name"] = self.logfile_path.field.text()
+        general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
+        general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
+        general["fig_height"] = self.figure_height.field.value()
+        general["fig_width"] = self.figure_width.field.value()
+        general["fig_dpi"] = self.figure_dpi.field.value()
+        general["fig_file_type"] = self.figure_format.fields.currentText()
+
+
+        # Fitting Settings
+        fitting["expand_lost_yy"] = self.expand_lost_yy.isChecked()
+        fitting["expand_lost_zz"] = self.expand_lost_zz.isChecked()
+        fitting["perform_comparisons"] = self.perform_comparisons_checkbox.isChecked()
+        fitting["do_titvar1"] = self.x_checkbox.isChecked()
+        fitting["do_titvar2"] = self.y_checkbox.isChecked()
+        fitting["do_titvar3"] = self.z_checkbox.isChecked()
+
+        # CS Settings
+        cs["perform_cs_correction"] = self.cs_correction.isChecked()
+        cs["cs_correction_res_ref"] = self.cs_correction_res_ref.field.value()
+
+        # CSP Settings
+        csp["csp_res4alpha"] = self.csp_alpha.field.value()
+        csp["cs_lost"] = self.csp_lost.fields.currentText()
+
+        # FASTA Settings
+        fasta["applyFASTA"] = self.apply_fasta_checkbox.isChecked()
+        fasta["FASTAstart"] = self.fasta_start.field.value()
+
+        # Plot F1 Settings
+        plots_f1["plots_PosF1_delta"] = self.plot_F1_data.isChecked()
+        plots_f1["yy_label_PosF1_delta"] = self.plot_F1_y_label.field.text()
+        plots_f1["yy_scale_PosF1_delta"] = self.plot_F1_y_scale.field.value()
+        plots_f1["calccol_name_PosF1_delta"] = self.plot_F1_calccol.field.text()
+
+        # Plot F2 Settings
+        plots_f2["plots_PosF2_delta"] = self.plot_F2_data.isChecked()
+        plots_f2["yy_label_PosF2_delta"] = self.plot_F2_y_label.field.text()
+        plots_f2["yy_scale_PosF2_delta"] = self.plot_F2_y_scale.field.value()
+        plots_f2["calccol_name_PosF2_delta"] = self.plot_F2_calccol.field.text()
+
+
+        # Plot CSP Settings
+        plots_csp["plots_CSP"] = self.plot_CSP.isChecked()
+        plots_csp["yy_label_CSP"] =self.plot_CSP_y_label.field.text()
+        plots_csp["yy_scale_CSP"] = self.plot_CSP_y_scale.field.value()
+        plots_csp["calccol_name_CSP"] = self.plot_CSP_calccol.field.text()
+
+        # Plot Height Settings
+        plots_height["plots_Height_ratio"] = self.plot_height_ratio.isChecked()
+        plots_height["yy_label_Height_ratio"] = self.plot_height_y_label.field.text()
+        plots_height["yy_scale_Height_ratio"] =self.plot_height_y_scale.field.value()
+        plots_height["calccol_name_Height_ratio"] = self.plot_height_calccol.field.text()
+
+        # Plot Volume Settings
+        plots_volume["plots_Volume_ratio"] = self.plot_volume_ratio.isChecked()
+        plots_volume["yy_label_Volume_ratio"] = self.plot_volume_y_label.field.text()
+        plots_volume["yy_scale_Volume_ratio"] = self.plot_volume_y_scale.field.value()
+        plots_volume["calccol_name_Volume_ratio"] = self.plot_volume_calccol.field.text()
+
+        # Plot Booleans
+        self.variables["extended_bar_settings"]["do_ext_bar"] = self.ext_bar_checkbox.isChecked()
+        self.variables["compact_bar_settings"]["do_comp_bar"] = self.comp_bar_checkbox.isChecked()
+        self.variables["vert_bar_settings"]["do_vert_bar"] = self.vert_bar_checkbox.isChecked()
+        self.variables["res_evo_settings"]["do_res_evo"] = self.res_evo_checkbox.isChecked()
+        self.variables["cs_scatter_settings"]["do_cs_scatter"] = self.scatter_checkbox.isChecked()
+        self.variables["heat_map_settings"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
+        self.variables["dpre_osci_settings"]["do_dpre"] = self.dpre_checkbox.isChecked()
+        import pprint
+        pprint.pprint(self.variables)
         self.parent().parent().parent().save_config(self.variables)
 
     def run_farseer_calculation(self):
@@ -479,7 +568,10 @@ class Settings(QWidget):
         plots_volume = self.variables["plots_Volume_ratio_settings"]
 
         # General Settings
-        self.spectrum_path.field.setText(general["spectrum_path"])
+        if os.path.exists(general["spectrum_path"]):
+            self.spectrum_path.field.setText(general["spectrum_path"])
+        else:
+            self.spectrum_path.field.setText(os.getcwd())
         self.logfile_path.field.setText(general["logfile_name"])
         self.has_sidechains_checkbox.setChecked(general["has_sidechains"])
         self.use_sidechains_checkbox.setChecked(general["use_sidechains"])
@@ -543,7 +635,6 @@ class Settings(QWidget):
         self.scatter_checkbox.setChecked(self.variables["cs_scatter_settings"]["do_cs_scatter"])
         self.heat_map_checkbox.setChecked(self.variables["heat_map_settings"]["do_heat_map"])
         self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
-        # self.user_details_checkbox.setChecked(fitting["include_user_annotations"])
 
     def show_popup(self, popup, variables):
         p = popup(variables=self.variables)

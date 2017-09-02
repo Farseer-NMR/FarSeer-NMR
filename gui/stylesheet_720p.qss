@@ -8,6 +8,10 @@ QGroupBox {
 color: #FAFAF7;
 }
 
+QGroupBox {
+color: #FAFAF7;
+}
+
 QWidget#MainWidget {
 background-color: #001450;
 }

@@ -12,7 +12,7 @@ class Footer(QWidget):
 
         affiliations = '<span style="display:inline"><span style="color: #D5FD84; font-size: 6pt; display:inline">Joao MC Texeira<span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
                        '<span style="color: #D5FD84; font-size: 6pt;">Simon P. Skinner</span><span style="color: #07C3F5">**&nbsp;&nbsp;</span>' \
-                       '<span style="color: #D5FD84; font-size: 6pt;"> Miguel Arbescu</span><span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
+                       '<span style="color: #D5FD84; font-size: 6pt;"> Miguel Arbesu</span><span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
                        '<span style="color: #D5FD84; font-size: 6pt;"> Alexander L. Breeze</span><span style="color: #07C3F5">**&nbsp;&nbsp;</span>' \
                        '<span style="color: #D5FD84; font-size: 6pt;"> Miquel Pons</span><span style="color: #08F2EE">*</span>'
         address1 = '<span style="color: #08F2EE; font-size: 6pt;">* BioNMR Laboratory, Inorganic and Organic Chemistry Department, Universitat de Barcelona, Baldiri Reixac 10-12, 08028 Barcelona, Spain</span>'
