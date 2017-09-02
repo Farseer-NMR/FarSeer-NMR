@@ -107,8 +107,8 @@ class TabWidget(QTabWidget):
         create_directory_structure(spectrum_path, valuesDict, peak_list_objects, peakLists)
         self.write_fsuv(spectrum_path)
         from current.farseermain import read_user_variables, run_farseer
-        fsuv, cwd = read_user_variables(spectrum_path)
-        run_farseer('{}/spectra'.format(cwd), fsuv)
+        fsuv = read_user_variables(spectrum_path)
+        run_farseer(fsuv)
 
     def write_fsuv(self, file_path):
         variables = self.settings.variables
