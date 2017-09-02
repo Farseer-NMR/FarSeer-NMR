@@ -509,32 +509,32 @@ class Settings(QWidget):
         fasta["FASTAstart"] = self.fasta_start.field.value()
 
         # Plot F1 Settings
-        plots_f1["plots_PosF1_delta"] = self.plot_F1_data.isChecked()
+        plots_f1["calcs_PosF1_delta"] = self.plot_F1_data.isChecked()
         plots_f1["yy_label_PosF1_delta"] = self.plot_F1_y_label.field.text()
         plots_f1["yy_scale_PosF1_delta"] = self.plot_F1_y_scale.field.value()
         plots_f1["calccol_name_PosF1_delta"] = self.plot_F1_calccol.field.text()
 
         # Plot F2 Settings
-        plots_f2["plots_PosF2_delta"] = self.plot_F2_data.isChecked()
+        plots_f2["calcs_PosF2_delta"] = self.plot_F2_data.isChecked()
         plots_f2["yy_label_PosF2_delta"] = self.plot_F2_y_label.field.text()
         plots_f2["yy_scale_PosF2_delta"] = self.plot_F2_y_scale.field.value()
         plots_f2["calccol_name_PosF2_delta"] = self.plot_F2_calccol.field.text()
 
 
         # Plot CSP Settings
-        plots_csp["plots_CSP"] = self.plot_CSP.isChecked()
+        plots_csp["calcs_CSP"] = self.plot_CSP.isChecked()
         plots_csp["yy_label_CSP"] =self.plot_CSP_y_label.field.text()
         plots_csp["yy_scale_CSP"] = self.plot_CSP_y_scale.field.value()
         plots_csp["calccol_name_CSP"] = self.plot_CSP_calccol.field.text()
 
         # Plot Height Settings
-        plots_height["plots_Height_ratio"] = self.plot_height_ratio.isChecked()
+        plots_height["calcs_Height_ratio"] = self.plot_height_ratio.isChecked()
         plots_height["yy_label_Height_ratio"] = self.plot_height_y_label.field.text()
         plots_height["yy_scale_Height_ratio"] =self.plot_height_y_scale.field.value()
         plots_height["calccol_name_Height_ratio"] = self.plot_height_calccol.field.text()
 
         # Plot Volume Settings
-        plots_volume["plots_Volume_ratio"] = self.plot_volume_ratio.isChecked()
+        plots_volume["calcs_Volume_ratio"] = self.plot_volume_ratio.isChecked()
         plots_volume["yy_label_Volume_ratio"] = self.plot_volume_y_label.field.text()
         plots_volume["yy_scale_Volume_ratio"] = self.plot_volume_y_scale.field.value()
         plots_volume["calccol_name_Volume_ratio"] = self.plot_volume_calccol.field.text()
@@ -598,31 +598,31 @@ class Settings(QWidget):
         self.fasta_start.setValue(fasta["FASTAstart"])
 
         # Plot F1 Settings
-        self.plot_F1_data.setChecked(plots_f1["plots_PosF1_delta"])
+        self.plot_F1_data.setChecked(plots_f1["calcs_PosF1_delta"])
         self.plot_F1_y_label.field.setText(plots_f1["yy_label_PosF1_delta"])
         self.plot_F1_y_scale.setValue(plots_f1["yy_scale_PosF1_delta"])
         self.plot_F1_calccol.field.setText(plots_f1["calccol_name_PosF1_delta"])
 
         # Plot F2 Settings
-        self.plot_F2_data.setChecked(plots_f2["plots_PosF2_delta"])
+        self.plot_F2_data.setChecked(plots_f2["calcs_PosF2_delta"])
         self.plot_F2_y_label.field.setText(plots_f2["yy_label_PosF2_delta"])
         self.plot_F2_y_scale.setValue(plots_f2["yy_scale_PosF2_delta"])
         self.plot_F2_calccol.field.setText(plots_f2["calccol_name_PosF2_delta"])
 
         # Plot CSP Settings
-        self.plot_CSP.setChecked(plots_csp["plots_CSP"])
+        self.plot_CSP.setChecked(plots_csp["calcs_CSP"])
         self.plot_CSP_y_label.field.setText(plots_csp["yy_label_CSP"])
         self.plot_CSP_y_scale.setValue(plots_csp["yy_scale_CSP"])
         self.plot_CSP_calccol.field.setText(plots_csp["calccol_name_CSP"])
 
         # Plot Height Settings
-        self.plot_height_ratio.setChecked(plots_height["plots_Height_ratio"])
+        self.plot_height_ratio.setChecked(plots_height["calcs_Height_ratio"])
         self.plot_height_y_label.field.setText(plots_height["yy_label_Height_ratio"])
         self.plot_height_y_scale.setValue(plots_height["yy_scale_Height_ratio"])
         self.plot_height_calccol.field.setText(plots_height["calccol_name_Height_ratio"])
 
         # Plot Volume Settings
-        self.plot_volume_ratio.setChecked(plots_volume["plots_Volume_ratio"])
+        self.plot_volume_ratio.setChecked(plots_volume["calcs_Volume_ratio"])
         self.plot_volume_y_label.field.setText(plots_volume["yy_label_Volume_ratio"])
         self.plot_volume_y_scale.setValue(plots_volume["yy_scale_Volume_ratio"])
         self.plot_volume_calccol.field.setText(plots_volume["calccol_name_Volume_ratio"])
