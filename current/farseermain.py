@@ -1408,8 +1408,8 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                         ylabel=\
                         fsuv["restraint_settings"].loc[restraint,
                                                  'plt_y_axis_lbl'],
-                        cols_per_page=fsuv["vert_bar_settings"]["vert_bar_cols_page"],
-                        rows_per_page=fsuv["vert_bar_settings"]["vert_bar_rows_page"],
+                        cols_per_page=fsuv["vert_bar_settings"]["cols_page"],
+                        rows_per_page=fsuv["vert_bar_settings"]["rows_page"],
                         fig_height=fig_height,
                         fig_width=fig_width,
                         fig_file_type=fig_file_type,

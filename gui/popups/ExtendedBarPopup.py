@@ -5,8 +5,7 @@ from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 
-from current.default_config import defaults
-from gui.gui_utils import font_weights
+from gui.gui_utils import defaults, font_weights
 from functools import partial
 
 class ExtendedBarPopup(QDialog):

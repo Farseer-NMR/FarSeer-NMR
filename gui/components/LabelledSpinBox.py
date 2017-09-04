@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QSpinBox, QLabel, QHBoxLayout
 
 class LabelledSpinBox(QWidget):
 
-    def __init__(self, parent, text, callback=None):
+    def __init__(self, parent, text, callback=None, min=None, max=None, step=None):
 
         QWidget.__init__(self, parent)
 
@@ -15,6 +15,13 @@ class LabelledSpinBox(QWidget):
 
         self.layout().addWidget(label)
         self.layout().addWidget(self.field)
+
+        if min:
+            self.field.setMinimum(min)
+        if max:
+            self.field.setMaximum(max)
+        if step:
+            self.field.setSingleStep(step)
 
         if callback:
             self.set_callback(callback)
