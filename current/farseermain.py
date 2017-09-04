@@ -1200,9 +1200,10 @@ def PRE_analysis(farseer_series, fsuv):
         
             # only in the parameters allowed by the user
             if fsuv["restraint_settings"].loc[sourcecol, 'calcs_restraint_flg']:
-                farseer_series.calc_Delta_PRE(sourcecol, targetcol,
-                                         gaussian_stddev=fsuv.gaussian_stddev,
-                                         guass_x_size=fsuv.gauss_x_size)
+                farseer_series.calc_Delta_PRE(
+                    sourcecol, targetcol,
+                    gaussian_stddev=fsuv["pre_settings"]["gaussian_stdev"],
+                    guass_x_size=fsuv["pre_settings"]["gauss_x_size"])
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
     # for cond3 and for comparison C3.
@@ -1223,17 +1224,18 @@ def PRE_analysis(farseer_series, fsuv):
             if fsuv["restraint_settings"].loc[sourcecol, 'calcs_restraint_flg']:
                 
                 farseer_series.plot_base(targetcol, 'exp', 'heat_map',
-                    fsuv.heat_map_dict,
+                    fsuv["heat_map_settings"],
                     par_ylims=\
                     fsuv["restraint_settings"].loc[sourcecol,'plt_y_axis_scl'],
                     ylabel=\
                     fsuv["restraint_settings"].loc[sourcecol,'plt_y_axis_lbl'],
                     cols_per_page=1,
-                    rows_per_page=fsuv.heat_map_rows,
-                    fig_height=fsuv.fig_height,
-                    fig_width=fsuv.fig_width,
-                    fig_file_type=fsuv.fig_file_type,
-                    fig_dpi=fsuv.fig_dpi)
+                    rows_per_page=\
+                    fsuv["heat_map_settings"]["rows"],
+                    fig_height=fsuv["general_settings"]["fig_height"],
+                    fig_width=fsuv["general_settings"]["fig_width"],
+                    fig_file_type=fsuv["general_settings"]["fig_file_type"],
+                    fig_dpi=fsuv["general_settings"]["fig_dpi"])
     
     # plots the DeltaPRE oscilation analysis only for <C3> comparison.
     # because DeltaPRE oscilation represents the results obtained only
@@ -1247,15 +1249,16 @@ def PRE_analysis(farseer_series, fsuv):
                                          ['Hgt_DPRE', 'Vol_DPRE']):
             if fsuv["restraint_settings"].loc[sourcecol, 'calcs_restraint_flg']:
                 farseer_series.plot_base(targetcols, 'exp', 'delta_osci',
-                    {**fsuv["series_plot_settings"],**fsuv.delta_osci_dict},
-                    par_ylims=(0,fsuv.dpre_osci_ymax),
-                    ylabel=fsuv.dpre_osci_y_label,
+                    {**fsuv["series_plot_settings"],
+                     **fsuv["dpre_osci_settings"]},
                     cols_per_page=1,
-                    rows_per_page=fsuv.dpre_osci_rows,
-                    fig_height=fsuv.fig_height,
-                    fig_width=fsuv.fig_width/fsuv.dpre_osci_width,
-                    fig_file_type=fsuv.fig_file_type,
-                    fig_dpi=fsuv.fig_dpi)
+                    rows_per_page=fsuv["dpre_osci_settings"]["rows"],
+                    fig_height=fsuv["general_settings"]["fig_height"],
+                    fig_width=\
+                        fsuv["general_settings"]["fig_width"]/\
+                        fsuv["dpre_osci_settings"]["width"],
+                    fig_file_type=fsuv["general_settings"]["fig_file_type"],
+                    fig_dpi=fsuv["general_settings"]["fig_dpi"])
     
     return
 
