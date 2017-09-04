@@ -41,11 +41,11 @@ def json_to_fsuv(fsuv_file_path, json_file=None, variables=None):
     flower = js["cs_scatter_flower_settings"]
     tplot = js["titration_plot_settings"]
     bar_plot = js["bar_plot_settings"]
-    pf1 = js["plots_PosF1_settings"]
-    pf2 = js["plots_PosF2_settings"]
-    p_csp = js["plots_CSP_settings"]
-    p_height = js["plots_Height_ratio_settings"]
-    p_vol = js["plots_Volume_ratio_settings"]
+    pf1 = js["PosF1_settings"]
+    pf2 = js["PosF2_settings"]
+    p_csp = js["csp_settings"]
+    p_height = js["Height_ratio_settings"]
+    p_vol = js["Volume_ratio_settings"]
     res_evo = js["res_evo_settings"]
     scatter = js["cs_scatter_settings"]
     heat_map = js["heat_map_settings"]
@@ -148,7 +148,7 @@ tag_ls = {}
 chimera_att_select_format = ':'  # format to select residues in Chimera
 #
 # Restraints to Plot:
-plots_PosF1_delta = {}  # Plot nuclei 1 shift perturbation data
+PosF1_delta = {}  # Plot nuclei 1 shift perturbation data
 plots_PosF2_delta = {}  # Plot nuclei 2 shift perturbation data
 plots_CSP = {}  # Plot combined chemical shift perturbation data
 plots_Height_ratio = {}  # Plot Height ratio data
@@ -182,7 +182,7 @@ yy_scale_Volume_ratio = {}  # y axis scale for volume ratio
 yy_scale_nbins = {}
 #
 """.format(
-    pf1["plots_PosF1_delta"],
+    pf1["PosF1_delta"],
     pf2["plots_PosF2_delta"],
     p_csp["plots_CSP"],
     p_height["plots_Height_ratio"],

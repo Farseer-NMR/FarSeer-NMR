@@ -224,7 +224,11 @@ defaults = {
     "csp_settings": {
         "cs_lost": 'prev', 
         "csp_res4alpha": 0.14, 
-        "csp_res_exceptions": "{'G': 0.2}"
+        "csp_res_exceptions": "{'G': 0.2}",
+        "calccol_name_CSP": 'CSP',
+        "calcs_CSP": True,
+        "yy_label_CSP": 'CSPs (ppm)',
+        "yy_scale_CSP": 0.3
     }, 
     "fasta_settings": {
         "FASTAstart": 1, 
@@ -250,31 +254,26 @@ defaults = {
         "logfile_name": 'farseer_log.md', 
         "spectrum_path": 'sys.argv[1]'
     }, 
-    "plots_PosF1_settings": {
+    "PosF1_settings": {
         "calccol_name_PosF1_delta": 'H1_delta', 
         "calcs_PosF1_delta": False, 
         "yy_label_PosF1_delta": 'ppm', 
         "yy_scale_PosF1_delta": 0.2
     }, 
-    "plots_PosF2_settings": {
+    "PosF2_settings": {
         "calccol_name_PosF2_delta": 'N15_delta', 
         "calcs_PosF2_delta": False, 
         "yy_label_PosF2_delta": 'ppm', 
         "yy_scale_PosF2_delta": 2
     }, 
-    "plots_CSP_settings": {
-        "calccol_name_CSP": 'CSP', 
-        "calcs_CSP": True,
-        "yy_label_CSP": 'CSPs (ppm)',
-        "yy_scale_CSP": 0.3
-    }, 
-    "plots_Volume_ratio_settings": {
+
+    "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": 'Vol_ratio', 
         "calcs_Volume_ratio": False, 
         "yy_label_Volume_ratio": 'Vi/V0', 
         "yy_scale_Volume_ratio": 1.1
     }, 
-    "plots_Height_ratio_settings": {
+    "Height_ratio_settings": {
         "calccol_name_Height_ratio": 'Height_ratio', 
         "calcs_Height_ratio": False, 
         "yy_label_Height_ratio": 'Hi/H0',

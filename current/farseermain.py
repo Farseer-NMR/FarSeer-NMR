@@ -119,11 +119,11 @@ def config_user_variables(fsuv):
     cs = fsuv["cs_settings"]
     csp = fsuv["csp_settings"]
     fasta = fsuv["fasta_settings"]
-    plots_f1 = fsuv["plots_PosF1_settings"]
-    plots_f2 = fsuv["plots_PosF2_settings"]
-    plots_csp = fsuv["plots_CSP_settings"]
-    plots_height = fsuv["plots_Height_ratio_settings"]
-    plots_volume = fsuv["plots_Volume_ratio_settings"]
+    plots_f1 = fsuv["PosF1_settings"]
+    plots_f2 = fsuv["PosF2_settings"]
+    plots_csp = fsuv["csp_settings"]
+    plots_height = fsuv["Height_ratio_settings"]
+    plots_volume = fsuv["Volume_ratio_settings"]
 
     # does the user want to perform any analysis on the Farseer-NMR cube?
     fsuv["any_axis"] = any([fitting["do_cond1"], fitting["do_cond2"], fitting["do_cond3"]])
@@ -489,8 +489,8 @@ def checks_PRE_analysis_flags(fsuv):
         msg = "PRE Analysis is set to <{}> and depends on the following variables: do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || perform_comparisons :: <{}>. All these variables should be set to True for PRE Analysis to be executed.".\
             format(fsuv["pre_settings"]["apply_PRE_analysis"],
                    fsuv["fitting_settings"]["do_cond3"],
-                   fsuv["plots_Height_ratio_settings"]["calcs_Height_ratio"] or \
-                        fsuv["plots_Volume_ratio_settings"]["calcs_Volume_ratio"],
+                   fsuv["Height_ratio_settings"]["calcs_Height_ratio"] or \
+                        fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
                    fsuv["fitting_settings"]["perform_comparisons"])
            
         logs(fsw.gen_wet('ERROR', msg, 1), fsuv["general_settings"]["logfile_name"])
@@ -1086,11 +1086,11 @@ def perform_calcs(farseer_series, fsuv):
             .read_user_variables().
     
     Depends on:
-    fsuv["plots_PosF1_settings"]["calcs_PosF1_data"]
-    fsuv["plots_PosF2_settings"]["calcs_PosF2_data"]
+    fsuv["PosF1_settings"]["calcs_PosF1_delta"]
+    fsuv["PosF2_settings"]["calcs_PosF2_delta"]
     fsuv.calcs_CSP
-    fsuv["plots_Height_ratio_settings"]["calcs_Height_ratio"]
-    fsuv["plots_Volume_ratio_settings"]["calcs_Volume_ratio"]
+    fsuv["Height_ratio_settings"]["calcs_Height_ratio"]
+    fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]
     fsuv.calccol_name_PosF1_delta
     fsuv.calccol_name_PosF2_delta
     fsuv.calccol_name_CSP
@@ -1101,32 +1101,32 @@ def perform_calcs(farseer_series, fsuv):
     checks_calculation_flags(fsuv)
     
     # if the user wants to calculate combined Chemical Shift Perturbations
-    if fsuv["plots_CSP_settings"]["calcs_CSP"]:
+    if fsuv["csp_settings"]["calcs_CSP"]:
         # calculate differences in chemical shift for each dimension
-        farseer_series.calc_cs_diffs(fsuv["plots_PosF1_settings"]["calccol_name_PosF1_delta"],
+        farseer_series.calc_cs_diffs(fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
                                       'Position F1')
-        farseer_series.calc_cs_diffs(fsuv["plots_PosF2_settings"]["calccol_name_PosF2_delta"],
+        farseer_series.calc_cs_diffs(fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
                                       'Position F2')
     
         # Calculates CSPs
-        farseer_series.calc_csp(calccol=fsuv["plots_CSP_settings"]["calccol_name_CSP"],
-                                 pos1=fsuv["plots_PosF1_settings"]["calccol_name_PosF1_delta"],
-                                 pos2=fsuv["plots_PosF2_settings"]["calccol_name_PosF2_delta"])
+        farseer_series.calc_csp(calccol=fsuv["csp_settings"]["calccol_name_CSP"],
+                                 pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                                 pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"])
     
     # if the user only wants to calculate perturbation in single dimensions
     else:
-        if fsuv["plots_PosF1_settings"]["calcs_PosF1_data"]:
-            farseer_series.calc_cs_diffs(fsuv["plots_PosF1_settings"]["calccol_name_PosF1_delta"],
+        if fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
+            farseer_series.calc_cs_diffs(fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
                                           'Position F1')
-        if fsuv["plots_PosF2_settings"]["calcs_PosF2_data"]:
-            farseer_series.calc_cs_diffs(fsuv["plots_PosF2_settings"]["calccol_name_PosF2_delta"],
+        if fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
+            farseer_series.calc_cs_diffs(fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
                                           'Position F2')
     
     # Calculates Ratios
-    if fsuv["plots_Height_ratio_settings"]["calcs_Height_ratio"]:
-        farseer_series.calc_ratio(fsuv["plots_Height_ratio_settings"]["calccol_name_Height_ratio"], 'Height')
-    if fsuv["plots_Volume_ratio_settings"]["calcs_Volume_ratio"]:
-        farseer_series.calc_ratio(fsuv["plots_Volume_ratio_settings"]["calccol_name_Volume_ratio"], 'Volume')
+    if fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
+        farseer_series.calc_ratio(fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"], 'Height')
+    if fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
+        farseer_series.calc_ratio(fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"], 'Volume')
     
     return
 
@@ -1384,7 +1384,7 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                         ylabel=\
                         fsuv["restraint_settings"].loc[restraint,
                                                  'plt_y_axis_lbl'],
-                        hspace=fsuv.vspace,
+                        hspace=fsuv["series_plot_settings"]["vspace"],
                         cols_per_page=fsuv["compact_bar_settings"]["cols_page"],
                         rows_per_page=fsuv["compact_bar_settings"]["rows_page"],
                         fig_height=fig_height,
@@ -1406,7 +1406,7 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                         fsuv["restraint_settings"].loc[restraint,
                                                  'plt_y_axis_lbl'],
                         cols_per_page=fsuv["vert_bar_settings"]["vert_bar_cols_page"],
-                        rows_per_page=fsuv["ver_bar_settings"]["vert_bar_rows_page"],
+                        rows_per_page=fsuv["vert_bar_settings"]["vert_bar_rows_page"],
                         fig_height=fig_height,
                         fig_width=fig_width,
                         fig_file_type=fig_file_type,
@@ -1448,34 +1448,34 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                     ylabel=\
                     fsuv["restraint_settings"].loc[restraint,
                                              'plt_y_axis_lbl'],
-                    cols_per_page=fsuv["res_evo_settings"]["res_evo_cols_page"],
-                    rows_per_page=fsuv["res_evo_settings"]["res_evo_rows_page"],
+                    cols_per_page=fsuv["res_evo_settings"]["cols_page"],
+                    rows_per_page=fsuv["res_evo_settings"]["rows_page"],
                     fig_height=fig_height,
                     fig_width=fig_width,
                     fig_file_type=fig_file_type,
                     fig_dpi=fig_dpi)
             
     if fsuv["plotting_flags"]["do_cs_scatter"] \
-        and ((fsuv["plots_PosF1_settings"]["calcs_PosF1_data"] and fsuv["plots_PosF2_settings"]["calcs_PosF2_data"])\
-            or fsuv.calcs_CSP):
+        and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
+            or fsuv["csp_settings"]["calcs_CSP"]):
         # DO ++++
         farseer_series.plot_base('15N_vs_1H', 'res', 'cs_scatter',
                             {**fsuv["revo_settings"],
                              **fsuv["cs_scatter_settings"]},
-                            cols_per_page=fsuv["cs_scatter_settings"]["cs_scatter_cols_page"],
-                            rows_per_page=fsuv["cs_scatter_settings"]["cs_scatter_rows_page"],
+                            cols_per_page=fsuv["cs_scatter_settings"]["cols_page"],
+                            rows_per_page=fsuv["cs_scatter_settings"]["rows_page"],
                             fig_height=fig_height,
                             fig_width=fig_width,
                             fig_file_type=fig_file_type,
                             fig_dpi=fig_dpi)
     
     if fsuv["plotting_flags"]["do_cs_scatter_flower"] \
-        and ((fsuv["plots_PosF1_settings"]["calcs_PosF1_data"] and fsuv["plots_PosF2_settings"]["calcs_PosF2_data"])\
+        and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
             or fsuv["csp_settings"]["calcs_CSP"]):
         #DO ++++
         farseer_series.plot_base('15N_vs_1H', 'single', 'cs_scatter_flower',
                                   {**fsuv["revo_settings"],
-                                   **fsuv["cs_scatter_flower_dict"]},
+                                   **fsuv["cs_scatter_flower_settings"]},
                                   cols_per_page=2,
                                   rows_per_page=3,
                                   fig_height=fig_height,

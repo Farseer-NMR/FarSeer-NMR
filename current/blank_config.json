@@ -249,31 +249,31 @@
         "spectrum_path": null, 
         "use_sidechains": null
     }, 
-    "plots_CSP_settings": {
+    "csp_settings": {
         "calccol_name_CSP": null, 
         "calcs_CSP": null,
         "yy_label_CSP": null,
         "yy_scale_CSP": null
     }, 
-    "plots_Height_ratio_settings": {
+    "Height_ratio_settings": {
         "calccol_name_Height_ratio": null, 
         "calcs_Height_ratio": null, 
         "yy_label_Height_ratio": null,
         "yy_scale_Height_ratio": null
     }, 
-    "plots_PosF1_settings": {
+    "PosF1_settings": {
         "calccol_name_PosF1_delta": null, 
         "calcs_PosF1_delta": null, 
         "yy_label_PosF1_delta": null, 
         "yy_scale_PosF1_delta": null
     }, 
-    "plots_PosF2_settings": {
+    "PosF2_settings": {
         "calccol_name_PosF2_delta": null, 
         "calcs_PosF2_delta": null, 
         "yy_label_PosF2_delta": null, 
         "yy_scale_PosF2_delta": null
     }, 
-    "plots_Volume_ratio_settings": {
+    "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": null, 
         "calcs_Volume_ratio": null, 
         "yy_label_Volume_ratio": null, 

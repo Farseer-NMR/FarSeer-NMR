@@ -1215,7 +1215,11 @@ recipient: residues
                           x_ticks_fn='monospace',
                           x_ticks_fs=6,
                           x_ticks_weight='normal',
-                          x_ticks_rot=0):
+                          x_ticks_rot=0,
+                          vspace='',
+                          rows_page='',
+                          cols_page=''
+                          ):
         """
         Plots vertical bar plots.
         
@@ -1424,7 +1428,11 @@ recipient: residues
                      fit_line_width = 1,
                      fit_line_style = '-',
                      
-                     titration_x_values=None):
+                     titration_x_values=None,
+                     vspace='',
+                     rows_page='',
+                     cols_page=''
+                     ):
         """
         Plots the evolution of a restraint along the series of a residue.
         
@@ -1453,7 +1461,9 @@ recipient: residues
             (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
             # do
             if len(titration_x_values) != len(self.items):
-                self.log_r(fsw.wet5(titration_x_values, self.items))
+                msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}]."\
+                    .format(titration_x_values, self.items)
+                self.log_r(fsw.gen_wet('ERROR', msg, 5))
                 self.abort()
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
@@ -1706,7 +1716,11 @@ recipient: residues
                      mk_color=['none'],
                      mk_edgecolors='black',
                      mk_lost_color='red',
-                     hide_lost=False):
+                     hide_lost=False,
+                     titration_x_values='',
+                     rows_page='',
+                     cols_page=''
+                        ):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         along the series for the current residue.
@@ -1917,7 +1931,8 @@ recipient: residues
                              color_grad=True,
                              color_list=[],
                              mk_start_color="#ff0000",
-                             mk_end_color='#30ff00'):
+                             mk_end_color='#30ff00',
+                             titration_x_values=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         for all the residues in a single plot.
