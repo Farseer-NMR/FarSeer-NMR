@@ -8,7 +8,7 @@ from gui.components.ColourBox import ColourBox
 
 from current.utils import aal3tol1
 
-from current.default_config import defaults
+from gui.gui_utils import defaults
 from functools import partial
 
 class CSPExceptionsPopup(QDialog):
@@ -23,10 +23,10 @@ class CSPExceptionsPopup(QDialog):
         self.alpha_value = self.parent().csp_alpha.field.value()
         print('alpha', self.alpha_value)
         if variables:
-            self.variables = eval(variables["csp_settings"]["csp_res_exceptions"])
+            self.variables = variables["csp_settings"]["csp_res_exceptions"]
 
             # self.user_variables = variables["user_mark_settings"]
-        self.defaults = eval(defaults["csp_settings"]["csp_res_exceptions"])
+        self.defaults = defaults["csp_settings"]["csp_res_exceptions"]
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):
             self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, min=0, max=1, step=0.01)

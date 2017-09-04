@@ -7,7 +7,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 
-from current.default_config import defaults
+from gui.gui_utils import defaults
 from functools import partial
 
 class PreAnalysisPopup(QDialog):
@@ -54,8 +54,8 @@ class PreAnalysisPopup(QDialog):
 
     def get_defaults(self):
         self.applySmooth.checkBox.setChecked(self.default["apply_smooth"])
-        self.gaussian_stdev.field.setValue(self.default["gaussian_stdev"])
         self.gauss_x_size.field.setValue(self.default["gauss_x_size"])
+        self.gaussian_stdev.field.setValue(self.default["gaussian_stdev"])
         self.pre_colour.select(self.default["pre_color"])
         self.pre_lw.field.setValue(self.default["pre_lw"])
         self.tag_color.select(self.default["tag_color"])

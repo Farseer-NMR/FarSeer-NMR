@@ -136,7 +136,7 @@ defaults = {
           "vert_bar_rows_page": 2,
   },
   
-  "plots_PosF1_settings":{
+  "PosF1_settings":{
           "plots_PosF1_delta": True,
           "yy_label_PosF1_delta": "ppm",
           "calccol_name_PosF1_delta": "H1_delta",

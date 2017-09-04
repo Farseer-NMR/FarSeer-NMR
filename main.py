@@ -459,10 +459,9 @@ class Settings(QWidget):
         csp = self.variables["csp_settings"]
         fasta = self.variables["fasta_settings"]
         plots_f1 = self.variables["PosF1_settings"]
-        plots_f2 = self.variables["plots_PosF2_settings"]
-        plots_csp = self.variables["plots_CSP_settings"]
-        plots_height = self.variables["plots_Height_ratio_settings"]
-        plots_volume = self.variables["plots_Volume_ratio_settings"]
+        plots_f2 = self.variables["PosF2_settings"]
+        plots_height = self.variables["Height_ratio_settings"]
+        plots_volume = self.variables["Volume_ratio_settings"]
 
         # General Settings
 
@@ -510,10 +509,10 @@ class Settings(QWidget):
 
 
         # Plot CSP Settings
-        plots_csp["calcs_CSP"] = self.plot_CSP.isChecked()
-        plots_csp["yy_label_CSP"] =self.plot_CSP_y_label.field.text()
-        plots_csp["yy_scale_CSP"] = self.plot_CSP_y_scale.field.value()
-        plots_csp["calccol_name_CSP"] = self.plot_CSP_calccol.field.text()
+        csp["calcs_CSP"] = self.plot_CSP.isChecked()
+        csp["yy_label_CSP"] =self.plot_CSP_y_label.field.text()
+        csp["yy_scale_CSP"] = self.plot_CSP_y_scale.field.value()
+        csp["calccol_name_CSP"] = self.plot_CSP_calccol.field.text()
 
         # Plot Height Settings
         plots_height["calcs_Height_ratio"] = self.plot_height_ratio.isChecked()
@@ -550,14 +549,13 @@ class Settings(QWidget):
         csp = self.variables["csp_settings"]
         fasta = self.variables["fasta_settings"]
         plots_f1 = self.variables["PosF1_settings"]
-        plots_f2 = self.variables["plots_PosF2_settings"]
-        plots_csp = self.variables["plots_CSP_settings"]
-        plots_height = self.variables["plots_Height_ratio_settings"]
-        plots_volume = self.variables["plots_Volume_ratio_settings"]
+        plots_f2 = self.variables["PosF2_settings"]
+        plots_height = self.variables["Height_ratio_settings"]
+        plots_volume = self.variables["Volume_ratio_settings"]
 
         # General Settings
-        if os.path.exists(general["spectrum_path"]):
-            self.spectrum_path.field.setText(general["spectrum_path"])
+        if os.path.exists(general["spectra_path"]):
+            self.spectrum_path.field.setText(general["spectra_path"])
         else:
             self.spectrum_path.field.setText(os.getcwd())
         self.logfile_path.field.setText(general["logfile_name"])
@@ -602,10 +600,10 @@ class Settings(QWidget):
         self.plot_F2_calccol.field.setText(plots_f2["calccol_name_PosF2_delta"])
 
         # Plot CSP Settings
-        self.plot_CSP.setChecked(plots_csp["calcs_CSP"])
-        self.plot_CSP_y_label.field.setText(plots_csp["yy_label_CSP"])
-        self.plot_CSP_y_scale.setValue(plots_csp["yy_scale_CSP"])
-        self.plot_CSP_calccol.field.setText(plots_csp["calccol_name_CSP"])
+        self.plot_CSP.setChecked(csp["calcs_CSP"])
+        self.plot_CSP_y_label.field.setText(csp["yy_label_CSP"])
+        self.plot_CSP_y_scale.setValue(csp["yy_scale_CSP"])
+        self.plot_CSP_calccol.field.setText(csp["calccol_name_CSP"])
 
         # Plot Height Settings
         self.plot_height_ratio.setChecked(plots_height["calcs_Height_ratio"])
@@ -620,13 +618,14 @@ class Settings(QWidget):
         self.plot_volume_calccol.field.setText(plots_volume["calccol_name_Volume_ratio"])
 
         # Plot Booleans
-        self.ext_bar_checkbox.setChecked(self.variables["extended_bar_settings"]["do_ext_bar"])
-        self.comp_bar_checkbox.setChecked(self.variables["compact_bar_settings"]["do_comp_bar"])
-        self.vert_bar_checkbox.setChecked(self.variables["vert_bar_settings"]["do_vert_bar"])
-        self.res_evo_checkbox.setChecked(self.variables["res_evo_settings"]["do_res_evo"])
-        self.scatter_checkbox.setChecked(self.variables["cs_scatter_settings"]["do_cs_scatter"])
-        self.heat_map_checkbox.setChecked(self.variables["heat_map_settings"]["do_heat_map"])
-        self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
+        self.ext_bar_checkbox.setChecked(self.variables["plotting_flags"]["do_ext_bar"])
+        self.comp_bar_checkbox.setChecked(self.variables["plotting_flags"]["do_comp_bar"])
+        self.vert_bar_checkbox.setChecked(self.variables["plotting_flags"]["do_vert_bar"])
+        self.res_evo_checkbox.setChecked(self.variables["plotting_flags"]["do_res_evo"])
+        self.scatter_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter"])
+        self.scatter_flower_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter_flower"])
+        # self.heat_map_checkbox.setChecked(self.variables["heat_map_settings"]["do_heat_map"])
+        # self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
 
     def show_popup(self, popup, variables):
         p = popup(self, variables=self.variables)

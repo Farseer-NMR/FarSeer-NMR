@@ -195,7 +195,7 @@
         "yy_label_Height_ratio": null,
         "yy_scale_Height_ratio": null
     }, 
-    "plots_PosF1_settings": {
+    "PosF1_settings": {
         "calccol_name_PosF1_delta": null, 
         "plots_PosF1_delta": null, 
         "yy_label_PosF1_delta": null, 

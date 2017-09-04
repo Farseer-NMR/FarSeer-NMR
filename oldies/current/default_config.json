@@ -232,7 +232,7 @@
         "yy_label_Height_ratio": "Hi/H0", 
         "yy_scale_Height_ratio": 1.5
     }, 
-    "plots_PosF1_settings": {
+    "PosF1_settings": {
         "calccol_name_PosF1_delta": "H1_delta", 
         "plots_PosF1_delta": true, 
         "yy_label_PosF1_delta": "ppm", 

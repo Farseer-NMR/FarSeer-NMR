@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from functools import partial
 
-from current.default_config import defaults
+from gui.gui_utils import defaults
 
 class VerticalBarPopup(QDialog):
 

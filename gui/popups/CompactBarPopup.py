@@ -6,9 +6,7 @@ from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 
-from gui.gui_utils import font_weights
-
-from current.default_config import defaults
+from gui.gui_utils import font_weights, defaults
 from functools import partial
 
 class CompactBarPopup(QDialog):
@@ -56,33 +54,33 @@ class CompactBarPopup(QDialog):
             self.get_values()
 
     def get_defaults(self):
-        self.bar_cols.setValue(self.defaults["fsuv["extended_bar_settings"]cols_page"])
-        self.bar_rows.setValue(self.defaults["fsuv["extended_bar_settings"]rows_page"])
-        self.x_tick_font_size.setValue(self.defaults["fsuv["extended_bar_settings"]x_ticks_fs"])
-        self.x_tick_font.select(self.defaults["fsuv["extended_bar_settings"]x_ticks_fn"])
-        self.x_tick_rotation.setValue(self.defaults["fsuv["extended_bar_settings"]x_ticks_rot"])
-        self.x_tick_weight.select(self.defaults["fsuv["extended_bar_settings"]x_ticks_weight"])
-        self.shade_unassigned_checkbox.setChecked(self.defaults["fsuv["extended_bar_settings"]unassigned_shade"])
-        self.unassigned_shade_alpha.setValue(self.defaults["fsuv["extended_bar_settings"]unassigned_shade_alpha"])
+        self.bar_cols.setValue(self.defaults["cols_page"])
+        self.bar_rows.setValue(self.defaults["rows_page"])
+        self.x_tick_font_size.setValue(self.defaults["x_ticks_fs"])
+        self.x_tick_font.select(self.defaults["x_ticks_fn"])
+        self.x_tick_rotation.setValue(self.defaults["x_ticks_rot"])
+        self.x_tick_weight.select(self.defaults["x_ticks_weight"])
+        self.shade_unassigned_checkbox.setChecked(self.defaults["unassigned_shade"])
+        self.unassigned_shade_alpha.setValue(self.defaults["unassigned_shade_alpha"])
 
     def get_values(self):
-        self.bar_cols.setValue(self.variables["fsuv["extended_bar_settings"]cols_page"])
-        self.bar_rows.setValue(self.variables["fsuv["extended_bar_settings"]rows_page"])
-        self.x_tick_font_size.setValue(self.variables["fsuv["extended_bar_settings"]x_ticks_fs"])
-        self.x_tick_font.select(self.variables["fsuv["extended_bar_settings"]x_ticks_fn"])
-        self.x_tick_rotation.setValue(self.variables["fsuv["extended_bar_settings"]x_ticks_rot"])
-        self.x_tick_weight.select(self.variables["fsuv["extended_bar_settings"]x_ticks_weight"])
-        self.shade_unassigned_checkbox.setChecked(self.variables["fsuv["extended_bar_settings"]unassigned_shade"])
-        self.unassigned_shade_alpha.setValue(self.variables["fsuv["extended_bar_settings"]unassigned_shade_alpha"])
+        self.bar_cols.setValue(self.variables["cols_page"])
+        self.bar_rows.setValue(self.variables["rows_page"])
+        self.x_tick_font_size.setValue(self.variables["x_ticks_fs"])
+        self.x_tick_font.select(self.variables["x_ticks_fn"])
+        self.x_tick_rotation.setValue(self.variables["x_ticks_rot"])
+        self.x_tick_weight.select(self.variables["x_ticks_weight"])
+        self.shade_unassigned_checkbox.setChecked(self.variables["unassigned_shade"])
+        self.unassigned_shade_alpha.setValue(self.variables["unassigned_shade_alpha"])
 
     def set_values(self, variables):
-        self.variables["fsuv["extended_bar_settings"]cols_page"] = self.bar_cols.field.value()
-        self.variables["fsuv["extended_bar_settings"]rows_page"] = self.bar_rows.field.value()
-        self.variables["fsuv["extended_bar_settings"]x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
-        self.variables["fsuv["extended_bar_settings"]x_ticks_fs"] = self.x_tick_font_size.field.value()
-        self.variables["fsuv["extended_bar_settings"]x_ticks_rot"] = self.x_tick_rotation.field.value()
-        self.variables["fsuv["extended_bar_settings"]x_ticks_weight"] = str(self.x_tick_weight.fields.currentText())
-        self.variables["fsuv["extended_bar_settings"]unassigned_shade"] = self.shade_unassigned_checkbox.isChecked()
-        self.variables["fsuv["extended_bar_settings"]unassigned_shade_alpha"] = self.unassigned_shade_alpha.field.value()
-        variables["fsuv["extended_bar_settings"]settings"] = self.variables
+        self.variables["cols_page"] = self.bar_cols.field.value()
+        self.variables["rows_page"] = self.bar_rows.field.value()
+        self.variables["x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
+        self.variables["x_ticks_fs"] = self.x_tick_font_size.field.value()
+        self.variables["x_ticks_rot"] = self.x_tick_rotation.field.value()
+        self.variables["x_ticks_weight"] = str(self.x_tick_weight.fields.currentText())
+        self.variables["unassigned_shade"] = self.shade_unassigned_checkbox.isChecked()
+        self.variables["unassigned_shade_alpha"] = self.unassigned_shade_alpha.field.value()
+        variables["compact_bar_settings"] = self.variables
         self.accept()

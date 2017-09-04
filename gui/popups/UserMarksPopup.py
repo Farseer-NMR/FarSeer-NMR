@@ -3,8 +3,7 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox, QPushButton,
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from functools import partial
-from current.default_config import defaults
-
+from gui.gui_utils import defaults
 class UserMarksPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
@@ -152,8 +151,8 @@ class UserMarksPopup(QDialog):
     def setValues(self, variables):
         user_dict = {pair[0].field.text():pair[1].field.text() for pair in self.pairs}
         user_colours = {pair[0].field.text(): pair[2].fields.currentText() for pair in self.pairs}
-        variables["bar_plot_settings"]["bar_user_marks_dict"] = user_dict
-        variables["bar_plot_settings"]["bar_user_bar_colors_dict"] = user_colours
+        variables["bar_plot_settings"]["user_marks_dict"] = user_dict
+        variables["bar_plot_settings"]["user_bar_colors_dict"] = user_colours
         import pprint
         pprint.pprint(variables["bar_plot_settings"])
         self.accept()
