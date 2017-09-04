@@ -910,14 +910,17 @@ recipient: residues
                           tag_color='magenta',
                           tag_lw=0.2,
                           tag_ls=':',
-                          
                           x_ticks_color_flag=True,
                           x_ticks_fn='monospace',
                           x_ticks_fs=6,
                           x_ticks_weight='normal',
                           x_ticks_rot=90,
                           unassigned_shade=False,
-                          unassigned_shade_alpha=0.5):
+                          unassigned_shade_alpha=0.5,
+                          vspace='',
+                          rows_page='',
+                          cols_page=''
+                            ):
         """
         Plots horizontal bar plots.
         
@@ -2643,7 +2646,7 @@ ydata: {}
                 continue
             ###
             
-            # starts Hill fit algorythm
+            # starts Hill fit algorithm
             # http://www.physiologyweb.com/calculators/hill_equation_interactive_graph.html
             
             try:

@@ -40,16 +40,16 @@ class VerticalBarPopup(QDialog):
         # self.set_defaults()
 
     def get_defaults(self):
-        self.bar_cols.setValue(self.defaults["vert_bar_cols_page"])
-        self.bar_rows.setValue(self.defaults["vert_bar_rows_page"])
+        self.bar_cols.setValue(self.defaults["cols_page"])
+        self.bar_rows.setValue(self.defaults["rows_page"])
 
 
     def get_values(self):
-        self.bar_cols.setValue(self.variables["vert_bar_cols_page"])
-        self.bar_rows.setValue(self.variables["vert_bar_rows_page"])
+        self.bar_cols.setValue(self.variables["cols_page"])
+        self.bar_rows.setValue(self.variables["rows_page"])
 
     def set_values(self, variables):
-        self.variables["vert_bar_cols_page"] = self.bar_cols.field.value()
-        self.variables["vert_bar_rows_page"] = self.bar_rows.field.value()
+        self.variables["cols_page"] = self.bar_cols.field.value()
+        self.variables["rows_page"] = self.bar_rows.field.value()
         variables["vert_bar_settings"] = self.variables
         self.accept()

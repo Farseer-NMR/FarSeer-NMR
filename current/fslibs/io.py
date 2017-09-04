@@ -214,59 +214,59 @@ yy_scale_nbins = {}
     fsuv_tplot = """
 #### Plot configuration variables
 ### General Titration Plots Variables
-tplot_subtitle_fn= {}  # font type for the subplot titles.
-tplot_subtitle_fs= {}  # font size for the subplot titles.
-tplot_subtitle_pad= {}  # subplot title separation from y
-tplot_subtitle_weight= {}  # subplot title font weight: bold, italic, etc...
-tplot_x_label_fn= {}  # x-label font
-tplot_x_label_fs= {}  # x-label font size
-tplot_x_label_pad= {}  # x-label separation from axis
-tplot_x_label_weight= {}  #x_label font weight: bold, italic, etc...
-tplot_y_label_fn= {}  # y-label font
-tplot_y_label_fs= {}  # y-label font size
-tplot_y_label_pad= {}  # y-label separation from ayis
-tplot_y_label_weight= {}  #y_label font weight: bold, italic, etc...
-tplot_x_ticks_pad={}  # x ticks pad
-tplot_x_ticks_len={}  # length of xticks
-tplot_y_ticks_fn={}  # y-tick font name
-tplot_y_ticks_fs={}  # y-tick font size
-tplot_y_ticks_rot={}
-tplot_y_ticks_pad={}  # y-tick separati
-tplot_y_ticks_weight= {}  #x_label font weight: bold, italic, etc...on
-tplot_y_ticks_len={}  # length of y ticks
-tplot_y_grid_flag={}  # ON/OFF horizontal grid
-tplot_y_grid_color={}  # grid color
-tplot_y_grid_linestyle={}  # style of grid line
-tplot_y_grid_linewidth={}  # grid line width
-tplot_y_grid_alpha={}  # grid transparency
-tplot_vspace={} # vertical spacing between plots
+subtitle_fn= {}  # font type for the subplot titles.
+subtitle_fs= {}  # font size for the subplot titles.
+subtitle_pad= {}  # subplot title separation from y
+subtitle_weight= {}  # subplot title font weight: bold, italic, etc...
+x_label_fn= {}  # x-label font
+x_label_fs= {}  # x-label font size
+x_label_pad= {}  # x-label separation from axis
+x_label_weight= {}  #x_label font weight: bold, italic, etc...
+y_label_fn= {}  # y-label font
+y_label_fs= {}  # y-label font size
+y_label_pad= {}  # y-label separation from ayis
+y_label_weight= {}  #y_label font weight: bold, italic, etc...
+x_ticks_pad={}  # x ticks pad
+x_ticks_len={}  # length of xticks
+y_ticks_fn={}  # y-tick font name
+y_ticks_fs={}  # y-tick font size
+y_ticks_rot={}
+y_ticks_pad={}  # y-tick separati
+y_ticks_weight= {}  #x_label font weight: bold, italic, etc...on
+y_ticks_len={}  # length of y ticks
+y_grid_flag={}  # ON/OFF horizontal grid
+y_grid_color={}  # grid color
+y_grid_linestyle={}  # style of grid line
+y_grid_linewidth={}  # grid line width
+y_grid_alpha={}  # grid transparency
+vspace={} # vertical spacing between plots
     """.format(
-        tplot["tplot_subtitle_fn"],
-        tplot["tplot_subtitle_fs"],
-        tplot["tplot_subtitle_pad"],
-        tplot["tplot_subtitle_weight"],
-        tplot["tplot_x_label_fn"],
-        tplot["tplot_x_label_fs"],
-        tplot["tplot_x_label_pad"],
-        tplot["tplot_x_label_weight"],
-        tplot["tplot_y_label_fn"],
-        tplot["tplot_y_label_fs"],
-        tplot["tplot_y_label_pad"],
-        tplot["tplot_y_label_weight"],
-        tplot["tplot_x_ticks_pad"],
-        tplot["tplot_x_ticks_len"],
-        tplot["tplot_y_ticks_fn"],
-        tplot["tplot_y_ticks_fs"],
-        tplot["tplot_y_ticks_rot"],
-        tplot["tplot_y_ticks_pad"],
-        tplot["tplot_y_ticks_weight"],
-        tplot["tplot_y_ticks_len"],
-        tplot["tplot_y_grid_flag"],
-        tplot["tplot_y_grid_color"],
-        tplot["tplot_y_grid_linestyle"],
-        tplot["tplot_y_grid_linewidth"],
-        tplot["tplot_y_grid_alpha"],
-        tplot["tplot_vspace"],
+        tplot["subtitle_fn"],
+        tplot["subtitle_fs"],
+        tplot["subtitle_pad"],
+        tplot["subtitle_weight"],
+        tplot["x_label_fn"],
+        tplot["x_label_fs"],
+        tplot["x_label_pad"],
+        tplot["x_label_weight"],
+        tplot["y_label_fn"],
+        tplot["y_label_fs"],
+        tplot["y_label_pad"],
+        tplot["y_label_weight"],
+        tplot["x_ticks_pad"],
+        tplot["x_ticks_len"],
+        tplot["y_ticks_fn"],
+        tplot["y_ticks_fs"],
+        tplot["y_ticks_rot"],
+        tplot["y_ticks_pad"],
+        tplot["y_ticks_weight"],
+        tplot["y_ticks_len"],
+        tplot["y_grid_flag"],
+        tplot["y_grid_color"],
+        tplot["y_grid_linestyle"],
+        tplot["y_grid_linewidth"],
+        tplot["y_grid_alpha"],
+        tplot["vspace"],
     )
 
     fsuv_bar_plot = """
