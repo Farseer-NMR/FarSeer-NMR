@@ -165,6 +165,8 @@ class FarseerSeries(pd.Panel):
         # affects plot_res_evo()
         self.fit_performed = False 
         
+        self.PRE_loaded = False  # True after .load_theoretical_PRE
+        
         # log related variables
         self.log = ''
         self.log_export_onthefly = log_export_onthefly
@@ -411,6 +413,8 @@ class FarseerSeries(pd.Panel):
         Modifies: 
             self: added columns 'tag', 'Theo PRE'.
         """
+        self.PRE_loaded = True
+        
         target_folder = '{}/para/{}/'.format(spectra_path, datapoint)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
@@ -502,17 +506,24 @@ class FarseerSeries(pd.Panel):
             self.loc[exp,negmask,targetcol] = 0
             
             # aplies convolution with a normalized 1D Gaussian kernel
+            
             smooth_col = '{}_smooth'.format(targetcol)
             self.loc[exp,:,smooth_col] = \
                 convolve(np.array(self.loc[exp,:,targetcol]),
                          gauss,
                          boundary='extend',
                          normalize_kernel=True)
+            
+            """
+            print(self.loc[exp,:,smooth_col])
+            print(self.loc[exp,:,targetcol])
+            input()
+            """
         
         self.log_r(\
         '**Calculated DELTA PRE Smoothed** for source {} in target {} \
 with window size {} and stdev {}'.\
-            format(sourcecol, targetcol, guass_x_size, gaussian_stddev))
+            format(sourcecol, smooth_col, guass_x_size, gaussian_stddev))
         return
     
     def write_table(self, restraint_folder, tablecol,
@@ -909,12 +920,11 @@ recipient: residues
                           color_user_details_flag=False,
                           user_marks_dict={},
                           user_bar_colors_dict={},
-                          PRE_flag=False,
-                          pre_color='red',
-                          pre_lw=0.2,
-                          tag_color='magenta',
-                          tag_lw=0.2,
-                          tag_ls=':',
+                          theo_pre_color='red',
+                          theo_pre_lw=0.2,
+                          tag_cartoon_color='magenta',
+                          tag_cartoon_lw=0.2,
+                          tag_cartoon_ls=':',
                           x_ticks_color_flag=True,
                           x_ticks_fn='monospace',
                           x_ticks_fs=6,
@@ -1149,14 +1159,14 @@ recipient: residues
             self.set_item_colors(bars, self.loc[experiment,:,'Details'],
                                   user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.restraint_list[3:]):
+        if self.PRE_loaded and (calccol in self.restraint_list[3:]):
             self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.05,
                               bartype='h',
-                              pre_color=pre_color,
-                              pre_lw=pre_lw,
-                              tag_color=tag_color,
-                              tag_ls=tag_ls,
-                              tag_lw=tag_lw)
+                              pre_color=theo_pre_color,
+                              pre_lw=theo_pre_lw,
+                              tag_color=tag_cartoon_color,
+                              tag_ls=tag_cartoon_ls,
+                              tag_lw=tag_cartoon_lw)
     
     def plot_bar_vertical(self, calccol, axs, i, experiment,
                           y_lims=(0,1),
@@ -1209,12 +1219,11 @@ recipient: residues
                           color_user_details_flag=False,
                           user_marks_dict={},
                           user_bar_colors_dict={},
-                          PRE_flag=False,
-                          pre_color='red',
-                          pre_lw=0.2,
-                          tag_color='magenta',
-                          tag_lw=0.2,
-                          tag_ls=':',
+                          theo_pre_color='red',
+                          theo_pre_lw=0.2,
+                          tag_cartoon_color='magenta',
+                          tag_cartoon_lw=0.2,
+                          tag_cartoon_ls=':',
                           
                           x_ticks_color_flag=True,
                           x_ticks_fn='monospace',
@@ -1375,14 +1384,14 @@ recipient: residues
                                  self.loc[experiment,:,'Details'],
                                  user_bar_colors_dict)
         
-        if PRE_flag and (calccol in self.restraint_list[3:]):
+        if self.PRE_loaded and (calccol in self.restraint_list[3:]):
             self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
                               bartype='v',
-                              pre_color=pre_color,
-                              pre_lw=pre_lw,
-                              tag_color=tag_color,
-                              tag_ls=tag_ls,
-                              tag_lw=tag_lw)
+                              pre_color=theo_pre_color,
+                              pre_lw=theo_pre_lw,
+                              tag_color=tag_cartoon_color,
+                              tag_ls=tag_cartoon_ls,
+                              tag_lw=tag_cartoon_lw)
         
         return
     
@@ -2045,9 +2054,10 @@ recipient: residues
                           bottom_margin=0.1,
                           top_margin=0.9,
                           cbar_font_size=4,
-                          tag_color='red',
-                          tag_lw=0.3,
-                          tag_ls='-'):
+                          tag_line_color='red',
+                          tag_line_lw=0.3,
+                          tag_line_ls='-',
+                          rows=''):
         """
         Plots Delta PRE heatmaps.
         
@@ -2087,9 +2097,9 @@ recipient: residues
         
         self.plot_theo_pre(axs[i], experiment, 2,
                            bartype = 'hm',
-                           tag_color=tag_color,
-                           tag_ls=tag_ls,
-                           tag_lw=tag_lw)
+                           tag_color=tag_line_color,
+                           tag_ls=tag_line_ls,
+                           tag_lw=tag_line_lw)
         
         if i == len(self.items)-1:
             cbar = plt.colorbar(cleg,
@@ -2132,8 +2142,8 @@ recipient: residues
         return
     
     def plot_delta_osci(self, calccol, axs, i ,experiment,
-                        y_lims=(0,1),
-                        ylabel='DPRE',
+                        ymax=1.0,
+                        y_label='DPRE',
                         
                         subtitle_fn= 'Arial',
                         subtitle_fs= 8,
@@ -2167,12 +2177,9 @@ recipient: residues
                         y_grid_linestyle='-',
                         y_grid_linewidth=0.2,
                         y_grid_alpha=1,
-                        PRE_flag=None,
-                        pre_color='red',
-                        pre_lw=1,
-                        tag_color='blue',
-                        tag_lw=0.5,
-                        tag_ls=':',
+                        tag_cartoon_color='blue',
+                        tag_cartoon_lw=0.5,
+                        tag_cartoon_ls=':',
                         
                         dpre_ms=2,
                         dpre_alpha=0.5,
@@ -2187,7 +2194,11 @@ recipient: residues
                         res_highlight=True,
                         res_hl_list=[25,32,54,64,66,47],
                         res_highlight_fs=4,
-                        res_highlight_y=0.9):
+                        res_highlight_y=0.9,
+                        
+                        vspace='',
+                        rows='',
+                        width=''):
         """
         Plots the Delta PRE data in scatter points and the gaussian
         smoothed curved.
@@ -2205,7 +2216,7 @@ recipient: residues
             
             experiment (srt): the name of the data point.
         """
-        
+        y_lims = (0, ymax)
         # to solve .find Attribute Error
         # http://stackoverflow.com/questions/29437305/how-to-fix-attributeerror-series-object-has-no-attribute-find
         # plots dpre for first point in comparison
@@ -2306,7 +2317,7 @@ recipient: residues
                           weight=x_label_weight,
                           rotation=x_label_rot)
         
-        axs[i].set_ylabel(ylabel,
+        axs[i].set_ylabel(y_label,
                           fontsize=y_label_fs,
                           labelpad=y_label_pad,
                           fontname=y_label_fn,
@@ -2338,9 +2349,9 @@ recipient: residues
         
         self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
                            bartype = 'osci',
-                           tag_color=tag_color,
-                           tag_ls=tag_ls,
-                           tag_lw=tag_lw)
+                           tag_color=tag_cartoon_color,
+                           tag_ls=tag_cartoon_ls,
+                           tag_lw=tag_cartoon_lw)
         
         return
     
@@ -2468,8 +2479,6 @@ recipient: residues
             
             for i, experiment in enumerate(self):
                 self.plot_delta_osci(calccol, axs, i, experiment,
-                                     y_lims=par_ylims,
-                                     ylabel=ylabel,
                                      color=next(dp_color),
                                      **param_dict)
                 pass

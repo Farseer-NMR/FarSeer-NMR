@@ -46,15 +46,20 @@
         "mark_user_details_flag":false,
         "color_user_details_flag":false,
         "user_marks_dict":{"mark": "m"},
-        "user_bar_colors_dict":{"mark": "khaki"}
+        "user_bar_colors_dict":{"mark": "khaki"},
+	"theo_pre_color":"red",
+        "theo_pre_lw":0.2,
+        "tag_cartoon_color":"magenta",
+        "tag_cartoon_lw":0.2,
+        "tag_cartoon_ls":":"
     },
     "plotting_flags" : {
         "do_ext_bar": true,
-        "do_comp_bar": true,
-        "do_vert_bar": true,
-        "do_res_evo": true,
-        "do_cs_scatter": true,
-        "do_cs_scatter_flower": true
+        "do_comp_bar": false,
+        "do_vert_bar": false,
+        "do_res_evo": false,
+        "do_cs_scatter": false,
+        "do_cs_scatter_flower": false
     },
 
     "extended_bar_settings": {
@@ -80,8 +85,8 @@
     },
     "vert_bar_settings": {
 
-        "cols_page": 5,
-        "rows_page": 2
+        "vert_bar_cols_page": 5,
+        "vert_bar_rows_page": 2
     },
     "dpre_osci_settings": {
         "rows": 10,
@@ -107,8 +112,11 @@
             1,
             2
         ],
-        "rh_fs": 4,
-        "rh_y": 0.9
+        "res_highlight_fs": 4,
+        "res_highlight_y": 0.9,
+	"tag_cartoon_color":"blue",
+	"tag_cartoon_lw":0.5,
+	"tag_cartoon_ls":":"
     },
     "revo_settings": {
         "subtitle_fn": "Arial",
@@ -207,7 +215,7 @@
         "y_ticks_fn":"Arial",
         "y_ticks_fs":8,
         "y_ticks_pad":1,
-        "y_ticks_weight":"normal",
+        "y_ticks_weight":1,
         "y_ticks_rot":0
     },
     "heat_map_settings": {
@@ -226,7 +234,10 @@
         "y_label_weight": "bold",
         "right_margin": 0.22,
         "bottom_margin": 0.6,
-        "cbar_font_size": 4
+        "cbar_font_size": 4,
+	"tag_line_color":"blue",
+        "tag_line_ls":"-", 
+        "tag_line_lw":0.8
     }, 
     "cs_settings": {
         "cs_correction_res_ref": 1, 
@@ -293,13 +304,8 @@
     "pre_settings": {
         "apply_PRE_analysis": false, 
         "apply_smooth": false, 
-        "gauss_x_size": 1, 
-        "gaussian_stdev": 7, 
-        "pre_color": "red",
-        "pre_lw": 1, 
-        "tag_color": "blue",
-        "tag_ls": "-",
-        "tag_lw": 0.8
+        "gauss_x_size": 7, 
+        "gaussian_stdev": 1
     }, 
     "user_mark_settings": {"mark": "m"}
 }
