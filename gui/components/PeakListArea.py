@@ -175,7 +175,6 @@ class PeakListLabel(QGraphicsTextItem):
   def mousePressEvent(self, event):
 
       if event.button() == QtCore.Qt.RightButton:
-          print('right button clicked')
           if self.peak_list:
             self._raiseContextMenu(event)
 
@@ -183,15 +182,10 @@ class PeakListLabel(QGraphicsTextItem):
   def _raiseContextMenu(self, event):
       contextMenu = QMenu()
       contextMenu.addAction('Delete', self.removeItem)
-      print('poppy poppy')
       contextMenu.exec_(event.screenPos())
 
   def removeItem(self):
-      print(self.peak_list)
-      print(self.scene.parent().sideBar().addItem(self.peak_list))
       self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', "Drop peaklist here"))
-
-
 
 
   def dragEnterEvent(self, event):
