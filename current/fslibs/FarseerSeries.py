@@ -60,6 +60,7 @@ class FarseerSeries(pd.Panel):
             used for each residue in the CSP calculation formula.
         
         fitdf (dict): stored pd.DataFrames with information on fitting.
+        fit_performed (bool): defaults False. True after .perform_fit().
     
     Methods:
         
@@ -159,6 +160,10 @@ class FarseerSeries(pd.Panel):
         
         # dictionary to store dataframes with information on fitting results
         self.fitdf = {}
+        
+        # becomes if perform_fit() runs.
+        # affects plot_res_evo()
+        self.fit_performed = False 
         
         # log related variables
         self.log = ''
@@ -1423,7 +1428,6 @@ recipient: residues
                      fill_between=True,
                      fill_color='pink',
                      fill_alpha=0.5,
-                     fit_perform=False,
                      fit_line_color = 'black',
                      fit_line_width = 1,
                      fit_line_style = '-',
@@ -1570,7 +1574,7 @@ recipient: residues
             axs[i].fill_between(x, 0, y,
                                 facecolor=fill_color, alpha=fill_alpha)
         
-        if fit_perform \
+        if self.fit_performed \
                 and self.series_axis == 'cond1'\
                 and (calccol in self.restraint_list[:3])\
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
@@ -2608,6 +2612,7 @@ ydata: {}
         
         # creates data frame to store fiting results.
         self.fitdf[calccol] = pd.DataFrame()
+        self.fit_performed = True
         
         # open fit logs
         if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
