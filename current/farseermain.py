@@ -1581,8 +1581,8 @@ def analyse_comparisons(series_dct, fsuv,
                     
                     # writes log
                     c.all_next_dim[dp2][dp1].log_r(\
-                        'COMPARING... [{}][{}] - [{}]'.format(\
-                            dp2, dp1, list(c.hyper_panel.labels)),
+                        'COMPARING... [{}][{}][{}] - [{}]'.format(\
+                            dimension, dp2, dp1, list(c.hyper_panel.labels)),
                         istitle=True)
                     
                     # performs ploting routines
@@ -1601,8 +1601,8 @@ def analyse_comparisons(series_dct, fsuv,
                     
                     # writes log
                     c.all_prev_dim[dp2][dp1].log_r(\
-                        'COMPARING... [{}][{}] - [{}]'.format(\
-                            dp2, dp1, list(c.hyper_panel.cool)),
+                        'COMPARING... [{}][{}][{}] - [{}]'.format(\
+                            dimension, dp2, dp1, list(c.hyper_panel.cool)),
                         istitle=True)
                     
                     comparison_analysis_routines(\
