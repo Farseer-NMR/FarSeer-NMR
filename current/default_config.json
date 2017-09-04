@@ -85,8 +85,8 @@
     },
     "vert_bar_settings": {
 
-        "vert_bar_cols_page": 5,
-        "vert_bar_rows_page": 2
+        "cols_page": 5,
+        "rows_page": 2
     },
     "dpre_osci_settings": {
         "rows": 10,
@@ -215,7 +215,7 @@
         "y_ticks_fn":"Arial",
         "y_ticks_fs":8,
         "y_ticks_pad":1,
-        "y_ticks_weight":1,
+        "y_ticks_weight":"normal",
         "y_ticks_rot":0
     },
     "heat_map_settings": {
