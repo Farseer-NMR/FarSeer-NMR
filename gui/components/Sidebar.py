@@ -18,7 +18,14 @@ class SideBar(QTreeWidget):
         self.peakLists = peakLists
         self.setSortingEnabled(True)
         if variables:
-            self.variables = variables["peaklists"]
+            self.update_from_config(variables)
+
+
+    def update_from_config(self, variables):
+        self.clear()
+        self.variables = variables["peaklists"]
+        for peaklist in self.variables.values():
+            self.load_peaklist(peaklist)
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -86,3 +93,8 @@ class SideBar(QTreeWidget):
         newItem.setText(0, name)
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)
         return newItem
+
+    def removeItem(self, item_name):
+        import sip
+        result = self.findItems(item_name, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive, 0)
+        sip.delete(result[0])

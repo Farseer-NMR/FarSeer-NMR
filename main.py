@@ -53,16 +53,7 @@ from current.fslibs.io import json_to_fsuv, fsuv_to_json
 peakLists = OrderedDict()
 
 
-def load_config():
-    import os
-    fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
-    if fname[0]:
-        if fname[0].split('.')[1] == 'json':
-            variables = json.load(open(fname[0], 'r'))
-        elif fname[0].split('.')[1] == 'py':
-            variables = fsuv_to_json(open(fname[0], 'r'))
-        return variables
-    return None
+
 
 class TabWidget(QTabWidget):
 
@@ -91,6 +82,29 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
         self.config_file = None
 
+    def load_config(self):
+        fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+        if fname[0]:
+            if fname[0].split('.')[1] == 'json':
+                variables = json.load(open(fname[0], 'r'))
+                self.interface.sideBar.update_from_config(variables)
+                self.interface.variables = variables
+                self.interface.x_combobox.setValue(len(variables["conditions"]["x"]))
+                self.interface.y_combobox.setValue(len(variables["conditions"]["y"]))
+                self.interface.z_combobox.setValue(len(variables["conditions"]["z"]))
+                if len(variables["conditions"]["x"]) == 1:
+                    self.interface.update_condition_boxes(3, 'x', 1)
+                if len(variables["conditions"]["y"]) == 1:
+                    self.interface.update_condition_boxes(2, 'y', 1)
+                if len(variables["conditions"]["z"]) == 1:
+                    self.interface.update_condition_boxes(1, 'z', 1)
+                self.interface.valuesDict = variables["conditions"]
+                self.interface.peakListArea.variables = variables
+                self.interface.peakListArea.updateTree(variables)
+
+                return variables
+        return None
+
     def load_peak_lists(self, path=None):
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
@@ -111,13 +125,9 @@ class TabWidget(QTabWidget):
 
 
     def run_farseer_calculation(self):
-        print(self.variables["conditions"])
-        print(self.variables["fasta_files"])
-        print(peakLists)
-        # spectrum_path = self.settings.spectrum_path.field.text()
+
         output_path = self.settings.output_path.field.text()
         create_directory_structure(output_path, self.variables, peakLists)
-        # self.write_fsuv(output_path)
         from current.farseermain import read_user_variables, run_farseer
         if self.config_file:
             path, config_name = os.path.split(self.config_file)
@@ -467,7 +477,7 @@ class Settings(QWidget):
         self.output_path.setText(path)
 
     def load_config(self):
-        self.variables = load_config()
+        self.variables = self.parent().parent().parent().load_config()
         if self.variables:
             self.load_variables()
 
@@ -572,6 +582,7 @@ class Settings(QWidget):
         plots_f2 = self.variables["PosF2_settings"]
         plots_height = self.variables["Height_ratio_settings"]
         plots_volume = self.variables["Volume_ratio_settings"]
+
 
         # General Settings
         if os.path.exists(general["spectra_path"]):

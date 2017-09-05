@@ -20,10 +20,10 @@ class PeakListArea(QWidget):
         self.layout().addWidget(self.scrollContents)
         self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
-
-        self.valuesDict = variables["conditions"]
-        self.peak_list_dict = variables["experimental_dataset"]
-        self.fasta_files = variables["fasta_files"]
+        self.variables = variables
+        # self.valuesDict = self.variables["conditions"]
+        # self.peak_list_dict = self.variables["experimental_dataset"]
+        # self.fasta_files = self.variables["fasta_files"]
         self.setEvents()
         self.updateClicks = 0
 
@@ -50,6 +50,10 @@ class PeakListArea(QWidget):
         return retval
 
     def updateTree(self, variables):
+
+        self.valuesDict = variables["conditions"]
+        self.peak_list_dict = variables["experimental_dataset"]
+        self.fasta_files = variables["fasta_files"]
         if self.updateClicks > 0:
             self.show_update_warning()
         self.peak_list_objects = []
@@ -96,9 +100,17 @@ class PeakListArea(QWidget):
                 for k, x in enumerate(x_conds):
                     xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                     self.scene.addItem(xx)
-                    pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
+                    if not variables["experimental_dataset"][z][y][x]:
+                        pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
                                        [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
-                    self.peak_list_dict[z][y][x] = ''
+                        self.peak_list_dict[z][y][x] = ''
+                    else:
+                        pl_name = variables["experimental_dataset"][z][y][x]
+                        pl = PeakListLabel(self, pl_name, self.scene,
+                                           [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
+                        self.peak_list_dict[z][y][x] = pl_name
+                        self.sideBar().removeItem(pl_name)
+
                     self.peak_list_objects.append(pl)
                     self.scene.addItem(pl)
                     self._addConnectingLine(xx, pl)
@@ -172,7 +184,7 @@ class ConditionLabel(QGraphicsTextItem):
 
 class PeakListLabel(QGraphicsTextItem):
 
-  def __init__(self, parent, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
+  def __init__(self, parent, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None, peak_list=None):
       QGraphicsTextItem.__init__(self)
       self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
@@ -181,7 +193,7 @@ class PeakListLabel(QGraphicsTextItem):
       self.x_cond = x_cond
       self.y_cond = y_cond
       self.z_cond = z_cond
-      self.peak_list = None
+      self.peak_list = peak_list
       self.peak_list_dict = parent.peak_list_dict
       self.sideBar = parent.sideBar
 
