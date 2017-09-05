@@ -2195,7 +2195,9 @@ recipient: residues
                         res_hl_list=[25,32,54,64,66,47],
                         res_highlight_fs=4,
                         res_highlight_y=0.9,
-                        
+
+                        theo_pre_color='',
+                        theo_pre_lw='',
                         vspace='',
                         rows='',
                         width=''):
