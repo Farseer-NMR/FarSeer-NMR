@@ -1,20 +1,23 @@
 import os, csv
+from shutil import copy2
 
 def create_directory_structure(output_path, variables, peakLists):
     spectrum_dir = output_path+'/spectra/'
     if not os.path.exists(os.path.join(spectrum_dir)):
         os.mkdir(spectrum_dir)
-    # import pprint
-    # pprint.pprint(peakLists)
+
     exp_dataset = variables["experimental_dataset"]
     for z_key in variables["conditions"]["z"]:
         for y_key in variables["conditions"]["y"]:
             if not os.path.exists(os.path.join(spectrum_dir, z_key, y_key)):
                 os.makedirs(os.path.join(spectrum_dir, z_key, y_key))
-                for x_key in variables["conditions"]["x"]:
-                    fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
-                    write_peaklist_file(fout, peakLists[exp_dataset[z_key][y_key][x_key]])
-                    fout.close()
+            if variables["fasta_files"][y_key]:
+                fasta_file = variables["fasta_files"][y_key]
+                copy2(fasta_file, os.path.join(spectrum_dir, z_key, y_key))
+            for x_key in variables["conditions"]["x"]:
+                fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
+                write_peaklist_file(fout, peakLists[exp_dataset[z_key][y_key][x_key]])
+                fout.close()
 
 
 def write_peaklist_file(fin, peak_list):
