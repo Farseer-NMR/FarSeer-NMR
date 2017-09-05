@@ -5,6 +5,8 @@ GUI_DIR = os.path.dirname(__file__)
 
 defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'current', 'default_config.json'), 'r'))
 
+line_styles = ['-', '--', '-.', ':', 'o']
+
 colours = OrderedDict([('#ff0000','red'),
                        ('#8b0000','dark red'),
                        ('#00ffff', 'cyan'),

@@ -7,15 +7,15 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-from gui.gui_utils import defaults, font_weights
+from gui.gui_utils import defaults, font_weights, line_styles
 from functools import partial
 
 
 
-class TitrationPlotPopup(QDialog):
+class SeriesPlotPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
-        super(TitrationPlotPopup, self).__init__(parent)
+        super(SeriesPlotPopup, self).__init__(parent)
         self.setWindowTitle("Titration Plot Settings")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
@@ -29,6 +29,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_subtitle_groupbox_layout = QVBoxLayout()
         self.tplot_subtitle_groupbox.setLayout(self.tplot_subtitle_groupbox_layout)
         self.tplot_subtitle_groupbox.setTitle("Subtitle Settings")
+
         self.tplot_subtitle_fn = FontComboBox(self, "Subtitle Font")
         self.tplot_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size")
         self.tplot_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding")
@@ -75,7 +76,22 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Alpha", min=0, max=1, step=0.1)
         self.tplot_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing")
 
+        self.theo_pre_groupbox = QGroupBox()
+        self.theo_pre_groupbox_layout = QVBoxLayout()
+        self.theo_pre_groupbox.setLayout(self.theo_pre_groupbox_layout)
+        self.theo_pre_groupbox.setTitle("Dedicated PRE Settings")
 
+        self.theo_pre_color = ColourBox(self, "Theoretical PRE Line Colour")
+        self.theo_pre_lw = LabelledDoubleSpinBox(self, "Theoretical PRE Line Width", min=0, step=0.1)
+        self.tag_cartoon_color = ColourBox(self, "Tag Pin Colour")
+        self.tag_cartoon_lw = LabelledDoubleSpinBox(self, "Tag Pin Line Width", min=0, step=0.1)
+        self.tag_cartoon_ls = LabelledCombobox(self, "Tag Pin Line Style", items=line_styles)
+
+        self.theo_pre_groupbox.layout().addWidget(self.theo_pre_color)
+        self.theo_pre_groupbox.layout().addWidget(self.theo_pre_lw)
+        self.theo_pre_groupbox.layout().addWidget(self.tag_cartoon_color)
+        self.theo_pre_groupbox.layout().addWidget(self.tag_cartoon_lw)
+        self.theo_pre_groupbox.layout().addWidget(self.tag_cartoon_ls)
 
         self.tplot_subtitle_groupbox.layout().addWidget(self.tplot_subtitle_fn)
         self.tplot_subtitle_groupbox.layout().addWidget(self.tplot_subtitle_fs)
@@ -88,9 +104,10 @@ class TitrationPlotPopup(QDialog):
         self.tplot_x_label_groupbox.layout().addWidget(self.tplot_x_label_weight)
 
 
-
         self.layout().addWidget(self.tplot_subtitle_groupbox, 0, 0, 4, 1)
         self.layout().addWidget(self.tplot_x_label_groupbox, 0, 1, 4, 1)
+        self.layout().addWidget(self.theo_pre_groupbox, 0, 2, 4, 1)
+
 
 
         self.tplot_y_label_groupbox.layout().addWidget(self.tplot_y_label_fn)
@@ -104,7 +121,7 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_x_ticks_pad)
         self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_x_ticks_len)
         self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_y_ticks_fn)
-        self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_y_ticks_fs,)
+        self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_y_ticks_fs)
         self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_y_ticks_rot)
         self.tplot_y_tick_groupbox.layout().addWidget(self.tplot_y_ticks_pad)
         self.tplot_y_label_groupbox.layout().addWidget(self.tplot_y_ticks_weight)
@@ -124,13 +141,15 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_grid_groupbox.layout().addWidget(self.tplot_y_grid_alpha)
         self.tplot_y_grid_groupbox.layout().addWidget(self.tplot_vspace)
 
-        self.layout().addWidget(self.tplot_y_grid_groupbox, 0, 2, 4, 1)
+        self.layout().addWidget(self.tplot_y_grid_groupbox, 4, 2, 4, 1)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
         self.buttonBox.accepted.connect(partial(self.set_values, variables))
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
+
+
 
         self.layout().addWidget(self.buttonBox, 8, 2, 1, 1)
 
@@ -165,6 +184,12 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_grid_linewidth.setValue(self.default["y_grid_linewidth"])
         self.tplot_y_grid_alpha.setValue(self.default["y_grid_alpha"])
 
+        self.theo_pre_color.select(self.default["theo_pre_color"])
+        self.theo_pre_lw.setValue(self.default["theo_pre_lw"])
+        self.tag_cartoon_color.select(self.default["tag_cartoon_color"])
+        self.tag_cartoon_lw.setValue(self.default["tag_cartoon_lw"])
+        self.tag_cartoon_ls.select(self.default["tag_cartoon_ls"])
+
 
     def set_values(self, variables):
         self.variables["subtitle_fn"] = str(self.tplot_subtitle_fn.fields.currentText())
@@ -196,6 +221,13 @@ class TitrationPlotPopup(QDialog):
         self.variables["y_grid_linewidth"] = self.tplot_y_grid_linewidth.field.value()
         self.variables["y_grid_alpha"] = self.tplot_y_grid_alpha.field.value()
 
+        self.variables["theo_pre_color"] = self.theo_pre_color.fields.currentText()
+        self.variables["theo_pre_lw"] = self.theo_pre_lw.field.value()
+        self.variables["tag_cartoon_color"] = self.tag_cartoon_color.fields.currentText()
+        self.variables["tag_cartoon_lw"] = self.tag_cartoon_lw.field.value()
+        self.variables["tag_cartoon_ls"] = self.tag_cartoon_ls.fields.currentText()
+
+
         variables["series_plot_settings"] = self.variables
         self.accept()
 
@@ -226,3 +258,9 @@ class TitrationPlotPopup(QDialog):
         self.tplot_y_grid_linestyle.select(self.variables["y_grid_linestyle"])
         self.tplot_y_grid_linewidth.setValue(self.variables["y_grid_linewidth"])
         self.tplot_y_grid_alpha.setValue(self.variables["y_grid_alpha"])
+
+        self.theo_pre_color.select(self.variables["theo_pre_color"])
+        self.theo_pre_lw.setValue(self.variables["theo_pre_lw"])
+        self.tag_cartoon_color.select(self.variables["tag_cartoon_color"])
+        self.tag_cartoon_lw.setValue(self.variables["tag_cartoon_lw"])
+        self.tag_cartoon_ls.select(self.variables["tag_cartoon_ls"])

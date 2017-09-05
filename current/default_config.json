@@ -44,7 +44,6 @@
         "threshold_color":"red",
         "threshold_linewidth":0.5,
         "threshold_alpha":0.8,
-        "threshold_zorder":4,
         "mark_fontsize":3,
         "mark_prolines_flag":true,
         "mark_prolines_symbol":"P",
@@ -93,8 +92,8 @@
         "width": 3,
         "y_label": "r'$\\Delta$PRE$_(rc-exp)$",
         "y_label_fs": 5,
-        "dpre_ms": 2,
         "ymax": 1.0,
+        "dpre_ms": 2,
         "dpre_alpha": 0.5,
         "smooth_lw": 1,
         "ref_color": "black",
@@ -106,7 +105,10 @@
         "x_ticks_weight": "normal",
         "grid_color": "grey",
         "shade": false,
-        "shade_regions": "write a list of tuples",
+        "shade_regions": [
+            [0,10],
+            [20,25]
+        ],
         "res_highlight": false,
         "res_hl_list": [
             1,
@@ -232,7 +234,7 @@
         "right_margin": 0.22,
         "bottom_margin": 0.6,
         "cbar_font_size": 4,
-	"tag_line_color":"black",
+	    "tag_line_color":"black",
         "tag_line_ls":"-", 
         "tag_line_lw":0.8
     }, 
@@ -299,8 +301,7 @@
         "yy_scale_Height_ratio": 1.1
     }, 
     "pre_settings": {
-        "apply_PRE_analysis": false, 
-        "apply_smooth": false, 
+        "apply_PRE_analysis": false,
         "gauss_x_size": 7, 
         "gaussian_stdev": 1
     }

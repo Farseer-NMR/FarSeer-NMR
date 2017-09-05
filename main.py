@@ -29,8 +29,8 @@ from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
 from gui.popups.HeatMapPopup import HeatMapPopup
-from gui.popups.DPrePopup import DPrePopup
-from gui.popups.TitrationPlotPopup import TitrationPlotPopup
+from gui.popups.OscillationMapPopup import OscillationMapPopup
+from gui.popups.SeriesPlotPopup import SeriesPlotPopup
 
 from gui.Footer import Footer
 
@@ -153,12 +153,12 @@ class Settings(QWidget):
         self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
         self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
         self.scatter_checkbox = LabelledCheckbox(self, "CS Scatter")
-        self.dpre_checkbox = LabelledCheckbox(self, "DPre")
-        self.heat_map_checkbox = LabelledCheckbox(self, "PRE Heat Map")
+        self.dpre_checkbox = LabelledCheckbox(self, "Oscillation Map")
+        self.heat_map_checkbox = LabelledCheckbox(self, "Heat Map")
         self.scatter_flower_checkbox = LabelledCheckbox(self, " CS Scatter Flower")
 
         self.tplot_button = QPushButton("General Series Plot Settings", self)
-        self.tplot_button.clicked.connect(partial(self.show_popup, TitrationPlotPopup, self.variables))
+        self.tplot_button.clicked.connect(partial(self.show_popup, SeriesPlotPopup, self.variables))
 
         self.revo_button = QPushButton("General Evolution Settings", self)
         self.revo_button.clicked.connect(partial(self.show_popup, GeneralResidueEvolution, self.variables))
@@ -188,7 +188,7 @@ class Settings(QWidget):
         self.heat_map_button.clicked.connect(partial(self.show_popup, HeatMapPopup, self.variables))
 
         self.dpre_button = QPushButton("Settings", self)
-        self.dpre_button.clicked.connect(partial(self.show_popup, DPrePopup, self.variables))
+        self.dpre_button.clicked.connect(partial(self.show_popup, OscillationMapPopup, self.variables))
 
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Are Sidechain Peaks Present?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
@@ -353,7 +353,7 @@ class Settings(QWidget):
         pre_groupbox_layout = QGridLayout()
         pre_groupbox.setLayout(pre_groupbox_layout)
 
-        self.do_pre = LabelledCheckbox(self, "PRE Analysis")
+        self.do_pre = LabelledCheckbox(self, "Do PRE Analysis")
         self.pre_settings = QPushButton("PRE Settings", self)
         self.pre_settings.clicked.connect(partial(self.show_popup, PreAnalysisPopup, self.variables))
 

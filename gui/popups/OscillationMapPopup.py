@@ -11,11 +11,11 @@ from gui.components.FontComboBox import FontComboBox
 from functools import partial
 from gui.gui_utils import defaults, font_weights
 
-class DPrePopup(QDialog):
+class OscillationMapPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
-        super(DPrePopup, self).__init__(parent)
-        self.setWindowTitle("DPre Oscillation Plot")
+        super(OscillationMapPopup, self).__init__(parent)
+        self.setWindowTitle("Oscillation Map")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
@@ -28,14 +28,15 @@ class DPrePopup(QDialog):
         self.dpre_osci_width = LabelledSpinBox(self, "Scale Factor for Width")
         self.dpre_osci_y_label = LabelledLineEdit(self, "Y Label")
         self.dpre_osci_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
+        self.dpre_osci_ymax = LabelledSpinBox(self, "Y Maximum")
         self.dpre_osci_dpre_ms = LabelledSpinBox(self, "Marker Size")
         self.dpre_osci_dpre_alpha = LabelledDoubleSpinBox(self, "Marker alpha")
         self.dpre_osci_smooth_lw = LabelledSpinBox(self, "Smoothed DPRE Line Width")
         self.dpre_osci_ref_color = ColourBox(self, "Reference Data Colour")
         self.dpre_osci_color_init = ColourBox(self, "Gradient Start Colour")
         self.dpre_osci_color_end = ColourBox(self, "Gradient End Colour")
-        self.dpre_osci_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size")
         self.dpre_osci_x_ticks_fn = FontComboBox(self, "X Tick Font")
+        self.dpre_osci_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size")
         self.dpre_osci_x_ticks_pad = LabelledSpinBox(self, "X Tick Padding")
         self.dpre_osci_x_ticks_weight = LabelledCombobox(self, text="X Font Weight", items=font_weights)
         self.dpre_osci_grid_color = ColourBox(self, "Grid Colour")
@@ -45,7 +46,6 @@ class DPrePopup(QDialog):
         self.dpre_osci_regions = LabelledLineEdit(self, "Regions to Shade")
         self.dpre_osci_rh_fs = LabelledSpinBox(self, "Highlight Font Size ")
         self.dpre_osci_rh_y = LabelledDoubleSpinBox(self, "Residue Label Scale")
-        self.dpre_osci_rh_y = LabelledSpinBox(self, "Y Maximum")
 
 
         self.layout().addWidget(self.dpre_osci_rows, 0, 0)
@@ -72,7 +72,7 @@ class DPrePopup(QDialog):
         self.layout().addWidget(self.dpre_osci_regions, 7, 1)
         self.layout().addWidget(self.dpre_osci_rh_fs, 8, 1)
         self.layout().addWidget(self.dpre_osci_rh_y, 9, 1)
-        self.layout().addWidget(self.dpre_ymax, 10, 1)
+        self.layout().addWidget(self.dpre_osci_ymax, 10, 1)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
@@ -84,6 +84,14 @@ class DPrePopup(QDialog):
 
         if variables:
             self.get_values()
+
+    def set_ranges(self, field_value):
+        ll = field_value.split(',')
+        print(ll)
+        return [[x.split('-')[0], x.split('-')[1]] for x in ll]
+
+    def get_ranges(self, ranges):
+        return ', '.join(["%s-%s" % (x[0], x[1]) for x in ranges])
 
     def get_defaults(self):
         self.dpre_osci_rows.setValue(self.default["rows"])
@@ -102,12 +110,12 @@ class DPrePopup(QDialog):
         self.dpre_osci_x_ticks_weight.select(self.default["x_ticks_weight"])
         self.dpre_osci_grid_color.select(self.default["grid_color"])
         self.dpre_osci_shade.setChecked(self.default["shade"])
-        self.dpre_osci_res_regions.setText(', '.join(self.default["shade_regions"]))
+        self.dpre_osci_regions.setText(self.get_ranges(self.default["shade_regions"]))
         self.dpre_osci_res_highlight.field.setText(str(self.default["res_highlight"]))
         self.dpre_osci_res_highlight_list.field.setText(', '.join(self.default["res_hl_list"]))
-        self.dpre_osci_rh_fs.setValue(self.default["rh_fs"])
-        self.dpre_osci_rh_y.setValue(self.default["rh_y"])
-        self.dpre_ymax.setValue(self.default["ymax"])
+        self.dpre_osci_rh_fs.setValue(self.default["res_highlight_fs"])
+        self.dpre_osci_rh_y.setValue(self.default["res_highlight_y"])
+        self.dpre_osci_ymax.setValue(self.default["ymax"])
 
 
     def set_values(self, variables):
@@ -127,12 +135,12 @@ class DPrePopup(QDialog):
         self.variables["x_ticks_weight"] = self.dpre_osci_x_ticks_weight.fields.currentText()
         self.variables["grid_color"] = self.dpre_osci_grid_color.fields.currentText()
         self.variables["shade"] = self.dpre_osci_shade.isChecked()
-        self.variables["shade_regions"] = list(self.dpre_osci_regions.field.text())
+        self.variables["shade_regions"] = self.set_ranges(self.dpre_osci_regions.field.text())
         self.variables["res_highlight"] = self.dpre_osci_res_highlight.isChecked()
-        self.variables["res_hl_list"] = self.dpre_osci_res_highlight_list.field.text()
-        self.variables["rh_fs"] = self.dpre_osci_rh_fs.field.value()
-        self.variables["rh_y"] = self.dpre_osci_rh_y.field.value()
-        self.variables["ymax"] = self.dpre_ymax.field.value()
+        self.variables["res_hl_list"] = self.dpre_osci_res_highlight_list.field.text().split(',')
+        self.variables["res_highlight_fs"] = self.dpre_osci_rh_fs.field.value()
+        self.variables["res_highlight_y"] = self.dpre_osci_rh_y.field.value()
+        self.variables["ymax"] = self.dpre_osci_ymax.field.value()
         variables["dpre_osci_settings"] = self.variables
         self.accept()
 
@@ -156,8 +164,8 @@ class DPrePopup(QDialog):
         self.dpre_osci_shade.setChecked(self.variables["shade"])
         self.dpre_osci_res_highlight.setChecked(self.variables["res_highlight"])
         self.dpre_osci_res_highlight_list.field.setText(','.join([str(x) for x in self.variables["res_hl_list"]]))
-        self.dpre_osci_regions.setText(self.variables["shade_regions"])
-        self.dpre_osci_rh_fs.setValue(self.variables["rh_fs"])
-        self.dpre_osci_rh_y.setValue(self.variables["rh_y"])
-        self.dpre_ymax.setValue(self.variables["ymax"])
+        self.dpre_osci_regions.setText(self.get_ranges(self.variables["shade_regions"]))
+        self.dpre_osci_rh_fs.setValue(self.variables["res_highlight_fs"])
+        self.dpre_osci_rh_y.setValue(self.variables["res_highlight_y"])
+        self.dpre_osci_ymax.setValue(self.variables["ymax"])
 

@@ -30,7 +30,7 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_color_grad = LabelledCheckbox(self, "Colour Gradient")
         self.cs_scatter_flower_color_start = ColourBox(self, "Mark Start Colour")
         self.cs_scatter_flower_color_end = ColourBox(self, "Mark End Colour")
-        self.cs_scatter_flower_color_list_fs = LabelledLineEdit(self, "Colour List")
+        self.cs_scatter_flower_color_list = LabelledLineEdit(self, "Colour List")
 
         self.cs_scatter_flower_x_label_fn = FontComboBox(self, "X Label Font")
         self.cs_scatter_flower_x_label_fs = LabelledSpinBox(self, "X Label Font Size")
@@ -62,7 +62,7 @@ class ScatterFlowerPlotPopup(QDialog):
         self.layout().addWidget(self.cs_scatter_flower_color_end, 5, 0)
         self.layout().addWidget(self.cs_scatter_flower_x_label_fn, 6, 0)
         self.layout().addWidget(self.cs_scatter_flower_x_label_fs, 7, 0)
-        self.layout().addWidget(self.cs_scatter_flower_colour_list, 8, 0)
+        self.layout().addWidget(self.cs_scatter_flower_color_list, 8, 0)
 
 
         self.layout().addWidget(self.cs_scatter_flower_x_label_pad, 0, 1)

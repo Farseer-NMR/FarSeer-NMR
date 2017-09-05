@@ -22,13 +22,12 @@ class BarPlotPopup(QDialog):
         self.variables = None
         if variables:
             self.variables = variables["bar_plot_settings"]
-            # self.user_variables = variables["user_mark_settings"]
         self.defaults = defaults["bar_plot_settings"]
 
 
-        self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
-        self.lost_bar_colour = ColourBox(self, text="Missing Bar Colour")
+        self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
+        self.lost_bar_colour = ColourBox(self, text="Lost Bar Colour")
         self.unassigned_bar_colour = ColourBox(self, text="Unassigned Bar Colour")
         self.bar_width = LabelledDoubleSpinBox(self, text="Bar Width")
         self.bar_alpha = LabelledDoubleSpinBox(self, text="Bar Alpha", min=0, max=1, step=0.1)
@@ -36,11 +35,11 @@ class BarPlotPopup(QDialog):
         self.bar_threshold = LabelledCheckbox(self, "Apply Stdev Threshold")
         self.bar_threshold_colour = ColourBox(self, "Stdev Threshold Colour")
         self.bar_threshold_alpha = LabelledDoubleSpinBox(self, "Stdev Threshold Alpha", min=0, max=1, step=0.1)
-        self.bar_threshold_linewidth = LabelledDoubleSpinBox(self, text="Stdev Threshold Line Width")
+        self.bar_threshold_linewidth = LabelledDoubleSpinBox(self, text="Stdev Threshold Line Width", min=0, step=0.1)
+        self.user_mark_font_size = LabelledSpinBox(self, "Mark Font Size")
         self.markProlines = LabelledCheckbox(self, text="Mark Prolines")
         self.proline_marker = LabelledLineEdit(self, text="Proline Marker")
         self.user_details = LabelledCheckbox(self, "Mark User Details")
-        self.user_mark_font_size = LabelledSpinBox(self, "User Mark Font Size")
         self.colour_user_details = LabelledCheckbox(self, "Colour User Details")
         self.user_markers_button = QPushButton("User Defined Markers", self)
         self.user_markers_button.clicked.connect(partial(self.launch_user_marker_popup, variables))
