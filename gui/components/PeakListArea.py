@@ -7,7 +7,7 @@ width = 600
 import math
 
 class PeakListArea(QWidget):
-    def __init__(self, parent, valuesDict, gui_settings):
+    def __init__(self, parent, variables, gui_settings):
 
         QWidget.__init__(self, parent)
         self.scene = QGraphicsScene(self)
@@ -21,7 +21,9 @@ class PeakListArea(QWidget):
         self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
 
-        self.valuesDict = valuesDict
+        self.valuesDict = variables["conditions"]
+        self.peak_list_dict = variables["experimental_dataset"]
+        self.fasta_files = variables["fasta_files"]
         self.setEvents()
         self.updateClicks = 0
 
@@ -47,10 +49,12 @@ class PeakListArea(QWidget):
         retval = msg.exec_()
         return retval
 
-    def updateTree(self):
+    def updateTree(self, variables):
         if self.updateClicks > 0:
             self.show_update_warning()
         self.peak_list_objects = []
+        self.fasta_files = {}
+        self.peak_list_dict = {}
         self.show()
         self.sideBar().refresh_sidebar()
         self.scene.clear()
@@ -83,39 +87,45 @@ class PeakListArea(QWidget):
 
 
         for i, z in enumerate(z_conds):
-                y_markers = []
-                for j, y in enumerate(y_conds):
-                    x_markers = []
-                    for k, x in enumerate(x_conds):
-                        xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
-                        self.scene.addItem(xx)
-                        pl = PeakListLabel('Drop peaklist here', self.scene, [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
-                        self.peak_list_objects.append(pl)
-                        self.scene.addItem(pl)
-                        self._addConnectingLine(xx, pl)
-                        x_markers.append(xx)
-                        num+=1
-                        xx_vertical += x_spacing
-                    if len(x_markers) % 2 == 1:
-                        yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()
-                    else:
-                        yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()-(x_spacing/2)
-                    yy = ConditionLabel(str(y), [yy_pos, yy_vertical])
-                    y_markers.append(yy)
-                    self.scene.addItem(yy)
-                    for x_marker in x_markers:
-                        self._addConnectingLine(yy, x_marker)
-                if len(y_markers) % 2 == 1:
-                    zz_vertical = y_markers[int(math.ceil(len(y_markers))/2)].y()
+            self.peak_list_dict[z] = {}
+            y_markers = []
+            for j, y in enumerate(y_conds):
+                self.peak_list_dict[z][y] = {}
+                self.fasta_files[y] = ''
+                x_markers = []
+                for k, x in enumerate(x_conds):
+                    xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
+                    self.scene.addItem(xx)
+                    pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
+                                       [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
+                    self.peak_list_dict[z][y][x] = ''
+                    self.peak_list_objects.append(pl)
+                    self.scene.addItem(pl)
+                    self._addConnectingLine(xx, pl)
+                    x_markers.append(xx)
+                    num+=1
+                    xx_vertical += x_spacing
+                if len(x_markers) % 2 == 1:
+                    yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()
                 else:
-                    zz_vertical = (y_markers[0].y()+y_markers[-1].y())/2
-                zz = ConditionLabel(str(z), [zz_pos, zz_vertical])
-                # y_markers.append(y)
-                self.scene.addItem(zz)
-                for x_marker in y_markers:
-                    self._addConnectingLine(zz, x_marker)
+                    yy_vertical = x_markers[int(math.ceil(len(x_markers))/2)].y()-(x_spacing/2)
+                yy = ConditionLabel(str(y), [yy_pos, yy_vertical])
+                y_markers.append(yy)
+                self.scene.addItem(yy)
+                for x_marker in x_markers:
+                    self._addConnectingLine(yy, x_marker)
+            if len(y_markers) % 2 == 1:
+                zz_vertical = y_markers[int(math.ceil(len(y_markers))/2)].y()
+            else:
+                zz_vertical = (y_markers[0].y()+y_markers[-1].y())/2
+            zz = ConditionLabel(str(z), [zz_pos, zz_vertical])
+            self.scene.addItem(zz)
+            for x_marker in y_markers:
+                self._addConnectingLine(zz, x_marker)
 
         self.updateClicks += 1
+        variables["fasta_files"] = self.fasta_files
+        variables["experimental_dataset"] = self.peak_list_dict
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():
@@ -151,6 +161,7 @@ class PeakListArea(QWidget):
         newLine.setPen(pen)
         self.scene.addItem(newLine)
 
+
 class ConditionLabel(QGraphicsTextItem):
 
 
@@ -161,7 +172,7 @@ class ConditionLabel(QGraphicsTextItem):
 
 class PeakListLabel(QGraphicsTextItem):
 
-  def __init__(self, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
+  def __init__(self, parent, text, scene, pos=None, x_cond=None, y_cond=None, z_cond=None):
       QGraphicsTextItem.__init__(self)
       self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', text))
       self.setPos(QtCore.QPointF(pos[0], pos[1]))
@@ -171,6 +182,7 @@ class PeakListLabel(QGraphicsTextItem):
       self.y_cond = y_cond
       self.z_cond = z_cond
       self.peak_list = None
+      self.peak_list_dict = parent.peak_list_dict
 
   def mousePressEvent(self, event):
 
@@ -199,5 +211,6 @@ class PeakListLabel(QGraphicsTextItem):
     mimeData = event.mimeData()
     self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', mimeData.text()))
     self.peak_list = mimeData.text()
+    self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = self.peak_list
     event.accept()
 

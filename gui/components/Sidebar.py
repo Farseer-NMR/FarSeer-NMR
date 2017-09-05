@@ -5,7 +5,7 @@ import os
 
 
 class SideBar(QTreeWidget):
-    def __init__(self, parent=None, peakLists=None, gui_settings=None):
+    def __init__(self, parent=None, peakLists=None, gui_settings=None, variables=None):
         QTreeWidget.__init__(self, parent)
         self.header().hide()
         self.setDragEnabled(True)
@@ -17,6 +17,8 @@ class SideBar(QTreeWidget):
         self.setFixedHeight(gui_settings['sideBar_height'])
         self.peakLists = peakLists
         self.setSortingEnabled(True)
+        if variables:
+            self.variables = variables["peaklists"]
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -34,7 +36,8 @@ class SideBar(QTreeWidget):
             event.accept()
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
-                self.load_from_path(filePath)
+                name, path = self.load_from_path(filePath)
+                self.variables[name] = path
 
     def load_from_path(self, filePath):
         if os.path.isdir(filePath):
@@ -42,12 +45,12 @@ class SideBar(QTreeWidget):
                 for filename in filenames:
                     try:
                         path = os.path.join(root, filename)
-                        self.load_peaklist(path)
+                        name, path = self.load_peaklist(path)
                     except IOError:
                         pass
         else:
-            self.load_peaklist(filePath)
-
+            name, path = self.load_peaklist(filePath)
+        return name, path
 
 
 
@@ -73,6 +76,7 @@ class SideBar(QTreeWidget):
                     pl_name = name + '_1'
             item = self.addItem(pl_name)
             self.peakLists[item.text(0)] = peaklist
+            return pl_name, filePath
         else:
             print("Invalid file: %s" % filePath)
 

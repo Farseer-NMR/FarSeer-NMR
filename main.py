@@ -22,15 +22,17 @@ from gui.popups.BarPlotPopup import BarPlotPopup
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from gui.popups.CompactBarPopup import CompactBarPopup
 from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
+from gui.popups.FastaSelectionPopup import FastaSelectionPopup
 from gui.popups.GeneralResidueEvolution import GeneralResidueEvolution
-from gui.popups.VerticalBar import VerticalBarPopup
-from gui.popups.PreAnalysisPopup import PreAnalysisPopup
-from gui.popups.ResidueEvolution import ResidueEvolutionPopup
-from gui.popups.ScatterPlotPopup import ScatterPlotPopup
-from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
 from gui.popups.HeatMapPopup import HeatMapPopup
 from gui.popups.OscillationMapPopup import OscillationMapPopup
+from gui.popups.PreAnalysisPopup import PreAnalysisPopup
+from gui.popups.ResidueEvolution import ResidueEvolutionPopup
+from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
+from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
+from gui.popups.VerticalBar import VerticalBarPopup
+
 
 from gui.Footer import Footer
 
@@ -39,11 +41,11 @@ from gui import resources_rc
 
 from current.fslibs.io import json_to_fsuv, fsuv_to_json
 
-valuesDict = {
-            'x': [],
-            'y': [],
-            'z': []
-        }
+# valuesDict = {
+#             'x': [],
+#             'y': [],
+#             'z': []
+#         }
 
 peakLists = OrderedDict()
 
@@ -67,8 +69,10 @@ class TabWidget(QTabWidget):
         self.tab2 = QWidget()
         self.tab1.setLayout(QGridLayout())
         self.tab2.setLayout(QGridLayout())
-        self.interface = Interface(gui_settings=gui_settings)
-        self.settings = Settings(gui_settings=gui_settings)
+        variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
+        self.variables = variables
+        self.interface = Interface(gui_settings=gui_settings, variables=variables)
+        self.settings = Settings(gui_settings=gui_settings, variables=variables)
         self.tab1.layout().addWidget(self.settings)
         self.tab2.layout().addWidget(self.interface)
         self.addTab(self.tab2, "PeakList Selection")
@@ -94,19 +98,21 @@ class TabWidget(QTabWidget):
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
-                    json.dump(variables, outfile, indent=4, sort_keys=True)
+                    json.dump(variables, outfile, indent=4)
                 print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
+        print(self.variables["conditions"])
+        print(self.variables["fasta_files"])
         from current.setup_farseer_calculation import create_directory_structure
         spectrum_path = self.settings.spectrum_path.field.text()
         output_path = self.settings.logfile_path.field.text()
-        peak_list_objects = self.interface.peakListArea.peak_list_objects
-        create_directory_structure(output_path, valuesDict, peak_list_objects, peakLists)
-        self.write_fsuv(output_path)
-        from current.farseermain import read_user_variables, run_farseer
-        fsuv = read_user_variables(output_path)
-        run_farseer(fsuv)
+        # peak_list_objects = self.interface.peakListArea.peak_list_objects
+        # create_directory_structure(output_path, variables["conditions"], variables["peaklist_objects"], peakLists)
+        # self.write_fsuv(output_path)
+        # from current.farseermain import read_user_variables, run_farseer
+        # fsuv = read_user_variables(output_path)
+        # run_farseer(fsuv)
 
     def write_fsuv(self, file_path):
         variables = self.settings.variables
@@ -115,7 +121,7 @@ class TabWidget(QTabWidget):
 
 
 class Settings(QWidget):
-    def __init__(self, parent=None, gui_settings=None):
+    def __init__(self, parent=None, gui_settings=None, variables=None):
         QWidget.__init__(self, parent=parent)
         grid = QGridLayout()
         grid2 = QGridLayout()
@@ -128,7 +134,7 @@ class Settings(QWidget):
 
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
+        self.variables = variables
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QGridLayout()
         paths_groupbox_layout.setSpacing(2)
@@ -190,6 +196,9 @@ class Settings(QWidget):
         self.dpre_button = QPushButton("Settings", self)
         self.dpre_button.clicked.connect(partial(self.show_popup, OscillationMapPopup, self.variables))
 
+        self.fasta_button = QPushButton("Select FASTA Files", self)
+        self.fasta_button.clicked.connect(partial(self.show_popup, FastaSelectionPopup, self.variables))
+
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Are Sidechain Peaks Present?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
@@ -214,10 +223,11 @@ class Settings(QWidget):
 
         fasta_groupbox = QGroupBox()
         fasta_groupbox.setTitle("FASTA")
-        fasta_groupbox_layout = QVBoxLayout()
+        fasta_groupbox_layout = QGridLayout()
         fasta_groupbox.setLayout(fasta_groupbox_layout)
-        fasta_groupbox.layout().addWidget(self.apply_fasta_checkbox)
-        fasta_groupbox.layout().addWidget(self.fasta_start)
+        fasta_groupbox.layout().addWidget(self.apply_fasta_checkbox, 0, 0)
+        fasta_groupbox.layout().addWidget(self.fasta_start, 0, 1)
+        fasta_groupbox.layout().addWidget(self.fasta_button, 1, 0, 1, 2)
 
 
 
@@ -635,16 +645,21 @@ class Settings(QWidget):
 
 class Interface(QWidget):
  
-    def __init__(self, parent=None, gui_settings=None):
+    def __init__(self, parent=None, gui_settings=None, variables=None):
         QWidget.__init__(self, parent=parent)
+        if variables:
+            self.variables = variables
+
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
         self.gui_settings = gui_settings
+
         # self.setStyleSheet('.QWidget { border: 1px solid red; margin-top: 0;}')
+
         print(self.sideBar)
 
     def initUI(self):
-        self.peakListArea = PeakListArea(self, valuesDict=valuesDict, gui_settings=gui_settings)
+        self.peakListArea = PeakListArea(self, variables=self.variables, gui_settings=gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
@@ -657,8 +672,7 @@ class Interface(QWidget):
         widget3_layout = QGridLayout()
 
         self.widget3.setLayout(widget3_layout)
-
-        self.sideBar = SideBar(self, peakLists, gui_settings=gui_settings)
+        self.sideBar = SideBar(self, peakLists, gui_settings=gui_settings, variables=self.variables)
         self.h_splitter = QSplitter(QtCore.Qt.Horizontal)
         widget4 = QWidget()
         widget4_layout = QGridLayout()
@@ -719,7 +733,7 @@ class Interface(QWidget):
 
         self.showTreeButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
         self.widget3.layout().addWidget(self.peakListArea, 3, 0, 1, 2)
-        self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
+        self.showTreeButton.clicked.connect(partial(self.peakListArea.updateTree, self.variables))
         self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.h_splitter.addWidget(self.widget3)
         # self.widget2.setFixedWidth(1264)
@@ -733,6 +747,7 @@ class Interface(QWidget):
         self.x, self.y, self.z = self.x_combobox.value(), self.y_combobox.value(), self.z_combobox.value()
         layout = self.widget2.layout()
         colCount = layout.columnCount()
+        valuesDict = self.variables["conditions"]
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
             if item:

@@ -26,33 +26,37 @@
         "y_grid_linewidth": 0.2,
         "y_grid_alpha": 0.8,
         "vspace": 0.5,
-        "theo_pre_color":"black",
-        "theo_pre_lw":1.0,
-        "tag_cartoon_color":"green",
-        "tag_cartoon_lw":1.0,
-        "tag_cartoon_ls":":"
+        "theo_pre_color": "black",
+        "theo_pre_lw": 1.0,
+        "tag_cartoon_color": "green",
+        "tag_cartoon_lw": 1.0,
+        "tag_cartoon_ls": ":"
     },
     "bar_plot_settings": {
-        "measured_color":"black",
-        "status_color_flag":true,
-        "lost_color":"red",
-        "unassigned_color":"lightgrey",
-        "bar_width":0.8,
-        "bar_alpha":1,
-        "bar_linewidth":0,
-        "threshold_flag":true,
-        "threshold_color":"red",
-        "threshold_linewidth":0.5,
-        "threshold_alpha":0.8,
-        "mark_fontsize":3,
-        "mark_prolines_flag":true,
-        "mark_prolines_symbol":"P",
-        "mark_user_details_flag":false,
-        "color_user_details_flag":false,
-        "user_marks_dict":{"mark": "m"},
-        "user_bar_colors_dict":{"mark": "khaki"}
+        "measured_color": "black",
+        "status_color_flag": true,
+        "lost_color": "red",
+        "unassigned_color": "lightgrey",
+        "bar_width": 0.8,
+        "bar_alpha": 1,
+        "bar_linewidth": 0,
+        "threshold_flag": true,
+        "threshold_color": "red",
+        "threshold_linewidth": 0.5,
+        "threshold_alpha": 0.8,
+        "mark_fontsize": 3,
+        "mark_prolines_flag": true,
+        "mark_prolines_symbol": "P",
+        "mark_user_details_flag": false,
+        "color_user_details_flag": false,
+        "user_marks_dict": {
+            "mark": "m"
+        },
+        "user_bar_colors_dict": {
+            "mark": "khaki"
+        }
     },
-    "plotting_flags" : {
+    "plotting_flags": {
         "do_ext_bar": true,
         "do_comp_bar": false,
         "do_vert_bar": false,
@@ -60,9 +64,7 @@
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false
     },
-
     "extended_bar_settings": {
-
         "cols_page": 1,
         "rows_page": 6,
         "x_ticks_fn": "monospace",
@@ -72,18 +74,16 @@
         "x_ticks_color_flag": true
     },
     "compact_bar_settings": {
-
-        "cols_page":3,
-        "rows_page":5,
-        "x_ticks_fn":"Arial",
-        "x_ticks_fs":6,
-        "x_ticks_rot":0,
-        "x_ticks_weight":"normal",
-        "unassigned_shade":true,
-        "unassigned_shade_alpha":0.5
+        "cols_page": 3,
+        "rows_page": 5,
+        "x_ticks_fn": "Arial",
+        "x_ticks_fs": 6,
+        "x_ticks_rot": 0,
+        "x_ticks_weight": "normal",
+        "unassigned_shade": true,
+        "unassigned_shade_alpha": 0.5
     },
     "vert_bar_settings": {
-
         "cols_page": 5,
         "rows_page": 2
     },
@@ -106,8 +106,14 @@
         "grid_color": "grey",
         "shade": false,
         "shade_regions": [
-            [0,10],
-            [20,25]
+            [
+                0,
+                10
+            ],
+            [
+                20,
+                25
+            ]
         ],
         "res_highlight": false,
         "res_hl_list": [
@@ -140,10 +146,13 @@
         "y_ticks_pad": 1,
         "y_ticks_weight": "normal",
         "y_ticks_rot": 0,
-        "titration_x_values": [0, 100, 200]
+        "titration_x_values": [
+            0,
+            100,
+            200
+        ]
     },
     "res_evo_settings": {
-
         "cols_page": 5,
         "rows_page": 8,
         "set_x_values": false,
@@ -163,7 +172,6 @@
         "fit_line_style": "-"
     },
     "cs_scatter_settings": {
-
         "cols_page": 5,
         "rows_page": 7,
         "markers": [
@@ -185,40 +193,43 @@
         "mk_type": "color",
         "mk_start_color": "#cdcdcd",
         "mk_end_color": "#000000",
-        "mk_color": ["none"],
-        "mk_edgecolors": ["black"],
+        "mk_color": [
+            "none"
+        ],
+        "mk_edgecolors": [
+            "black"
+        ],
         "mk_lost_color": "red",
         "hide_lost": false
     },
     "cs_scatter_flower_settings": {
-        "x_label":"1H (ppm)",
-        "y_label":"15N (ppm)",
-        "mksize":8,
-        "color_grad":true,
-        "mk_start_color":"#e7e7e7",
-        "mk_end_color":"#000000",
-        "color_list":[],
-        "x_label_fn":"Arial",
-        "x_label_fs":10,
-        "x_label_pad":2,
-        "x_label_weight":"normal",
-        "y_label_fn":"Arial",
-        "y_label_fs":10,
-        "y_label_pad":2,
-        "y_label_weight":"normal",
-        "x_ticks_fn":"Arial",
-        "x_ticks_fs":8,
-        "x_ticks_pad":1,
-        "x_ticks_weight":"normal",
-        "x_ticks_rot":0,
-        "y_ticks_fn":"Arial",
-        "y_ticks_fs":8,
-        "y_ticks_pad":1,
-        "y_ticks_weight":"normal",
-        "y_ticks_rot":0
+        "x_label": "1H (ppm)",
+        "y_label": "15N (ppm)",
+        "mksize": 8,
+        "color_grad": true,
+        "mk_start_color": "#e7e7e7",
+        "mk_end_color": "#000000",
+        "color_list": [],
+        "x_label_fn": "Arial",
+        "x_label_fs": 10,
+        "x_label_pad": 2,
+        "x_label_weight": "normal",
+        "y_label_fn": "Arial",
+        "y_label_fs": 10,
+        "y_label_pad": 2,
+        "y_label_weight": "normal",
+        "x_ticks_fn": "Arial",
+        "x_ticks_fs": 8,
+        "x_ticks_pad": 1,
+        "x_ticks_weight": "normal",
+        "x_ticks_rot": 0,
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 8,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_rot": 0
     },
     "heat_map_settings": {
-
         "rows": 20,
         "vmin": 0.05,
         "vmax": 1.0,
@@ -234,75 +245,92 @@
         "right_margin": 0.22,
         "bottom_margin": 0.6,
         "cbar_font_size": 4,
-	    "tag_line_color":"black",
-        "tag_line_ls":"-", 
-        "tag_line_lw":0.8
-    }, 
+        "tag_line_color": "black",
+        "tag_line_ls": "-",
+        "tag_line_lw": 0.8
+    },
     "cs_settings": {
-        "cs_correction_res_ref": 1, 
+        "cs_correction_res_ref": 1,
         "perform_cs_correction": false
-    }, 
+    },
     "csp_settings": {
         "cs_lost": "prev",
-        "csp_res4alpha": 0.14, 
-        "csp_res_exceptions": {"G": 0.2},
+        "csp_res4alpha": 0.14,
+        "csp_res_exceptions": {
+            "G": 0.2
+        },
         "calccol_name_CSP": "CSP",
         "calcs_CSP": true,
         "yy_label_CSP": "CSPs (ppm)",
         "yy_scale_CSP": 0.3
-    }, 
+    },
     "fasta_settings": {
-        "FASTAstart": 1, 
+        "FASTAstart": 1,
         "applyFASTA": true
-    }, 
+    },
     "fitting_settings": {
-        "do_cond1": true, 
-        "do_cond2": false, 
-        "do_cond3": false, 
-        "expand_lost_yy": false, 
-        "expand_lost_zz": false, 
-        "perform_comparisons": false, 
+        "do_cond1": true,
+        "do_cond2": false,
+        "do_cond3": false,
+        "expand_lost_yy": false,
+        "expand_lost_zz": false,
+        "perform_comparisons": false,
         "perform_resevo_fitting": false
-    }, 
+    },
     "general_settings": {
-        "chimera_att_select_format":":",
-        "fig_dpi": 300, 
+        "chimera_att_select_format": ":",
+        "fig_dpi": 300,
         "fig_file_type": "pdf",
-        "fig_height": 11.69, 
-        "fig_width": 8.69, 
-        "has_sidechains": false, 
+        "fig_height": 11.69,
+        "fig_width": 8.69,
+        "has_sidechains": false,
         "use_sidechains": false,
         "logfile_name": "farseer_log.md",
         "spectra_path": ""
-    }, 
+    },
     "PosF1_settings": {
         "calccol_name_PosF1_delta": "H1_delta",
-        "calcs_PosF1_delta": false, 
+        "calcs_PosF1_delta": false,
         "yy_label_PosF1_delta": "ppm",
         "yy_scale_PosF1_delta": 0.2
-    }, 
+    },
     "PosF2_settings": {
         "calccol_name_PosF2_delta": "N15_delta",
-        "calcs_PosF2_delta": false, 
+        "calcs_PosF2_delta": false,
         "yy_label_PosF2_delta": "ppm",
         "yy_scale_PosF2_delta": 2
-    }, 
-
+    },
     "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": "Vol_ratio",
-        "calcs_Volume_ratio": false, 
+        "calcs_Volume_ratio": false,
         "yy_label_Volume_ratio": "Vi/V0",
         "yy_scale_Volume_ratio": 1.1
-    }, 
+    },
     "Height_ratio_settings": {
         "calccol_name_Height_ratio": "Height_ratio",
-        "calcs_Height_ratio": false, 
+        "calcs_Height_ratio": false,
         "yy_label_Height_ratio": "Hi/H0",
         "yy_scale_Height_ratio": 1.1
-    }, 
+    },
     "pre_settings": {
         "apply_PRE_analysis": false,
-        "gauss_x_size": 7, 
+        "gauss_x_size": 7,
         "gaussian_stdev": 1
+    },
+    "experimental_dataset": {
+
+    },
+    "peaklists": {
+    },
+    "conditions": {
+        "x": [
+        ],
+        "z": [
+        ],
+        "y": [
+        ]
+    },
+    "fasta_files": {
+
     }
 }
