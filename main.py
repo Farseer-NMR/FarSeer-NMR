@@ -89,21 +89,25 @@ class TabWidget(QTabWidget):
         self.tablogo.setContentsMargins(9, 0, 0, 6)
         self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
+        self.config_file = None
 
     def load_peak_lists(self, path=None):
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
 
 
-    def save_config(self, variables):
+    def save_config(self, variables, path=None):
 
-        fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
+        if not path:
+            fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
+        else:
+            fname = [path]
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
                     json.dump(variables, outfile, indent=4)
+                    self.config_file = outfile
                 print('Configuration saved to %s' % fname[0])
-
 
 
     def run_farseer_calculation(self):
@@ -115,12 +119,14 @@ class TabWidget(QTabWidget):
         create_directory_structure(output_path, self.variables, peakLists)
         # self.write_fsuv(output_path)
         from current.farseermain import read_user_variables, run_farseer
-        fsuv = read_user_variables(self.variables)
-        run_farseer(fsuv)
+        if self.config_file:
+            path, config_name = os.path.split(self.config_file)
+            fsuv = read_user_variables(path, config_name)
+        else:
+            self.save_config(self.variables, os.path.join(output_path, 'user_config.json'))
+            fsuv = read_user_variables(output_path, 'user_config.json')
 
-    def write_fsuv(self, file_path):
-        variables = self.settings.variables
-        # json_to_fsuv(file_path, variables=variables)
+        run_farseer(fsuv)
 
 
 
