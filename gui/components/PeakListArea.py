@@ -183,6 +183,7 @@ class PeakListLabel(QGraphicsTextItem):
       self.z_cond = z_cond
       self.peak_list = None
       self.peak_list_dict = parent.peak_list_dict
+      self.sideBar = parent.sideBar
 
   def mousePressEvent(self, event):
 
@@ -198,19 +199,33 @@ class PeakListLabel(QGraphicsTextItem):
 
   def removeItem(self):
       self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', "Drop peaklist here"))
+      self.sideBar().addItem(self.peak_list)
+      self.peak_list = None
+
+
 
 
   def dragEnterEvent(self, event):
-    event.accept()
+    if not self.peak_list:
+        event.accept()
+    else:
+        event.ignore()
 
   def dragMoveEvent(self, event):
-    event.accept()
+    if not self.peak_list:
+        event.accept()
+    else:
+        event.ignore()
+
 
   def dropEvent(self, event):
-
-    mimeData = event.mimeData()
-    self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', mimeData.text()))
-    self.peak_list = mimeData.text()
-    self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = self.peak_list
-    event.accept()
+    if not self.peak_list:
+        mimeData = event.mimeData()
+        self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>' % ('#FAFAF7', mimeData.text()))
+        self.peak_list = mimeData.text()
+        self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = self.peak_list
+        event.accept()
+    else:
+        self.sideBar().addItem(mimeData.text())
+        event.ignore()
 
