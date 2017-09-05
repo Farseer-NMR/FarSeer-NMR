@@ -4,6 +4,9 @@ import json
 import os
 from collections import OrderedDict
 from PyQt5 import QtCore, QtGui
+
+from current.setup_farseer_calculation import create_directory_structure
+
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
     QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem
 
@@ -101,22 +104,23 @@ class TabWidget(QTabWidget):
                     json.dump(variables, outfile, indent=4)
                 print('Configuration saved to %s' % fname[0])
 
+
+
     def run_farseer_calculation(self):
         print(self.variables["conditions"])
         print(self.variables["fasta_files"])
-        from current.setup_farseer_calculation import create_directory_structure
-        spectrum_path = self.settings.spectrum_path.field.text()
-        output_path = self.settings.logfile_path.field.text()
-        # peak_list_objects = self.interface.peakListArea.peak_list_objects
-        # create_directory_structure(output_path, variables["conditions"], variables["peaklist_objects"], peakLists)
+        print(peakLists)
+        # spectrum_path = self.settings.spectrum_path.field.text()
+        output_path = self.settings.output_path.field.text()
+        create_directory_structure(output_path, self.variables, peakLists)
         # self.write_fsuv(output_path)
-        # from current.farseermain import read_user_variables, run_farseer
-        # fsuv = read_user_variables(output_path)
-        # run_farseer(fsuv)
+        from current.farseermain import read_user_variables, run_farseer
+        fsuv = read_user_variables(self.variables)
+        run_farseer(fsuv)
 
     def write_fsuv(self, file_path):
         variables = self.settings.variables
-        json_to_fsuv(file_path, variables=variables)
+        # json_to_fsuv(file_path, variables=variables)
 
 
 
@@ -141,18 +145,18 @@ class Settings(QWidget):
         paths_group_box.setLayout(paths_groupbox_layout)
 
         self.spectrum_path = LabelledLineEdit(self, "Spectrum Path", callback=self.set_spectrum_path_text)
-        self.logfile_path = LabelledLineEdit(self, "Calculation Output Folder", callback=self.set_logfile_path)
+        self.output_path = LabelledLineEdit(self, "Calculation Output Folder", callback=self.set_output_path)
 
         self.spectrum_path_browse = QPushButton("...", self)
-        self.logfile_path_browse = QPushButton("...", self)
+        self.output_path_browse = QPushButton("...", self)
 
         self.spectrum_path_browse.clicked.connect(self.set_spectrum_path)
-        self.logfile_path_browse.clicked.connect(self.set_logfile_path)
+        self.output_path_browse.clicked.connect(self.set_output_path)
 
         paths_group_box.layout().addWidget(self.spectrum_path, 0, 0, 1, 12)
-        paths_group_box.layout().addWidget(self.logfile_path, 1, 0, 1, 12)
+        paths_group_box.layout().addWidget(self.output_path, 1, 0, 1, 12)
         paths_group_box.layout().addWidget(self.spectrum_path_browse, 0, 13, 1, 1)
-        paths_group_box.layout().addWidget(self.logfile_path_browse, 1, 13, 1, 1)
+        paths_group_box.layout().addWidget(self.output_path_browse, 1, 13, 1, 1)
 
         self.ext_bar_checkbox = LabelledCheckbox(self, "Extended Bar")
         self.comp_bar_checkbox = LabelledCheckbox(self, "Compact Bar")
@@ -441,8 +445,8 @@ class Settings(QWidget):
         self.spectrum_path.setText(path)
         self.parent().parent().parent().load_peak_lists(path)
 
-    def set_logfile_path_text(self, path=None):
-        self.logfile_path.setText(path)
+    def set_output_path_text(self, path=None):
+        self.output_path.setText(path)
 
     def set_spectrum_path(self, path=None):
         if not path:
@@ -451,10 +455,10 @@ class Settings(QWidget):
 
 
 
-    def set_logfile_path(self, path=None):
+    def set_output_path(self, path=None):
         if not path:
             path = str(QFileDialog.getExistingDirectory(None, 'Select Directory', os.getcwd()))
-        self.logfile_path.setText(path)
+        self.output_path.setText(path)
 
     def load_config(self):
         self.variables = load_config()
@@ -476,7 +480,7 @@ class Settings(QWidget):
         # General Settings
 
         general["spectrum_path"] = self.spectrum_path.field.text()
-        general["logfile_name"] = self.logfile_path.field.text()
+        general["output_path"] = self.output_path.field.text()
         general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
         general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
         general["fig_height"] = self.figure_height.field.value()
@@ -568,7 +572,13 @@ class Settings(QWidget):
             self.spectrum_path.field.setText(general["spectra_path"])
         else:
             self.spectrum_path.field.setText(os.getcwd())
-        self.logfile_path.field.setText(general["logfile_name"])
+
+
+
+        if os.path.exists(general["output_path"]):
+            sself.output_path.field.setText(general["output_path"])
+        else:
+            self.output_path.field.setText(os.getcwd())
         self.has_sidechains_checkbox.setChecked(general["has_sidechains"])
         self.use_sidechains_checkbox.setChecked(general["use_sidechains"])
         self.figure_height.setValue(general["fig_height"])

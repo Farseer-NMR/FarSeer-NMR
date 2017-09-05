@@ -1,19 +1,20 @@
 import os, csv
 
-def create_directory_structure(spectrum_path, values_dict, peak_list_objects, peakLists):
-    spectrum_dir = spectrum_path+'/spectra/'
-    os.mkdir(spectrum_dir)
-    for z_key in values_dict['z']:
-        pls1 = [plo for plo in peak_list_objects if plo.z_cond == z_key]
-        os.mkdir(os.path.join(spectrum_dir, z_key))
-        for y_key in values_dict['y']:
-            pls2 = [plo for plo in pls1 if plo.y_cond == y_key]
-            os.mkdir(os.path.join(spectrum_dir, z_key, y_key))
-            for x_key in values_dict['x']:
-                pls3 = [plo for plo in pls2 if plo.x_cond == x_key]
-                fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
-                write_peaklist_file(fout, peakLists[pls3[0].peak_list])
-                fout.close()
+def create_directory_structure(output_path, variables, peakLists):
+    spectrum_dir = output_path+'/spectra/'
+    if not os.path.exists(os.path.join(spectrum_dir)):
+        os.mkdir(spectrum_dir)
+    # import pprint
+    # pprint.pprint(peakLists)
+    exp_dataset = variables["experimental_dataset"]
+    for z_key in variables["conditions"]["z"]:
+        for y_key in variables["conditions"]["y"]:
+            if not os.path.exists(os.path.join(spectrum_dir, z_key, y_key)):
+                os.makedirs(os.path.join(spectrum_dir, z_key, y_key))
+                for x_key in variables["conditions"]["x"]:
+                    fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
+                    write_peaklist_file(fout, peakLists[exp_dataset[z_key][y_key][x_key]])
+                    fout.close()
 
 
 def write_peaklist_file(fin, peak_list):

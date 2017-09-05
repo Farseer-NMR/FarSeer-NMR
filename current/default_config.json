@@ -286,6 +286,7 @@
         "has_sidechains": false,
         "use_sidechains": false,
         "logfile_name": "farseer_log.md",
+        "output_path": "",
         "spectra_path": ""
     },
     "PosF1_settings": {
