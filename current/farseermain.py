@@ -159,7 +159,8 @@ def config_user_variables(fsuv):
     # flags which fsuv.apply_PRE_analysis deppends on
     fsuv["PRE_analysis_flags"] = \
                 fitting["do_cond3"] and \
-                (plots_height["calcs_Height_ratio"] or plots_height["calcs_Volume_ratio"]) and \
+                (plots_height["calcs_Height_ratio"] or \
+                    plots_volume["calcs_Volume_ratio"]) and \
                 fitting["perform_comparisons"]
     
     restraint_settings_dct = {
@@ -494,7 +495,7 @@ def checks_PRE_analysis_flags(fsuv):
                    fsuv["fitting_settings"]["perform_comparisons"])
            
         logs(fsw.gen_wet('ERROR', msg, 1), fsuv["general_settings"]["logfile_name"])
-        logs(fsw.abort_msg(), fsuv["general_settings"]["logfile_name"])
+        logs(fsw.abort_msg, fsuv["general_settings"]["logfile_name"])
         fsw.abort()
         #DONE
     
