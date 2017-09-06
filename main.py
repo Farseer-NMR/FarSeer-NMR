@@ -89,6 +89,7 @@ class TabWidget(QTabWidget):
                 variables = json.load(open(fname[0], 'r'))
                 self.interface.sideBar.update_from_config(variables)
                 self.interface.variables = variables
+                self.settings.variables = variables
                 self.interface.x_combobox.setValue(len(variables["conditions"]["x"]))
                 self.interface.y_combobox.setValue(len(variables["conditions"]["y"]))
                 self.interface.z_combobox.setValue(len(variables["conditions"]["z"]))

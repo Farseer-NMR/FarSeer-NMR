@@ -49,19 +49,30 @@ class PeakListArea(QWidget):
         retval = msg.exec_()
         return retval
 
+    def show_duplicate_key_warning(self, axis):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Duplicate conditions")
+        msg.setInformativeText("There are duplicate conditions on the %s axis. " % axis)
+        msg.setWindowTitle("Duplicate conditions")
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        retval = msg.exec_()
+        return retval
+
     def updateTree(self, variables):
 
         self.valuesDict = variables["conditions"]
-        if len(set(self.valuesDict['x'])) != len(self.valuesDict['x']):
-            print("duplicates in x")
+        if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
+            self.show_duplicate_key_warning('z')
             return
 
         if len(set(self.valuesDict['y'])) != len(self.valuesDict['y']):
-            print("duplicates in y")
+            self.show_duplicate_key_warning('y')
             return
 
-        if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
-            print("duplicates in z")
+        if len(set(self.valuesDict['x'])) != len(self.valuesDict['x']):
+            self.show_duplicate_key_warning('x')
             return
 
 
