@@ -95,8 +95,9 @@ def read_user_variables(path, config_name):
 
     fsuv["cwd"] = cwd
     
-    if not fsuv["general_settings"]["input_spectra_path"]:
-        fsuv["general_settings"]["input_spectra_path"] = '{}/spectra'.format(cwd)
+    if not("input_spectra_path" in fsuv["general_settings"]):
+        fsuv["general_settings"]["input_spectra_path"] =\
+             '{}/spectra'.format(cwd)
     
     fsuv = config_user_variables(fsuv)
     
