@@ -98,4 +98,5 @@ class SideBar(QTreeWidget):
     def removeItem(self, item_name):
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive, 0)
-        sip.delete(result[0])
+        if result:
+            sip.delete(result[0])
