@@ -69,7 +69,7 @@ settings_2k = {'peaklistarea_height': 640,
                'interface_top_width': 1345,
                'footer_height': 60
                }
-font_weights = ["ultralight", "light", "normal", "regular", "book", "medium", "roman", "semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
+font_weights = ["light", "normal", "medium", "semibold", "bold", "heavy", "black"]
 
 def deliver_settings(resolution):
     print(resolution)
