@@ -8,7 +8,7 @@ from PyQt5 import QtCore, QtGui
 from current.setup_farseer_calculation import create_directory_structure
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog, QLabel, QGroupBox, QGridLayout, \
-    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem
+    QSpinBox, QPushButton, QTabWidget, QHBoxLayout, QSplitter, QCheckBox, QSizePolicy, QSplashScreen, QSpacerItem, QMessageBox
 
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
@@ -128,18 +128,24 @@ class TabWidget(QTabWidget):
     def run_farseer_calculation(self):
 
         output_path = self.settings.output_path.field.text()
-        create_directory_structure(output_path, self.variables, peakLists)
-        from current.farseermain import read_user_variables, run_farseer
-        if self.config_file:
-            path, config_name = os.path.split(self.config_file)
-            fsuv = read_user_variables(path, config_name)
+        run_msg = create_directory_structure(output_path, self.variables, peakLists)
+        if run_msg:
+            from current.farseermain import read_user_variables, run_farseer
+            if self.config_file:
+                path, config_name = os.path.split(self.config_file)
+                fsuv = read_user_variables(path, config_name)
+            else:
+                self.save_config(self.variables, os.path.join(output_path, 'user_config.json'))
+                fsuv = read_user_variables(output_path, 'user_config.json')
+
+            run_farseer(fsuv)
         else:
-            self.save_config(self.variables, os.path.join(output_path, 'user_config.json'))
-            fsuv = read_user_variables(output_path, 'user_config.json')
-
-        run_farseer(fsuv)
-
-
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Output Path Exists")
+            msg.setInformativeText("Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
 class Settings(QWidget):
     def __init__(self, parent=None, gui_settings=None, variables=None):

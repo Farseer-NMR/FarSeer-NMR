@@ -3,7 +3,10 @@ from shutil import copy2
 
 def create_directory_structure(output_path, variables, peakLists):
     spectrum_dir = output_path+'/spectra/'
-    if not os.path.exists(os.path.join(spectrum_dir)):
+    if os.path.exists(os.path.join(spectrum_dir)):
+        return False
+
+    else:
         os.mkdir(spectrum_dir)
 
     exp_dataset = variables["experimental_dataset"]
@@ -18,6 +21,7 @@ def create_directory_structure(output_path, variables, peakLists):
                 fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
                 write_peaklist_file(fout, peakLists[exp_dataset[z_key][y_key][x_key]])
                 fout.close()
+    return True
 
 
 def write_peaklist_file(fin, peak_list):
