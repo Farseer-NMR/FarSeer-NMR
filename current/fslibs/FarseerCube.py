@@ -1382,17 +1382,21 @@ residues.'.format(z, y, x)
     
     def checks_xy_datapoints_coherency(self, target, filetype):
         """
+        Confirms axis names along Y folders and X files.
+        
+        Confirms that the Y folder names are equal accross every Z folder.
+        Raises WET#11 otherwise.
+        
+        Confirms each Y folder has one and ONLY on .fasta file.
+        Raises WET#12 otherwise.
+        
         Confirms wether the number of files of <filetype> is the same in every
         subdirectory of spectra/.
-        
-        Reports missing file and stops run with WET#8.
-        
-        AND
+        Raises WET#8 otherwise.
         
         Confirms that the files of <filetype> have the same names in all
-        the y datapoints subfolders.
-        
-        Reports names mismatches with WET#10
+        the Y datapoints subfolders.
+        Raises names mismatches with WET#10.
         
         Args:
             target (dict): nested dictionary representing the tree in spectra/
