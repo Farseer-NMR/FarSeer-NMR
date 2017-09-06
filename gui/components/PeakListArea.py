@@ -64,18 +64,18 @@ class PeakListArea(QWidget):
 
         retval = msg.exec_()
         return retval
-
-    def update_experimental_dataset(self):
+    #
+    def update_experimental_dataset(self, valuesDict):
         tmp_dict = {}
-        for z in self.valuesDict["z"]:
+        for z in valuesDict["z"]:
             tmp_dict[z] = {}
-            for y in self.valuesDict["y"]:
+            for y in valuesDict["y"]:
                 tmp_dict[z][y] = {}
-                for x in self.valuesDict["x"]:
+                for x in valuesDict["x"]:
+                    tmp_dict[z][y][x] = ''
                     if x in self.variables["experimental_dataset"][z][y].keys():
                         tmp_dict[z][y][x] = self.variables["experimental_dataset"][z][y][x]
-
-        self.variables["experimental_dataset"] = tmp_dict
+        return tmp_dict
 
     def updateTree(self, variables):
 
@@ -94,7 +94,8 @@ class PeakListArea(QWidget):
             self.show_duplicate_key_warning('x')
             return
 
-        self.update_experimental_dataset()
+        self.variables["experimental_dataset"] = self.update_experimental_dataset(self.valuesDict)
+
 
 
         self.peak_list_dict = self.variables["experimental_dataset"]
@@ -181,8 +182,8 @@ class PeakListArea(QWidget):
                 self._addConnectingLine(zz, x_marker)
 
         self.updateClicks += 1
-        variables["fasta_files"] = self.fasta_files
-        variables["experimental_dataset"] = self.peak_list_dict
+        self.variables["fasta_files"] = self.fasta_files
+        self.variables["experimental_dataset"] = self.peak_list_dict
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():
