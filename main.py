@@ -120,7 +120,7 @@ class TabWidget(QTabWidget):
         from current.Threading import Threading
         output_path = self.settings.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables, peakLists)
-        if run_msg:
+        if run_msg =='Run':
             from current.farseermain import read_user_variables, run_farseer
             if self.config_file:
                 path, config_name = os.path.split(self.config_file)
@@ -136,10 +136,14 @@ class TabWidget(QTabWidget):
 
         else:
             msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("Output Path Exists")
-            msg.setInformativeText("Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")
             msg.setStandardButtons(QMessageBox.Ok)
+            msg.setIcon(QMessageBox.Warning)
+            if run_msg == "Path Exists":
+                msg.setText("Output Path Exists")
+                msg.setInformativeText("Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")
+            elif run_msg == "No dataset":
+                msg.setText("No dataset")
+                msg.setInformativeText("No Experimental dataset has been created. Please populate Experimental Dataset Tree.")
             msg.exec_()
 
 class Settings(QWidget):
