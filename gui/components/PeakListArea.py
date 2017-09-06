@@ -52,6 +52,19 @@ class PeakListArea(QWidget):
     def updateTree(self, variables):
 
         self.valuesDict = variables["conditions"]
+        if len(set(self.valuesDict['x'])) != len(self.valuesDict['x']):
+            print("duplicates in x")
+            return
+
+        if len(set(self.valuesDict['y'])) != len(self.valuesDict['y']):
+            print("duplicates in y")
+            return
+
+        if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
+            print("duplicates in z")
+            return
+
+
         self.peak_list_dict = variables["experimental_dataset"]
         self.fasta_files = variables["fasta_files"]
         if self.updateClicks > 0:
