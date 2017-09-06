@@ -27,10 +27,13 @@ res1to3dict = {
      'Y': 'Tyr'
 }
 
+file_extenstions = ['peaks', 'xpk', 'out', 'csv']
+
 def getPeakListFileFormat(filePath):
 
     fin = open(filePath, 'r')
-
+    if filePath.split('.')[1] not in file_extenstions:
+        return
     for line in fin:
         if not line.strip():
             continue

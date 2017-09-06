@@ -62,7 +62,9 @@
         "do_vert_bar": false,
         "do_res_evo": false,
         "do_cs_scatter": false,
-        "do_cs_scatter_flower": false
+        "do_cs_scatter_flower": false,
+        "do_pre_osci": false,
+        "do_heat_map": false
     },
     "extended_bar_settings": {
         "cols_page": 1,
@@ -303,7 +305,7 @@
     },
     "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": "Vol_ratio",
-        "calcs_Volume_ratio": false,
+        "calcs_Volume_ratio": true,
         "yy_label_Volume_ratio": "Vi/V0",
         "yy_scale_Volume_ratio": 1.1
     },

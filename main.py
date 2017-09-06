@@ -268,7 +268,6 @@ class Settings(QWidget):
         series_groupbox.layout().addWidget(self.perform_comparisons_checkbox)
 
 
-
         figure_groupbox = QGroupBox()
         figure_groupbox.setTitle("Figure")
         figure_groupbox_layout = QVBoxLayout()
@@ -318,8 +317,8 @@ class Settings(QWidget):
         self.plot_F1_data = LabelledCheckbox(self, text="F1 data")
         self.plot_F2_data = LabelledCheckbox(self, text="F2 data")
         self.plot_CSP = LabelledCheckbox(self, text="CSPs")
-        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio")
-        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio")
+        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio", callback=self.activate_pre_analysis)
+        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio", callback=self.activate_pre_analysis)
 
         self.plot_F1_y_label = LabelledLineEdit(self, text='')
         self.plot_F2_y_label = LabelledLineEdit(self, text='')
@@ -385,11 +384,14 @@ class Settings(QWidget):
         pre_groupbox_layout = QGridLayout()
         pre_groupbox.setLayout(pre_groupbox_layout)
 
-        self.do_pre = LabelledCheckbox(self, "Do PRE Analysis")
+        self.do_pre_checkbox = LabelledCheckbox(self, "Do PRE Analysis")
+        self.do_pre_checkbox.setEnabled(False)
+        self.heat_map_checkbox.setEnabled(False)
+        self.dpre_checkbox.setEnabled(False)
         self.pre_settings = QPushButton("PRE Settings", self)
         self.pre_settings.clicked.connect(partial(self.show_popup, PreAnalysisPopup, self.variables))
 
-        pre_groupbox.layout().addWidget(self.do_pre, 0, 0)
+        pre_groupbox.layout().addWidget(self.do_pre_checkbox, 0, 0)
         pre_groupbox.layout().addWidget(self.pre_settings, 0, 1)
         pre_groupbox.layout().addWidget(self.dpre_checkbox, 1, 0)
         pre_groupbox.layout().addWidget(self.dpre_button, 1, 1)
@@ -441,6 +443,7 @@ class Settings(QWidget):
         buttons_groupbox.layout().addWidget(self.run_farseer_button)
 
 
+
         grid.layout().addWidget(paths_group_box, 0, 0, 3, 16)
         grid.layout().addWidget(fasta_groupbox, 7, 4, 4, 4)
         grid.layout().addWidget(sidechains_groupbox, 3, 4, 4, 4)
@@ -458,6 +461,17 @@ class Settings(QWidget):
         grid.layout().addWidget(buttons_groupbox, 21, 0, 2, 16)
 
         self.load_variables()
+
+
+    def activate_pre_analysis(self):
+        if self.plot_height_ratio.isChecked() or self.plot_volume_ratio.isChecked():
+            self.do_pre_checkbox.setEnabled(True)
+            self.dpre_checkbox.setEnabled(True)
+            self.heat_map_checkbox.setEnabled(True)
+        else:
+            self.do_pre_checkbox.setEnabled(False)
+            self.dpre_checkbox.setEnabled(False)
+            self.heat_map_checkbox.setEnabled(False)
 
     def set_spectrum_path_text(self, path=None):
         self.spectrum_path.setText(path)
@@ -497,7 +511,7 @@ class Settings(QWidget):
 
         # General Settings
 
-        general["spectrum_path"] = self.spectrum_path.field.text()
+        general["spectra_path"] = self.spectrum_path.field.text()
         general["output_path"] = self.output_path.field.text()
         general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
         general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
@@ -526,6 +540,8 @@ class Settings(QWidget):
         # FASTA Settings
         fasta["applyFASTA"] = self.apply_fasta_checkbox.isChecked()
         fasta["FASTAstart"] = self.fasta_start.field.value()
+
+        self.variables["pre_settings"]["apply_PRE_analysis"] = self.do_pre_checkbox.isChecked()
 
         # Plot F1 Settings
         plots_f1["calcs_PosF1_delta"] = self.plot_F1_data.isChecked()
@@ -559,13 +575,14 @@ class Settings(QWidget):
         plots_volume["calccol_name_Volume_ratio"] = self.plot_volume_calccol.field.text()
 
         # Plot Booleans
-        self.variables["extended_bar_settings"]["do_ext_bar"] = self.ext_bar_checkbox.isChecked()
-        self.variables["compact_bar_settings"]["do_comp_bar"] = self.comp_bar_checkbox.isChecked()
-        self.variables["vert_bar_settings"]["do_vert_bar"] = self.vert_bar_checkbox.isChecked()
-        self.variables["res_evo_settings"]["do_res_evo"] = self.res_evo_checkbox.isChecked()
-        self.variables["cs_scatter_settings"]["do_cs_scatter"] = self.scatter_checkbox.isChecked()
-        self.variables["heat_map_settings"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
-        self.variables["dpre_osci_settings"]["do_dpre"] = self.dpre_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_ext_bar"] = self.ext_bar_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_comp_bar"] = self.comp_bar_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_vert_bar"] = self.vert_bar_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_res_evo"] = self.res_evo_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_cs_scatter"] = self.scatter_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_cs_scatter_flower"] = self.scatter_flower_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
         import pprint
         pprint.pprint(self.variables)
         self.parent().parent().parent().save_config(self.variables, path)
@@ -626,6 +643,9 @@ class Settings(QWidget):
         self.apply_fasta_checkbox.setChecked(fasta["applyFASTA"])
         self.fasta_start.setValue(fasta["FASTAstart"])
 
+        #PRE settings
+        self.do_pre_checkbox.setChecked(self.variables["pre_settings"]["apply_PRE_analysis"])
+
         # Plot F1 Settings
         self.plot_F1_data.setChecked(plots_f1["calcs_PosF1_delta"])
         self.plot_F1_y_label.field.setText(plots_f1["yy_label_PosF1_delta"])
@@ -663,8 +683,9 @@ class Settings(QWidget):
         self.res_evo_checkbox.setChecked(self.variables["plotting_flags"]["do_res_evo"])
         self.scatter_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter"])
         self.scatter_flower_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter_flower"])
-        # self.heat_map_checkbox.setChecked(self.variables["heat_map_settings"]["do_heat_map"])
-        # self.dpre_checkbox.setChecked(self.variables["dpre_osci_settings"]["do_dpre"])
+        self.heat_map_checkbox.setChecked(self.variables["plotting_flags"]["do_heat_map"])
+        self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_pre_osci"])
+
 
     def show_popup(self, popup, variables):
         p = popup(self, variables=self.variables)
