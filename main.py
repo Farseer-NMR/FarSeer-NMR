@@ -75,36 +75,34 @@ class TabWidget(QTabWidget):
         self.setFixedSize(QtCore.QSize(gui_settings['app_width'], gui_settings['app_height']))
         self.config_file = None
 
-    def load_config(self):
-        fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+    def load_config(self, path=None):
+        if not path:
+            fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+        else:
+            fname = [path]
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
                 variables = json.load(open(fname[0], 'r'))
                 self.variables = variables
-                self.settings.load_variables(variables)
-                self.interface.sideBar.update_from_config(variables)
-                self.interface.variables = variables
-                self.settings.variables = variables
-                self.interface.x_combobox.setValue(len(variables["conditions"]["x"]))
-                self.interface.y_combobox.setValue(len(variables["conditions"]["y"]))
-                self.interface.z_combobox.setValue(len(variables["conditions"]["z"]))
-                if len(variables["conditions"]["x"]) == 1:
-                    self.interface.update_condition_boxes(3, 'x', 1)
-                if len(variables["conditions"]["y"]) == 1:
-                    self.interface.update_condition_boxes(2, 'y', 1)
-                if len(variables["conditions"]["z"]) == 1:
-                    self.interface.update_condition_boxes(1, 'z', 1)
-                self.interface.valuesDict = variables["conditions"]
-                self.interface.peakListArea.variables = variables
-                self.interface.peakListArea.updateTree(variables)
+                self.load_variables(variables)
+
 
                 return variables
         return None
 
+
+    def load_variables(self, variables):
+
+        self.settings.load_variables(variables)
+        self.settings.variables = variables
+        self.interface.load_variables(variables)
+
+
+
     def load_peak_lists(self, path=None):
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
-
+            self.interface.sideBar.update_from_config(self.variables)
 
     def save_config(self, variables, path=None):
 
@@ -145,7 +143,6 @@ class TabWidget(QTabWidget):
             msg = QMessageBox()
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setIcon(QMessageBox.Warning)
-            print(run_msg)
             if run_msg == "Path Exists":
                 msg.setText("Output Path Exists")
                 msg.setInformativeText("Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")
@@ -725,6 +722,19 @@ class Interface(QWidget):
 
         print(self.sideBar)
 
+    def load_variables(self, variables):
+        self.variables = variables
+
+        self.update_condition_boxes(3, 'x', len(self.variables["conditions"]["x"]))
+        self.update_condition_boxes(2, 'y', len(self.variables["conditions"]["y"]))
+        self.update_condition_boxes(1, 'z', len(self.variables["conditions"]["z"]))
+        self.x_combobox.setValue(len(self.variables["conditions"]["x"]))
+        self.y_combobox.setValue(len(self.variables["conditions"]["y"]))
+        self.z_combobox.setValue(len(self.variables["conditions"]["z"]))
+        self.peakListArea.update_variables(self.variables)
+
+
+
     def initUI(self):
         self.peakListArea = PeakListArea(self, variables=self.variables, gui_settings=gui_settings)
         grid = QGridLayout()
@@ -814,7 +824,6 @@ class Interface(QWidget):
         self.x, self.y, self.z = self.x_combobox.value(), self.y_combobox.value(), self.z_combobox.value()
         layout = self.widget2.layout()
         colCount = layout.columnCount()
-        print(self.variables["conditions"], 'update')
         valuesDict = self.variables["conditions"]
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
@@ -826,10 +835,11 @@ class Interface(QWidget):
             [valuesDict[dim].append(0) for x in range(value-len(valuesDict[dim]))]
         if len(valuesDict[dim]) > value:
             valuesDict[dim] = valuesDict[dim][:value]
+            print(valuesDict[dim], 'valuesdict', dim)
         for x in range(value):
             text_box = ValueField(self, x, dim, valuesDict)
             text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            # text_box.setFixedWidth(50)
+
             text_box.setText(str(valuesDict[dim][x]))
             layout.addWidget(text_box, row, x+3, 1, 1)
 
@@ -837,9 +847,10 @@ class Interface(QWidget):
 
 class Main(QWidget):
 
-    def __init__(self, parent=None, gui_settings=None, **kw):
+    def __init__(self, parent=None, gui_settings=None, config=None, **kw):
         QWidget.__init__(self, parent=parent)
         tabWidget = TabWidget(gui_settings)
+
         footer = Footer(self, gui_settings=gui_settings)
 
         layout = QVBoxLayout(self)
@@ -848,6 +859,8 @@ class Main(QWidget):
         self.layout().addWidget(tabWidget)
         self.layout().addWidget(footer)
         self.setObjectName("MainWidget")
+        if config:
+            tabWidget.load_config(config)
 
 
 
@@ -855,7 +868,14 @@ class Main(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     import time
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Run Farseer')
+    parser.add_argument('--config', metavar='path', required=False,
+                        help='Farseer Configuration File')
     splash_pix = QtGui.QPixmap('gui/images/splash-screen.png')
+
+    args = parser.parse_args()
 
     splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
@@ -869,7 +889,7 @@ if __name__ == '__main__':
     from gui import gui_utils
     gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
 
-    ex = Main(gui_settings=gui_settings)
+    ex = Main(gui_settings=gui_settings, config=args.config)
     splash.finish(ex)
     fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'
     font_id = QtGui.QFontDatabase.addApplicationFont(fin)

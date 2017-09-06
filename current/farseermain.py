@@ -1,5 +1,5 @@
 """
-Optimal algorythm to run the Farseer-NMR method.
+Optimal algorithm to run the Farseer-NMR method.
 
 Usage as main script:
 

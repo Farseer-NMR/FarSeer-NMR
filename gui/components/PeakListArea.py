@@ -38,6 +38,11 @@ class PeakListArea(QWidget):
     def sideBar(self):
         return self.parent().parent().parent().sideBar
 
+
+    def update_variables(self, variables):
+        self.variables = variables
+        self.updateTree(variables)
+
     def show_update_warning(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
@@ -60,9 +65,23 @@ class PeakListArea(QWidget):
         retval = msg.exec_()
         return retval
 
+    def update_experimental_dataset(self):
+        tmp_dict = {}
+        for z in self.valuesDict["z"]:
+            tmp_dict[z] = {}
+            for y in self.valuesDict["y"]:
+                tmp_dict[z][y] = {}
+                for x in self.valuesDict["x"]:
+                    if x in self.variables["experimental_dataset"][z][y].keys():
+                        tmp_dict[z][y][x] = self.variables["experimental_dataset"][z][y][x]
+
+        self.variables["experimental_dataset"] = tmp_dict
+
     def updateTree(self, variables):
 
-        self.valuesDict = variables["conditions"]
+        self.valuesDict = self.variables["conditions"]
+
+
         if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
             self.show_duplicate_key_warning('z')
             return
@@ -75,9 +94,11 @@ class PeakListArea(QWidget):
             self.show_duplicate_key_warning('x')
             return
 
+        self.update_experimental_dataset()
 
-        self.peak_list_dict = variables["experimental_dataset"]
-        self.fasta_files = variables["fasta_files"]
+
+        self.peak_list_dict = self.variables["experimental_dataset"]
+        self.fasta_files = self.variables["fasta_files"]
         if self.updateClicks > 0:
             self.show_update_warning()
         self.peak_list_objects = []
@@ -124,12 +145,12 @@ class PeakListArea(QWidget):
                 for k, x in enumerate(x_conds):
                     xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                     self.scene.addItem(xx)
-                    if not z in variables["experimental_dataset"].keys() or not variables["experimental_dataset"][z][y][x]:
+                    if not z in self.variables["experimental_dataset"].keys() or not self.variables["experimental_dataset"][z][y][x]:
                         pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
                                        [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
                         self.peak_list_dict[z][y][x] = ''
                     else:
-                        pl_name = variables["experimental_dataset"][z][y][x]
+                        pl_name = self.variables["experimental_dataset"][z][y][x]
                         pl = PeakListLabel(self, pl_name, self.scene,
                                            [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
                         self.peak_list_dict[z][y][x] = pl_name

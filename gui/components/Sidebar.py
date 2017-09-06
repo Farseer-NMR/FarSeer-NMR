@@ -23,9 +23,18 @@ class SideBar(QTreeWidget):
 
     def update_from_config(self, variables):
         self.clear()
-        self.variables = variables["peaklists"]
-        for peaklist in self.variables.values():
+        self.variables = variables
+        used_peaklists = []
+        for z in self.variables["conditions"]["z"]:
+            for y in self.variables["conditions"]["y"]:
+                for x in self.variables["conditions"]["x"]:
+                        used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
+        unused_peaklists = [pl for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
+        for peaklist in unused_peaklists:
             self.load_peaklist(peaklist)
+
+
+
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -82,7 +91,7 @@ class SideBar(QTreeWidget):
                     pl_name = name + '_1'
             item = self.addItem(pl_name)
             self.peakLists[item.text(0)] = peaklist
-            self.variables[pl_name] = filePath
+            self.variables["peaklists"][pl_name] = filePath
             return pl_name, filePath
         else:
             print("Invalid peak list file: %s" % filePath)
@@ -98,5 +107,5 @@ class SideBar(QTreeWidget):
     def removeItem(self, item_name):
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive, 0)
-        # if result:
-        sip.delete(result[0])
+        if result:
+            sip.delete(result[0])
