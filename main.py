@@ -3,6 +3,8 @@ from functools import partial
 import json
 import os
 from collections import OrderedDict
+import pprint
+
 from PyQt5 import QtCore, QtGui
 
 from current.setup_farseer_calculation import create_directory_structure
@@ -78,6 +80,8 @@ class TabWidget(QTabWidget):
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
                 variables = json.load(open(fname[0], 'r'))
+                self.variables = variables
+                self.settings.load_variables(variables)
                 self.interface.sideBar.update_from_config(variables)
                 self.interface.variables = variables
                 self.settings.variables = variables
@@ -119,7 +123,10 @@ class TabWidget(QTabWidget):
     def run_farseer_calculation(self):
         from current.Threading import Threading
         output_path = self.settings.output_path.field.text()
+        pprint.pprint(self.variables)
         run_msg = create_directory_structure(output_path, self.variables, peakLists)
+
+
         if run_msg =='Run':
             from current.farseermain import read_user_variables, run_farseer
             if self.config_file:
@@ -594,7 +601,10 @@ class Settings(QWidget):
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
 
-    def load_variables(self):
+    def load_variables(self, variables=None):
+
+        # if variables:
+        #     self.variables = variables
 
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
@@ -644,7 +654,9 @@ class Settings(QWidget):
         self.csp_lost.select(csp["cs_lost"])
 
         # FASTA Settings
+        print('applyFasta', fasta["applyFASTA"])
         self.apply_fasta_checkbox.setChecked(fasta["applyFASTA"])
+        print(self.apply_fasta_checkbox.checkBox.checkState())
         self.fasta_start.setValue(fasta["FASTAstart"])
 
         #PRE settings
