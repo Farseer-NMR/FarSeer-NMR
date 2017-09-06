@@ -86,6 +86,7 @@ class SideBar(QTreeWidget):
             return pl_name, filePath
         else:
             print("Invalid file: %s" % filePath)
+            return None, None
 
     def addItem(self, name):
         newItem = QTreeWidgetItem(self)
