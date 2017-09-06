@@ -25,6 +25,17 @@ colours = OrderedDict([('#ff0000','red'),
                        ('#000000', 'black')])
 
 
+settings_1280x800 = {'peaklistarea_height': 350,
+                 'peaklistarea_width': 920,
+                 'scene_width': 910,
+                 'scene_height': 346,
+                 'app_height': 700,
+                 'app_width': 1200,
+                 'sideBar_height': 510,
+                 'interface_top_width': 920,
+                 'interface_top_height': 150,
+                 'footer_height': 10
+                 }
 settings_720p = {'peaklistarea_height': 350,
                  'peaklistarea_width': 920,
                  'scene_width': 910,
@@ -71,6 +82,12 @@ def deliver_settings(resolution):
         print('1k')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_1k.qss')).read()
         return settings_1k, stylesheet
+    elif (resolution.height(), resolution.width()) == (800, 1280):
+        print('1280x800')
+        msg = " @@@@@@@@@@@@@@@@@@@@@@ \nATTENTION YOU WILL BE USING A PROTOTYPE GUI DEVELOPED ONLY TO BE FUNCTIONAL IN 1280X800 SCREENS. IT IS NOT SUPPOSED TO HAVE A GOOD LOOK.\n@@@@@@@@@@@@@@@@@@@@@@"
+        print(msg)
+        stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_1280x800.qss')).read()
+        return settings_1280x800, stylesheet
     else:
         print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
