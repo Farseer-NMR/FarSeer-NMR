@@ -44,16 +44,7 @@ from gui import resources_rc
 
 from current.fslibs.io import json_to_fsuv, fsuv_to_json
 
-# valuesDict = {
-#             'x': [],
-#             'y': [],
-#             'z': []
-#         }
-
 peakLists = OrderedDict()
-
-
-
 
 class TabWidget(QTabWidget):
 
@@ -126,7 +117,7 @@ class TabWidget(QTabWidget):
 
 
     def run_farseer_calculation(self):
-
+        from current.Threading import Threading
         output_path = self.settings.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables, peakLists)
         if run_msg:
@@ -138,7 +129,8 @@ class TabWidget(QTabWidget):
                 self.save_config(self.variables, os.path.join(output_path, 'user_config.json'))
                 fsuv = read_user_variables(output_path, 'user_config.json')
 
-            run_farseer(fsuv)
+            process = Threading(function=run_farseer, args=fsuv)
+
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -600,7 +592,7 @@ class Settings(QWidget):
 
 
         if os.path.exists(general["output_path"]):
-            sself.output_path.field.setText(general["output_path"])
+            self.output_path.field.setText(general["output_path"])
         else:
             self.output_path.field.setText(os.getcwd())
         self.has_sidechains_checkbox.setChecked(general["has_sidechains"])
@@ -781,6 +773,7 @@ class Interface(QWidget):
         self.x, self.y, self.z = self.x_combobox.value(), self.y_combobox.value(), self.z_combobox.value()
         layout = self.widget2.layout()
         colCount = layout.columnCount()
+        print(self.variables["conditions"], 'update')
         valuesDict = self.variables["conditions"]
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
@@ -798,6 +791,7 @@ class Interface(QWidget):
             # text_box.setFixedWidth(50)
             text_box.setText(str(valuesDict[dim][x]))
             layout.addWidget(text_box, row, x+3, 1, 1)
+
 
 
 class Main(QWidget):

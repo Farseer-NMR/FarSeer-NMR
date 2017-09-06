@@ -7,8 +7,9 @@ def create_directory_structure(output_path, variables, peakLists):
         return False
 
     else:
-        os.mkdir(spectrum_dir)
-
+        os.makedirs(spectrum_dir)
+    print(variables["fasta_files"], 'fastafiles')
+    print(variables["conditions"])
     exp_dataset = variables["experimental_dataset"]
     for z_key in variables["conditions"]["z"]:
         for y_key in variables["conditions"]["y"]:
