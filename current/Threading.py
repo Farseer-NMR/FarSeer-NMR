@@ -21,8 +21,5 @@ class Threading(object):
 
     def run(self, function, args):
         """ Method that runs forever """
-        while True:
-            function(args)
-            print('Doing something imporant in the background')
-            time.sleep(self.interval)
+        function(args)
 

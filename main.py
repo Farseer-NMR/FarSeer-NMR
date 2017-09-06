@@ -145,6 +145,7 @@ class TabWidget(QTabWidget):
             msg = QMessageBox()
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setIcon(QMessageBox.Warning)
+            print(run_msg)
             if run_msg == "Path Exists":
                 msg.setText("Output Path Exists")
                 msg.setInformativeText("Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")

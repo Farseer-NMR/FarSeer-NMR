@@ -8,12 +8,9 @@ def create_directory_structure(output_path, variables, peakLists):
 
     else:
         os.makedirs(spectrum_dir)
-    print(variables["fasta_files"], 'fastafiles')
-    print(variables["conditions"])
-    print(variables["fasta_settings"]["applyFASTA"], 'applyfasta')
     exp_dataset = variables["experimental_dataset"]
-    # if not exp_dataset:
-    #     return "No dataset"
+    if not exp_dataset:
+        return "No dataset"
     for z_key in variables["conditions"]["z"]:
         for y_key in variables["conditions"]["y"]:
             if not os.path.exists(os.path.join(spectrum_dir, z_key, y_key)):
