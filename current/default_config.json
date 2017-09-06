@@ -62,7 +62,10 @@
         "do_vert_bar": false,
         "do_res_evo": false,
         "do_cs_scatter": false,
-        "do_cs_scatter_flower": false
+        "do_cs_scatter_flower": false,
+        "do_pre_osci": false,
+        "do_heat_map": false
+        "do_heat_map": false
     },
     "extended_bar_settings": {
         "cols_page": 1,
