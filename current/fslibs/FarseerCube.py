@@ -985,6 +985,12 @@ residues.'.format(z, y, x)
             self.log_r(msg)
             return
         
+        # before expanding the peaklists to the fasta file to identify the 
+        # unassigned residues, it confirms the integrity of the fasta Starting
+        # number.
+        if missing == 'unassigned':
+            self.checks_fasta_start_number()
+        
         if resonance_type == 'Backbone':
             target = self.allpeaklists
         elif resonance_type == 'Sidechains':
@@ -1524,4 +1530,48 @@ residues.'.format(z, y, x)
             self.abort()
         return
         
+    def checks_fasta_start_number(self):
+        """
+        Confirms if the start number of the fasta file won't result in protein
+        truncation in the peaklist.
         
+        This occurs when lasta fasta residue is < last protein residue.
+        
+        Raises WET#22 otherwise.
+        """
+        
+        if not(self.zzcoords and self.allfasta):
+            msg = "Operation cannot complete as Cube coordinates have not been set or fasta files have not yet been read."
+            print(msg)
+            return
+        
+        for z, y, x in it.product(self.zzcoords,
+                                  self.yycoords,
+                                  self.xxcoords):
+            # DO
+            f = list(self.allfasta[z][y].keys())[0]
+            
+            peaklist_last_residue = \
+                int(self.allpeaklists[z][y][x].loc[:,'Res#'].tail(n=1))
+            
+            fasta_last_residue = \
+                int(self.allfasta[z][y][f].loc[:,'Res#'].tail(n=1))
+            
+            if fasta_last_residue >= peaklist_last_residue:
+                continue
+            elif fasta_last_residue < peaklist_last_residue:
+                msg = "The last residue of your fasta file is minor than your protein last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
+                    format(z, y, x, f)
+                    
+                self.log_r(fsw.gen_wet('ERROR', msg, 22))
+                self.abort()
+            else:
+                msg = 'Something is wrong in .checks_fasta_start_number()'
+                self.log_r(fsw.gen_wet('DEVELOPER ISSUE', msg, 0))
+                self.abort()
+            # DONE
+        else:
+            msg = "> FASTA files starting number is consistent with peaklists"
+            self.log_r(msg)
+        
+        return
