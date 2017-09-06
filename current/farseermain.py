@@ -94,8 +94,9 @@ def read_user_variables(path, config_name):
     fsuv = json.load(open(os.path.join(cwd, config_name), 'r'))
 
     fsuv["cwd"] = cwd
-    if not fsuv["general_settings"]["spectra_path"]:
-        fsuv["general_settings"]["spectra_path"] = '{}/spectra'.format(cwd)
+    
+    if not fsuv["general_settings"]["input_spectra_path"]:
+        fsuv["general_settings"]["input_spectra_path"] = '{}/spectra'.format(cwd)
     
     fsuv = config_user_variables(fsuv)
     
@@ -650,12 +651,12 @@ def creates_farseer_dataset(fsuv):
         exp (FarseerCube class instance): contains all peaklist data.
     
     Depends on:
-    fsuv["general_settings"]["spectra_path"]
+    fsuv["general_settings"]["input_spectra_path"]
     fsuv.has_sidechains
     fsuv.FASTAstart
     fsuv["general_settings"]["logfile_name"]
     """
-    exp = fcube.FarseerCube(fsuv["general_settings"]["spectra_path"],
+    exp = fcube.FarseerCube(fsuv["general_settings"]["input_spectra_path"],
                             has_sidechains=fsuv["general_settings"]["has_sidechains"],
                             FASTAstart=fsuv["fasta_settings"]["FASTAstart"])
     
@@ -1193,7 +1194,7 @@ def PRE_analysis(farseer_series, fsuv):
         return
     # if analysing cond3: performs calculations.
     if farseer_series.series_axis == 'cond3':
-        farseer_series.load_theoretical_PRE(fsuv["general_settings"]["spectra_path"],
+        farseer_series.load_theoretical_PRE(fsuv["general_settings"]["input_spectra_path"],
                                              farseer_series.prev_dim)
         
         for sourcecol, targetcol in zip(fsuv["restraint_settings"].index[3:],\
