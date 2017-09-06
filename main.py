@@ -268,7 +268,6 @@ class Settings(QWidget):
         series_groupbox.layout().addWidget(self.perform_comparisons_checkbox)
 
 
-
         figure_groupbox = QGroupBox()
         figure_groupbox.setTitle("Figure")
         figure_groupbox_layout = QVBoxLayout()
@@ -318,8 +317,8 @@ class Settings(QWidget):
         self.plot_F1_data = LabelledCheckbox(self, text="F1 data")
         self.plot_F2_data = LabelledCheckbox(self, text="F2 data")
         self.plot_CSP = LabelledCheckbox(self, text="CSPs")
-        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio")
-        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio")
+        self.plot_height_ratio = LabelledCheckbox(self, text="Height Ratio", callback=self.activate_pre_analysis)
+        self.plot_volume_ratio = LabelledCheckbox(self, text="Volume Ratio", callback=self.activate_pre_analysis)
 
         self.plot_F1_y_label = LabelledLineEdit(self, text='')
         self.plot_F2_y_label = LabelledLineEdit(self, text='')
@@ -386,6 +385,9 @@ class Settings(QWidget):
         pre_groupbox.setLayout(pre_groupbox_layout)
 
         self.do_pre_checkbox = LabelledCheckbox(self, "Do PRE Analysis")
+        self.do_pre_checkbox.setEnabled(False)
+        self.heat_map_checkbox.setEnabled(False)
+        self.dpre_checkbox.setEnabled(False)
         self.pre_settings = QPushButton("PRE Settings", self)
         self.pre_settings.clicked.connect(partial(self.show_popup, PreAnalysisPopup, self.variables))
 
@@ -441,6 +443,7 @@ class Settings(QWidget):
         buttons_groupbox.layout().addWidget(self.run_farseer_button)
 
 
+
         grid.layout().addWidget(paths_group_box, 0, 0, 3, 16)
         grid.layout().addWidget(fasta_groupbox, 7, 4, 4, 4)
         grid.layout().addWidget(sidechains_groupbox, 3, 4, 4, 4)
@@ -458,6 +461,17 @@ class Settings(QWidget):
         grid.layout().addWidget(buttons_groupbox, 21, 0, 2, 16)
 
         self.load_variables()
+
+
+    def activate_pre_analysis(self):
+        if self.plot_height_ratio.isChecked() or self.plot_volume_ratio.isChecked():
+            self.do_pre_checkbox.setEnabled(True)
+            self.dpre_checkbox.setEnabled(True)
+            self.heat_map_checkbox.setEnabled(True)
+        else:
+            self.do_pre_checkbox.setEnabled(False)
+            self.dpre_checkbox.setEnabled(False)
+            self.heat_map_checkbox.setEnabled(False)
 
     def set_spectrum_path_text(self, path=None):
         self.spectrum_path.setText(path)

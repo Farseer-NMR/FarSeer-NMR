@@ -305,7 +305,7 @@
     },
     "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": "Vol_ratio",
-        "calcs_Volume_ratio": false,
+        "calcs_Volume_ratio": true,
         "yy_label_Volume_ratio": "Vi/V0",
         "yy_scale_Volume_ratio": 1.1
     },
