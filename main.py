@@ -497,7 +497,7 @@ class Settings(QWidget):
 
         # General Settings
 
-        general["spectrum_path"] = self.spectrum_path.field.text()
+        general["spectra_path"] = self.spectrum_path.field.text()
         general["output_path"] = self.output_path.field.text()
         general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
         general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()

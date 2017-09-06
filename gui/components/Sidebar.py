@@ -43,8 +43,7 @@ class SideBar(QTreeWidget):
             event.accept()
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
-                name, path = self.load_from_path(filePath)
-                self.variables[name] = path
+               self.load_from_path(filePath)
 
     def load_from_path(self, filePath):
         if os.path.isdir(filePath):
@@ -83,9 +82,10 @@ class SideBar(QTreeWidget):
                     pl_name = name + '_1'
             item = self.addItem(pl_name)
             self.peakLists[item.text(0)] = peaklist
+            self.variables[pl_name] = filePath
             return pl_name, filePath
         else:
-            print("Invalid file: %s" % filePath)
+            print("Invalid peak list file: %s" % filePath)
             return None, None
 
     def addItem(self, name):
@@ -98,5 +98,5 @@ class SideBar(QTreeWidget):
     def removeItem(self, item_name):
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive, 0)
-        if result:
-            sip.delete(result[0])
+        # if result:
+        sip.delete(result[0])
