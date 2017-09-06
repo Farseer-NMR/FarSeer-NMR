@@ -126,10 +126,13 @@ class TabWidget(QTabWidget):
                 path, config_name = os.path.split(self.config_file)
                 fsuv = read_user_variables(path, config_name)
             else:
-                self.save_config(self.variables, os.path.join(output_path, 'user_config.json'))
+                self.settings.save_config(path=os.path.join(output_path, 'user_config.json'))
                 fsuv = read_user_variables(output_path, 'user_config.json')
 
             process = Threading(function=run_farseer, args=fsuv)
+
+
+            # os.spawnl(os.P_DETACH, run_farseer(fsuv))
 
         else:
             msg = QMessageBox()
@@ -480,7 +483,7 @@ class Settings(QWidget):
         if self.variables:
             self.load_variables()
 
-    def save_config(self):
+    def save_config(self, path=None):
 
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
@@ -565,7 +568,7 @@ class Settings(QWidget):
         self.variables["dpre_osci_settings"]["do_dpre"] = self.dpre_checkbox.isChecked()
         import pprint
         pprint.pprint(self.variables)
-        self.parent().parent().parent().save_config(self.variables)
+        self.parent().parent().parent().save_config(self.variables, path)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
