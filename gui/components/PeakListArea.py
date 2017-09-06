@@ -100,7 +100,7 @@ class PeakListArea(QWidget):
                 for k, x in enumerate(x_conds):
                     xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                     self.scene.addItem(xx)
-                    if not variables["experimental_dataset"][z][y][x]:
+                    if not z in variables["experimental_dataset"].keys() or not variables["experimental_dataset"][z][y][x]:
                         pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
                                        [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
                         self.peak_list_dict[z][y][x] = ''
