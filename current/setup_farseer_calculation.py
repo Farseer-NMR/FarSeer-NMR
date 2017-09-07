@@ -1,6 +1,6 @@
 import os, csv
 from shutil import copy2
-
+from parsing import read_peaklist
 def create_directory_structure(output_path, variables, peakLists):
     spectrum_dir = output_path+'/spectra/'
     if os.path.exists(os.path.join(spectrum_dir)):
@@ -21,7 +21,9 @@ def create_directory_structure(output_path, variables, peakLists):
                     copy2(fasta_file, os.path.join(spectrum_dir, z_key, y_key))
             for x_key in variables["conditions"]["x"]:
                 fout = open(os.path.join(spectrum_dir, z_key, y_key, "%s.csv" % x_key), 'w')
-                write_peaklist_file(fout, peakLists[exp_dataset[z_key][y_key][x_key]])
+                peaklist_path = variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
+                peaklist = read_peaklist(peaklist_path)
+                write_peaklist_file(fout, peaklist)
                 fout.close()
     return "Run"
 
