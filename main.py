@@ -760,7 +760,7 @@ class Interface(QWidget):
         num_points_label = QLabel("Number of Points", self)
         num_points_label.setObjectName("PointsLabel")
         num_points_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        grid2.layout().addWidget(num_points_label, 0, 0, 1, 13)
+        grid2.layout().addWidget(num_points_label, 0, 0, 1, 20)
 
 
         self.z_combobox = QSpinBox(self)
@@ -790,7 +790,7 @@ class Interface(QWidget):
         self.x_combobox.setMinimum(1)
         self.z_combobox.setMaximum(10)
         self.y_combobox.setMaximum(10)
-        self.x_combobox.setMaximum(10)
+        self.x_combobox.setMaximum(15)
 
 
         self.sideBar.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
@@ -801,7 +801,7 @@ class Interface(QWidget):
 
         self.showTreeButton.setObjectName("TreeButton")
 
-        self.widget2.layout().addWidget(self.showTreeButton, 4, 2, 1, 11)
+        self.widget2.layout().addWidget(self.showTreeButton, 4, 2, 1, 16)
         self.peakListArea.setObjectName("PeakListArea")
 
         self.showTreeButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
