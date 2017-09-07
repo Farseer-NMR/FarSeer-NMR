@@ -143,3 +143,12 @@ def combine_dicts(dictionaries):
     for dictionary in dictionaries:
         tmp_dict.update(dictionary)
     return tmp_dict
+
+def exp_set_is_valid(variables):
+    if not variables["experimental_dataset"]:
+        return False
+    else:
+        if variables["conditions"]["z"] in list(variables["experimental_dataset"].keys()):
+            if all(variables["conditions"]["y"] in list(variables["experimental_dataset"][z].keys()) for z in variables["conditions"]["z"]):
+                if all(variables["conditions"]["x"] in list(variables["experimental_dataset"][z][y].keys()) for z in variables["conditions"]["y"]):
+                    return True

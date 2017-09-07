@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5 import QtCore
 from parsing import read_peaklist
 import os
+from current.utils import exp_set_is_valid
 
 
 class SideBar(QTreeWidget):
@@ -26,19 +27,23 @@ class SideBar(QTreeWidget):
         self.variables = variables
         used_peaklists = []
         self.peakLists = self.variables["peaklists"]
+
         if not all(x for v in self.variables["conditions"].values() for x in v):
+            self.peakLists = self.variables["peaklists"]
             self.refresh_sidebar()
 
         else:
+            print(self.variables["conditions"], 'inelse')
             for z in self.variables["conditions"]["z"]:
                 for y in self.variables["conditions"]["y"]:
                     for x in self.variables["conditions"]["x"]:
+                        if exp_set_is_valid(self.variables):
                             used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
-            unused_peaklists = [pl for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
+            unused_peaklists = [x for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
+            print(unused_peaklists)
 
             for peaklist in unused_peaklists:
-                self.load_peaklist(peaklist)
-
+                self.addItem(peaklist)
 
 
 
