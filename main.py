@@ -483,13 +483,14 @@ class Settings(QWidget):
             self.heat_map_checkbox.setEnabled(False)
 
     def set_spectrum_path_text(self, path=None):
-        if path != self.variables["general_settings"]["spectra_path"]:
-            print('path changed from %s to %s' % (self.variables["general_settings"]["spectra_path"], path))
-            self.spectrum_path.setText(path)
-            self.variables["general_settings"]["spectra_path"] = path
-            self.parent().parent().parent().load_peak_lists(path)
-        else:
-            return
+        # if path != self.variables["general_settings"]["spectra_path"]:
+        print('path changed from %s to %s' % (self.variables["general_settings"]["spectra_path"], path))
+        self.spectrum_path.setText(path)
+        self.variables["general_settings"]["spectra_path"] = path
+        self.parent().parent().parent().load_peak_lists(path)
+        print('setting_spectrum_path')
+        # else:
+        #     return
 
 
 
