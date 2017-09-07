@@ -503,9 +503,20 @@ class Settings(QWidget):
         self.output_path.setText(path)
 
     def load_config(self):
-        self.variables = self.parent().parent().parent().load_config()
-        if self.variables:
-            self.load_variables()
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Load Configuration")
+        msg.setInformativeText("This will overwrite all existing settings and data points!")
+        msg.setWindowTitle("Reset Experimental Series")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+        retval = msg.exec_()
+        if retval == QMessageBox.Ok:
+            self.variables = self.parent().parent().parent().load_config()
+            if self.variables:
+                self.load_variables()
+        else:
+            return
 
     def save_config(self, path=None):
 

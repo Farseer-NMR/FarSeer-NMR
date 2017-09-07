@@ -118,7 +118,8 @@ class PeakListArea(QWidget):
             return
 
         if self.updateClicks > 0:
-            self.show_update_warning()
+            if self.show_update_warning() == QMessageBox.Cancel:
+                return
 
 
         self.peak_list_objects = []
