@@ -1633,25 +1633,33 @@ recipient: residues
             r_sq = ( titration_x_values[0], y_lims[1]+y_lims[1]*0.02)
             
             # kd value label
-            if  titration_x_values[-1]/2 \
-                < self.fitdf[calccol].ix[i, 'kd']\
-                <  titration_x_values[-1]:
+            
+            # this value is always a numpy.float64
+            kd_str = "{:.2f}".format(self.fitdf[calccol].ix[i, 'kd'])
+            kd_ha = 'right'
+            
+            if self.fitdf[calccol].ix[i, 'kd'] > titration_x_values[-1]:
+                # do
+                kdc = (titration_x_values[-1], y_lims[1]*0.02,
+                       'kd {}'.format(kd_str))
+                kd_ha = 'right'
+                #
+            
+            elif self.fitdf[calccol].ix[i, 'kd'] \
+                    > titration_x_values[-1]*0.5:
+                # DO
+                kdc = (self.fitdf[calccol].ix[i, 'kd'], y_lims[1]*0.02, kd_str)
+                kd_ha = 'right'
+                #
+            
+            elif  self.fitdf[calccol].ix[i, 'kd'] \
+                    <  titration_x_values[-1]*0.5:
                 #do 
                 kdc = (self.fitdf[calccol].ix[i,'kd']\
-                       -titration_x_values[-1]*0.02,
-                       y_lims[1]*0.02,
-                       int(round(self.fitdf[calccol].ix[i, 'kd'])))
-            
-            elif self.fitdf[calccol].ix[i, 'kd'] > titration_x_values[-1]:
-                kdc = (titration_x_values[-1]-titration_x_values[-1]*0.02,
-                       y_lims[1]*0.02,
-                       'kd {}'.format(int(round(self.fitdf[calccol].ix[i, 'kd']
-                       ))))
-            else:
-                kdc = (self.fitdf[calccol].ix[i, 'kd']\
-                       + titration_x_values[-1]*0.11,
-                       y_lims[1]*0.02,
-                       int(round(self.fitdf[calccol].ix[i, 'kd'])))
+                          +self.fitdf[calccol].ix[i,'kd']*0.05,
+                       y_lims[1]*0.02, kd_str)
+                kd_ha = 'left'
+                #
             
             # ymax value label
             if self.fitdf[calccol].ix[i, 'ymax'] > y_lims[1]:
@@ -1688,7 +1696,7 @@ recipient: residues
                             format(self.fitdf[calccol].ix[i, 'r_sq']),
                         ha='left', **txtkwargs)
             axs[i].text(*ymaxc, **txtkwargs)
-            axs[i].text(*kdc, ha='right', **txtkwargs)
+            axs[i].text(*kdc, ha=kd_ha, **txtkwargs)
     
     
     def plot_cs_scatter(self, axs, i, row_number,
@@ -2619,7 +2627,8 @@ ydata: {}
             return
         
         # sets an x linear space
-        self.xfit=np.linspace(0, 10000, 100000+1)
+        maxxfit = x_values[-1] * 2
+        self.xfit=np.linspace(0, maxxfit, 200, endpoint=True)
         
         # creates data frame to store fiting results.
         self.fitdf[calccol] = pd.DataFrame()
