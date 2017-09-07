@@ -24,6 +24,7 @@ class SideBar(QTreeWidget):
 
     def update_from_config(self, variables):
         self.clear()
+        print('updating sidebar from condifg')
         self.variables = variables
         used_peaklists = []
         self.peakLists = self.variables["peaklists"]
@@ -45,6 +46,8 @@ class SideBar(QTreeWidget):
             for peaklist in unused_peaklists:
                 self.addItem(peaklist)
 
+        print(self.peakLists)
+
 
 
     def dragEnterEvent(self, event):
@@ -64,6 +67,8 @@ class SideBar(QTreeWidget):
             filePaths = [url.path() for url in event.mimeData().urls()]
             for filePath in filePaths:
                self.load_from_path(filePath)
+
+
 
     def load_from_path(self, filePath):
         if os.path.isdir(filePath):
@@ -100,7 +105,8 @@ class SideBar(QTreeWidget):
 
                 item = self.addItem(pl_name)
                 self.peakLists[item.text(0)] = peaklist
-                self.variables["peaklists"][pl_name] = filePath
+                self.peakLists[pl_name] = filePath
+
                 return pl_name, filePath
             else:
                 print("Invalid peak list file: %s" % filePath)

@@ -83,6 +83,7 @@ class TabWidget(QTabWidget):
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
                 variables = json.load(open(fname[0], 'r'))
+                self.settings.spectrum_path.setText('')
                 self.variables = variables
                 self.load_variables(variables)
 
@@ -113,6 +114,7 @@ class TabWidget(QTabWidget):
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
+                    self.variables["peaklists"] = self.interface.sideBar.peakLists
                     json.dump(variables, outfile, indent=4)
                     self.config_file = outfile
                 print('Configuration saved to %s' % fname[0])
@@ -601,8 +603,9 @@ class Settings(QWidget):
         self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
         import pprint
-        pprint.pprint(self.variables)
+
         self.parent().parent().parent().save_config(self.variables, path)
+        pprint.pprint(self.variables)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()

@@ -62,7 +62,7 @@ class PeakListArea(QWidget):
         retval = msg.exec_()
         return retval
 
-    def show_empty_condition__warning(self):
+    def show_empty_condition_warning(self):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText("Empty conditions")
@@ -94,7 +94,7 @@ class PeakListArea(QWidget):
         #
         # Check if condition boxes are empty and throw warning if so.
         if not all(x for v in self.valuesDict.values() for x in v):
-            self.show_empty_condition__warning()
+            self.show_empty_condition_warning()
             return False
 
         if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
