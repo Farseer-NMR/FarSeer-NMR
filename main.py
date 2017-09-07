@@ -3,7 +3,6 @@ from functools import partial
 import json
 import os
 from collections import OrderedDict
-import pprint
 
 from PyQt5 import QtCore, QtGui
 
@@ -121,7 +120,6 @@ class TabWidget(QTabWidget):
     def run_farseer_calculation(self):
         from current.Threading import Threading
         output_path = self.settings.output_path.field.text()
-        pprint.pprint(self.variables)
         run_msg = create_directory_structure(output_path, self.variables, peakLists)
 
 
@@ -597,7 +595,6 @@ class Settings(QWidget):
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
 
         self.parent().parent().parent().save_config(self.variables, path)
-        pprint.pprint(self.variables)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
