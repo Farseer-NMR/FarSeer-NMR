@@ -37,7 +37,6 @@ from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
 from gui.popups.VerticalBar import VerticalBarPopup
 
-
 from gui.Footer import Footer
 
 from gui import resources_rc

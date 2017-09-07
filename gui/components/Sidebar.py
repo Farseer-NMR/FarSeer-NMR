@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
-from PyQt5 import QtCore
-from parsing import read_peaklist
 import os
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
+
+from current.parsing import read_peaklist
 from current.utils import exp_set_is_valid
 
 
