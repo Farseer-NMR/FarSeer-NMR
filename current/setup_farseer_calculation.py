@@ -1,7 +1,7 @@
 import os, csv
 from shutil import copy2
 from parsing import read_peaklist
-def create_directory_structure(output_path, variables, peakLists):
+def create_directory_structure(output_path, variables):
     spectrum_dir = output_path+'/spectra/'
     if os.path.exists(os.path.join(spectrum_dir)):
         return "Path Exists"

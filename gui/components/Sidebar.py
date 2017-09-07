@@ -26,10 +26,10 @@ class SideBar(QTreeWidget):
         self.clear()
         self.variables = variables
         used_peaklists = []
-        self.peakLists = self.variables["peaklists"]
+        # self.peakLists = self.variables["peaklists"]
 
         if not all(x for v in self.variables["conditions"].values() for x in v):
-            self.peakLists = self.variables["peaklists"]
+            # self.peakLists = self.variables["peaklists"]
             self.refresh_sidebar()
 
         else:

@@ -120,7 +120,7 @@ class TabWidget(QTabWidget):
     def run_farseer_calculation(self):
         from current.Threading import Threading
         output_path = self.settings.output_path.field.text()
-        run_msg = create_directory_structure(output_path, self.variables, peakLists)
+        run_msg = create_directory_structure(output_path, self.variables)
 
 
         if run_msg =='Run':
