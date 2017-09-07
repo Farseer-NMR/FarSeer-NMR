@@ -83,11 +83,9 @@ class TabWidget(QTabWidget):
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
                 variables = json.load(open(fname[0], 'r'))
-                self.settings.spectrum_path.setText('')
+                self.settings.spectrum_path.field.setText('')
                 self.variables = variables
                 self.load_variables(variables)
-
-
                 return variables
         return None
 
@@ -97,7 +95,7 @@ class TabWidget(QTabWidget):
         self.settings.load_variables(variables)
         self.settings.variables = variables
         self.interface.load_variables(variables)
-
+        self.interface.sideBar.update_from_config(variables)
 
 
     def load_peak_lists(self, path=None):
@@ -485,14 +483,9 @@ class Settings(QWidget):
             self.heat_map_checkbox.setEnabled(False)
 
     def set_spectrum_path_text(self, path=None):
-        # if path != self.variables["general_settings"]["spectra_path"]:
-        print('path changed from %s to %s' % (self.variables["general_settings"]["spectra_path"], path))
         self.spectrum_path.setText(path)
         self.variables["general_settings"]["spectra_path"] = path
         self.parent().parent().parent().load_peak_lists(path)
-        print('setting_spectrum_path')
-        # else:
-        #     return
 
 
 
@@ -602,7 +595,6 @@ class Settings(QWidget):
         self.variables["plotting_flags"]["do_cs_scatter_flower"] = self.scatter_flower_checkbox.isChecked()
         self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
-        import pprint
 
         self.parent().parent().parent().save_config(self.variables, path)
         pprint.pprint(self.variables)
@@ -663,9 +655,7 @@ class Settings(QWidget):
         self.csp_lost.select(csp["cs_lost"])
 
         # FASTA Settings
-        print('applyFasta', fasta["applyFASTA"])
         self.apply_fasta_checkbox.setChecked(fasta["applyFASTA"])
-        print(self.apply_fasta_checkbox.checkBox.checkState())
         self.fasta_start.setValue(fasta["FASTAstart"])
 
         #PRE settings
@@ -834,8 +824,7 @@ class Interface(QWidget):
         layout = self.widget2.layout()
         colCount = layout.columnCount()
         valuesDict = self.variables["conditions"]
-        import pprint
-        pprint.pprint(valuesDict)
+
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
             if item:
@@ -897,7 +886,6 @@ if __name__ == '__main__':
     splash.show()
 
     screen_resolution = app.desktop().screenGeometry()
-    print(screen_resolution)
 
     from gui import gui_utils
     gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)

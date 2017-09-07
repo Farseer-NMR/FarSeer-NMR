@@ -72,7 +72,6 @@ settings_2k = {'peaklistarea_height': 640,
 font_weights = ["light", "normal", "medium", "semibold", "bold", "heavy", "black"]
 
 def deliver_settings(resolution):
-    print(resolution)
 
     if (resolution.height(), resolution.width()) == (1440, 2560):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_2k.qss')).read()

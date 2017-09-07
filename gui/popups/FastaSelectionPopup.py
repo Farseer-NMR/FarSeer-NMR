@@ -24,11 +24,10 @@ class FastaSelectionPopup(QDialog):
         label = QLabel("Y conditions", self)
         self.layout().addWidget(label)
         self.cond_widget_dict = {}
-        print(variables["fasta_files"])
 
         if variables:
             self.fasta_files = OrderedDict(sorted(variables["fasta_files"].items()))
-            self.get_values()
+            self.get_values(variables)
 
         self.buttonBox = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -39,9 +38,15 @@ class FastaSelectionPopup(QDialog):
         self.layout().addWidget(self.buttonBox)
 
 
-    def get_values(self):
-        for cond_name, fasta_path in self.fasta_files.items():
-            self.add_field(cond_name, fasta_path)
+    def get_values(self, variables):
+        if self.fasta_files:
+            for cond_name, fasta_path in self.fasta_files.items():
+                self.add_field(cond_name, fasta_path)
+        elif variables["conditions"]["y"]:
+            for cond in variables["conditions"]["y"]:
+                self.add_field(cond, '')
+
+
 
     def set_values(self, variables):
         for name, widget in self.cond_widget_dict.items():

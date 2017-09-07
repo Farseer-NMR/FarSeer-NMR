@@ -49,7 +49,7 @@ class CompactBarPopup(QDialog):
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 8, 0)
-        print(self.variables)
+
         if self.variables:
             self.get_values()
 

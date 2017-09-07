@@ -90,7 +90,6 @@ class PeakListArea(QWidget):
     def check_conditions_for_tree(self):
 
         self.valuesDict = self.variables["conditions"]
-        print(self.valuesDict)
         #
         # Check if condition boxes are empty and throw warning if so.
         if not all(x for v in self.valuesDict.values() for x in v):
@@ -179,7 +178,6 @@ class PeakListArea(QWidget):
                         pl_name = self.variables["experimental_dataset"][z][y][x]
                         pl = PeakListLabel(self, pl_name, self.scene,
                                            [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
-                        print(pl_name, 'plname')
                         self.peak_list_dict[z][y][x] = pl_name
                         self.sideBar().removeItem(pl_name)
 

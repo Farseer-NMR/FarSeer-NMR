@@ -21,11 +21,9 @@ class CSPExceptionsPopup(QDialog):
         self.setLayout(grid)
         self.variables = None
         self.alpha_value = self.parent().csp_alpha.field.value()
-        print('alpha', self.alpha_value)
         if variables:
             self.variables = variables["csp_settings"]["csp_res_exceptions"]
 
-            # self.user_variables = variables["user_mark_settings"]
         self.defaults = defaults["csp_settings"]["csp_res_exceptions"]
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):

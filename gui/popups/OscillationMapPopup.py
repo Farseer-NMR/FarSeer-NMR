@@ -87,7 +87,6 @@ class OscillationMapPopup(QDialog):
 
     def set_ranges(self, field_value):
         ll = field_value.split(',')
-        print(ll)
         return [[x.split('-')[0], x.split('-')[1]] for x in ll]
 
     def get_ranges(self, ranges):

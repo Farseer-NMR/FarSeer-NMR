@@ -71,12 +71,9 @@ class UserMarksPopup(QDialog):
         self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
         self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
         self.marker_rows += 1
-        # print(self.pairs)
-        print(self.marker_rows)
 
     def remove_row_to_popup(self, index, pop=True):
 
-        print(index, 'remove index number')
         self.marker_rows -= 1
         colCount = self.mainWidget.layout().columnCount()
         for m in range(0, colCount):
@@ -85,7 +82,7 @@ class UserMarksPopup(QDialog):
                 if item.widget():
                     item.widget().hide()
             self.mainWidget.layout().removeItem(item)
-        # if index in self.pairs:
+
         if pop:
             self.pairs.pop(index)
 
@@ -115,7 +112,6 @@ class UserMarksPopup(QDialog):
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
             self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
-            print(self.marker_rows, 'setvalsfromconfig')
 
 
     def set_defaults(self):
@@ -153,6 +149,4 @@ class UserMarksPopup(QDialog):
         user_colours = {pair[0].field.text(): pair[2].fields.currentText() for pair in self.pairs}
         variables["bar_plot_settings"]["user_marks_dict"] = user_dict
         variables["bar_plot_settings"]["user_bar_colors_dict"] = user_colours
-        import pprint
-        pprint.pprint(variables["bar_plot_settings"])
         self.accept()
