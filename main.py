@@ -810,7 +810,7 @@ class Interface(QWidget):
 
         self.showTreeButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
         self.widget3.layout().addWidget(self.peakListArea, 3, 0, 1, 2)
-        self.showTreeButton.clicked.connect(partial(self.peakListArea.updateTree, self.variables))
+        self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
         self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.h_splitter.addWidget(self.widget3)
         # self.widget2.setFixedWidth(1264)
@@ -825,6 +825,8 @@ class Interface(QWidget):
         layout = self.widget2.layout()
         colCount = layout.columnCount()
         valuesDict = self.variables["conditions"]
+        import pprint
+        pprint.pprint(valuesDict)
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
             if item:
@@ -832,15 +834,17 @@ class Interface(QWidget):
                     item.widget().hide()
             layout.removeItem(item)
         if len(valuesDict[dim]) < value:
-            [valuesDict[dim].append(0) for x in range(value-len(valuesDict[dim]))]
+            [valuesDict[dim].append('') for x in range(value-len(valuesDict[dim]))]
         if len(valuesDict[dim]) > value:
             valuesDict[dim] = valuesDict[dim][:value]
-            print(valuesDict[dim], 'valuesdict', dim)
+
         for x in range(value):
             text_box = ValueField(self, x, dim, valuesDict)
             text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-            text_box.setText(str(valuesDict[dim][x]))
+            if valuesDict[dim][x]:
+                text_box.setText(str(valuesDict[dim][x]))
+
             layout.addWidget(text_box, row, x+3, 1, 1)
 
 

@@ -21,9 +21,6 @@ class PeakListArea(QWidget):
         self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
         self.variables = variables
-        # self.valuesDict = self.variables["conditions"]
-        # self.peak_list_dict = self.variables["experimental_dataset"]
-        # self.fasta_files = self.variables["fasta_files"]
         self.setEvents()
         self.updateClicks = 0
 
@@ -41,7 +38,7 @@ class PeakListArea(QWidget):
 
     def update_variables(self, variables):
         self.variables = variables
-        self.updateTree(variables)
+        self.updateTree()
 
     def show_update_warning(self):
         msg = QMessageBox()
@@ -64,8 +61,20 @@ class PeakListArea(QWidget):
 
         retval = msg.exec_()
         return retval
+
+    def show_empty_condition__warning(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Empty conditions")
+        msg.setInformativeText("There are empty conditions, so dataset cannot be drawn.")
+        msg.setWindowTitle("Empty conditions")
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        retval = msg.exec_()
+        return retval
     #
     def update_experimental_dataset(self, valuesDict):
+
         tmp_dict = {}
         for z in valuesDict["z"]:
             tmp_dict[z] = {}
@@ -73,14 +82,19 @@ class PeakListArea(QWidget):
                 tmp_dict[z][y] = {}
                 for x in valuesDict["x"]:
                     tmp_dict[z][y][x] = ''
-                    if x in self.variables["experimental_dataset"][z][y].keys():
+                    if self.variables["experimental_dataset"][z][y].keys():
                         tmp_dict[z][y][x] = self.variables["experimental_dataset"][z][y][x]
         return tmp_dict
 
-    def updateTree(self, variables):
+    def updateTree(self):
 
         self.valuesDict = self.variables["conditions"]
-
+        print(self.valuesDict)
+        #
+        # Check if condition boxes are empty and throw warning if so.
+        if not all(x for v in self.valuesDict.values() for x in v):
+            self.show_empty_condition__warning()
+            return
 
         if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
             self.show_duplicate_key_warning('z')
@@ -93,13 +107,13 @@ class PeakListArea(QWidget):
         if len(set(self.valuesDict['x'])) != len(self.valuesDict['x']):
             self.show_duplicate_key_warning('x')
             return
+        #
+        # self.variables["experimental_dataset"] = self.update_experimental_dataset(self.valuesDict)
 
-        self.variables["experimental_dataset"] = self.update_experimental_dataset(self.valuesDict)
 
 
-
-        self.peak_list_dict = self.variables["experimental_dataset"]
-        self.fasta_files = self.variables["fasta_files"]
+        # self.peak_list_dict = self.variables["experimental_dataset"]
+        # self.fasta_files = self.variables["fasta_files"]
         if self.updateClicks > 0:
             self.show_update_warning()
         self.peak_list_objects = []
@@ -146,16 +160,16 @@ class PeakListArea(QWidget):
                 for k, x in enumerate(x_conds):
                     xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                     self.scene.addItem(xx)
-                    if not z in self.variables["experimental_dataset"].keys() or not self.variables["experimental_dataset"][z][y][x]:
-                        pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
-                                       [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
-                        self.peak_list_dict[z][y][x] = ''
-                    else:
-                        pl_name = self.variables["experimental_dataset"][z][y][x]
-                        pl = PeakListLabel(self, pl_name, self.scene,
-                                           [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
-                        self.peak_list_dict[z][y][x] = pl_name
-                        self.sideBar().removeItem(pl_name)
+                    # if not z in self.variables["experimental_dataset"].keys() or not self.variables["experimental_dataset"][z][y][x]:
+                    pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
+                                   [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
+                    self.peak_list_dict[z][y][x] = ''
+                    # else:
+                    #     pl_name = self.variables["experimental_dataset"][z][y][x]
+                    #     pl = PeakListLabel(self, pl_name, self.scene,
+                    #                        [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
+                    #     self.peak_list_dict[z][y][x] = pl_name
+                    #     self.sideBar().removeItem(pl_name)
 
                     self.peak_list_objects.append(pl)
                     self.scene.addItem(pl)
@@ -182,8 +196,8 @@ class PeakListArea(QWidget):
                 self._addConnectingLine(zz, x_marker)
 
         self.updateClicks += 1
-        self.variables["fasta_files"] = self.fasta_files
-        self.variables["experimental_dataset"] = self.peak_list_dict
+        # self.variables["fasta_files"] = self.fasta_files
+        # self.variables["experimental_dataset"] = self.peak_list_dict
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():
