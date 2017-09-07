@@ -165,16 +165,23 @@ class PeakListArea(QWidget):
                 for k, x in enumerate(x_conds):
                     xx = ConditionLabel(str(x), [xx_pos, xx_vertical])
                     self.scene.addItem(xx)
-                    # if not z in self.variables["experimental_dataset"].keys() or not self.variables["experimental_dataset"][z][y][x]:
-                    pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
-                                   [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
-                    self.peak_list_dict[z][y][x] = ''
-                    # else:
-                    #     pl_name = self.variables["experimental_dataset"][z][y][x]
-                    #     pl = PeakListLabel(self, pl_name, self.scene,
-                    #                        [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
-                    #     self.peak_list_dict[z][y][x] = pl_name
-                    #     self.sideBar().removeItem(pl_name)
+                    if not z in self.variables["experimental_dataset"].keys() or not y in self.variables["experimental_dataset"][z].keys() \
+                            or not x in self.variables["experimental_dataset"][z][y].keys():
+                        pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
+                                       [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
+                        self.peak_list_dict[z][y][x] = ''
+
+                    elif not self.variables["experimental_dataset"][z][y][x]:
+                        pl = PeakListLabel(self, 'Drop peaklist here', self.scene,
+                                           [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z)
+                        self.peak_list_dict[z][y][x] = ''
+                    else:
+                        pl_name = self.variables["experimental_dataset"][z][y][x]
+                        pl = PeakListLabel(self, pl_name, self.scene,
+                                           [pl_pos, xx_vertical], x_cond=x, y_cond=y, z_cond=z, peak_list=pl_name)
+                        print(pl_name, 'plname')
+                        self.peak_list_dict[z][y][x] = pl_name
+                        self.sideBar().removeItem(pl_name)
 
                     self.peak_list_objects.append(pl)
                     self.scene.addItem(pl)

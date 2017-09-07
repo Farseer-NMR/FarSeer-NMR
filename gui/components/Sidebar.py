@@ -38,10 +38,13 @@ class SideBar(QTreeWidget):
             for z in self.variables["conditions"]["z"]:
                 for y in self.variables["conditions"]["y"]:
                     for x in self.variables["conditions"]["x"]:
-                        if exp_set_is_valid(self.variables):
-                            used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
+                        print('vars', self.variables["experimental_dataset"][z][y][x])
+                        # if exp_set_is_valid(self.variables):
+                        #     print(self.variables["experimental_dataset"][z][y][x])
+                        used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
+
             unused_peaklists = [x for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
-            print(unused_peaklists)
+            print('ununsed\n\n', unused_peaklists, '\n\n', 'used\n\n', used_peaklists)
 
             for peaklist in unused_peaklists:
                 self.addItem(peaklist)
@@ -124,6 +127,6 @@ class SideBar(QTreeWidget):
 
     def removeItem(self, item_name):
         import sip
-        result = self.findItems(item_name, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive, 0)
+        result = self.findItems(item_name, QtCore.Qt.MatchRecursive, 0)
         if result:
             sip.delete(result[0])
