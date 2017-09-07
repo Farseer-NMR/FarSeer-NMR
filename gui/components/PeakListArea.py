@@ -86,7 +86,8 @@ class PeakListArea(QWidget):
                         tmp_dict[z][y][x] = self.variables["experimental_dataset"][z][y][x]
         return tmp_dict
 
-    def updateTree(self):
+
+    def check_conditions_for_tree(self):
 
         self.valuesDict = self.variables["conditions"]
         print(self.valuesDict)
@@ -94,28 +95,33 @@ class PeakListArea(QWidget):
         # Check if condition boxes are empty and throw warning if so.
         if not all(x for v in self.valuesDict.values() for x in v):
             self.show_empty_condition__warning()
-            return
+            return False
 
         if len(set(self.valuesDict['z'])) != len(self.valuesDict['z']):
             self.show_duplicate_key_warning('z')
-            return
+            return False
 
         if len(set(self.valuesDict['y'])) != len(self.valuesDict['y']):
             self.show_duplicate_key_warning('y')
-            return
+            return False
 
         if len(set(self.valuesDict['x'])) != len(self.valuesDict['x']):
             self.show_duplicate_key_warning('x')
+            return False
+
+        return True
+
+
+    def updateTree(self):
+
+
+        if not self.check_conditions_for_tree():
             return
-        #
-        # self.variables["experimental_dataset"] = self.update_experimental_dataset(self.valuesDict)
 
-
-
-        # self.peak_list_dict = self.variables["experimental_dataset"]
-        # self.fasta_files = self.variables["fasta_files"]
         if self.updateClicks > 0:
             self.show_update_warning()
+
+
         self.peak_list_objects = []
         self.fasta_files = {}
         self.peak_list_dict = {}
@@ -148,7 +154,6 @@ class PeakListArea(QWidget):
         pl_pos = self.scene.width()*0.75
         xx_vertical = x_spacing
         num = 0
-
 
         for i, z in enumerate(z_conds):
             self.peak_list_dict[z] = {}
@@ -197,7 +202,7 @@ class PeakListArea(QWidget):
 
         self.updateClicks += 1
         # self.variables["fasta_files"] = self.fasta_files
-        # self.variables["experimental_dataset"] = self.peak_list_dict
+        self.variables["experimental_dataset"] = self.peak_list_dict
 
     def _addConnectingLine(self, atom1, atom2):
         if atom1.y() > atom2.y():

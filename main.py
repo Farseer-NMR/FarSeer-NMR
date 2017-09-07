@@ -483,8 +483,15 @@ class Settings(QWidget):
             self.heat_map_checkbox.setEnabled(False)
 
     def set_spectrum_path_text(self, path=None):
-        self.spectrum_path.setText(path)
-        self.parent().parent().parent().load_peak_lists(path)
+        if path != self.variables["general_settings"]["spectra_path"]:
+            print('path changed from %s to %s' % (self.variables["general_settings"]["spectra_path"], path))
+            self.spectrum_path.setText(path)
+            self.variables["general_settings"]["spectra_path"] = path
+            self.parent().parent().parent().load_peak_lists(path)
+        else:
+            return
+
+
 
     def set_output_path_text(self, path=None):
         self.output_path.setText(path)
@@ -718,11 +725,9 @@ class Interface(QWidget):
         self.widget2.setObjectName("InterfaceTop")
         self.gui_settings = gui_settings
 
-        # self.setStyleSheet('.QWidget { border: 1px solid red; margin-top: 0;}')
-
-        print(self.sideBar)
 
     def load_variables(self, variables):
+
         self.variables = variables
 
         self.update_condition_boxes(3, 'x', len(self.variables["conditions"]["x"]))

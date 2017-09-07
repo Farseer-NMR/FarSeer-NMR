@@ -25,13 +25,19 @@ class SideBar(QTreeWidget):
         self.clear()
         self.variables = variables
         used_peaklists = []
-        for z in self.variables["conditions"]["z"]:
-            for y in self.variables["conditions"]["y"]:
-                for x in self.variables["conditions"]["x"]:
-                        used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
-        unused_peaklists = [pl for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
-        for peaklist in unused_peaklists:
-            self.load_peaklist(peaklist)
+
+        if not all(x for v in self.variables["conditions"].values() for x in v):
+            self.refresh_sidebar()
+
+        else:
+            for z in self.variables["conditions"]["z"]:
+                for y in self.variables["conditions"]["y"]:
+                    for x in self.variables["conditions"]["x"]:
+                            used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
+            unused_peaklists = [pl for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
+
+            for peaklist in unused_peaklists:
+                self.load_peaklist(peaklist)
 
 
 
@@ -75,26 +81,27 @@ class SideBar(QTreeWidget):
             self.addItem(peaklist)
 
     def load_peaklist(self, filePath):
+
         if os.path.isdir(filePath):
             return
-        peaklist = read_peaklist(filePath)
 
-        if peaklist:
-            name = filePath.split('/')[-1].split('.')[0]
-            if not name in self.peakLists.keys():
+        name = filePath.split('/')[-1].split('.')[0]
+
+        if not name in self.peakLists.keys():
+            peaklist = read_peaklist(filePath)
+            if peaklist:
                 pl_name = name
+
+
+                item = self.addItem(pl_name)
+                self.peakLists[item.text(0)] = peaklist
+                self.variables["peaklists"][pl_name] = filePath
+                return pl_name, filePath
             else:
-                if any([name+'_' in x for x in self.peakLists.keys()]):
-                    number = int(self.peakLists.keys()[-1].split('_')[1])+1
-                    pl_name = name+'_%s' % number
-                else:
-                    pl_name = name + '_1'
-            item = self.addItem(pl_name)
-            self.peakLists[item.text(0)] = peaklist
-            self.variables["peaklists"][pl_name] = filePath
-            return pl_name, filePath
+                print("Invalid peak list file: %s" % filePath)
+                return None, None
         else:
-            print("Invalid peak list file: %s" % filePath)
+            print('Peaklist with name %s already exists.' % name)
             return None, None
 
     def addItem(self, name):
