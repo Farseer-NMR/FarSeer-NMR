@@ -111,7 +111,7 @@ class TabWidget(QTabWidget):
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
                     print(self.interface.sideBar.peakLists)
-                    #variables["peaklists"] = self.interface.sideBar.peakLists
+                    variables["peaklists"] = self.interface.sideBar.peakLists
                     #self.variables["peaklists"] = self.interface.sideBar.peakLists
                     json.dump(variables, outfile, indent=4)
                     self.config_file = fname[0]
