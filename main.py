@@ -110,6 +110,8 @@ class TabWidget(QTabWidget):
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
+                    print(self.interface.sideBar.peakLists)
+                    #variables["peaklists"] = self.interface.sideBar.peakLists
                     #self.variables["peaklists"] = self.interface.sideBar.peakLists
                     json.dump(variables, outfile, indent=4)
                     self.config_file = fname[0]
@@ -623,7 +625,7 @@ class Settings(QWidget):
         plots_f2 = self.variables["PosF2_settings"]
         plots_height = self.variables["Height_ratio_settings"]
         plots_volume = self.variables["Volume_ratio_settings"]
-
+        
 
         # General Settings
         if os.path.exists(general["spectra_path"]):
@@ -707,7 +709,9 @@ class Settings(QWidget):
         self.scatter_flower_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter_flower"])
         self.heat_map_checkbox.setChecked(self.variables["plotting_flags"]["do_heat_map"])
         self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_pre_osci"])
-
+    
+        # peaklists from loaded config
+        #self.variables[] = self.variables["peaklists"]
 
     def show_popup(self, popup, variables):
         p = popup(self, variables=self.variables)
