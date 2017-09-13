@@ -84,6 +84,7 @@ class TabWidget(QTabWidget):
                 self.settings.spectrum_path.field.setText('')
                 self.variables = variables
                 self.load_variables(variables)
+                print(self.variables["peaklists"], "peaklists")
                 return variables
         return None
 
@@ -97,12 +98,13 @@ class TabWidget(QTabWidget):
 
 
     def load_peak_lists(self, path=None):
+        print('load')
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
             self.interface.sideBar.update_from_config(self.variables)
 
     def save_config(self, variables, path=None):
-
+        print(variables["peaklists"], 'saving')
         if not path:
             fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
         else:
@@ -111,7 +113,9 @@ class TabWidget(QTabWidget):
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
                     print(self.interface.sideBar.peakLists)
-                    variables["peaklists"] = self.interface.sideBar.peakLists
+                    if not variables["peaklists"]:
+                        variables["peaklists"] = self.interface.sideBar.peakLists
+                    
                     #self.variables["peaklists"] = self.interface.sideBar.peakLists
                     json.dump(variables, outfile, indent=4)
                     self.config_file = fname[0]
