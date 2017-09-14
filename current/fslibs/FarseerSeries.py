@@ -1437,7 +1437,8 @@ recipient: residues
                      titration_x_values=None,
                      vspace='',
                      rows_page='',
-                     cols_page=''
+                     cols_page='',
+                     perform_resevo_fitting=''
                      ):
         """
         Plots the evolution of a restraint along the series of a residue.
@@ -1733,7 +1734,8 @@ recipient: residues
                      hide_lost=False,
                      titration_x_values='',
                      rows_page='',
-                     cols_page=''
+                     cols_page='',
+                     perform_resevo_fitting=''
                         ):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
@@ -1946,7 +1948,8 @@ recipient: residues
                              color_list=[],
                              mk_start_color="#ff0000",
                              mk_end_color='#30ff00',
-                             titration_x_values=''):
+                             titration_x_values='',
+                             perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         for all the residues in a single plot.
