@@ -726,13 +726,15 @@ def correct_shifts(exp, fsuv, resonance_type='Backbone'):
     """
     
     if resonance_type == 'Backbone':
-        exp.correct_shifts_backbone(fsuv.cs_correction_res_ref)
+        exp.correct_shifts_backbone(\
+            fsuv["cs_settings"]["cs_correction_res_ref"])
     
     elif resonance_type=='Sidechains':
         exp.correct_shifts_sidechains()
     
     else:
-        logs('Choose a valid <resonance_type> argument.', fsuv["general_settings"]["logfile_name"])
+        logs('Choose a valid <resonance_type> argument.',
+             fsuv["general_settings"]["logfile_name"])
     
     return
 
