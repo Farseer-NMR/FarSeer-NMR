@@ -19,8 +19,8 @@ class GeneralResidueEvolution(QDialog):
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
         self.variables = None
-        self.default_do_revo_fit_setting = defaults["fitting_settings"]["perform_resevo_fitting"]
-        self.variable_do_revo_fit_setting = variables["fitting_settings"]["perform_resevo_fitting"]
+        #self.default_do_revo_fit_setting = defaults["fitting_settings"]["perform_resevo_fitting"]
+        #self.variable_do_revo_fit_setting = variables["fitting_settings"]["perform_resevo_fitting"]
         if variables:
             self.variables = variables["revo_settings"]
         self.default = defaults["revo_settings"]
@@ -93,7 +93,7 @@ class GeneralResidueEvolution(QDialog):
             self.get_values()
 
     def get_defaults(self):
-        self.do_revo_fit.checkBox.setChecked(self.default_do_revo_fit_setting)
+        self.do_revo_fit.checkBox.setChecked(self.default["perform_resevo_fitting"])
         self.revo_subtitle_fn.select(self.default["revo_subtitle_fn"])
         self.revo_subtitle_fs.setValue(self.default["revo_subtitle_fs"])
         self.revo_subtitle_pad.setValue(self.default["revo_subtitle_pad"])
@@ -122,7 +122,7 @@ class GeneralResidueEvolution(QDialog):
 
 
     def set_values(self, variables):
-        self.variable_do_revo_fit_setting = self.do_revo_fit.checkBox.isChecked()
+        self.variables["perform_resevo_fitting"] = self.do_revo_fit.checkBox.isChecked()
         self.variables["subtitle_fn"] = str(self.revo_subtitle_fn.fields.currentText())
         self.variables["subtitle_fs"] = self.revo_subtitle_fs.field.value()
         self.variables["subtitle_pad"] = self.revo_subtitle_pad.field.value()
@@ -151,7 +151,7 @@ class GeneralResidueEvolution(QDialog):
         self.accept()
 
     def get_values(self):
-        self.do_revo_fit.setChecked(self.variable_do_revo_fit_setting)
+        self.do_revo_fit.setChecked(self.variables["perform_resevo_fitting"])
         self.revo_subtitle_fn.select(self.variables["subtitle_fn"])
         self.revo_subtitle_fs.setValue(self.variables["subtitle_fs"])
         self.revo_subtitle_pad.setValue(self.variables["subtitle_pad"])
