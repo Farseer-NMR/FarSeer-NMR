@@ -955,12 +955,8 @@ recipient: residues
         if plot_style == 'bar_extended' and self.resonance_type == 'Backbone':
             # fillna(0) is added because nan conflicts with text_maker()
             # in bar.get_height() which return nan
-            # xaxis = self.loc[experiment,:,'Res#'].astype(int)
-            xaxis = np.arange(start=1,
-                              stop=self.loc[experiment,:,'Res#'].size+1,
-                              step=1)
             
-            bars = axs[i].bar(xaxis,
+            bars = axs[i].bar(self.major_axis,
                               self.loc[experiment,:,calccol].fillna(0),
                               width=bar_width,
                               align='center',
@@ -976,21 +972,13 @@ recipient: residues
             else:
                 xtick_spacing = 1
             
-            
-            #startick = float(self.loc[experiment,:,'Res#'].head(1))
-            #endtick = startick + self.loc[experiment,:,'Res#'].size
-            #tickspos = np.arange(\
-                        #start=startick,
-                        #stop=endtick,
-                        #step=xtick_spacing)
-            
             ticklabels = self.loc[experiment,\
                                   0::xtick_spacing,\
                                   ['Res#','1-letter']].\
                             apply(lambda x: ''.join(x), axis=1)
             
             # Configure XX ticks and Label
-            axs[i].set_xticks(xaxis)
+            axs[i].set_xticks(self.major_axis)
         
             ## https://github.com/matplotlib/matplotlib/issues/6266
             axs[i].set_xticklabels(ticklabels,
@@ -1259,7 +1247,7 @@ recipient: residues
         # fillna(0) is added because nan conflicts with text_maker()
         # .iloc[::-1]
         # in bat.get_height() which return nan
-        bars = axs[i].barh(self.loc[experiment,:,'Res#'].astype(float),
+        bars = axs[i].barh(self.major_axis,
                            self.loc[experiment,:,calccol].fillna(0),
                            height=bar_width,
                            align='center',
@@ -1287,10 +1275,7 @@ recipient: residues
         else:
             xtick_spacing = 1
         
-        axs[i].set_yticks(\
-            np.arange(float(self.loc[experiment,:,'Res#'].head(1)),
-                      float(self.loc[experiment,:,'Res#'].tail(1))+1,
-                      xtick_spacing))
+        axs[i].set_yticks(self.major_axis)
     
         # https://github.com/matplotlib/matplotlib/issues/6266
         axs[i].set_yticklabels(\
