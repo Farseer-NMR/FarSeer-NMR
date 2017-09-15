@@ -237,14 +237,14 @@ class Settings(QWidget):
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
-        self.fasta_start = LabelledSpinBox(self, "Fasta start")
+        self.fasta_start = LabelledSpinBox(self, "Fasta start", step=1)
 
         self.expand_lost_yy = LabelledCheckbox(self, "Analyse Lost Y Residues?")
         self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
 
-        self.figure_width = LabelledDoubleSpinBox(self, "Figure Width", min=0, max=100, step=1)
-        self.figure_height = LabelledDoubleSpinBox(self, "Figure Height", min=0, max=100, step=1)
-        self.figure_dpi = LabelledDoubleSpinBox(self, "Figure DPI", min=0, max=10000, step=10)
+        self.figure_width = LabelledDoubleSpinBox(self, "Figure Width", min=0.1, max=100, step=0.1)
+        self.figure_height = LabelledDoubleSpinBox(self, "Figure Height", min=0.1, max=100, step=0.1)
+        self.figure_dpi = LabelledSpinBox(self, "Figure DPI", min=0, max=10000, step=10)
         self.figure_format = LabelledCombobox(self, "Figure Format", items=['pdf', 'png', 'ps', 'svg'])
 
         sidechains_groupbox = QGroupBox()
@@ -311,7 +311,7 @@ class Settings(QWidget):
         cs_groupbox_layout = QVBoxLayout()
         cs_groupbox.setLayout(cs_groupbox_layout)
 
-        self.csp_alpha = LabelledDoubleSpinBox(self, text="CSP Alpha", min=0, max=1, step=0.01)
+        self.csp_alpha = LabelledDoubleSpinBox(self, text="CSP Alpha", min=0.01, max=1, step=0.01)
         self.csp_lost = LabelledCombobox(self, text="Show Lost Residues", items=['prev', 'full', 'zero'])
         self.csp_exceptions = QPushButton("Alpha by residue", self)
         self.csp_exceptions.clicked.connect(partial(self.show_popup, CSPExceptionsPopup, self.variables))

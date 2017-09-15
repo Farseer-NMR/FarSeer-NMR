@@ -18,8 +18,8 @@ class VerticalBarPopup(QDialog):
             self.variables = variables["vert_bar_settings"]
         self.defaults = defaults["vert_bar_settings"]
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page")
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page")
+        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
+        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)

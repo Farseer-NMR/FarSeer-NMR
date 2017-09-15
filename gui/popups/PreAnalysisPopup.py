@@ -23,8 +23,8 @@ class PreAnalysisPopup(QDialog):
             self.variables = variables["pre_settings"]
         self.default = defaults["pre_settings"]
 
-        self.gaussian_stdev = LabelledDoubleSpinBox(self, "Gaussian Stdev")
-        self.gauss_x_size = LabelledDoubleSpinBox(self, "Gaussian X Size")
+        self.gaussian_stdev = LabelledSpinBox(self, "Gaussian Stdev", min=1, step=1)
+        self.gauss_x_size = LabelledSpinBox(self, "Gaussian X Size", min=1, step=1)
 
         self.layout().addWidget(self.gauss_x_size, 0, 0)
         self.layout().addWidget(self.gaussian_stdev, 1, 0)
