@@ -16,7 +16,7 @@ class SeriesPlotPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
         super(SeriesPlotPopup, self).__init__(parent)
-        self.setWindowTitle("Titration Plot Settings")
+        self.setWindowTitle("Series General Plot Settings")
         grid = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(grid)
@@ -31,8 +31,8 @@ class SeriesPlotPopup(QDialog):
         self.tplot_subtitle_groupbox.setTitle("Subtitle Settings")
 
         self.tplot_subtitle_fn = FontComboBox(self, "Subtitle Font")
-        self.tplot_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size")
-        self.tplot_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding")
+        self.tplot_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size", min=0, step=1)
+        self.tplot_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding", min=-100, max=100, step=0.1)
         self.tplot_subtitle_weight = LabelledCombobox(self, text="Subtitle Font Weight", items=font_weights)
 
         self.tplot_x_label_groupbox = QGroupBox()
@@ -41,8 +41,8 @@ class SeriesPlotPopup(QDialog):
         self.tplot_x_label_groupbox.setTitle("X Label Settings")
 
         self.tplot_x_label_fn = FontComboBox(self, "X Font Label")
-        self.tplot_x_label_fs = LabelledSpinBox(self, "X Label Font Size")
-        self.tplot_x_label_pad = LabelledSpinBox(self, "X Label Padding")
+        self.tplot_x_label_fs = LabelledSpinBox(self, "X Label Font Size", min=0, step=1)
+        self.tplot_x_label_pad = LabelledDoubleSpinBox(self, "X Label Padding", min=-100, max=100, step=0.1)
         self.tplot_x_label_weight = LabelledCombobox(self, text="X Label Font Weight", items=font_weights)
 
         self.tplot_y_label_groupbox = QGroupBox()
@@ -56,25 +56,25 @@ class SeriesPlotPopup(QDialog):
         self.tplot_y_tick_groupbox.setTitle("Tick Settings")
 
         self.tplot_y_label_fn = FontComboBox(self, "Y Label Font")
-        self.tplot_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
-        self.tplot_y_label_pad = LabelledSpinBox(self, "Y Label Padding")
+        self.tplot_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", min=0, step=1)
+        self.tplot_y_label_pad = LabelledDoubleSpinBox(self, "Y Label Padding", min=-100, max=100, step=0.1)
         self.tplot_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
 
-        self.tplot_x_ticks_pad = LabelledSpinBox(self, "X Tick Padding")
-        self.tplot_x_ticks_len = LabelledSpinBox(self, "X Tick Length")
+        self.tplot_x_ticks_pad = LabelledDoubleSpinBox(self, "X Tick Padding", min=-100, max=100, step=0.1)
+        self.tplot_x_ticks_len = LabelledDoubleSpinBox(self, "X Tick Length", min=0, max=100, step=0.1)
 
         self.tplot_y_ticks_fn = FontComboBox(self, "Y Tick Font")
-        self.tplot_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size")
-        self.tplot_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation")
-        self.tplot_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding")
+        self.tplot_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size", min=0, step=1)
+        self.tplot_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation", min=0, max=360, step=1)
+        self.tplot_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding", min=-100, max=100, step=0.1)
         self.tplot_y_ticks_weight = LabelledCombobox(self, text="Y Tick Font Weight", items=font_weights)
-        self.tplot_y_ticks_len = LabelledDoubleSpinBox(self, "Y Tick Length")
+        self.tplot_y_ticks_len = LabelledDoubleSpinBox(self, "Y Tick Length", min=0, max=100, step=0.1)
         self.tplot_y_grid_flag = LabelledCheckbox(self, "Show Y Grid")
         self.tplot_y_grid_color = ColourBox(self, "Y Grid Colour")
         self.tplot_y_grid_linestyle = LabelledCombobox(self, text="Y Grid Line Style", items=['-', '--', '-.', ':'])
         self.tplot_y_grid_linewidth = LabelledDoubleSpinBox(self, "Y Grid Line Width")
-        self.tplot_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Alpha", min=0, max=1, step=0.1)
-        self.tplot_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing")
+        self.tplot_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Transparency", min=0, max=1, step=0.1)
+        self.tplot_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing", min=-100, max=100, step=0.1)
 
         self.theo_pre_groupbox = QGroupBox()
         self.theo_pre_groupbox_layout = QVBoxLayout()

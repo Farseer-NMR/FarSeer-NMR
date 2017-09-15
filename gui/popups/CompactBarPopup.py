@@ -22,14 +22,14 @@ class CompactBarPopup(QDialog):
             self.variables = variables["compact_bar_settings"]
         self.defaults = defaults["compact_bar_settings"]
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page")
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page")
+        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
+        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
         self.x_tick_font = FontComboBox(self, "X Tick Font")
-        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size")
-        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation")
+        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size", min=0, step=1)
+        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation", min=0, max=360, step=1)
         self.x_tick_weight = LabelledCombobox(self, "X Tick Font Weight", items=font_weights)
         self.shade_unassigned_checkbox = LabelledCheckbox(self, "Shade Unassigned?")
-        self.unassigned_shade_alpha = LabelledDoubleSpinBox(self, "Unassigned Shade Alpha")
+        self.unassigned_shade_alpha = LabelledDoubleSpinBox(self, "Unassigned Shade Transparency", min=0, max=1, step=0.1)
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)

@@ -2,6 +2,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
+from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
@@ -20,21 +21,21 @@ class ResidueEvolutionPopup(QDialog):
             self.variables = variables["res_evo_settings"]
         self.default = defaults["res_evo_settings"]
 
-        self.res_evo_cols = LabelledSpinBox(self, text="Columns Per Page")
-        self.res_evo_rows = LabelledSpinBox(self, text="Rows Per Page")
+        self.res_evo_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
+        self.res_evo_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
         self.res_evo_set_x_values = LabelledCheckbox(self, "Use User Defined X Values?")
-        self.res_evo_x_ticks_nbins = LabelledSpinBox(self, text="Number of Ticks")
+        self.res_evo_x_ticks_nbins = LabelledSpinBox(self, text="Number of Ticks", min=1, step=1)
         self.res_evo_x_label = LabelledLineEdit(self, text="X Label")
         self.res_evo_plot_line_style = LabelledCombobox(self, text="Plot Line Style", items=['-', '--', '-.', ':'])
-        self.res_evo_plot_line_width = LabelledSpinBox(self, 'Line Width')
+        self.res_evo_plot_line_width = LabelledSpinBox(self, 'Line Width', min=0, step=1)
         self.res_evo_line_color = ColourBox(self, text='Marker Colour')
         self.res_evo_plot_marker_style = LabelledCombobox(self, text="Plot Line Style", items=['-', '--', '-.', ':', 'o'])
-        self.res_evo_plot_marker_size = LabelledSpinBox(self, 'Marker Size')
+        self.res_evo_plot_marker_size = LabelledSpinBox(self, 'Marker Size', min=0, step=1)
         self.res_evo_plot_fill_between = LabelledCheckbox(self, text="Draw Data Shade")
         self.res_evo_plot_fill_colour = ColourBox(self, text="Shade Colour")
-        self.res_evo_fill_alpha = LabelledSpinBox(self, text="Shade Transparency", min=0, max=1, step=0.1)
+        self.res_evo_fill_alpha = LabelledDoubleSpinBox(self, text="Shade Transparency", min=0, max=1, step=0.1)
         self.res_evo_fit_line_colour = ColourBox(self, text="Fit Line Colour")
-        self.res_evo_fit_line_width = LabelledSpinBox(self, text="Fit Line Width")
+        self.res_evo_fit_line_width = LabelledSpinBox(self, text="Fit Line Width", min=0, step=1)
         self.res_evo_fit_line_style = LabelledCombobox(self, text="Fit Line Style", items=['-', '--', '-.', ':', 'o'])
 
         self.layout().addWidget(self.res_evo_cols, 0, 0)
