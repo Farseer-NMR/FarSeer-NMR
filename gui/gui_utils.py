@@ -1,28 +1,42 @@
 from collections import OrderedDict
 import os
 import json
+from matplotlib import colors as mcolors
 GUI_DIR = os.path.dirname(__file__)
 
 defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'current', 'default_config.json'), 'r'))
 
 line_styles = ['-', '--', '-.', ':', 'o']
 
-colours = OrderedDict([('#ff0000','red'),
-                       ('#8b0000','dark red'),
-                       ('#00ffff', 'cyan'),
-                       ('#ff8000', 'orange'),
-                       ('#0080ff', 'manganese blue'),
-                       ('#ffff00', 'yellow'),
-                       ('#0000ff', 'blue'),
-                       ('#80ff00', 'chartreuse'),
-                       ('#8000ff', 'purple'),
-                       ('#00ff00', 'green'),
-                       ('#ff00ff', 'magenta'),
-                       ('#00ff80', 'spring green'),
-                       ('#ff0080', 'deep pink'),
-                       ('#e7e7e7', 'light grey'),
-                       ('#999999', 'grey'),
-                       ('#000000', 'black')])
+## https://matplotlib.org/examples/color/named_colors.html
+matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
+
+colours = OrderedDict(sorted(matplt_colours_dict.items(),
+                             key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
+
+keylist = list(colours.keys())
+
+for key in keylist:
+    if len(key) == 1:
+        colours.pop(key, None)
+
+
+#colours = OrderedDict([('#ff0000','red'),
+                       #('#8b0000','dark red'),
+                       #('#00ffff', 'cyan'),
+                       #('#ff8000', 'orange'),
+                       #('#0080ff', 'manganese blue'),
+                       #('#ffff00', 'yellow'),
+                       #('#0000ff', 'blue'),
+                       #('#80ff00', 'chartreuse'),
+                       #('#8000ff', 'purple'),
+                       #('#00ff00', 'green'),
+                       #('#ff00ff', 'magenta'),
+                       #('#00ff80', 'spring green'),
+                       #('#ff0080', 'deep pink'),
+                       #('#e7e7e7', 'light grey'),
+                       #('#999999', 'grey'),
+                       #('#000000', 'black')])
 
 
 settings_1280x800 = {'peaklistarea_height': 350,

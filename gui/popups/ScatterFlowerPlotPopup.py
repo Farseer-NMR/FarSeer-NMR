@@ -29,8 +29,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_y_label = LabelledLineEdit(self, "Y Label")
         self.cs_scatter_flower_mksize = LabelledSpinBox(self, "Mark Size", min=0, step=1)
         self.cs_scatter_flower_color_grad = LabelledCheckbox(self, "Colour Gradient")
-        self.cs_scatter_flower_color_start = LabelledLineEdit(self, text="Mark Start Colour (hex)")
-        self.cs_scatter_flower_color_end = LabelledLineEdit(self, text="Mark End Colour (hex)")
+        self.cs_scatter_flower_color_start = ColourBox(self, text="Mark Start Colour")
+        self.cs_scatter_flower_color_end = ColourBox(self, text="Mark End Colour")
         self.cs_scatter_flower_color_list = LabelledLineEdit(self, "Colour List")
 
         self.cs_scatter_flower_x_label_fn = FontComboBox(self, "X Label Font")
@@ -101,8 +101,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_y_label.field.setText(self.default["y_label"])
         self.cs_scatter_flower_mksize.setValue(self.default["mksize"])
         self.cs_scatter_flower_color_grad.setChecked(self.default["color_grad"])
-        self.cs_scatter_flower_color_start.field.setText(self.default["mk_start_color"])
-        self.cs_scatter_flower_color_end.field.setText(self.default["mk_end_color"])
+        self.cs_scatter_flower_color_start.select(self.default["mk_start_color"])
+        self.cs_scatter_flower_color_end.select(self.default["mk_end_color"])
         self.cs_scatter_flower_color_list.field.setText(', '.join(self.default["color_list"]))
 
         self.cs_scatter_flower_x_label_fn.select(self.default["x_label_fn"])
@@ -133,8 +133,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.variables["y_label"] = self.cs_scatter_flower_y_label.field.text()
         self.variables["mksize"] = self.cs_scatter_flower_mksize.field.value()
         self.variables["color_grad"] = self.cs_scatter_flower_color_grad.checkBox.isChecked()
-        self.variables["mk_start_color"] = self.cs_scatter_flower_color_start.field.text()
-        self.variables["mk_end_color"] = self.cs_scatter_flower_color_end.field.text()
+        self.variables["mk_start_color"] = self.cs_scatter_flower_color_start.fields.currentText()
+        self.variables["mk_end_color"] = self.cs_scatter_flower_color_end.fields.currentText()
 
         self.variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
         self.variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()
@@ -173,8 +173,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_y_label.field.setText(self.variables["y_label"])
         self.cs_scatter_flower_mksize.setValue(self.variables["mksize"])
         self.cs_scatter_flower_color_grad.setChecked(self.variables["color_grad"])
-        self.cs_scatter_flower_color_start.field.setText(self.variables["mk_start_color"])
-        self.cs_scatter_flower_color_end.field.setText(self.variables["mk_end_color"])
+        self.cs_scatter_flower_color_start.select(self.variables["mk_start_color"])
+        self.cs_scatter_flower_color_end.select(self.variables["mk_end_color"])
         self.cs_scatter_flower_color_list.field.setText(', '.join(self.variables["color_list"]))
 
         self.cs_scatter_flower_x_label_fn.select(self.variables["x_label_fn"])
