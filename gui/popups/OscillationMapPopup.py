@@ -87,10 +87,10 @@ class OscillationMapPopup(QDialog):
 
     def set_ranges(self, field_value):
         ll = field_value.split(',')
-        return [[x.split('-')[0], x.split('-')[1]] for x in ll]
+        return [[int(x.split('-')[0]), int(x.split('-')[1])] for x in ll]
 
     def get_ranges(self, ranges):
-        return ', '.join(["%s-%s" % (x[0], x[1]) for x in ranges])
+        return ','.join(["%s-%s" % (x[0], x[1]) for x in ranges])
 
     def get_defaults(self):
         self.dpre_osci_rows.setValue(self.default["rows"])
@@ -110,8 +110,8 @@ class OscillationMapPopup(QDialog):
         self.dpre_osci_grid_color.select(self.default["grid_color"])
         self.dpre_osci_shade.setChecked(self.default["shade"])
         self.dpre_osci_regions.setText(self.get_ranges(self.default["shade_regions"]))
-        self.dpre_osci_res_highlight.field.setText(str(self.default["res_highlight"]))
-        self.dpre_osci_res_highlight_list.field.setText(', '.join(self.default["res_hl_list"]))
+        self.dpre_osci_res_highlight.setChecked(self.default["res_highlight"])
+        self.dpre_osci_res_highlight_list.field.setText(','.join(list(map(str, self.default["res_hl_list"]))))
         self.dpre_osci_rh_fs.setValue(self.default["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.default["res_highlight_y"])
         self.dpre_osci_ymax.setValue(self.default["ymax"])
@@ -136,7 +136,7 @@ class OscillationMapPopup(QDialog):
         self.variables["shade"] = self.dpre_osci_shade.isChecked()
         self.variables["shade_regions"] = self.set_ranges(self.dpre_osci_regions.field.text())
         self.variables["res_highlight"] = self.dpre_osci_res_highlight.isChecked()
-        self.variables["res_hl_list"] = self.dpre_osci_res_highlight_list.field.text().split(',')
+        self.variables["res_hl_list"] = list(map(int, self.dpre_osci_res_highlight_list.field.text().split(',')))
         self.variables["res_highlight_fs"] = self.dpre_osci_rh_fs.field.value()
         self.variables["res_highlight_y"] = self.dpre_osci_rh_y.field.value()
         self.variables["ymax"] = self.dpre_osci_ymax.field.value()
@@ -162,7 +162,7 @@ class OscillationMapPopup(QDialog):
         self.dpre_osci_grid_color.select(self.variables["grid_color"])
         self.dpre_osci_shade.setChecked(self.variables["shade"])
         self.dpre_osci_res_highlight.setChecked(self.variables["res_highlight"])
-        self.dpre_osci_res_highlight_list.field.setText(','.join([str(x) for x in self.variables["res_hl_list"]]))
+        self.dpre_osci_res_highlight_list.field.setText(','.join(list(map(str, self.variables["res_hl_list"]))))
         self.dpre_osci_regions.setText(self.get_ranges(self.variables["shade_regions"]))
         self.dpre_osci_rh_fs.setValue(self.variables["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.variables["res_highlight_y"])
