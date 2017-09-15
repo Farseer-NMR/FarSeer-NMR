@@ -11,8 +11,8 @@ class ColourBox(LabelledCombobox):
         LabelledCombobox.__init__(self, parent, text)
         for item in colours.items():
             pix = QPixmap(QtCore.QSize(20, 20))
-            pix.fill(QColor(item[0]))
-            self.fields.addItem(QIcon(pix), item[1])
+            pix.fill(QColor(item[1]))
+            self.fields.addItem(QIcon(pix), item[0])
 
 
 
