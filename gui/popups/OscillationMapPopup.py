@@ -24,28 +24,28 @@ class OscillationMapPopup(QDialog):
             self.variables = variables["dpre_osci_settings"]
         self.default = defaults["dpre_osci_settings"]
 
-        self.dpre_osci_rows = LabelledSpinBox(self, "Number of Rows")
+        self.dpre_osci_rows = LabelledSpinBox(self, "Number of Rows", min=1, step=1)
         self.dpre_osci_width = LabelledSpinBox(self, "Scale Factor for Width")
         self.dpre_osci_y_label = LabelledLineEdit(self, "Y Label")
-        self.dpre_osci_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
-        self.dpre_osci_ymax = LabelledSpinBox(self, "Y Maximum")
-        self.dpre_osci_dpre_ms = LabelledSpinBox(self, "Marker Size")
-        self.dpre_osci_dpre_alpha = LabelledDoubleSpinBox(self, "Marker alpha")
-        self.dpre_osci_smooth_lw = LabelledSpinBox(self, "Smoothed DPRE Line Width")
+        self.dpre_osci_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", min=0, step=1)
+        self.dpre_osci_ymax = LabelledDoubleSpinBox(self, "Y Maximum", min=0, step=0.1)
+        self.dpre_osci_dpre_ms = LabelledSpinBox(self, "Marker Size", min=0, step=1)
+        self.dpre_osci_dpre_alpha = LabelledDoubleSpinBox(self, "Marker Transparency", min=0, max=1, step=0.1)
+        self.dpre_osci_smooth_lw = LabelledSpinBox(self, "Smoothed DPRE Line Width", min=0, step=1)
         self.dpre_osci_ref_color = ColourBox(self, "Reference Data Colour")
-        self.dpre_osci_color_init = ColourBox(self, "Gradient Start Colour")
-        self.dpre_osci_color_end = ColourBox(self, "Gradient End Colour")
+        self.dpre_osci_color_init = ColourBox(self, "Grad Start Colour")
+        self.dpre_osci_color_end = ColourBox(self, "Grad End Colour")
         self.dpre_osci_x_ticks_fn = FontComboBox(self, "X Tick Font")
-        self.dpre_osci_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size")
-        self.dpre_osci_x_ticks_pad = LabelledSpinBox(self, "X Tick Padding")
+        self.dpre_osci_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size", min=0, step=1)
+        self.dpre_osci_x_ticks_pad = LabelledDoubleSpinBox(self, "X Tick Padding", min=-100, max=100, step=0.1)
         self.dpre_osci_x_ticks_weight = LabelledCombobox(self, text="X Font Weight", items=font_weights)
         self.dpre_osci_grid_color = ColourBox(self, "Grid Colour")
         self.dpre_osci_res_highlight = LabelledCheckbox(self, "Highlight Residues?")
         self.dpre_osci_res_highlight_list = LabelledLineEdit(self, "Residues to Highlight")
         self.dpre_osci_shade = LabelledCheckbox(self, "Shade Residues?")
         self.dpre_osci_regions = LabelledLineEdit(self, "Regions to Shade")
-        self.dpre_osci_rh_fs = LabelledSpinBox(self, "Highlight Font Size ")
-        self.dpre_osci_rh_y = LabelledDoubleSpinBox(self, "Residue Label Scale")
+        self.dpre_osci_rh_fs = LabelledSpinBox(self, "Highlight Font Size ", min=0, step=1)
+        self.dpre_osci_rh_y = LabelledDoubleSpinBox(self, "Residue Label Scale", min=0, max=1, step=0.01)
 
 
         self.layout().addWidget(self.dpre_osci_rows, 0, 0)
@@ -87,10 +87,10 @@ class OscillationMapPopup(QDialog):
 
     def set_ranges(self, field_value):
         ll = field_value.split(',')
-        return [[x.split('-')[0], x.split('-')[1]] for x in ll]
+        return [[int(x.split('-')[0]), int(x.split('-')[1])] for x in ll]
 
     def get_ranges(self, ranges):
-        return ', '.join(["%s-%s" % (x[0], x[1]) for x in ranges])
+        return ','.join(["%s-%s" % (x[0], x[1]) for x in ranges])
 
     def get_defaults(self):
         self.dpre_osci_rows.setValue(self.default["rows"])
@@ -110,8 +110,8 @@ class OscillationMapPopup(QDialog):
         self.dpre_osci_grid_color.select(self.default["grid_color"])
         self.dpre_osci_shade.setChecked(self.default["shade"])
         self.dpre_osci_regions.setText(self.get_ranges(self.default["shade_regions"]))
-        self.dpre_osci_res_highlight.field.setText(str(self.default["res_highlight"]))
-        self.dpre_osci_res_highlight_list.field.setText(', '.join(self.default["res_hl_list"]))
+        self.dpre_osci_res_highlight.setChecked(self.default["res_highlight"])
+        self.dpre_osci_res_highlight_list.field.setText(','.join(list(map(str, self.default["res_hl_list"]))))
         self.dpre_osci_rh_fs.setValue(self.default["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.default["res_highlight_y"])
         self.dpre_osci_ymax.setValue(self.default["ymax"])
@@ -136,7 +136,7 @@ class OscillationMapPopup(QDialog):
         self.variables["shade"] = self.dpre_osci_shade.isChecked()
         self.variables["shade_regions"] = self.set_ranges(self.dpre_osci_regions.field.text())
         self.variables["res_highlight"] = self.dpre_osci_res_highlight.isChecked()
-        self.variables["res_hl_list"] = self.dpre_osci_res_highlight_list.field.text().split(',')
+        self.variables["res_hl_list"] = list(map(int, self.dpre_osci_res_highlight_list.field.text().split(',')))
         self.variables["res_highlight_fs"] = self.dpre_osci_rh_fs.field.value()
         self.variables["res_highlight_y"] = self.dpre_osci_rh_y.field.value()
         self.variables["ymax"] = self.dpre_osci_ymax.field.value()
@@ -162,7 +162,7 @@ class OscillationMapPopup(QDialog):
         self.dpre_osci_grid_color.select(self.variables["grid_color"])
         self.dpre_osci_shade.setChecked(self.variables["shade"])
         self.dpre_osci_res_highlight.setChecked(self.variables["res_highlight"])
-        self.dpre_osci_res_highlight_list.field.setText(','.join([str(x) for x in self.variables["res_hl_list"]]))
+        self.dpre_osci_res_highlight_list.field.setText(','.join(list(map(str, self.variables["res_hl_list"]))))
         self.dpre_osci_regions.setText(self.get_ranges(self.variables["shade_regions"]))
         self.dpre_osci_rh_fs.setValue(self.variables["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.variables["res_highlight_y"])

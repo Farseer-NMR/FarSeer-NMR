@@ -2,6 +2,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
+from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
@@ -26,33 +27,33 @@ class ScatterFlowerPlotPopup(QDialog):
 
         self.cs_scatter_flower_x_label = LabelledLineEdit(self, "X Label")
         self.cs_scatter_flower_y_label = LabelledLineEdit(self, "Y Label")
-        self.cs_scatter_flower_mksize = LabelledSpinBox(self, "Mark Size")
+        self.cs_scatter_flower_mksize = LabelledSpinBox(self, "Mark Size", min=0, step=1)
         self.cs_scatter_flower_color_grad = LabelledCheckbox(self, "Colour Gradient")
-        self.cs_scatter_flower_color_start = ColourBox(self, "Mark Start Colour")
-        self.cs_scatter_flower_color_end = ColourBox(self, "Mark End Colour")
+        self.cs_scatter_flower_color_start = ColourBox(self, text="Mark Start Colour")
+        self.cs_scatter_flower_color_end = ColourBox(self, text="Mark End Colour")
         self.cs_scatter_flower_color_list = LabelledLineEdit(self, "Colour List")
 
         self.cs_scatter_flower_x_label_fn = FontComboBox(self, "X Label Font")
-        self.cs_scatter_flower_x_label_fs = LabelledSpinBox(self, "X Label Font Size")
-        self.cs_scatter_flower_x_label_pad = LabelledSpinBox(self, "X Label Padding")
+        self.cs_scatter_flower_x_label_fs = LabelledSpinBox(self, "X Label Font Size", min=0, step=1)
+        self.cs_scatter_flower_x_label_pad = LabelledDoubleSpinBox(self, "X Label Padding", min=-100, max=100, step=0.1)
         self.cs_scatter_flower_x_label_weight = LabelledCombobox(self, text="X Label Font Weight", items=font_weights)
 
         self.cs_scatter_flower_y_label_fn = FontComboBox(self, "Y Label Font")
-        self.cs_scatter_flower_y_label_fs = LabelledSpinBox(self, "Y Label Font Size")
-        self.cs_scatter_flower_y_label_pad = LabelledSpinBox(self, "Y Label Padding")
+        self.cs_scatter_flower_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", min=0, step=1)
+        self.cs_scatter_flower_y_label_pad = LabelledDoubleSpinBox(self, "Y Label Padding", min=-100, max=100, step=0.1)
         self.cs_scatter_flower_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
 
         self.cs_scatter_flower_x_ticks_fn = FontComboBox(self, "X Tick Font")
-        self.cs_scatter_flower_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size")
-        self.cs_scatter_flower_x_ticks_pad = LabelledSpinBox(self, "X Tick Padding")
+        self.cs_scatter_flower_x_ticks_fs = LabelledSpinBox(self, "X Tick Font Size", min=0, step=1)
+        self.cs_scatter_flower_x_ticks_pad = LabelledDoubleSpinBox(self, "X Tick Padding", min=-100, max=100, step=0.1)
         self.cs_scatter_flower_x_ticks_weight = LabelledCombobox(self, text="X Tick Weight", items=font_weights)
-        self.cs_scatter_flower_x_ticks_rot = LabelledSpinBox(self, "X Tick Rotation")
+        self.cs_scatter_flower_x_ticks_rot = LabelledSpinBox(self, "X Tick Rotation", min=0, max=360, step=1)
 
         self.cs_scatter_flower_y_ticks_fn = FontComboBox(self, "Y Tick Font")
-        self.cs_scatter_flower_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size")
-        self.cs_scatter_flower_y_ticks_pad = LabelledSpinBox(self, "Y Tick Padding")
+        self.cs_scatter_flower_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size", min=0, step=1)
+        self.cs_scatter_flower_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding", min=-100, max=100, step=0.1)
         self.cs_scatter_flower_y_ticks_weight = LabelledCombobox(self, text="Y Tick Weight", items=font_weights)
-        self.cs_scatter_flower_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation")
+        self.cs_scatter_flower_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation", min=0, max=360, step=1)
 
         self.layout().addWidget(self.cs_scatter_flower_x_label, 0, 0)
         self.layout().addWidget(self.cs_scatter_flower_y_label, 1, 0)
