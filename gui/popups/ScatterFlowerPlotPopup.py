@@ -9,7 +9,7 @@ from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
 from functools import partial
-from gui.gui_utils import font_weights, defaults
+from gui.gui_utils import font_weights, defaults, colours
 
 
 class ScatterFlowerPlotPopup(QDialog):
@@ -133,8 +133,8 @@ class ScatterFlowerPlotPopup(QDialog):
         self.variables["y_label"] = self.cs_scatter_flower_y_label.field.text()
         self.variables["mksize"] = self.cs_scatter_flower_mksize.field.value()
         self.variables["color_grad"] = self.cs_scatter_flower_color_grad.checkBox.isChecked()
-        self.variables["mk_start_color"] = self.cs_scatter_flower_color_start.fields.currentText()
-        self.variables["mk_end_color"] = self.cs_scatter_flower_color_end.fields.currentText()
+        self.variables["mk_start_color"] = colours[self.cs_scatter_flower_color_start.fields.currentText()]
+        self.variables["mk_end_color"] = colours[self.cs_scatter_flower_color_end.fields.currentText()]
 
         self.variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
         self.variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()

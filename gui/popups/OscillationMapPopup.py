@@ -9,7 +9,7 @@ from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
 from functools import partial
-from gui.gui_utils import defaults, font_weights
+from gui.gui_utils import defaults, font_weights, colours
 
 class OscillationMapPopup(QDialog):
 
@@ -126,8 +126,8 @@ class OscillationMapPopup(QDialog):
         self.variables["dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
         self.variables["smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
         self.variables["ref_color"] = self.dpre_osci_ref_color.fields.currentText()
-        self.variables["color_init"] = self.dpre_osci_color_init.fields.currentText()
-        self.variables["color_end"] = self.dpre_osci_color_end.fields.currentText()
+        self.variables["color_init"] = colours[self.dpre_osci_color_init.fields.currentText()]
+        self.variables["color_end"] = colours[self.dpre_osci_color_end.fields.currentText()]
         self.variables["x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
         self.variables["x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
         self.variables["x_ticks_pad"] = self.dpre_osci_x_ticks_pad.field.value()

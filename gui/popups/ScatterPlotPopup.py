@@ -7,7 +7,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 
-from gui.gui_utils import defaults
+from gui.gui_utils import defaults, colours
 from functools import partial
 
 class ScatterPlotPopup(QDialog):
@@ -33,7 +33,7 @@ class ScatterPlotPopup(QDialog):
         self.cs_scatter_mk_start_color = ColourBox(self, text="Mark Start Colour")
         self.cs_scatter_mk_end_color = ColourBox(self, text="Mark End Colour")
         self.cs_scatter_markers = LabelledLineEdit(self, "Sequential Markers")
-        self.cs_scatter_mk_color = ColourBox(self, text="Mark Colours")
+        self.cs_scatter_mk_color = LabelledLineEdit(self, text="Mark Colours")
         self.cs_scatter_mk_lost_color = ColourBox(self, "Lost Mark Colour")
         self.cs_scatter_mk_edgecolors = LabelledLineEdit(self, "Marker Edge Colours")
         self.cs_scatter_hide_lost = LabelledCheckbox(self, "Hide Lost Data Points")
@@ -92,8 +92,8 @@ class ScatterPlotPopup(QDialog):
         self.variables["mksize"] = self.cs_scatter_mksize.field.value()
         self.variables["scale"] = self.cs_scatter_scale.field.value()
         self.variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
-        self.variables["mk_start_color"] = self.cs_scatter_mk_start_color.fields.currentText()
-        self.variables["mk_end_color"] = self.cs_scatter_mk_end_color.fields.currentText()
+        self.variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
+        self.variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
         self.variables["markers"] = self.cs_scatter_markers.field.text().split(',')
         self.variables["mk_color"] = self.cs_scatter_mk_color.field.text().split(',')
         self.variables["mk_edgecolors"] = self.cs_scatter_mk_edgecolors.field.text().split(',')
