@@ -63,7 +63,7 @@
         "do_res_evo": false,
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
-        "do_pre_osci": false,
+        "do_dpre_osci": false,
         "do_heat_map": false
     },
     "extended_bar_settings": {
@@ -148,6 +148,7 @@
         "y_ticks_pad": 1,
         "y_ticks_weight": "normal",
         "y_ticks_rot": 0,
+        "perform_resevo_fitting": false,
         "titration_x_values": [
             0,
             100,
@@ -276,8 +277,7 @@
         "do_cond3": false,
         "expand_lost_yy": false,
         "expand_lost_zz": false,
-        "perform_comparisons": false,
-        "perform_resevo_fitting": false
+        "perform_comparisons": false
     },
     "general_settings": {
         "chimera_att_select_format": ":",
