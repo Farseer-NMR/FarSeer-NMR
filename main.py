@@ -237,7 +237,7 @@ class Settings(QWidget):
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
-        self.fasta_start = LabelledSpinBox(self, "Fasta start", step=1)
+        self.fasta_start = LabelledSpinBox(self, "Fasta start", max=10000, step=1)
 
         self.expand_lost_yy = LabelledCheckbox(self, "Analyse Lost Y Residues?")
         self.expand_lost_zz = LabelledCheckbox(self, "Analyse Lost Z Residues?")
@@ -712,7 +712,7 @@ class Settings(QWidget):
         self.scatter_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter"])
         self.scatter_flower_checkbox.setChecked(self.variables["plotting_flags"]["do_cs_scatter_flower"])
         self.heat_map_checkbox.setChecked(self.variables["plotting_flags"]["do_heat_map"])
-        self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_pre_osci"])
+        self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_dpre_osci"])
     
         # peaklists from loaded config
         #self.variables[] = self.variables["peaklists"]
