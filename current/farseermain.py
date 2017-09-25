@@ -1216,7 +1216,7 @@ def PRE_analysis(farseer_series, fsuv):
             or (farseer_series.series_axis == 'C3' \
                 and (farseer_series.prev_dim == 'para'\
                     or farseer_series.next_dim == 'para'))) \
-        and fsuv['heat_map_settings']['do_heatmap']:
+        and fsuv['plotting_flags']['do_heat_map']:
         
         # do
         for sourcecol, targetcol in \
@@ -1249,7 +1249,7 @@ def PRE_analysis(farseer_series, fsuv):
     if (farseer_series.series_axis == 'C3' \
         and (farseer_series.prev_dim == 'para' \
             or farseer_series.next_dim == 'para')) \
-        and fsuv['dpre_osci_settings']['do_dpre_osci']:
+        and fsuv['plotting_flags']['do_dpre_osci']:
         
         
         for sourcecol, targetcols in zip(fsuv["restraint_settings"].index[3:],
