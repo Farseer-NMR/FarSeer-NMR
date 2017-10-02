@@ -1589,6 +1589,9 @@ def analyse_comparisons(series_dct, fsuv,
                 
                 for dp1 in sorted(c.all_next_dim[dp2].keys()):
                     
+                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
+                        c.all_next_dim[dp2][dp1].PRE_loaded = True
+                    
                     # writes log
                     c.all_next_dim[dp2][dp1].log_r(\
                         'COMPARING... [{}][{}][{}] - [{}]'.format(\
@@ -1608,6 +1611,9 @@ def analyse_comparisons(series_dct, fsuv,
             for dp2 in sorted(c.all_prev_dim.keys()):
                 
                 for dp1 in sorted(c.all_prev_dim[dp2].keys()):
+                    
+                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
+                        c.all_prev_dim[dp2][dp1].PRE_loaded = True
                     
                     # writes log
                     c.all_prev_dim[dp2][dp1].log_r(\
