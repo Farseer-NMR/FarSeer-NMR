@@ -1153,7 +1153,7 @@ def perform_fits(farseer_series, fsuv):
     fsuv["revo_settings"]["titration_x_values"]
     """
     # fits are allowed only for X axis series
-    if not(fsuv["fitting_settings"]["perform_resevo_fitting"] \
+    if not(fsuv["revo_settings"]["perform_resevo_fitting"] \
            and farseer_series.series_axis == 'cond1'):
         return
     
