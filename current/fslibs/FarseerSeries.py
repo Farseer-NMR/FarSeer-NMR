@@ -1501,7 +1501,17 @@ recipient: residues
             (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
                 #do
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
-            xlabels = [int(n) for n in axs[i].get_xticks()]
+            
+            def eval_tick(x):
+                if x >= 1:
+                    if int(x) % x == 0:
+                        return int(x)
+                    elif int(x) % x != 0:
+                        return str(x)
+                else:
+                    return str(x)
+            
+            xlabels = [eval_tick(n) for n in axs[i].get_xticks()]
         
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
