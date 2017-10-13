@@ -1437,7 +1437,8 @@ recipient: residues
                      titration_x_values=None,
                      vspace='',
                      rows_page='',
-                     cols_page=''
+                     cols_page='',
+                     perform_resevo_fitting=''
                      ):
         """
         Plots the evolution of a restraint along the series of a residue.
@@ -1500,7 +1501,17 @@ recipient: residues
             (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
                 #do
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
-            xlabels = [int(n) for n in axs[i].get_xticks()]
+            
+            def eval_tick(x):
+                if x >= 1:
+                    if int(x) % x == 0:
+                        return int(x)
+                    elif int(x) % x != 0:
+                        return str(x)
+                else:
+                    return str(x)
+            
+            xlabels = [eval_tick(n) for n in axs[i].get_xticks()]
         
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
@@ -1733,7 +1744,8 @@ recipient: residues
                      hide_lost=False,
                      titration_x_values='',
                      rows_page='',
-                     cols_page=''
+                     cols_page='',
+                     perform_resevo_fitting=''
                         ):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
@@ -1946,7 +1958,8 @@ recipient: residues
                              color_list=[],
                              mk_start_color="#ff0000",
                              mk_end_color='#30ff00',
-                             titration_x_values=''):
+                             titration_x_values='',
+                             perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         for all the residues in a single plot.

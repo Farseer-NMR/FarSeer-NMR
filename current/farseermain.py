@@ -1153,7 +1153,7 @@ def perform_fits(farseer_series, fsuv):
     fsuv["revo_settings"]["titration_x_values"]
     """
     # fits are allowed only for X axis series
-    if not(fsuv["fitting_settings"]["perform_resevo_fitting"] \
+    if not(fsuv["revo_settings"]["perform_resevo_fitting"] \
            and farseer_series.series_axis == 'cond1'):
         return
     
@@ -1216,7 +1216,7 @@ def PRE_analysis(farseer_series, fsuv):
             or (farseer_series.series_axis == 'C3' \
                 and (farseer_series.prev_dim == 'para'\
                     or farseer_series.next_dim == 'para'))) \
-        and fsuv['heat_map_settings']['do_heatmap']:
+        and fsuv['plotting_flags']['do_heat_map']:
         
         # do
         for sourcecol, targetcol in \
@@ -1249,7 +1249,7 @@ def PRE_analysis(farseer_series, fsuv):
     if (farseer_series.series_axis == 'C3' \
         and (farseer_series.prev_dim == 'para' \
             or farseer_series.next_dim == 'para')) \
-        and fsuv['dpre_osci_settings']['do_dpre_osci']:
+        and fsuv['plotting_flags']['do_dpre_osci']:
         
         
         for sourcecol, targetcols in zip(fsuv["restraint_settings"].index[3:],
@@ -1589,6 +1589,9 @@ def analyse_comparisons(series_dct, fsuv,
                 
                 for dp1 in sorted(c.all_next_dim[dp2].keys()):
                     
+                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
+                        c.all_next_dim[dp2][dp1].PRE_loaded = True
+                    
                     # writes log
                     c.all_next_dim[dp2][dp1].log_r(\
                         'COMPARING... [{}][{}][{}] - [{}]'.format(\
@@ -1608,6 +1611,9 @@ def analyse_comparisons(series_dct, fsuv,
             for dp2 in sorted(c.all_prev_dim.keys()):
                 
                 for dp1 in sorted(c.all_prev_dim[dp2].keys()):
+                    
+                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
+                        c.all_prev_dim[dp2][dp1].PRE_loaded = True
                     
                     # writes log
                     c.all_prev_dim[dp2][dp1].log_r(\
