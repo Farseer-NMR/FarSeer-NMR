@@ -190,6 +190,20 @@ def config_user_variables(fsuv):
     fsuv["restraint_settings"] = pd.DataFrame(restraint_settings_dct,
                                            index=fsuv["restraint_names"])
     
+    ### observables:
+    
+    fsuv["obs_names"] = ['Position F1', 'Position F2']
+    observables_stngs_dict = {
+        "obs_flags" : [fsuv["observables"]["plots_posf1"],
+                       fsuv["observables"]["plots_posf2"]],
+        "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)"],
+        "obs_yaxis_scl" : [fsuv["observables"]["posf1_scale"],
+                           fsuv["observables"]["posf2_scale"]]}
+    
+    fsuv["observables_settings"] = \
+        pd.DataFrame(observables_stngs_dict, index=fsuv["obs_names"])
+    
+    
     # configures dictionaries to be passed to plotting functions.
     # fsuv["series_plot_settings"] = config["series_plot_settings"]
 
@@ -1164,7 +1178,7 @@ def perform_fits(farseer_series, fsuv):
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
             
             farseer_series.perform_fit(calccol = restraint,
-                                        x_values=fsuv["revo_settings"]["titration_x_values"])
+                                       x_values=fsuv["revo_settings"]["titration_x_values"])
     return
 
 def PRE_analysis(farseer_series, fsuv):
@@ -1493,6 +1507,22 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                                   fig_file_type=fig_file_type,
                                   fig_dpi=fig_dpi)
         # DONE ++++
+    
+    for obs in fsuv["observables_settings"].index:
+        if fsuv["observables_settings"].loc[obs,"obs_flags"]:
+            farseer_series.plot_base(\
+                    obs, 'res', 'res_evo',
+                    {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
+                    par_ylims=fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
+                    ylabel=\
+                    fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
+                    cols_per_page=fsuv["res_evo_settings"]["cols_page"],
+                    rows_per_page=fsuv["res_evo_settings"]["rows_page"],
+                    fig_height=fig_height,
+                    fig_width=fig_width,
+                    fig_file_type=fig_file_type,
+                    fig_dpi=fig_dpi)
+    
     return
 
 def comparison_analysis_routines(comp_panel, fsuv, resonance_type):

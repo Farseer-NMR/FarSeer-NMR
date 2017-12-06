@@ -64,7 +64,9 @@
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
         "do_dpre_osci": false,
-        "do_heat_map": false
+        "do_heat_map": false,
+        "do_posf1_cs": false,
+        "do_posf2_cs": false
     },
     "extended_bar_settings": {
         "cols_page": 1,
@@ -320,6 +322,13 @@
         "gauss_x_size": 7,
         "gaussian_stdev": 1
     },
+    "observables": {
+        "plots_posf1":false,
+        "plots_posf2":false,
+        "posf1_scale":[6,9],
+        "posf2_scale":[100,135]
+    },
+    
     "experimental_dataset": {
 
     },
