@@ -64,9 +64,7 @@
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
         "do_dpre_osci": false,
-        "do_heat_map": false,
-        "do_posf1_cs": false,
-        "do_posf2_cs": false
+        "do_heat_map": false
     },
     "extended_bar_settings": {
         "cols_page": 1,
