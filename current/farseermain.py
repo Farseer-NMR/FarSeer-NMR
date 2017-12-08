@@ -188,7 +188,7 @@ def config_user_variables(fsuv):
                 fitting["do_cond3"] \
                 and (plots_height["calcs_Height_ratio"] or \
                         plots_volume["calcs_Volume_ratio"]) \
-                and itting["perform_comparisons"]
+                and fitting["perform_comparisons"]
     
     ### configures flags for observables:
     #### provisional ****
