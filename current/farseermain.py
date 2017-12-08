@@ -1500,9 +1500,6 @@ def run_farseer(fsuv):
     # identify residues
     identify_residues(exp)
     
-    print(exp.allpeaklists['dia']['M1']['0001'])
-    input("#")
-    
     # corrects chemical shifts
     if cs["perform_cs_correction"]:
         correct_shifts(exp, fsuv, resonance_type='Backbone')
