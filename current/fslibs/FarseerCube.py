@@ -1552,10 +1552,11 @@ residues.'.format(z, y, x)
         
     def checks_fasta_start_number(self):
         """
-        Confirms if the start number of the fasta file won't result in protein
-        truncation in the peaklist.
+        Confirms if the start or end number of the fasta file 
+        won't result in protein truncation in the peaklist.
         
-        This occurs when lasta fasta residue is < last protein residue.
+        This occurs when first fasta residue is > first protein residue.
+        This occurs when last fasta residue is < last protein residue.
         
         Raises WET#22 otherwise.
         """
@@ -1569,22 +1570,40 @@ residues.'.format(z, y, x)
                                   self.yycoords,
                                   self.xxcoords):
             # DO
+            # name of the fasta file being read
             f = list(self.allfasta[z][y].keys())[0]
+            
+            peaklist_first_residue = \
+                int(self.allpeaklists[z][y][x].loc[:,'Res#'].head(n=1))
             
             peaklist_last_residue = \
                 int(self.allpeaklists[z][y][x].loc[:,'Res#'].tail(n=1))
             
+            fasta_first_residue = \
+                int(self.allfasta[z][y][f].loc[:,'Res#'].head(n=1))
+            
             fasta_last_residue = \
                 int(self.allfasta[z][y][f].loc[:,'Res#'].tail(n=1))
             
-            if fasta_last_residue >= peaklist_last_residue:
+            
+            if fasta_first_residue <= peaklist_first_residue \
+                and fasta_last_residue >= peaklist_last_residue:
                 continue
+            
+            elif fasta_first_residue > peaklist_first_residue:
+                msg = "The first residue of your fasta file is greater than your protein first residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
+                    format(z, y, x, f)
+                
+                self.log_r(fsw.gen_wet('ERROR', msg, 22))
+                self.abort()
+            
             elif fasta_last_residue < peaklist_last_residue:
                 msg = "The last residue of your fasta file is minor than your protein last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
                     
                 self.log_r(fsw.gen_wet('ERROR', msg, 22))
                 self.abort()
+            
             else:
                 msg = 'Something is wrong in .checks_fasta_start_number()'
                 self.log_r(fsw.gen_wet('DEVELOPER ISSUE', msg, 0))
