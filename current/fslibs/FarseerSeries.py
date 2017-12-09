@@ -1589,7 +1589,7 @@ recipient: residues
         
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
-                and (calccol in self.restraint_list[:3])\
+                and calccol in self.fitdf \
                 and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
             
             # plot fit

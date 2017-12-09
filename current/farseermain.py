@@ -192,13 +192,15 @@ def config_user_variables(fsuv):
     
     ### configures flags for observables:
     #### provisional ****
-    fsuv["obs_names"] = ['Position F1', 'Position F2']
+    fsuv["obs_names"] = ['Position F1', 'Position F2', 'Height']
     observables_stngs_dict = {
         "obs_flags" : [fsuv["observables"]["plots_posf1"],
-                       fsuv["observables"]["plots_posf2"]],
-        "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)"],
+                       fsuv["observables"]["plots_posf2"],
+                       fsuv["observables"]["plots_height"]],
+        "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)", "Height"],
         "obs_yaxis_scl" : [fsuv["observables"]["posf1_scale"],
-                           fsuv["observables"]["posf2_scale"]]}
+                           fsuv["observables"]["posf2_scale"],
+                           fsuv["observables"]["height_scale"]]}
     
     fsuv["observables_settings"] = \
         pd.DataFrame(observables_stngs_dict, index=fsuv["obs_names"])
@@ -987,6 +989,14 @@ def perform_fits(farseer_series, fsuv):
             
             farseer_series.perform_fit(calccol = restraint,
                                        x_values=fsuv["revo_settings"]["titration_x_values"])
+    
+    for obs in fsuv["observables_settings"].index:
+        
+        if fsuv["observables_settings"].loc[obs, 'obs_flags']:
+            
+            farseer_series.perform_fit(calccol = obs,
+                                       x_values=fsuv["revo_settings"]["titration_x_values"])
+    
     return
 
 def PRE_analysis(farseer_series, fsuv):

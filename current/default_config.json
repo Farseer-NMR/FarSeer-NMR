@@ -324,7 +324,9 @@
         "plots_posf1":false,
         "plots_posf2":false,
         "posf1_scale":[6,9],
-        "posf2_scale":[100,135]
+        "posf2_scale":[100,135],
+        "plots_height":true,
+        "height_scale":[0,100000]
     },
     
     "experimental_dataset": {
