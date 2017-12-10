@@ -160,7 +160,9 @@ class FarseerSeries(pd.Panel):
         self.restraint_list = restraint_list
         
         # dictionary to store dataframes with information on fitting results
-        self.fitdict = {}
+        self.fit_plot_text = {}
+        self.fit_plot_ydata = {}
+        self.fit_okay = {}
         
         # becomes if perform_fit() runs.
         # affects plot_res_evo()
@@ -1455,6 +1457,7 @@ recipient: residues
         """
         
         # Draws subplot title
+        res = self.ix[0,i,'Res#']
         subtitle = self.ix[0,i,'Res#'] + self.ix[0,i,'1-letter']
         axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
                          fontname=subtitle_fn, fontweight=subtitle_weight)
@@ -1588,120 +1591,33 @@ recipient: residues
             axs[i].fill_between(x, 0, y,
                                 facecolor=fill_color, alpha=fill_alpha)
         
+        fit_res_col = "{}_{}".format(calccol, res)
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
-                and calccol in self.fitdf \
-                and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
+                and self.fit_okay[fit_res_col]:
             
             # plot fit
-            axs[i].plot(self.xfit, self.fitdf[calccol].ix[i, 'yfit'],
+            axs[i].plot(self.xfit,
+                        self.fit_plot_ydata[fit_res_col],
                         fit_line_style,
                         lw=fit_line_width,
                         color=fit_line_color, zorder=6)
             
-            # plot fit param grid lines
-            fit_kwargs={'yline':{'ls':'-',
-                                 'lw':0.2,
-                                 'color':'grey',
-                                 'zorder':1},
-                        'kd':{'ls':'-',
-                              'lw':0.2,
-                              'color':'grey',
-                              'zorder':1}
-                       }
             
-            if self.fitdf[calccol].ix[i, 'kd'] > \
-                (titration_x_values[-1]):
-                    fit_kwargs['yline']['ls'] = 'dotted'
+            # write text
             
+            axs[i].text(xmax*0.05, y_lims[1]*0.97,
+                        self.fit_plot_text[fit_res_col],
+                        ha='left', va='top', fontsize=4)
+        
+        elif self.fit_performed and self.series_axis == 'cond1' \
+            and not(self.fit_okay[fit_res_col]):
                 
-            ## ymax horizontal line
-            axs[i].plot((0, self.fitdf[calccol].ix[i, 'kd']),
-                        (self.fitdf[calccol].ix[i, 'ymax'],
-                         self.fitdf[calccol].ix[i, 'ymax']),
-                         **fit_kwargs['yline'])
-            ## ymax horizontal line
-            axs[i].plot((0, self.fitdf[calccol].ix[i, 'kd']),
-                        (self.fitdf[calccol].ix[i, 'yhalf'],
-                         self.fitdf[calccol].ix[i, 'yhalf']),
-                         **fit_kwargs['yline'])
-            ## kd vertical line
-            axs[i].plot((self.fitdf[calccol].ix[i, 'kd'],
-                         self.fitdf[calccol].ix[i, 'kd']),
-                        (0, self.fitdf[calccol].ix[i, 'ymax']),
-                         **fit_kwargs['kd'])
-                         
-            
-            # plot fit param numbers
-            txtkwargs = {'fontsize':4}
-            n_hillc = ( titration_x_values[-1], y_lims[1]+y_lims[1]*0.02)
-            r_sq = ( titration_x_values[0], y_lims[1]+y_lims[1]*0.02)
-            
-            # kd value label
-            
-            # this value is always a numpy.float64
-            kd_str = "{:.2f}".format(self.fitdf[calccol].ix[i, 'kd'])
-            kd_ha = 'right'
-            
-            if self.fitdf[calccol].ix[i, 'kd'] > titration_x_values[-1]:
-                # do
-                kdc = (titration_x_values[-1], y_lims[1]*0.02,
-                       'kd {}'.format(kd_str))
-                kd_ha = 'right'
-                #
-            
-            elif self.fitdf[calccol].ix[i, 'kd'] \
-                    > titration_x_values[-1]*0.5:
-                # DO
-                kdc = (self.fitdf[calccol].ix[i, 'kd'], y_lims[1]*0.02, kd_str)
-                kd_ha = 'right'
-                #
-            
-            elif  self.fitdf[calccol].ix[i, 'kd'] \
-                    <  titration_x_values[-1]*0.5:
-                #do 
-                kdc = (self.fitdf[calccol].ix[i,'kd']\
-                          +self.fitdf[calccol].ix[i,'kd']*0.05,
-                       y_lims[1]*0.02, kd_str)
-                kd_ha = 'left'
-                #
-            
-            # ymax value label
-            if self.fitdf[calccol].ix[i, 'ymax'] > y_lims[1]:
-                # places value label right bellow ylim[1]
-                ymaxc = (titration_x_values[-1]*0.02,
-                         y_lims[1]-y_lims[1]*0.15,
-                         'ymax {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'ymax']))
-                            
-            elif y_lims[1]*0.8 < self.fitdf[calccol].ix[i, 'ymax'] < y_lims[1]:
-                # places value label at the position but bellow the line
-                ymaxc = (titration_x_values[-1]*0.02,
-                         self.fitdf[calccol].ix[i, 'ymax']-y_lims[1]*0.08,
-                         '{:.3f}'.format(self.fitdf[calccol].ix[i, 'ymax']))
-            
-            elif self.fitdf[calccol].ix[i, 'ymax'] < y_lims[0]:
-                # places value label right above ylim[0]
-                ymaxc = (titration_x_values[-1]*0.02,
-                         y_lims[0]+y_lims[1]*0.08,
-                         'ymax {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'ymax']))
-            else:
-                # places value label where it is
-                ymaxc = (titration_x_values[-1]*0.02,
-                         self.fitdf[calccol].ix[i, 'ymax']+y_lims[1]*0.02,
-                         '{:.3f}'.format(self.fitdf[calccol].ix[i, 'ymax']))
-            
-            axs[i].text(n_hillc[0], n_hillc[1],
-                        'n = {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'n_hill']),
-                        ha='right', **txtkwargs)
-            axs[i].text(r_sq[0], r_sq[1],
-                        'r**2 = {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'r_sq']),
-                        ha='left', **txtkwargs)
-            axs[i].text(*ymaxc, **txtkwargs)
-            axs[i].text(*kdc, ha=kd_ha, **txtkwargs)
+            axs[i].text(xmax*0.05, y_lims[1]*0.97,
+                        self.fit_plot_text[fit_res_col],
+                        ha='left', va='top', fontsize=4)
+        
+        return
     
     
     def plot_cs_scatter(self, axs, i, row_number,
@@ -2545,21 +2461,38 @@ recipient: residues
         
         return
     
-    def perform_fitty(self, mindp, col, x_values, fit_function):
+    def perform_fit(self, col, x_values, mindp, fit_function):
         """
-        Prepares data to be fit:
-        - selects data from cond1
-        - selects only measured data points
-        - if series lower than <mindp>, fit not calculated
-        - unassigned peak entries not considered
+        General workflow for fitting data along cond1
+        
+        Note, only one fit can be performed at a time.
+        If multiple fits have to be performed, run Faseer-NMR with
+        different config files.
         
         Arguments:
+            - col: the column containing the data to fit
+            - x_values: the x data
             - mindp: minimum number of points to consider residue
                      for fitting.
+            - fit_function: the key that directs to the fiting function
+                            in fsfit module.
         """
         
+        self.fit_performed = True
+        
+        # checks correct input
+        if fit_function not in ('hill'):
+            self.abort(\
+                "Chosen fiting function <{}> not an available option.".\
+                format(fit_function))
+        
+        # add new fitting functions and related in these dictionaries
         fitting_functions = {
         "hill":fsfit.fitting_hill
+        }
+        
+        not_enough_data_funcs = {
+        "hill":fsfit.hill_results
         }
         
         # logging ###
@@ -2574,7 +2507,7 @@ recipient: residues
         logfout.write(fsfit.fit_log_head(fit_function, col))
         
         logresults = \
-        '{0}/{1}/{1}_fit_results.log'.format(self.tables_and_plots_folder, col)
+        '{0}/{1}/{1}_fit_results.csv'.format(self.tables_and_plots_folder, col)
         logrout = open(logresults, 'w')
         logrout.write(fsfit.fit_results_head(fit_function))
         
@@ -2588,8 +2521,7 @@ recipient: residues
         for row in self.major_axis:
             mmask = measured_mask.loc[row,:]
             res = int(self.loc[self.items[0],row, 'Res#'])
-            if mmask.sum() < mindp:
-                continue
+            col_res = "{}_{}".format(col,res)
             
             xdata = pd.Series(x_values)[np.array(mmask)]
             # .fillna is used to avoid minpack.error:
@@ -2598,11 +2530,27 @@ recipient: residues
             
             xdata.index = ydata.index
             
-            a, b, c = fitting_functions[fit_function](xdata, ydata, res)
+            if mmask.sum() < mindp:
+                # residue does not have enough data to perform fit
+                logfout.write(fsfit.not_enough_data(res, xdata, ydata))
+                logrout.write(\
+                    not_enough_data_funcs[fit_function](\
+                        res, xdata, ydata, status='not_enough_data'))
+                
+                self.fit_okay[col_res] = False
+                self.fit_plot_text[col_res] = "not enough data"
+                self.fit_plot_ydata[col_res] = None
+                
+                continue
+            
+            a, b, c, d, e, self.xfit = \
+                fitting_functions[fit_function](xdata, ydata, res, x_values[-1])
             
             logfout.write(a)
             logrout.write(b)
-            self.fitdict["{}_{}".format(col,res)] = c
+            self.fit_plot_text[col_res] = c
+            self.fit_okay[col_res] = d
+            self.fit_plot_ydata[col_res] = e
         
         logfout.close()
         logrout.close()

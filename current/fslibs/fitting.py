@@ -1,3 +1,20 @@
+"""
+This module gathers the fitting functions.
+To implement a new fitting function
+just add in this module:
+- the general workflow for the function
+- the equation
+- the addition text generating functions
+
+follow the example given with the Hill Equation.
+
+Maintain consistency with FarseerSeries.perform_fit method,
+for example: the general workflow should return,
+
+return a, b, c, d, e, xfit
+
+
+"""
 import scipy.optimize as sciopt
 import numpy as np
 
@@ -54,20 +71,20 @@ def hill_results(res,popt,yhalf,status='okay'):
     if status == 'okay':
         return "{},{},{},{},{},{}\n".format(res,status,popt[0],
                                           yhalf,popt[2],popt[1])
-    elif status == 'failed':
-        return "{},{},,,,,".format(res,status)
+    elif status != 'failed':
+        return "{},{},,,,,\n".format(res,status)
 
 
 
 # FITTING TEXT TO GO IN PLOT:
 
-def hill_txt_plot():
+def hill_txt_plot(popt, yhalf):
     s2w = \
 """
-ymax: {}
-yhalf: {}
-K0.5: {}
-n: {}
+ymax: {:.3f}
+yhalf: {:.3f}
+K0.5: {:.3f}
+n: {:.3f}
 """.format(popt[0],yhalf,popt[2],popt[1])
     return s2w
 
@@ -84,10 +101,22 @@ ydata: {}
 """.format(res, list(x), list(y))
     return s2w
 
+# NOT ENOUGH DATA
+def not_enough_data(res, x, y):
+    s2w = \
+"""
+Res#:  {}
+xdata: {}
+ydata: {}
+!¡NOT ENOUGH DATA POINTS - FIT NOT PERFORMED!¡
+**************************
+""".format(res, list(x), list(y))
+    return s2w
+
 
 # FITTING WORKFLOWS:
 
-def fitting_hill(x, y, res):
+def fitting_hill(x, y, res, last_x):
     """Workflow for fitting data with the Hill Equation."""
     
     p_guess = [np.max(y), 1, np.median(x)]
@@ -101,12 +130,18 @@ def fitting_hill(x, y, res):
         
         a = hill_log_okay(res, x, y, popt, pcov)
         b = hill_results(res, popt, yhalf)
-        c = hill_txt_plot
+        c = hill_txt_plot(popt, yhalf)
+        d = True
+        xfit = np.linspace(0, last_x, 200, endpoint=True)
+        e = hill_equation(xfit, popt[0], popt[1], popt[2])
     
     except:
         print("*** Fit residue {} - Failed!".format(res))
         a = fit_failed(res, x, y)
         b = hill_results(res, popt, yhalf, status='failed')
         c = "fit failed"
+        d = False
+        e = None
+        xfit = None
     
-    return a, b, c
+    return a, b, c, d, e, xfit
