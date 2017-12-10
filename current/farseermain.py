@@ -983,19 +983,29 @@ def perform_fits(farseer_series, fsuv):
     
     checks_fit_input(farseer_series, fsuv)
     
-    for restraint in fsuv["restraint_settings"].index[:3]:
-        
-        if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
-            
-            farseer_series.perform_fit(calccol = restraint,
-                                       x_values=fsuv["revo_settings"]["titration_x_values"])
     
-    for obs in fsuv["observables_settings"].index:
+    ####
+    
+    
+    farseer_series.perform_fitty(5,
+                                 "CSP",
+                                 fsuv["revo_settings"]["titration_x_values"],
+                                 "hill")
+    
+    ####
+    #for restraint in fsuv["restraint_settings"].index[:3]:
         
-        if fsuv["observables_settings"].loc[obs, 'obs_flags']:
+        #if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
             
-            farseer_series.perform_fit(calccol = obs,
-                                       x_values=fsuv["revo_settings"]["titration_x_values"])
+            #farseer_series.perform_fit(calccol = restraint,
+                                       #x_values=fsuv["revo_settings"]["titration_x_values"])
+    
+    #for obs in fsuv["observables_settings"].index:
+        
+        #if fsuv["observables_settings"].loc[obs, 'obs_flags']:
+            
+            #farseer_series.perform_fit(calccol = obs,
+                                       #x_values=fsuv["revo_settings"]["titration_x_values"])
     
     return
 
