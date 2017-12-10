@@ -975,6 +975,7 @@ def perform_fits(farseer_series, fsuv):
     fsuv.perform_resevo_fit
     fsuv.restraint_settings
     fsuv["revo_settings"]["titration_x_values"]
+    fsuv["fitting_parameters"]
     """
     # fits are allowed only for X axis series
     if not(fsuv["revo_settings"]["perform_resevo_fitting"] \
@@ -983,19 +984,26 @@ def perform_fits(farseer_series, fsuv):
     
     checks_fit_input(farseer_series, fsuv)
     
+    ####
     for restraint in fsuv["restraint_settings"].index[:3]:
         
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
             
-            farseer_series.perform_fit(calccol = restraint,
-                                       x_values=fsuv["revo_settings"]["titration_x_values"])
+            farseer_series.perform_fit(\
+                restraint,
+                fsuv["revo_settings"]["titration_x_values"],
+                fsuv["fitting_parameters"]["mininum_datapoints"],
+                fsuv["fitting_parameters"]["fitting_function"])
     
     for obs in fsuv["observables_settings"].index:
         
         if fsuv["observables_settings"].loc[obs, 'obs_flags']:
             
-            farseer_series.perform_fit(calccol = obs,
-                                       x_values=fsuv["revo_settings"]["titration_x_values"])
+            farseer_series.perform_fit(\
+                restraint,
+                fsuv["revo_settings"]["titration_x_values"],
+                fsuv["fitting_parameters"]["mininum_datapoints"],
+                fsuv["fitting_parameters"]["fitting_function"])
     
     return
 
