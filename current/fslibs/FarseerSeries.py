@@ -1595,7 +1595,9 @@ recipient: residues
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
                 and self.fit_okay[fit_res_col]:
-            
+            print(res)
+            print(self.xfit)
+            print(self.fit_plot_ydata[fit_res_col])
             # plot fit
             axs[i].plot(self.xfit,
                         self.fit_plot_ydata[fit_res_col],
@@ -2518,6 +2520,8 @@ recipient: residues
         measured_mask = \
             self.loc[:,:, 'Peak Status'] == 'measured'
         
+        self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
+        
         for row in self.major_axis:
             mmask = measured_mask.loc[row,:]
             res = int(self.loc[self.items[0],row, 'Res#'])
@@ -2543,8 +2547,8 @@ recipient: residues
                 
                 continue
             
-            a, b, c, d, e, self.xfit = \
-                fitting_functions[fit_function](xdata, ydata, res, x_values[-1])
+            a, b, c, d, e = \
+                fitting_functions[fit_function](xdata, ydata, res, self.xfit)
             
             logfout.write(a)
             logrout.write(b)

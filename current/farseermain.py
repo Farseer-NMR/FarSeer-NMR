@@ -985,7 +985,7 @@ def perform_fits(farseer_series, fsuv):
     checks_fit_input(farseer_series, fsuv)
     
     ####
-    for restraint in fsuv["restraint_settings"].index[:3]:
+    for restraint in fsuv["restraint_settings"].index:
         
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
             
@@ -1000,7 +1000,7 @@ def perform_fits(farseer_series, fsuv):
         if fsuv["observables_settings"].loc[obs, 'obs_flags']:
             
             farseer_series.perform_fit(\
-                restraint,
+                obs,
                 fsuv["revo_settings"]["titration_x_values"],
                 fsuv["fitting_parameters"]["mininum_datapoints"],
                 fsuv["fitting_parameters"]["fitting_function"])
