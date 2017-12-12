@@ -71,7 +71,7 @@ def hill_results(res,popt,yhalf,status='okay'):
     if status == 'okay':
         return "{},{},{},{},{},{}\n".format(res,status,popt[0],
                                           yhalf,popt[2],popt[1])
-    elif status != 'failed':
+    else:
         return "{},{},,,,,\n".format(res,status)
 
 
@@ -116,7 +116,7 @@ ydata: {}
 
 # FITTING WORKFLOWS:
 
-def fitting_hill(x, y, res, last_x):
+def fitting_hill(x, y, res, xfit):
     """Workflow for fitting data with the Hill Equation."""
     
     p_guess = [np.max(y), 1, np.median(x)]
@@ -132,16 +132,14 @@ def fitting_hill(x, y, res, last_x):
         b = hill_results(res, popt, yhalf)
         c = hill_txt_plot(popt, yhalf)
         d = True
-        xfit = np.linspace(0, last_x, 200, endpoint=True)
         e = hill_equation(xfit, popt[0], popt[1], popt[2])
     
     except:
         print("*** Fit residue {} - Failed!".format(res))
         a = fit_failed(res, x, y)
-        b = hill_results(res, popt, yhalf, status='failed')
+        b = hill_results(res, None, None, status='failed')
         c = "fit failed"
         d = False
         e = None
-        xfit = None
     
-    return a, b, c, d, e, xfit
+    return a, b, c, d, e
