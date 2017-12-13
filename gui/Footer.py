@@ -1,7 +1,9 @@
-from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout, QToolButton
+from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout, QToolButton, QToolBar
 from PyQt5 import QtCore, QtGui
 import os
 from gui.components.Icon import Icon, ICON_DIR
+import webbrowser
+
 
 class Footer(QWidget):
 
@@ -34,13 +36,18 @@ class Footer(QWidget):
 
 
         self.twitterButton = QToolButton()
+        self.twitterButton.setCheckable(True)
         self.twitterButton.setIcon(Icon('icons/footer-icon-twitter.png'))
+        self.twitterButton.toggled.connect(self.open_twitter)
 
         self.paperButton = QToolButton()
         self.paperButton.setIcon(Icon('icons/footer-icon-paper.png'))
+        self.paperButton.setCheckable(True)
+        self.twitterButton.toggled.connect(self.show_documentation)
 
         self.emailButton = QToolButton()
         self.emailButton.setIcon(Icon('icons/footer-icon-email.png'))
+        self.emailButton.setCheckable(True)
 
         self.twitterButton.setIconSize(self.twitterButton.size())
         self.paperButton.setIconSize(self.paperButton.size())
@@ -68,4 +75,9 @@ class Footer(QWidget):
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
         self.layout().addWidget(self.ctfpLabel, 1, 7, 2, 2)
 
+    def open_twitter(self):
+        webbrowser.open_new_tab("https://twitter.com/farseer_nmr")
+
+    def show_documentation(self):
+        webbrowser.open_new_tab("https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation")
 
