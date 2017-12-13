@@ -65,6 +65,7 @@ class SideBar(QTreeWidget):
 
 
     def load_from_path(self, filePath):
+        name = None
         if os.path.isdir(filePath):
             for root, dirs, filenames in os.walk(filePath):
                 for filename in filenames:
@@ -75,7 +76,8 @@ class SideBar(QTreeWidget):
                         pass
         else:
             name, path = self.load_peaklist(filePath)
-        return name, path
+        if name:
+            return name, path
 
 
 
