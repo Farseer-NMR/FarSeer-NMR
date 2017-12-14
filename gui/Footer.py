@@ -43,11 +43,12 @@ class Footer(QWidget):
         self.paperButton = QToolButton()
         self.paperButton.setIcon(Icon('icons/footer-icon-paper.png'))
         self.paperButton.setCheckable(True)
-        self.twitterButton.toggled.connect(self.show_documentation)
+        self.paperButton.toggled.connect(self.show_documentation)
 
         self.emailButton = QToolButton()
         self.emailButton.setIcon(Icon('icons/footer-icon-email.png'))
         self.emailButton.setCheckable(True)
+        self.emailButton.toggled.connect(self.send_email)
 
         self.twitterButton.setIconSize(self.twitterButton.size())
         self.paperButton.setIconSize(self.paperButton.size())
@@ -80,4 +81,9 @@ class Footer(QWidget):
 
     def show_documentation(self):
         webbrowser.open_new_tab("https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation")
+
+    def send_email(self):
+        webbrowser.open('mailto:?to=farseer-nmr@gmail.com', new=1)
+
+
 
