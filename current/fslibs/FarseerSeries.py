@@ -262,7 +262,7 @@ class FarseerSeries(pd.Panel):
     
     def hex_to_RGB(self, hexx):
         """
-        This function was taken verbatin from:
+        This function was taken verbatim from:
         Copyright 2017 Ben Southgate
         https://github.com/bsouthga/blog
         
@@ -294,7 +294,7 @@ class FarseerSeries(pd.Panel):
 
     def RGB_to_hex(self, RGB):
         """
-        This function was taken verbatin from:
+        This function was taken verbatim from:
         Copyright 2017 Ben Southgate
         https://github.com/bsouthga/blog
         
@@ -327,7 +327,7 @@ class FarseerSeries(pd.Panel):
     
     def color_dict(self, gradient):
         """
-        This function was taken verbatin from:
+        This function was taken verbatim from:
         Copyright 2017 Ben Southgate
         https://github.com/bsouthga/blog
         
@@ -364,7 +364,7 @@ class FarseerSeries(pd.Panel):
     
     def linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
         """
-        This function was taken verbatin from:
+        This function was taken verbatim from:
         Copyright 2017 Ben Southgate
         https://github.com/bsouthga/blog
         
