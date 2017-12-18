@@ -22,6 +22,8 @@ class TabWidget(QTabWidget):
     def __init__(self, gui_settings, variables):
         QTabWidget.__init__(self, parent=None)
 
+        self.widgets = []
+
         self.gui_settings = gui_settings
         self.add_tab_logo()
         self.variables = variables
@@ -30,16 +32,24 @@ class TabWidget(QTabWidget):
 
 
 
+
+
     def add_tabs_to_widget(self):
-        self.interface = Interface(gui_settings=self.gui_settings, variables=self.variables, footer=False)
-        self.settings = Settings(gui_settings=self.gui_settings, variables=self.variables, footer=True)
-        self.paraset = Paraset(gui_settings=self.gui_settings, variables=self.variables, footer=True)
+        self.interface = Interface(self, gui_settings=self.gui_settings, variables=self.variables, footer=False)
+        self.settings = Settings(self, gui_settings=self.gui_settings, variables=self.variables, footer=True)
+        self.paraset = Paraset(self, gui_settings=self.gui_settings, variables=self.variables, footer=True)
 
         self.add_tab(self.interface, "PeakList Selection")
         self.add_tab(self.settings, "Settings", "Settings")
         self.add_tab(self.paraset, "ParaSet", "ParaSetWidget")
 
+        self.widgets.extend([self.interface, self.settings, self.paraset])
 
+
+    def set_data_sets(self):
+        for widget in self.widgets:
+            if hasattr(widget, 'set_data_sets'):
+                widget.set_data_sets()
 
     def add_tab(self, widget, name, object_name=None):
         tab = QWidget()
@@ -63,7 +73,7 @@ class TabWidget(QTabWidget):
                 self.load_variables(variables)
                 print(self.variables["peaklists"], "peaklists")
                 return variables
-        return None
+        return
 
     def load_variables(self, variables):
 
@@ -78,8 +88,8 @@ class TabWidget(QTabWidget):
             self.interface.sideBar.load_from_path(path)
             self.interface.sideBar.update_from_config(self.variables)
 
-    def save_config(self, variables, path=None):
-        print(variables["peaklists"], 'saving')
+    def save_config(self, path=None):
+        print(self.variables["peaklists"], 'saving')
         if not path:
             fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
         else:
@@ -88,10 +98,10 @@ class TabWidget(QTabWidget):
             with open(fname[0], 'w') as outfile:
                 if fname[0].endswith('.json'):
                     print(self.interface.sideBar.peakLists)
-                    if not variables["peaklists"]:
-                        variables["peaklists"] = self.interface.sideBar.peakLists
+                    if not self.variables["peaklists"]:
+                        self.variables["peaklists"] = self.interface.sideBar.peakLists
 
-                    json.dump(variables, outfile, indent=4)
+                    json.dump(self.variables, outfile, indent=4)
                     self.config_file = fname[0]
                 print('Configuration saved to %s' % fname[0])
 

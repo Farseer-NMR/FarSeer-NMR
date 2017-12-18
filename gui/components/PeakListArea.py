@@ -24,7 +24,6 @@ class PeakListArea(QWidget):
         self.setEvents()
         self.updateClicks = 0
 
-
     def setEvents(self):
         self.scrollContents.scene().dragEnterEvent = self._dragEnterEvent
 
@@ -112,7 +111,6 @@ class PeakListArea(QWidget):
 
 
     def updateTree(self):
-
 
         if not self.check_conditions_for_tree():
             return

@@ -13,10 +13,12 @@ from gui.components.ValuesField import ValueField
 
 
 class Interface(BaseWidget):
-    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None):
+    def __init__(self, parent, gui_settings=None, variables=None, footer=None):
         BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, variables=variables, footer=footer)
+        self.gui_parent = parent
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
+
 
 
     def load_variables(self, variables):
@@ -105,6 +107,7 @@ class Interface(BaseWidget):
         self.showTreeButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
         self.widget3.layout().addWidget(self.peakListArea, 3, 0, 1, 2)
         self.showTreeButton.clicked.connect(self.peakListArea.updateTree)
+        self.showTreeButton.clicked.connect(self.gui_parent.set_data_sets)
         self.peakListArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         self.h_splitter.addWidget(self.widget3)
         # self.widget2.setFixedWidth(1264)
@@ -137,4 +140,6 @@ class Interface(BaseWidget):
                 text_box.setText(str(valuesDict[dim][x]))
 
             layout.addWidget(text_box, row, x + 3, 1, 1)
+
+
 

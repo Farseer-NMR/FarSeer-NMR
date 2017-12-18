@@ -335,5 +335,12 @@
     },
     "fasta_files": {
 
+    },
+
+    "paraset": {
+        "pcs": {},
+        "rdc": {},
+        "pre": {}
+
     }
 }
