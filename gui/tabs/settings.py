@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QGroupBox, QHBoxLayout, \
     QLabel, QMessageBox, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
+from gui.components.BaseWidget import BaseWidget
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledSpinBox import LabelledSpinBox
@@ -28,13 +29,14 @@ from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
 from gui.popups.VerticalBar import VerticalBarPopup
 
-class Settings(QWidget):
-    def __init__(self, parent=None, gui_settings=None, variables=None):
-        QWidget.__init__(self, parent=parent)
+class Settings(BaseWidget):
+    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None):
+
+        BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, variables=variables, footer=footer)
+
         grid = QGridLayout()
         grid2 = QGridLayout()
         self.setLayout(grid2)
-        self.gui_settings = gui_settings
         newWidget = QWidget(self)
         newWidget.setObjectName("SettingsWidget")
         newWidget.setLayout(grid)
@@ -42,7 +44,6 @@ class Settings(QWidget):
 
         grid.setAlignment(QtCore.Qt.AlignTop)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.variables = variables
         paths_group_box = QGroupBox()
         paths_groupbox_layout = QGridLayout()
         paths_groupbox_layout.setSpacing(2)
@@ -313,23 +314,6 @@ class Settings(QWidget):
         res_evo_groupbox.layout().addWidget(self.scatter_flower_button, 3, 1, 1, 1)
 
 
-
-        buttons_groupbox = QGroupBox()
-        buttons_groupbox_layout = QHBoxLayout()
-        buttons_groupbox.setLayout(buttons_groupbox_layout)
-
-        self.load_config_button = QPushButton("Load Configuration", self)
-        self.save_config_button = QPushButton("Save Configuration", self)
-        self.run_farseer_button = QPushButton("Run FarSeer-NMR", self)
-        buttons_groupbox.layout().addWidget(self.load_config_button)
-        self.load_config_button.clicked.connect(self.load_config)
-        self.save_config_button.clicked.connect(self.save_config)
-        self.run_farseer_button.clicked.connect(self.run_farseer_calculation)
-        buttons_groupbox.layout().addWidget(self.save_config_button)
-        buttons_groupbox.layout().addWidget(self.run_farseer_button)
-
-
-
         grid.layout().addWidget(paths_group_box, 0, 0, 3, 16)
         grid.layout().addWidget(fasta_groupbox, 7, 4, 4, 4)
         grid.layout().addWidget(sidechains_groupbox, 3, 4, 4, 4)
@@ -344,7 +328,7 @@ class Settings(QWidget):
         grid.layout().addWidget(pre_groupbox, 9, 12, 5, 4)
         grid.layout().addWidget(series_plotting_groupbox, 14, 8, 7, 4)
         grid.layout().addWidget(res_evo_groupbox, 14, 12, 7, 4)
-        grid.layout().addWidget(buttons_groupbox, 21, 0, 2, 16)
+        grid.layout().addWidget(self.tab_footer, 21, 0, 2, 16)
 
         self.load_variables()
 

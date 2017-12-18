@@ -6,16 +6,15 @@ from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QGridLayout, QLabel, QPushButton, QSizePolicy, QSpinBox, QSplitter, QWidget
 
+from gui.components.BaseWidget import BaseWidget
 from gui.components.PeakListArea import PeakListArea
 from gui.components.Sidebar import SideBar
 from gui.components.ValuesField import ValueField
-class Interface(QWidget):
-    def __init__(self, parent=None, gui_settings=None, variables=None):
-        QWidget.__init__(self, parent=parent)
-        if variables:
-            self.variables = variables
 
-        self.gui_settings = gui_settings
+
+class Interface(BaseWidget):
+    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None):
+        BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, variables=variables, footer=footer)
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
 

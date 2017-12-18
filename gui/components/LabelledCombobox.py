@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 
 class LabelledCombobox(QWidget):
 
-    def __init__(self, parent, text, items=None, callback=None):
+    def __init__(self, parent, text=None, items=None, callback=None):
 
         QWidget.__init__(self, parent)
 
