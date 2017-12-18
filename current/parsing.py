@@ -366,10 +366,10 @@ def parseCcpn(peaklist_file):
       atoms = []
       for v in res1to3dict.values():
           if v in row[4]:
-              a1 = row[4].split(v)[-1]
+              a1 = row[4].strip().split(v)[-1]
               atoms.append(a1)
           if v in row[5]:
-              a2 = row[5].split(v)[-1]
+              a2 = row[5].strip().split(v)[-1]
               atoms.append(a2)
       peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
                   volume=row[7], height=row[6])
