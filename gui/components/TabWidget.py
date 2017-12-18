@@ -89,7 +89,6 @@ class TabWidget(QTabWidget):
             self.interface.sideBar.update_from_config(self.variables)
 
     def save_config(self, path=None):
-        print(self.variables["peaklists"], 'saving')
         if not path:
             fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
         else:

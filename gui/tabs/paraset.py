@@ -7,8 +7,6 @@ from PyQt5.QtWidgets import QDoubleSpinBox, QGridLayout, QGroupBox, QLabel, QPus
 from gui.components.BaseWidget import BaseWidget
 
 pcs_dict = {
-            'dia_peaklist': '',
-            'para_peaklist': '',
             'Xax': '',
             'Xrh': '',
             'x': '',
@@ -20,8 +18,6 @@ pcs_dict = {
             }
 
 rdc_dict = {
-            'dia_peaklist': '',
-            'para_peaklist': '',
             'Dax': '',
             'Drh': '',
             'a': '',
@@ -33,8 +29,6 @@ rdc_dict = {
             }
 
 pre_dict = {
-            'dia_peaklist': '',
-            'para_peaklist': '',
             'x': '',
             'y': '',
             'z': '',
@@ -48,19 +42,18 @@ pre_dict = {
 
 
 class Paraset(BaseWidget):
-    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None):
+    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None, datasets=None):
 
         BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, variables=variables, footer=footer)
 
         self.setLayout(QGridLayout())
-        self.pcs_widget = PcsWidget(self)
-        self.rdc_widget = RdcWidget(self)
-        self.pre_widget = PreWidget(self)
+        self.pcs_widget = PcsWidget(self, datasets)
+        self.rdc_widget = RdcWidget(self, datasets)
+        self.pre_widget = PreWidget(self, datasets)
         self.layout().addWidget(self.pcs_widget, 0, 0)
         self.layout().addWidget(self.rdc_widget, 1, 0)
         self.layout().addWidget(self.pre_widget, 2, 0)
         self.layout().addWidget(self.tab_footer, 3, 0)
-
 
 
 
@@ -132,10 +125,12 @@ class PcsWidget(QGroupBox):
         self.layout().addWidget(y_label, 0, 7)
         self.layout().addWidget(z_label, 0, 8)
 
+        if datasets:
+            self.setup_parameter_boxes(datasets)
+
     def setup_parameter_boxes(self, datasets):
 
         for ii, ds in enumerate(datasets):
-            print(ii, ds)
             dataset = QLabel(ds, self)
             Xax = QDoubleSpinBox(self)
             Xrh = QDoubleSpinBox(self)
@@ -219,6 +214,9 @@ class RdcWidget(QGroupBox):
         self.layout().addWidget(B0_label, 0, 6)
         self.layout().addWidget(T_label, 0, 7)
         self.layout().addWidget(S2_label, 0, 8)
+
+        if datasets:
+            self.setup_parameter_boxes(datasets)
 
     def setup_parameter_boxes(self, datasets):
         for ii, ds in enumerate(datasets):
@@ -305,6 +303,9 @@ class PreWidget(QGroupBox):
         self.layout().addWidget(gj_label, 0, 7)
         self.layout().addWidget(J_label, 0, 8)
         self.layout().addWidget(T_label, 0, 9)
+
+        if datasets:
+            self.setup_parameter_boxes(datasets)
 
     def setup_parameter_boxes(self, datasets):
         for ii, ds in enumerate(datasets):
