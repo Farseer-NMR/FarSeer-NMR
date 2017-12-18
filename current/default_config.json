@@ -279,6 +279,12 @@
         "expand_lost_zz": false,
         "perform_comparisons": false
     },
+    
+    "fitting_parameters": {
+        "mininum_datapoints": 5,
+        "fitting_function": "hill"
+    },
+    
     "general_settings": {
         "chimera_att_select_format": ":",
         "fig_dpi": 300,
@@ -305,7 +311,7 @@
     },
     "Volume_ratio_settings": {
         "calccol_name_Volume_ratio": "Vol_ratio",
-        "calcs_Volume_ratio": true,
+        "calcs_Volume_ratio": false,
         "yy_label_Volume_ratio": "Vi/V0",
         "yy_scale_Volume_ratio": 1.1
     },
@@ -320,6 +326,15 @@
         "gauss_x_size": 7,
         "gaussian_stdev": 1
     },
+    "observables": {
+        "plots_posf1":false,
+        "plots_posf2":false,
+        "posf1_scale":[6,9],
+        "posf2_scale":[100,135],
+        "plots_height":false,
+        "height_scale":[0,100000]
+    },
+    
     "experimental_dataset": {
 
     },

@@ -1177,11 +1177,12 @@ residues.'.format(z, y, x)
         """
         
         self.log_r('INITIATING FARSEER CUBE', istitle=True)
-        self.peaklists_p5d = self.p5d(self.allpeaklists)
+        ## .copy() is used to solve issue_86
+        self.peaklists_p5d = self.p5d(self.allpeaklists.copy())
         self.log_r('> Created cube for all the backbone peaklists - OK!')
         
         if use_sidechains:
-            self.sidechains_p5d = self.p5d(self.allsidechains)
+            self.sidechains_p5d = self.p5d(self.allsidechains.copy())
             self.log_r(\
                 '> Created cube for all the sidechains peaklists - OK!')
             
@@ -1268,10 +1269,26 @@ residues.'.format(z, y, x)
                 series_kwargs['next_dim'] = dp1
                 
                 # initiates series
+                
+                ## intermediate step to remove rows with NaN in Res# column
+                ## this is necessary to solve issue_86 where NaN rows
+                ## are added if no fasta file is used to complete the residue
+                ## list and when different constrcuts are used along y
+                ## which may lead to different number of rows when generating
+                ## the 5D panel - creating NaN rows that later conflict with
+                ## parameter calculation.
+                dfdict = {}
+                for item in fscube.loc[dp2, dp1, :, :, :].items:
+                    df = fscube.loc[dp2, dp1, item, :, :]
+                    df.dropna(axis=0, how='any', subset=['Res#'], inplace=True)
+                    dfdict[item] = df
+                
+                series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
+                
                 series_dct[dp2][dp1] = \
-                    self.gen_series(fscube.loc[dp2, dp1, :, :, :],
-                                       series_class,
-                                       series_kwargs)
+                    self.gen_series(series_panel_NaN_filtered,
+                                    series_class,
+                                    series_kwargs)
                 
                 # writes to log
                 self.log_r(\
@@ -1310,6 +1327,9 @@ residues.'.format(z, y, x)
         # activates the series attibutes
         series_panel.create_attributes(**sc_kwargs)
         #
+        
+        #series_panel.dropna(axis=0, how='any', subset=['Res#'])
+        
         return series_panel
     
     def exports_parsed_pkls(self):
@@ -1532,10 +1552,11 @@ residues.'.format(z, y, x)
         
     def checks_fasta_start_number(self):
         """
-        Confirms if the start number of the fasta file won't result in protein
-        truncation in the peaklist.
+        Confirms if the start or end number of the fasta file 
+        won't result in protein truncation in the peaklist.
         
-        This occurs when lasta fasta residue is < last protein residue.
+        This occurs when first fasta residue is > first protein residue.
+        This occurs when last fasta residue is < last protein residue.
         
         Raises WET#22 otherwise.
         """
@@ -1549,22 +1570,40 @@ residues.'.format(z, y, x)
                                   self.yycoords,
                                   self.xxcoords):
             # DO
+            # name of the fasta file being read
             f = list(self.allfasta[z][y].keys())[0]
+            
+            peaklist_first_residue = \
+                int(self.allpeaklists[z][y][x].loc[:,'Res#'].head(n=1))
             
             peaklist_last_residue = \
                 int(self.allpeaklists[z][y][x].loc[:,'Res#'].tail(n=1))
             
+            fasta_first_residue = \
+                int(self.allfasta[z][y][f].loc[:,'Res#'].head(n=1))
+            
             fasta_last_residue = \
                 int(self.allfasta[z][y][f].loc[:,'Res#'].tail(n=1))
             
-            if fasta_last_residue >= peaklist_last_residue:
+            
+            if fasta_first_residue <= peaklist_first_residue \
+                and fasta_last_residue >= peaklist_last_residue:
                 continue
+            
+            elif fasta_first_residue > peaklist_first_residue:
+                msg = "The first residue of your fasta file is greater than your protein first residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
+                    format(z, y, x, f)
+                
+                self.log_r(fsw.gen_wet('ERROR', msg, 22))
+                self.abort()
+            
             elif fasta_last_residue < peaklist_last_residue:
                 msg = "The last residue of your fasta file is minor than your protein last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
                     
                 self.log_r(fsw.gen_wet('ERROR', msg, 22))
                 self.abort()
+            
             else:
                 msg = 'Something is wrong in .checks_fasta_start_number()'
                 self.log_r(fsw.gen_wet('DEVELOPER ISSUE', msg, 0))

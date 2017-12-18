@@ -7,6 +7,7 @@ import scipy.optimize as sciopt
 import itertools as it
 from matplotlib import pyplot as plt
 from current.fslibs import wet as fsw
+from current.fslibs import fitting as fsfit
 
 class FarseerSeries(pd.Panel):
     """
@@ -159,7 +160,9 @@ class FarseerSeries(pd.Panel):
         self.restraint_list = restraint_list
         
         # dictionary to store dataframes with information on fitting results
-        self.fitdf = {}
+        self.fit_plot_text = {}
+        self.fit_plot_ydata = {}
+        self.fit_okay = {}
         
         # becomes if perform_fit() runs.
         # affects plot_res_evo()
@@ -258,7 +261,32 @@ class FarseerSeries(pd.Panel):
         return
     
     def hex_to_RGB(self, hexx):
-        """http://bsou.io/posts/color-gradients-with-python
+        """
+        This function was taken verbatim from:
+        Copyright 2017 Ben Southgate
+        https://github.com/bsouthga/blog
+        
+        The MIT License (MIT)
+        
+        Permission is hereby granted, free of charge,
+        to any person obtaining a copy of this software and associated
+        documentation files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use, copy,
+        modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software, and to permit persons to whom the Software is furnished
+        to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
         "#FFFFFF" -> [255,255,255]
         """
         # Pass 16 to the integer function for change of base
@@ -266,7 +294,31 @@ class FarseerSeries(pd.Panel):
 
     def RGB_to_hex(self, RGB):
         """
-        http://bsou.io/posts/color-gradients-with-python
+        This function was taken verbatim from:
+        Copyright 2017 Ben Southgate
+        https://github.com/bsouthga/blog
+        
+        The MIT License (MIT)
+        
+        Permission is hereby granted, free of charge,
+        to any person obtaining a copy of this software and associated
+        documentation files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use, copy,
+        modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software, and to permit persons to whom the Software is furnished
+        to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
         [255,255,255] -> "#FFFFFF"
         """
         # Components need to be integers for hex to make sense
@@ -275,7 +327,31 @@ class FarseerSeries(pd.Panel):
     
     def color_dict(self, gradient):
         """
-        http://bsou.io/posts/color-gradients-with-python
+        This function was taken verbatim from:
+        Copyright 2017 Ben Southgate
+        https://github.com/bsouthga/blog
+        
+        The MIT License (MIT)
+        
+        Permission is hereby granted, free of charge,
+        to any person obtaining a copy of this software and associated
+        documentation files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use, copy,
+        modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software, and to permit persons to whom the Software is furnished
+        to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
         Takes in a list of RGB sub-lists and returns dictionary of
         colors in RGB and hex form for use in a graphing function
         defined later on.
@@ -288,7 +364,31 @@ class FarseerSeries(pd.Panel):
     
     def linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
         """
-        http://bsou.io/posts/color-gradients-with-python
+        This function was taken verbatim from:
+        Copyright 2017 Ben Southgate
+        https://github.com/bsouthga/blog
+        
+        The MIT License (MIT)
+        
+        Permission is hereby granted, free of charge,
+        to any person obtaining a copy of this software and associated
+        documentation files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use, copy,
+        modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software, and to permit persons to whom the Software is furnished
+        to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
         returns a gradient list of (n) colors between
         two hex colors. start_hex and finish_hex
         should be the full six-digit color string,
@@ -1454,6 +1554,7 @@ recipient: residues
         """
         
         # Draws subplot title
+        res = self.ix[0,i,'Res#']
         subtitle = self.ix[0,i,'Res#'] + self.ix[0,i,'1-letter']
         axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
                          fontname=subtitle_fn, fontweight=subtitle_weight)
@@ -1587,120 +1688,35 @@ recipient: residues
             axs[i].fill_between(x, 0, y,
                                 facecolor=fill_color, alpha=fill_alpha)
         
+        fit_res_col = "{}_{}".format(calccol, res)
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
-                and (calccol in self.restraint_list[:3])\
-                and self.fitdf[calccol].ix[i, 'fit'] == 'OK':
-            
+                and self.fit_okay[fit_res_col]:
+            print(res)
+            print(self.xfit)
+            print(self.fit_plot_ydata[fit_res_col])
             # plot fit
-            axs[i].plot(self.xfit, self.fitdf[calccol].ix[i, 'yfit'],
+            axs[i].plot(self.xfit,
+                        self.fit_plot_ydata[fit_res_col],
                         fit_line_style,
                         lw=fit_line_width,
                         color=fit_line_color, zorder=6)
             
-            # plot fit param grid lines
-            fit_kwargs={'yline':{'ls':'-',
-                                 'lw':0.2,
-                                 'color':'grey',
-                                 'zorder':1},
-                        'kd':{'ls':'-',
-                              'lw':0.2,
-                              'color':'grey',
-                              'zorder':1}
-                       }
             
-            if self.fitdf[calccol].ix[i, 'kd'] > \
-                (titration_x_values[-1]):
-                    fit_kwargs['yline']['ls'] = 'dotted'
+            # write text
             
+            axs[i].text(xmax*0.05, y_lims[1]*0.97,
+                        self.fit_plot_text[fit_res_col],
+                        ha='left', va='top', fontsize=4)
+        
+        elif self.fit_performed and self.series_axis == 'cond1' \
+            and not(self.fit_okay[fit_res_col]):
                 
-            ## ymax horizontal line
-            axs[i].plot((0, self.fitdf[calccol].ix[i, 'kd']),
-                        (self.fitdf[calccol].ix[i, 'ymax'],
-                         self.fitdf[calccol].ix[i, 'ymax']),
-                         **fit_kwargs['yline'])
-            ## ymax horizontal line
-            axs[i].plot((0, self.fitdf[calccol].ix[i, 'kd']),
-                        (self.fitdf[calccol].ix[i, 'yhalf'],
-                         self.fitdf[calccol].ix[i, 'yhalf']),
-                         **fit_kwargs['yline'])
-            ## kd vertical line
-            axs[i].plot((self.fitdf[calccol].ix[i, 'kd'],
-                         self.fitdf[calccol].ix[i, 'kd']),
-                        (0, self.fitdf[calccol].ix[i, 'ymax']),
-                         **fit_kwargs['kd'])
-                         
-            
-            # plot fit param numbers
-            txtkwargs = {'fontsize':4}
-            n_hillc = ( titration_x_values[-1], y_lims[1]+y_lims[1]*0.02)
-            r_sq = ( titration_x_values[0], y_lims[1]+y_lims[1]*0.02)
-            
-            # kd value label
-            
-            # this value is always a numpy.float64
-            kd_str = "{:.2f}".format(self.fitdf[calccol].ix[i, 'kd'])
-            kd_ha = 'right'
-            
-            if self.fitdf[calccol].ix[i, 'kd'] > titration_x_values[-1]:
-                # do
-                kdc = (titration_x_values[-1], y_lims[1]*0.02,
-                       'kd {}'.format(kd_str))
-                kd_ha = 'right'
-                #
-            
-            elif self.fitdf[calccol].ix[i, 'kd'] \
-                    > titration_x_values[-1]*0.5:
-                # DO
-                kdc = (self.fitdf[calccol].ix[i, 'kd'], y_lims[1]*0.02, kd_str)
-                kd_ha = 'right'
-                #
-            
-            elif  self.fitdf[calccol].ix[i, 'kd'] \
-                    <  titration_x_values[-1]*0.5:
-                #do 
-                kdc = (self.fitdf[calccol].ix[i,'kd']\
-                          +self.fitdf[calccol].ix[i,'kd']*0.05,
-                       y_lims[1]*0.02, kd_str)
-                kd_ha = 'left'
-                #
-            
-            # ymax value label
-            if self.fitdf[calccol].ix[i, 'ymax'] > y_lims[1]:
-                # places value label right bellow ylim[1]
-                ymaxc = (titration_x_values[-1]*0.02,
-                         y_lims[1]-y_lims[1]*0.15,
-                         'ymax {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'ymax']))
-                            
-            elif y_lims[1]*0.8 < self.fitdf[calccol].ix[i, 'ymax'] < y_lims[1]:
-                # places value label at the position but bellow the line
-                ymaxc = (titration_x_values[-1]*0.02,
-                         self.fitdf[calccol].ix[i, 'ymax']-y_lims[1]*0.08,
-                         '{:.3f}'.format(self.fitdf[calccol].ix[i, 'ymax']))
-            
-            elif self.fitdf[calccol].ix[i, 'ymax'] < y_lims[0]:
-                # places value label right above ylim[0]
-                ymaxc = (titration_x_values[-1]*0.02,
-                         y_lims[0]+y_lims[1]*0.08,
-                         'ymax {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'ymax']))
-            else:
-                # places value label where it is
-                ymaxc = (titration_x_values[-1]*0.02,
-                         self.fitdf[calccol].ix[i, 'ymax']+y_lims[1]*0.02,
-                         '{:.3f}'.format(self.fitdf[calccol].ix[i, 'ymax']))
-            
-            axs[i].text(n_hillc[0], n_hillc[1],
-                        'n = {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'n_hill']),
-                        ha='right', **txtkwargs)
-            axs[i].text(r_sq[0], r_sq[1],
-                        'r**2 = {:.3f}'.\
-                            format(self.fitdf[calccol].ix[i, 'r_sq']),
-                        ha='left', **txtkwargs)
-            axs[i].text(*ymaxc, **txtkwargs)
-            axs[i].text(*kdc, ha=kd_ha, **txtkwargs)
+            axs[i].text(xmax*0.05, y_lims[1]*0.97,
+                        self.fit_plot_text[fit_res_col],
+                        ha='left', va='top', fontsize=4)
+        
+        return
     
     
     def plot_cs_scatter(self, axs, i, row_number,
@@ -2544,214 +2560,100 @@ recipient: residues
         
         return
     
-    def perform_fit(self, calccol='CSP', x_values=None):
+    def perform_fit(self, col, x_values, mindp, fit_function):
         """
-        Controls the general fitting workflow.
+        General workflow for fitting data along cond1
         
-        Args:
+        Note, only one fit can be performed at a time.
+        If multiple fits have to be performed, run Faseer-NMR with
+        different config files.
         
-            calccol (str): the coolumn name upon which performs the fit.
-            
-            x_values (list): the fitting x values.
+        Arguments:
+            - col: the column containing the data to fit
+            - x_values: the x data
+            - mindp: minimum number of points to consider residue
+                     for fitting.
+            - fit_function: the key that directs to the fiting function
+                            in fsfit module.
         """
         
-        def fitting_hill(L0, Vmax, n, K):
-            """
-            The Hill Equation.
-            
-            https://en.wikipedia.org/wiki/Hill_equation_(biochemistry)
-            """
-            return (Vmax*L0**n)/(K**n+L0**n)
-        
-        def add_fit_results(data, col_names):
-            """
-            Stores fitting results in pd.DataFrame.
-            
-            Stores pd.DataFrame in dictionary with key <calccol>.
-            
-            Args:
-                data (list): the data to be entered as new row.
-                
-                col_names (list): column names.
-            """
-            dfres = pd.DataFrame(data=[data],
-                                     index=[row_number],
-                                     columns=col_names)
-            self.fitdf[calccol] = self.fitdf[calccol].append(dfres)
-            return
-        
-        def calc_r_squared(x, y , f, popt):
-            """
-            Calculates R**2 according to function.
-            
-            Args:
-                x (np.array): x values
-                
-                y (np.array): y values
-                
-                f (function):
-                
-                popt (np.array): fitting minimization array.
-            http://stackoverflow.com/questions/19189362/getting-the-r-squared-value-using-curve-fit
-            
-            Returns:
-                [r_squared, ss_res, ss_tot]
-            """
-            residuals = y.sub(f(x, *popt))
-            ss_res = np.sum(residuals**2)
-            ss_tot = np.sum((y-np.mean(y))**2)
-            r_squared = 1 - (ss_res / ss_tot)
-            
-            return [r_squared, ss_res, ss_tot]
-        
-        def write_fit_failed(x, y, row_number):
-            """
-            Writes summary of failed minimization.
-            
-            Args:
-                x: x values
-                
-                y: y values
-                
-                row_number (int): indexer of residue number.
-            """
-            s2w=\
-"""
-Res#:  {}
-xdata: {}
-ydata: {}
-!¡FIT FAILED TO FIND MINIMIZATION!¡
-**************************
-""".format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
-           list(x), list(y))
-            logfout.write(s2w)
-            print('* Res# {} - fit not found!'.format(resnum))
-            add_fit_results(['Failed'] + [np.NaN]*6,
-                            ['fit', 'ymax', 'yhalf','kd',
-                             'n_hill', 'r_sq', 'yfit'])
-            
-            return
-        
-        # sets an x linear space
-        maxxfit = x_values[-1] * 2
-        self.xfit=np.linspace(0, maxxfit, 200, endpoint=True)
-        
-        # creates data frame to store fiting results.
-        self.fitdf[calccol] = pd.DataFrame()
         self.fit_performed = True
         
-        # open fit logs
-        if not(os.path.exists('{}/{}'.format(self.tables_and_plots_folder,
-                                             calccol))):
-            os.makedirs('{}/{}'.format(self.tables_and_plots_folder, calccol))
+        # checks correct input
+        if fit_function not in ('hill'):
+            self.abort(\
+                "Chosen fiting function <{}> not an available option.".\
+                format(fit_function))
         
-        logf = '{0}/{1}/{1}_fit_report.log'.format(\
-            self.tables_and_plots_folder, calccol)
+        # add new fitting functions and related in these dictionaries
+        fitting_functions = {
+        "hill":fsfit.fitting_hill
+        }
         
+        not_enough_data_funcs = {
+        "hill":fsfit.hill_results
+        }
+        
+        # logging ###
+        
+        col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
+        if not(os.path.exists(col_path)):
+            os.makedirs(col_path)
+        
+        logf = \
+        '{0}/{1}/{1}_fit_report.log'.format(self.tables_and_plots_folder, col)
         logfout = open(logf, 'w')
-        self.log_r('** Performing fitting for {}...'.format(calccol))
+        logfout.write(fsfit.fit_log_head(fit_function, col))
         
-        s2w = \
-"""# fitting for parameter: '{}'
-fit performed: Hill Equation
-(Vmax*[S]**n)/(K0.5**n+[S]**n)
-""".format(calccol)
-        logfout.write(s2w)
-
-        # for each assigned residue
-        for row_number in \
-            (self.major_axis[self.ix[0,:, 'Peak Status'] != 'unassigned']):
-            # DO
-            # gets only the measured datapoints and discards the 'lost'
-            lostmask = \
-                np.array(self.loc[:,row_number,'Peak Status'] == 'measured')
-            # .fillna is used to avoid
-            # minpack.error: Result from function call is not a proper array of floats.
-            y = self.loc[lostmask,row_number,calccol].fillna(value=0.0)
-            x = pd.Series(x_values)[lostmask]
-            x.index = y.index
-            resnum = self.ix[0, row_number,'Res#']
+        logresults = \
+        '{0}/{1}/{1}_fit_results.csv'.format(self.tables_and_plots_folder, col)
+        logrout = open(logresults, 'w')
+        logrout.write(fsfit.fit_results_head(fit_function))
+        
+        self.log_r('** Performing fitting for {}...'.format(col))
+        
+        #
+        
+        measured_mask = \
+            self.loc[:,:, 'Peak Status'] == 'measured'
+        
+        self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
+        
+        for row in self.major_axis:
+            mmask = measured_mask.loc[row,:]
+            res = int(self.loc[self.items[0],row, 'Res#'])
+            col_res = "{}_{}".format(col,res)
             
-            # makes no sense to perform a fitting in only 2 or less datapoints
-            if len(x) <= 2: 
-                s2w=\
-"""
-Res#:  {}
-xdata: {}
-ydata: {}
-!¡NOT ENOUGH DATA POINTS - FIT NOT PERFORMED!¡
-**************************
-""".format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
-           x, y)
-                logfout.write(s2w)
-                print('* Res# {} - not enough data points!'.format(resnum))
-                add_fit_results(['No Data',np.nan, np.nan, np.nan,
-                                 np.nan, np.nan, False],
-                                ['fit', 'ymax', 'yhalf','kd',
-                                 'n_hill', 'r_sq', 'yfit'])
+            xdata = pd.Series(x_values)[np.array(mmask)]
+            # .fillna is used to avoid minpack.error:
+            # Result from function call is not a proper array of floats.
+            ydata = self.loc[mmask,row,col].fillna(value=0.0)
+            
+            xdata.index = ydata.index
+            
+            if mmask.sum() < mindp:
+                # residue does not have enough data to perform fit
+                logfout.write(fsfit.not_enough_data(res, xdata, ydata))
+                logrout.write(\
+                    not_enough_data_funcs[fit_function](\
+                        res, xdata, ydata, status='not_enough_data'))
+                
+                self.fit_okay[col_res] = False
+                self.fit_plot_text[col_res] = "not enough data"
+                self.fit_plot_ydata[col_res] = None
+                
                 continue
-            ###
             
-            # starts Hill fit algorithm
-            # http://www.physiologyweb.com/calculators/hill_equation_interactive_graph.html
+            a, b, c, d, e = \
+                fitting_functions[fit_function](xdata, ydata, res, self.xfit)
             
-            try:
-                p_guess = [np.max(y), 1, np.median(x)]
-                
-                popt, pcov = sciopt.curve_fit(fitting_hill, x, y, p0=p_guess)
-                
-                yfit = fitting_hill(self.xfit, *popt)
-                
-                rsq = calc_r_squared(x, y, fitting_hill, popt)
-                r_squared = rsq[0]
-                
-                ymax = popt[0]
-                n_hill = popt[1]
-                kd = popt[2]
-                yhalf = ymax/2
-                
-                add_fit_results(\
-                    ['OK', ymax, yhalf, kd, n_hill, r_squared, yfit],
-                    ['fit', 'ymax', 'yhalf','kd', 'n_hill', 'r_sq', 'yfit'])
-                
-                s2w=\
-"""
-Res#:  {}
-xdata: {}
-ydata: {}
-ymax: {}
-yhalf: {}
-K0.5: {}
-n: {}
-r**2: {}
-popt: {}
-pcov: {}
-rsq: {}
-**************************
-""".format(self.ix[0, row_number,'Res#']+self.ix[0, row_number,'1-letter'],
-           list(x), list(y), ymax, yhalf, kd, n_hill, r_squared,
-           popt, pcov, rsq)
-                logfout.write(s2w)
-                print('* Res# {} - fit converged!'.format(resnum))
-            
-            except:
-                write_fit_failed(x, y, row_number)
-            
-            # DONE for loop
-        
-        self.fitdf[calccol] = pd.concat([self.res_info.iloc[0,:,:],
-                                         self.fitdf[calccol]],
-                                         axis=1)
-                                         
-        self.fitdf[calccol].iloc[:,0:9].\
-            to_csv('{0}/{1}/{1}_fit_data.csv'.\
-                format(self.tables_and_plots_folder, calccol),
-                    index=False, float_format='%.3f')
-                    
-        self.log_r('*** File Saved {}\n'.format(\
-            '{0}/{1}/{1}_fit_data.csv'.format(\
-                self.tables_and_plots_folder, calccol)))
+            logfout.write(a)
+            logrout.write(b)
+            self.fit_plot_text[col_res] = c
+            self.fit_okay[col_res] = d
+            self.fit_plot_ydata[col_res] = e
         
         logfout.close()
-        
+        logrout.close()
         return
+    

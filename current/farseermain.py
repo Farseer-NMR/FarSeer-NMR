@@ -115,7 +115,7 @@ def config_user_variables(fsuv):
     Returns:
         fsuv
     """
-
+    # alias .conf json file
     general = fsuv["general_settings"]
     fitting = fsuv["fitting_settings"]
     cs = fsuv["cs_settings"]
@@ -128,7 +128,9 @@ def config_user_variables(fsuv):
     plots_volume = fsuv["Volume_ratio_settings"]
 
     # does the user want to perform any analysis on the Farseer-NMR cube?
-    fsuv["any_axis"] = any([fitting["do_cond1"], fitting["do_cond2"], fitting["do_cond3"]])
+    fsuv["any_axis"] = any([fitting["do_cond1"],
+                            fitting["do_cond2"],
+                            fitting["do_cond3"]])
     
     # sorted values to be used as x coordinates in the fitting routine
     # fsuv.txv = sorted(fsuv.titration_x_values)
@@ -140,7 +142,7 @@ def config_user_variables(fsuv):
         plots_csp["calccol_name_CSP"],
         plots_height["calccol_name_Height_ratio"],
         plots_volume["calccol_name_Volume_ratio"]
-    ]
+        ]
     
     # ORDERED calculation restraints flags
     fsuv["restraint_flags"] = [
@@ -150,8 +152,31 @@ def config_user_variables(fsuv):
         plots_height["calcs_Height_ratio"],
         plots_volume["calcs_Volume_ratio"]
         ]
-
-
+    
+    restraint_settings_dct = {
+        'calcs_restraint_flg': fsuv["restraint_flags"],
+        'plt_y_axis_lbl': [plots_f1["yy_label_PosF1_delta"],
+                           plots_f2["yy_label_PosF2_delta"],
+                           plots_csp["yy_label_CSP"],
+                           plots_height["yy_label_Height_ratio"],
+                           plots_volume["yy_label_Volume_ratio"]
+                        ],
+        'plt_y_axis_scl': [
+            (-plots_f1["yy_scale_PosF1_delta"],
+             plots_f1["yy_scale_PosF1_delta"]),
+            (-plots_f2["yy_scale_PosF2_delta"],
+             plots_f2["yy_scale_PosF2_delta"]),
+            (0, plots_csp["yy_scale_CSP"]),
+            (0, plots_height["yy_scale_Height_ratio"]),
+            (0, plots_volume["yy_scale_Volume_ratio"])
+        ]
+       }
+    
+    # A pd.DataFrame that organizes settings for each calculated restraint.
+    # Index are the calculated params labels
+    fsuv["restraint_settings"] = \
+        pd.DataFrame(restraint_settings_dct, index=fsuv["restraint_names"])
+    
     # does the user want to calculate any restraint?
     fsuv["calc_flags"] = any(fsuv["restraint_flags"])
     
@@ -160,246 +185,25 @@ def config_user_variables(fsuv):
     
     # flags which fsuv.apply_PRE_analysis deppends on
     fsuv["PRE_analysis_flags"] = \
-                fitting["do_cond3"] and \
-                (plots_height["calcs_Height_ratio"] or \
-                    plots_volume["calcs_Volume_ratio"]) and \
-                fitting["perform_comparisons"]
+                fitting["do_cond3"] \
+                and (plots_height["calcs_Height_ratio"] or \
+                        plots_volume["calcs_Volume_ratio"]) \
+                and fitting["perform_comparisons"]
     
-    restraint_settings_dct = {
-        'calcs_restraint_flg'   : fsuv["restraint_flags"],
-                               
-        'plt_y_axis_lbl': [
-            plots_f1["yy_label_PosF1_delta"],
-            plots_f2["yy_label_PosF2_delta"],
-            plots_csp["yy_label_CSP"],
-            plots_height["yy_label_Height_ratio"],
-            plots_volume["yy_label_Volume_ratio"]
-        ],
-
-        'plt_y_axis_scl': [
-            (-plots_f1["yy_scale_PosF1_delta"], plots_f1["yy_scale_PosF1_delta"]),
-            (-plots_f2["yy_scale_PosF2_delta"], plots_f2["yy_scale_PosF2_delta"]),
-            (0, plots_csp["yy_scale_CSP"]),
-            (0, plots_height["yy_scale_Height_ratio"]),
-             (0, plots_volume["yy_scale_Volume_ratio"])
-        ]
-       }
+    ### configures flags for observables:
+    #### provisional ****
+    fsuv["obs_names"] = ['Position F1', 'Position F2', 'Height']
+    observables_stngs_dict = {
+        "obs_flags" : [fsuv["observables"]["plots_posf1"],
+                       fsuv["observables"]["plots_posf2"],
+                       fsuv["observables"]["plots_height"]],
+        "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)", "Height"],
+        "obs_yaxis_scl" : [fsuv["observables"]["posf1_scale"],
+                           fsuv["observables"]["posf2_scale"],
+                           fsuv["observables"]["height_scale"]]}
     
-    # A pd.DataFrame that organizes settings for each calculated restraint.
-    # Index are the calculated params labels
-    fsuv["restraint_settings"] = pd.DataFrame(restraint_settings_dct,
-                                           index=fsuv["restraint_names"])
-    
-    # configures dictionaries to be passed to plotting functions.
-    # fsuv["series_plot_settings"] = config["series_plot_settings"]
-
-        # 'subtitle_fn':fsuv.subtitle_fn,
-        # 'subtitle_fs':fsuv.subtitle_fs,
-        # 'subtitle_pad':fsuv.subtitle_pad,
-        # 'subtitle_weight':fsuv.subtitle_weight,
-        # 'x_label_fn':fsuv.x_label_fn,
-        # 'x_label_fs':fsuv.x_label_fs,
-        # 'x_label_pad':fsuv.x_label_pad,
-        # 'x_label_weight':fsuv.x_label_weight,
-        # 'y_label_fn':fsuv.y_label_fn,
-        # 'y_label_fs':fsuv.y_label_fs,
-        # 'y_label_pad':fsuv.y_label_pad,
-        # 'y_label_weight':fsuv.y_label_weight,
-        # 'x_ticks_pad':fsuv.x_ticks_pad,
-        # 'x_ticks_len':fsuv.x_ticks_len,
-        # 'y_ticks_fn':fsuv.y_ticks_fn,
-        # 'y_ticks_fs':fsuv.y_ticks_fs,
-        # 'y_ticks_pad':fsuv.y_ticks_pad,
-        # 'y_ticks_weight':fsuv.y_ticks_weight,
-        # 'y_ticks_rot':fsuv.y_ticks_rot,
-        # 'y_ticks_len':fsuv.y_ticks_len,
-        # 'y_ticks_nbins':fsuv.yy_scale_nbins,
-        # 'y_grid_flag':fsuv.y_grid_flag,
-        # 'y_grid_color':fsuv.y_grid_color,
-        # 'y_grid_linestyle':fsuv.y_grid_linestyle,
-        # 'y_grid_linewidth':fsuv.y_grid_linewidth,
-        # 'y_grid_alpha':fsuv.y_grid_alpha,
-        # 'PRE_flag':fsuv.apply_PRE_analysis,
-        # 'pre_color':fsuv.pre_color,
-        # 'pre_lw':fsuv.pre_lw,
-        # 'tag_color':fsuv.tag_color,
-        # 'tag_lw':fsuv.tag_lw,
-        # 'tag_ls':fsuv.tag_ls
-        # }
-    
-    # fsuv["bar_plot_settings"] = {
-    #     'measured_color':fsuv.bar_measured_color,
-    #     'status_color_flag':fsuv.bar_status_color_flag,
-    #     'lost_color':fsuv.bar_lost_color,
-    #     'unassigned_color':fsuv.bar_unassigned_color,
-    #     'bar_width':fsuv.bar_width,
-    #     'bar_alpha':fsuv.bar_alpha,
-    #     'bar_linewidth':fsuv.bar_linewidth,
-    #     'threshold_flag':fsuv.bar_threshold_flag,
-    #     'threshold_color':fsuv.bar_threshold_color,
-    #     'threshold_linewidth':fsuv.bar_threshold_linewidth,
-    #     'threshold_alpha':fsuv.bar_threshold_alpha,
-    #     'threshold_zorder':fsuv.bar_threshold_zorder,
-    #     'mark_fontsize':fsuv.bar_mark_fontsize,
-    #     'mark_prolines_flag':fsuv.bar_mark_prolines_flag,
-    #     'mark_prolines_symbol':fsuv.bar_mark_prolines_symbol,
-    #     'mark_user_details_flag':fsuv.bar_mark_user_details_flag,
-    #     'color_user_details_flag':fsuv.bar_color_user_details_flag,
-    #     'user_marks_dict':fsuv.bar_user_marks_dict,
-    #     'user_bar_colors_dict':fsuv.bar_user_bar_colors_dict
-    #     }
-    #
-    # fsuv["extended_bar_settings"] = {
-    #     'x_ticks_fn':fsuv.ext_bar_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.ext_bar_x_ticks_fs,
-    #     'x_ticks_rot':fsuv.ext_bar_x_ticks_rot,
-    #     'x_ticks_weight':fsuv.ext_bar_x_ticks_weight,
-    #     'x_ticks_color_flag':fsuv.ext_bar_x_ticks_color_flag
-    #     }
-    #
-    # fsuv["compact_bar_settings"] = {
-    #     'x_ticks_fn':fsuv.comp_bar_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.comp_bar_x_ticks_fs,
-    #     'x_ticks_rot':fsuv.comp_bar_x_ticks_rot,
-    #     'x_ticks_weight':fsuv.comp_bar_x_ticks_weight,
-    #     'unassigned_shade':fsuv.comp_bar_unassigned_shade,
-    #     'unassigned_shade_alpha':fsuv.comp_bar_unassigned_shade_alpha
-    #     }
-    #
-    # fsuv["revo_settings"] = {
-    #     'subtitle_fn':fsuv.revo_subtitle_fn,
-    #     'subtitle_fs':fsuv.revo_subtitle_fs,
-    #     'subtitle_pad':fsuv.revo_subtitle_pad,
-    #     'subtitle_weight':fsuv.revo_subtitle_weight,
-    #     'x_label_fn':fsuv.revo_x_label_fn,
-    #     'x_label_fs':fsuv.revo_x_label_fs,
-    #     'x_label_pad':fsuv.revo_x_label_pad,
-    #     'x_label_weight':fsuv.revo_x_label_weight,
-    #     'y_label_fn':fsuv.revo_y_label_fn,
-    #     'y_label_fs':fsuv.revo_y_label_fs,
-    #     'y_label_pad':fsuv.revo_y_label_pad,
-    #     'y_label_weight':fsuv.revo_y_label_weight,
-    #     'x_ticks_fn':fsuv.revo_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.revo_x_ticks_fs,
-    #     'x_ticks_pad':fsuv.revo_x_ticks_pad,
-    #     'x_ticks_weight':fsuv.revo_x_ticks_weight,
-    #     'x_ticks_rot':fsuv.revo_x_ticks_rot,
-    #     'y_ticks_fn':fsuv.revo_y_ticks_fn,
-    #     'y_ticks_fs':fsuv.revo_y_ticks_fs,
-    #     'y_ticks_pad':fsuv.revo_y_ticks_pad,
-    #     'y_ticks_weight':fsuv.revo_y_ticks_weight,
-    #     'y_ticks_rot':fsuv.revo_y_ticks_rot,
-    #     }
-    #
-    # fsuv.res_evo_par_dict = {
-    #     'x_label':fsuv.res_evo_x_label,
-    #     'set_x_values':fsuv.res_evo_set_x_values,
-    #     'y_ticks_nbins':fsuv.yy_scale_nbins,
-    #     'x_ticks_nbins':fsuv.res_evo_x_ticks_nbins,
-    #     'line_style':fsuv.res_evo_line_style,
-    #     'line_color':fsuv.res_evo_line_color,
-    #     'marker_style':fsuv.res_evo_marker_style,
-    #     'marker_color':fsuv.res_evo_marker_color,
-    #     'marker_size':fsuv.res_evo_marker_size,
-    #     'line_width':fsuv.res_evo_line_width,
-    #     'fill_between':fsuv.res_evo_fill_between,
-    #     'fill_color':fsuv.res_evo_fill_color,
-    #     'fill_alpha':fsuv.res_evo_fill_alpha,
-    #     'fit_perform':fsuv.perform_resevo_fit,
-    #     'fit_line_color':fsuv.res_evo_fit_line_color,
-    #     'fit_line_width':fsuv.res_evo_fit_line_width,
-    #     'fit_line_style':fsuv.res_evo_fit_line_style,
-    #     'titration_x_values':fsuv.txv
-    #     }
-    #
-    # fsuv.cs_scatter_par_dict = {
-    #     'x_label':fsuv.cs_scatter_x_label,
-    #     'y_label':fsuv.cs_scatter_y_label,
-    #     'mksize':fsuv.cs_scatter_mksize,
-    #     'scale':fsuv.cs_scatter_scale,
-    #     'mk_type':fsuv.cs_scatter_mk_type,
-    #     'mk_start_color':fsuv.cs_scatter_mk_start_color,
-    #     'mk_end_color':fsuv.cs_scatter_mk_end_color,
-    #     'markers':fsuv.cs_scatter_markers,
-    #     'mk_color':fsuv.cs_scatter_mk_color,
-    #     'mk_edgecolors':fsuv.cs_scatter_mk_edgecolors,
-    #     'mk_lost_color':fsuv.cs_scatter_mk_lost_color,
-    #     'hide_lost':fsuv.cs_scatter_hide_lost
-    #     }
-    #
-    # fsuv.cs_scatter_flower_dict = {
-    #     'x_label':fsuv.cs_scatter_x_label,
-    #     'y_label':fsuv.cs_scatter_y_label,
-    #     'mksize':fsuv.cs_scatter_flower_mksize,
-    #     'color_grad':fsuv.cs_scatter_flower_color_grad,
-    #     'mk_start_color':fsuv.cs_scatter_flower_color_start,
-    #     'mk_end_color':fsuv.cs_scatter_flower_color_end,
-    #     'color_list':fsuv.cs_scatter_flower_color_list,
-    #     'x_label_fn':fsuv.cs_scatter_flower_x_label_fn,
-    #     'x_label_fs':fsuv.cs_scatter_flower_x_label_fs,
-    #     'x_label_pad':fsuv.cs_scatter_flower_x_label_pad,
-    #     'x_label_weight':fsuv.cs_scatter_flower_x_label_weight,
-    #     'y_label_fn':fsuv.cs_scatter_flower_y_label_fn,
-    #     'y_label_fs':fsuv.cs_scatter_flower_y_label_fs,
-    #     'y_label_pad':fsuv.cs_scatter_flower_y_label_pad,
-    #     'y_label_weight':fsuv.cs_scatter_flower_y_label_weight,
-    #     'x_ticks_fn':fsuv.cs_scatter_flower_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.cs_scatter_flower_x_ticks_fs,
-    #     'x_ticks_pad':fsuv.cs_scatter_flower_x_ticks_pad,
-    #     'x_ticks_weight':fsuv.cs_scatter_flower_x_ticks_weight,
-    #     'x_ticks_rot':fsuv.cs_scatter_flower_x_ticks_rot,
-    #     'y_ticks_fn':fsuv.cs_scatter_flower_y_ticks_fn,
-    #     'y_ticks_fs':fsuv.cs_scatter_flower_y_ticks_fs,
-    #     'y_ticks_pad':fsuv.cs_scatter_flower_y_ticks_pad,
-    #     'y_ticks_weight':fsuv.cs_scatter_flower_y_ticks_weight,
-    #     'y_ticks_rot':fsuv.cs_scatter_flower_y_ticks_rot,
-    #     'x_max':fsuv.yy_scale_PosF1_delta,
-    #     'x_min':-fsuv.yy_scale_PosF1_delta,
-    #     'y_max':fsuv.yy_scale_PosF2_delta,
-    #     'y_min':-fsuv.yy_scale_PosF2_delta
-    #     }
-    #
-    # fsuv.heat_map_dict = {
-    #     'vmin':fsuv.heat_map_vmin,
-    #     'vmax':fsuv.heat_map_vmax,
-    #     'x_ticks_fn':fsuv.heat_map_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.heat_map_x_ticks_fs,
-    #     'x_ticks_pad':fsuv.heat_map_x_ticks_pad,
-    #     'x_ticks_weight':fsuv.heat_map_x_ticks_weight,
-    #     'x_ticks_rot':fsuv.heat_map_x_ticks_rot,
-    #     'y_label_fn':fsuv.heat_map_y_label_fn,
-    #     'y_label_fs':fsuv.heat_map_y_label_fs,
-    #     'y_label_pad':fsuv.heat_map_y_label_pad,
-    #     'y_label_weight':fsuv.heat_map_y_label_weight,
-    #     'right_margin':fsuv.heat_map_right_margin,
-    #     'bottom_margin':fsuv.heat_map_bottom_margin,
-    #     #'top_margin':fsuv.heat_map_top_margin,
-    #     'cbar_font_size':fsuv.heat_map_cbar_font_size,
-    #     'tag_color':fsuv.tag_color,
-    #     'tag_lw':fsuv.tag_lw,
-    #     'tag_ls':fsuv.tag_ls
-    #     }
-    #
-    # fsuv.delta_osci_dict = {
-    #     'y_label_fs':fsuv.dpre_osci_y_label_fs,
-    #     'dpre_ms':fsuv.dpre_osci_dpre_ms,
-    #     'dpre_alpha':fsuv.dpre_osci_dpre_alpha,
-    #     'smooth_lw':fsuv.dpre_osci_smooth_lw,
-    #     'ref_color':fsuv.dpre_osci_ref_color,
-    #     'color_init':fsuv.dpre_osci_color_init,
-    #     'color_end':fsuv.dpre_osci_color_end,
-    #     'x_ticks_fn':fsuv.dpre_osci_x_ticks_fn,
-    #     'x_ticks_fs':fsuv.dpre_osci_x_ticks_fs,
-    #     'x_ticks_pad':fsuv.dpre_osci_x_ticks_pad,
-    #     'x_ticks_weight':fsuv.dpre_osci_x_ticks_weight,
-    #     'grid_color':fsuv.dpre_osci_grid_color,
-    #     'shade':fsuv.dpre_osci_shade,
-    #     'shade_regions':fsuv.dpre_osci_shade_regions,
-    #     'res_highlight':fsuv.dpre_osci_res_highlight,
-    #     'res_hl_list':fsuv.dpre_osci_res_hl_list,
-    #     'res_highlight_fs':fsuv.dpre_osci_rh_fs,
-    #     'res_highlight_y':fsuv.dpre_osci_rh_y,
-    #     }
+    fsuv["observables_settings"] = \
+        pd.DataFrame(observables_stngs_dict, index=fsuv["obs_names"])
     
     return fsuv
 
@@ -496,7 +300,8 @@ def checks_PRE_analysis_flags(fsuv):
                         fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
                    fsuv["fitting_settings"]["perform_comparisons"])
            
-        logs(fsw.gen_wet('ERROR', msg, 1), fsuv["general_settings"]["logfile_name"])
+        logs(fsw.gen_wet('ERROR', msg, 1),
+             fsuv["general_settings"]["logfile_name"])
         logs(fsw.abort_msg, fsuv["general_settings"]["logfile_name"])
         fsw.abort()
         #DONE
@@ -520,7 +325,8 @@ def checks_cube_axes_flags(fsuv):
         # DO
         msg = "Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. There is nothing to calculate. Confirm this is actually what you want."
         
-        logs(fsw.gen_wet('NOTE', msg, 2), fsuv["general_settings"]["logfile_name"])
+        logs(fsw.gen_wet('NOTE', msg, 2),
+             fsuv["general_settings"]["logfile_name"])
         # DONE
         return False
     else:
@@ -545,22 +351,24 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
         False otherwise.
     """
     
-    if not(fsuv["plotting_flags"]):
+    plot_bool = pd.Series([v for k,v in fsuv["plotting_flags"].items()])
+    
+    if not(plot_bool.any()):
         # DO ++++
         for restraint in fsuv["restraint_settings"].index:
             # DO export calculation tables
             if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
                 farseer_series.write_table(restraint,
                                            restraint,
-                                            resonance_type=resonance_type)
+                                           resonance_type=resonance_type)
             # DONE
         
         msg = "All potting flags are turned off. No plots will be drawn. Confirm in the Settings menu if this is the desired configuration. I won't leave you with empty hands though, all calculated restraints have been exported in nicely formated tables ;-)"
         
         farseer_series.log_r(fsw.gen_wet('NOTE', msg, 3))
-        
+    
         return False
-        # DONE ++++
+        # DONE ++++ 
     
     return True
 
@@ -577,7 +385,8 @@ def checks_calculation_flags(fsuv):
         #DO
         msg = "All restraints calculation routines are deactivated. Nothing will be calculated."
         
-        logs(fsw.gen_wet('WARNING', msg, 14), fsuv["general_settings"]["logfile_name"])
+        logs(fsw.gen_wet('WARNING', msg, 14),
+             fsuv["general_settings"]["logfile_name"])
         #DONE
     ########
     return
@@ -636,7 +445,8 @@ def checks_axis_coherency(dim, fsuv):
     
     msg = 'You have activated the analysis along dimension/axis {}. However, there are no datapoints along this axis so that a series could not be created and analysed. Confirm the axis analysis flags are correctly set in the Run Settings.'.format(dim)
     
-    logs(fsw.gen_wet('WARNING', msg, 20), fsuv["general_settings"]["logfile_name"])
+    logs(fsw.gen_wet('WARNING', msg, 20),
+         fsuv["general_settings"]["logfile_name"])
     
     return
     
@@ -657,9 +467,10 @@ def creates_farseer_dataset(fsuv):
     fsuv.FASTAstart
     fsuv["general_settings"]["logfile_name"]
     """
-    exp = fcube.FarseerCube(fsuv["general_settings"]["input_spectra_path"],
-                            has_sidechains=fsuv["general_settings"]["has_sidechains"],
-                            FASTAstart=fsuv["fasta_settings"]["FASTAstart"])
+    exp = fcube.FarseerCube(\
+        fsuv["general_settings"]["input_spectra_path"],
+        has_sidechains=fsuv["general_settings"]["has_sidechains"],
+        FASTAstart=fsuv["fasta_settings"]["FASTAstart"])
     
     exp.log_export_onthefly=True
     exp.log_export_name=fsuv["general_settings"]["logfile_name"]
@@ -869,7 +680,8 @@ def init_fs_cube(exp, fsuv):
     Depends on:
     fsuv.use_sidechains
     """
-    exp.init_Farseer_cube(use_sidechains=fsuv["general_settings"]["use_sidechains"])
+    exp.init_Farseer_cube(\
+        use_sidechains=fsuv["general_settings"]["use_sidechains"])
     
     return
 
@@ -1108,30 +920,42 @@ def perform_calcs(farseer_series, fsuv):
     # if the user wants to calculate combined Chemical Shift Perturbations
     if fsuv["csp_settings"]["calcs_CSP"]:
         # calculate differences in chemical shift for each dimension
-        farseer_series.calc_cs_diffs(fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                                      'Position F1')
-        farseer_series.calc_cs_diffs(fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-                                      'Position F2')
+        farseer_series.calc_cs_diffs(\
+            fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+            'Position F1')
+        
+        farseer_series.calc_cs_diffs(\
+            fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+            'Position F2')
     
         # Calculates CSPs
-        farseer_series.calc_csp(calccol=fsuv["csp_settings"]["calccol_name_CSP"],
-                                 pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                                 pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"])
+        farseer_series.calc_csp(\
+            calccol=fsuv["csp_settings"]["calccol_name_CSP"],
+            pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+            pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"])
     
     # if the user only wants to calculate perturbation in single dimensions
     else:
         if fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
-            farseer_series.calc_cs_diffs(fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                                          'Position F1')
+            farseer_series.calc_cs_diffs(\
+                fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                'Position F1')
         if fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
-            farseer_series.calc_cs_diffs(fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-                                          'Position F2')
+            farseer_series.calc_cs_diffs(\
+                fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                'Position F2')
     
     # Calculates Ratios
     if fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
-        farseer_series.calc_ratio(fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"], 'Height')
+        farseer_series.calc_ratio(\
+            fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
+            'Height')
     if fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
-        farseer_series.calc_ratio(fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"], 'Volume')
+        farseer_series.calc_ratio(\
+            fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
+            'Volume')
+    
+    ### ADD ADDITIONAL CALCULATION HERE ###
     
     return
 
@@ -1151,6 +975,7 @@ def perform_fits(farseer_series, fsuv):
     fsuv.perform_resevo_fit
     fsuv.restraint_settings
     fsuv["revo_settings"]["titration_x_values"]
+    fsuv["fitting_parameters"]
     """
     # fits are allowed only for X axis series
     if not(fsuv["revo_settings"]["perform_resevo_fitting"] \
@@ -1159,12 +984,27 @@ def perform_fits(farseer_series, fsuv):
     
     checks_fit_input(farseer_series, fsuv)
     
-    for restraint in fsuv["restraint_settings"].index[:3]:
+    ####
+    for restraint in fsuv["restraint_settings"].index:
         
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
             
-            farseer_series.perform_fit(calccol = restraint,
-                                        x_values=fsuv["revo_settings"]["titration_x_values"])
+            farseer_series.perform_fit(\
+                restraint,
+                fsuv["revo_settings"]["titration_x_values"],
+                fsuv["fitting_parameters"]["mininum_datapoints"],
+                fsuv["fitting_parameters"]["fitting_function"])
+    
+    for obs in fsuv["observables_settings"].index:
+        
+        if fsuv["observables_settings"].loc[obs, 'obs_flags']:
+            
+            farseer_series.perform_fit(\
+                obs,
+                fsuv["revo_settings"]["titration_x_values"],
+                fsuv["fitting_parameters"]["mininum_datapoints"],
+                fsuv["fitting_parameters"]["fitting_function"])
+    
     return
 
 def PRE_analysis(farseer_series, fsuv):
@@ -1197,15 +1037,16 @@ def PRE_analysis(farseer_series, fsuv):
         return
     # if analysing cond3: performs calculations.
     if farseer_series.series_axis == 'cond3':
-        farseer_series.load_theoretical_PRE(fsuv["general_settings"]["input_spectra_path"],
-                                             farseer_series.prev_dim)
+        farseer_series.load_theoretical_PRE(\
+            fsuv["general_settings"]["input_spectra_path"],
+            farseer_series.prev_dim)
         
         for sourcecol, targetcol in zip(fsuv["restraint_settings"].index[3:],\
                                         ['Hgt_DPRE', 'Vol_DPRE']):
         
             # only in the parameters allowed by the user
             if fsuv["restraint_settings"].loc[sourcecol, 'calcs_restraint_flg']:
-                farseer_series.calc_Delta_PRE(
+                farseer_series.calc_Delta_PRE(\
                     sourcecol, targetcol,
                     gaussian_stddev=fsuv["pre_settings"]["gaussian_stdev"],
                     guass_x_size=fsuv["pre_settings"]["gauss_x_size"])
@@ -1250,7 +1091,6 @@ def PRE_analysis(farseer_series, fsuv):
         and (farseer_series.prev_dim == 'para' \
             or farseer_series.next_dim == 'para')) \
         and fsuv['plotting_flags']['do_dpre_osci']:
-        
         
         for sourcecol, targetcols in zip(fsuv["restraint_settings"].index[3:],
                                          ['Hgt_DPRE', 'Vol_DPRE']):
@@ -1306,7 +1146,8 @@ def exports_chimera_att_files(farseer_series, fsuv):
             # do export chimera attribute files
             farseer_series.write_Chimera_attributes(\
                     restraint,
-                    resformat=fsuv["general_settings"]["chimera_att_select_format"])
+                    resformat=\
+                        fsuv["general_settings"]["chimera_att_select_format"])
     
     return
 
@@ -1493,6 +1334,23 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
                                   fig_file_type=fig_file_type,
                                   fig_dpi=fig_dpi)
         # DONE ++++
+    
+    for obs in fsuv["observables_settings"].index:
+        if fsuv["observables_settings"].loc[obs,"obs_flags"]:
+            farseer_series.plot_base(\
+                    obs, 'res', 'res_evo',
+                    {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
+                    par_ylims=\
+                    fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
+                    ylabel=\
+                    fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
+                    cols_per_page=fsuv["res_evo_settings"]["cols_page"],
+                    rows_per_page=fsuv["res_evo_settings"]["rows_page"],
+                    fig_height=fig_height,
+                    fig_width=fig_width,
+                    fig_file_type=fig_file_type,
+                    fig_dpi=fig_dpi)
+    
     return
 
 def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
@@ -1502,7 +1360,8 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     Args:
         comp_panel (FarseerSeries instance generated from 
             Comparisons.gen_next_dim or gen_prev_dim): contains all the 
-            experiments parsed along an axis and for a specific Farseer-NMR Cube's coordinates.
+            experiments parsed along an axis and for a specific
+            Farseer-NMR Cube's coordinates.
         
         fsuv (module): contains user defined variables (preferences) after
         .read_user_variables().
@@ -1658,8 +1517,7 @@ def run_farseer(fsuv):
     
     # identify residues
     identify_residues(exp)
-
-
+    
     # corrects chemical shifts
     if cs["perform_cs_correction"]:
         correct_shifts(exp, fsuv, resonance_type='Backbone')
