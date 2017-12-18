@@ -17,6 +17,7 @@ from gui.Footer import Footer
 from gui import resources_rc
 
 from gui.tabs.peaklist_selection import Interface
+from gui.tabs.parassign import Parassign
 from gui.tabs.settings import Settings
 
 
@@ -26,6 +27,7 @@ class TabWidget(QTabWidget):
         QTabWidget.__init__(self, parent=None)
         self.tab1 = QWidget()
         self.tab2 = QWidget()
+        self.tab3 = QWidget()
         self.tab1.setLayout(QGridLayout())
         self.tab2.setLayout(QGridLayout())
         variables = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
@@ -36,6 +38,7 @@ class TabWidget(QTabWidget):
         self.tab2.layout().addWidget(self.interface)
         self.addTab(self.tab2, "PeakList Selection")
         self.addTab(self.tab1, "Settings")
+        self.addTab(self.tab3, "Parassign")
         self.tab1.setObjectName("Settings")
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
