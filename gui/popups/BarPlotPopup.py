@@ -98,7 +98,7 @@ class BarPlotPopup(QDialog):
         self.markProlines.setChecked(self.defaults["mark_prolines_flag"])
         self.proline_marker.field.setText(self.defaults["mark_prolines_symbol"])
         self.user_details.setChecked(self.defaults["mark_user_details_flag"])
-        self.colour_user_details.setChecked(self.defaults["mark_user_details_flag"])
+        self.colour_user_details.setChecked(self.defaults["color_user_details_flag"])
 
 
     def get_values(self):
@@ -118,7 +118,7 @@ class BarPlotPopup(QDialog):
         self.markProlines.setChecked(self.variables["mark_prolines_flag"])
         self.proline_marker.field.setText(self.variables["mark_prolines_symbol"])
         self.user_details.setChecked(self.variables["mark_user_details_flag"])
-        self.colour_user_details.setChecked(self.variables["mark_user_details_flag"])
+        self.colour_user_details.setChecked(self.variables["color_user_details_flag"])
 
     def set_values(self, variables):
 
@@ -137,6 +137,6 @@ class BarPlotPopup(QDialog):
         self.variables["mark_prolines_flag"] = self.markProlines.checkBox.isChecked()
         self.variables["mark_prolines_symbol"] = str(self.proline_marker.field.text())
         self.variables["mark_user_details_flag"] = self.user_details.checkBox.isChecked()
-        self.variables["mark_user_details_flag"] = self.colour_user_details.checkBox.isChecked()
+        self.variables["color_user_details_flag"] = self.colour_user_details.checkBox.isChecked()
         variables["bar_plot_settings"] = self.variables
         self.accept()
