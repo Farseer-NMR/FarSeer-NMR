@@ -367,6 +367,7 @@ def parseCcpn(peaklist_file):
   peakList = []
   reader = csv.reader(fin)
   for row in reader:
+      print(row)
       atoms = []
       for v in res1to3dict.values():
           if v in row[4]:
@@ -376,7 +377,7 @@ def parseCcpn(peaklist_file):
               a2 = row[5].strip().split(v)[-1]
               atoms.append(a2)
       peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
-                  volume=row[7], height=row[6])
+                  volume=row[7], height=row[6], fit_method=row[12], merit=row[10], volume_method=row[13], details=row[11])
 
       peakList.append(peak)
 
