@@ -32,7 +32,11 @@ file_extenstions = ['peaks', 'xpk', 'out', 'csv']
 def getPeakListFileFormat(filePath):
 
     fin = open(filePath, 'r')
+    if len(filePath.split('.')) < 2:
+        print('Invalid File Extension')
+        return
     if filePath.split('.')[1] not in file_extenstions:
+        print('Invalid File Extension')
         return
     for line in fin:
         if not line.strip():
