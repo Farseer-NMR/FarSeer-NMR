@@ -773,7 +773,8 @@ def series_kwargs(fsuv,
         'cs_lost':fsuv["csp_settings"]["cs_lost"],
         'restraint_list':fsuv["restraint_names"],
         'log_export_onthefly':True,
-        'log_export_name':fsuv["general_settings"]["logfile_name"]}
+        'log_export_name':fsuv["general_settings"]["logfile_name"]
+        }
     
     return dd
 
