@@ -960,6 +960,11 @@ def eval_series(series_dct, fsuv,
                 exports_chimera_att_files(\
                     series_dct[cond][dim2_pt][dim1_pt], fsuv)
                 
+                exports_all_parameters(
+                    series_dct[cond][dim2_pt][dim1_pt],
+                    fsuv
+                    )
+                
                 # PLOTS DATA
                 # plots data are exported together with the plots in
                 # fsT.plot_base(), but can be used separatly with
@@ -1266,6 +1271,51 @@ def exports_chimera_att_files(farseer_series, fsuv):
                     resformat=\
                         fsuv["general_settings"]["chimera_att_select_format"]
                     )
+    
+    return
+
+def exports_all_parameters(farseer_series, fsuv,
+        resonance_type='Backbone'):
+    """
+    Exports the evolution of all parameters in separated tables.
+    
+    Table rows are residues and columns are series datapoints.
+    """
+    
+    if not(resonance_type in ['Backbone', 'Sidechains']):
+        input(\
+        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        return
+    
+    # Exports calculated parameters
+    for restraint in fsuv["restraint_settings"].index:
+        if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
+            farseer_series.write_table(
+                restraint,
+                restraint,
+                resonance_type=resonance_type
+                )
+    
+    # Exports all observables and user annotations
+    list_of_observables = [
+        "Position F2",
+        "Position F1",
+        "Height",
+        "Volume",
+        "Line Width F1 (Hz)",
+        "Line Width F2 (Hz)",
+        "Merit",
+        "Details",
+        "Fit Method",
+        "Vol. Method"
+        ]
+    
+    for observable in list_of_observables:
+        farseer_series.write_table(
+            "observables/"+observable,
+            observable,
+            resonance_type=resonance_type
+            )
     
     return
 

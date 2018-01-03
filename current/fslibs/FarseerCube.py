@@ -418,11 +418,11 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         FASTAfile.close()
 
-        # Res# is kept as str() to allow reindexing
+        # ResNo is kept as str() to allow reindexing
         # later on the finds_missing function.
         #
         dd = {}
-        dd["Res#"] = [str(i) for i in range(self.FASTAstart,
+        dd["ResNo"] = [str(i) for i in range(self.FASTAstart,
                                            (self.FASTAstart + len(FASTA)))]
         dd["1-letter"] = list(FASTA)
         # aal1tol3 dictionary is defined at the end of this module
@@ -432,22 +432,22 @@ FASTA starting residue: {}  """.format(spectra_path,
         # functions.
         atomtype = self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                         loc[0,'Assign F1'][-1]
-        dd["Assign F1"] = [str(i + j + atomtype) for i, j in zip(dd["Res#"], 
+        dd["Assign F1"] = [str(i + j + atomtype) for i, j in zip(dd["ResNo"], 
                                                             dd["3-letter"])]
         
         atomtype = self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                         loc[0,'Assign F2'][-1]
-        dd["Assign F2"] = [str(i + j + atomtype) for i, j in zip(dd["Res#"], 
+        dd["Assign F2"] = [str(i + j + atomtype) for i, j in zip(dd["ResNo"], 
                                                             dd["3-letter"])]
         
         # Details set to 'None' as it is by default in CCPNMRv2 peaklists
         dd['Details'] = ['None' for i in FASTA]
 
         df = pd.DataFrame(dd, 
-                          columns=['Res#', '3-letter', '1-letter',
+                          columns=['ResNo', '3-letter', '1-letter',
                                    'Assign F1', 'Assign F2', 'Details'])
         
-        logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['Res#'][-1])
+        logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         
         self.log_r(logs)
         
@@ -508,10 +508,10 @@ FASTA starting residue: {}  """.format(spectra_path,
         Receives a DataFrame with the original assignment information
         (AssignF1) and adds four columns to the DataFrame:
 
-        ['Res#', '1-letter', '3-letter', 'Peak Status']
+        ['ResNo', '1-letter', '3-letter', 'Peak Status']
 
         where:
-        - 'Res#' is the residue number
+        - 'ResNo' is the residue number
         - '1-letter', is the 1-letter code residue name
         - '3-letter', is the 3-letter code residue name
           if the assignment belongs to a side-chain resonance, a character
@@ -523,7 +523,7 @@ FASTA starting residue: {}  """.format(spectra_path,
 
         1. Extracts residue information from 'Assigned F1' column,
         separating the residue name from the residue number. This creates
-        a new pd.DataFrame with column names 'Res#' and '3-letter'.
+        a new pd.DataFrame with column names 'ResNo' and '3-letter'.
 
             '1MetH' -> '1' and 'Met'
 
@@ -536,8 +536,8 @@ FASTA starting residue: {}  """.format(spectra_path,
         
             3.1 if peaklist is empty adds all dummy rows of type <lost>.
         
-        4. Sorts the peaklist according to 'Res#' just in case the original
-        .CSV file was not sorted. For correct sorting 'Res#' as to be set
+        4. Sorts the peaklist according to 'ResNo' just in case the original
+        .CSV file was not sorted. For correct sorting 'ResNo' as to be set
         astype int and returned back to str.
 
         (conditional). If sidechains are present in the peaklist:
@@ -559,7 +559,7 @@ FASTA starting residue: {}  """.format(spectra_path,
             resInfo = self.allpeaklists[z][y][x].\
                 loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
             
-            resInfo.columns = ['Res#', '3-letter']
+            resInfo.columns = ['ResNo', '3-letter']
     
             # Step 2
             resInfo.loc[:,'1-letter'] = \
@@ -592,13 +592,13 @@ FASTA starting residue: {}  """.format(spectra_path,
                     ['lost',np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]
             
             # Step 4
-            self.allpeaklists[z][y][x].loc[:,'Res#'] = \
-            self.allpeaklists[z][y][x]['Res#'].astype(int)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+            self.allpeaklists[z][y][x]['ResNo'].astype(int)
             
-            self.allpeaklists[z][y][x].sort_values(by='Res#', inplace=True)
+            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
             
-            self.allpeaklists[z][y][x].loc[:,'Res#'] = \
-            self.allpeaklists[z][y][x].loc[:,'Res#'].astype(str)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+            self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
             
             self.allpeaklists[z][y][x].reset_index(inplace=True)
             
@@ -632,14 +632,14 @@ FASTA starting residue: {}  """.format(spectra_path,
                 
                 self.allsidechains[z][y][x].reset_index(inplace=True)
                 
-                self.allsidechains[z][y][x].loc[:,'Res#'] = \
-                    self.allsidechains[z][y][x]['Res#'].astype(int)
+                self.allsidechains[z][y][x].loc[:,'ResNo'] = \
+                    self.allsidechains[z][y][x]['ResNo'].astype(int)
                 
                 self.allsidechains[z][y][x].\
-                    sort_values(by=['Res#','ATOM'] , inplace=True)
+                    sort_values(by=['ResNo','ATOM'] , inplace=True)
                 
-                self.allsidechains[z][y][x].loc[:,'Res#'] = \
-                    self.allsidechains[z][y][x]['Res#'].astype(str)
+                self.allsidechains[z][y][x].loc[:,'ResNo'] = \
+                    self.allsidechains[z][y][x]['ResNo'].astype(str)
                 
                 # creates backbone peaklist without sidechains
                 self.allpeaklists[z][y][x] = \
@@ -648,7 +648,7 @@ FASTA starting residue: {}  """.format(spectra_path,
                 # DONE if ++++ 
             
             # Writes sanity check
-            if {'1-letter', 'Res#', '3-letter', 'Peak Status'}.\
+            if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
                issubset(self.allpeaklists[z][y][x].columns):
                 columns_OK = 'OK'
             
@@ -690,7 +690,7 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         self.check_ref_res(\
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
-                loc[:,'Res#'], ref_res)
+                loc[:,'ResNo'], ref_res)
         
         title = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A RESIDUE {}'.\
             format(ref_res)
@@ -702,7 +702,7 @@ FASTA starting residue: {}  """.format(spectra_path,
                                   self.xxcoords):
             # DO Cicle coords
             dp_res_mask = \
-                self.allpeaklists[z][y][x].loc[:,'Res#'] == ref_res
+                self.allpeaklists[z][y][x].loc[:,'ResNo'] == ref_res
             
             dp_F1_cs = \
                 self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F1']
@@ -813,20 +813,20 @@ residues.'.format(z, y, x)
             A list with information on the peaklist length evolution
                 [target initial length, ref length, target final length]
         """
-        # merges Res# and ATOM cols to keep sorted
+        # merges ResNo and ATOM cols to keep sorted
         if resonance_type=='Sidechains':
             # DO merge res and atom
-            ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,['Res#', 'ATOM']].\
+            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,['ResNo', 'ATOM']].\
                 apply(lambda x: ''.join(x), axis=1)
         
-            target_pkl.loc[:,'Res#'] = \
-                target_pkl.loc[:,['Res#', 'ATOM']].\
+            target_pkl.loc[:,'ResNo'] = \
+                target_pkl.loc[:,['ResNo', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1)
             # DONE
         
         # creates an index based on the residue numbers of the reference
         # peaklist
-        ind = ref_pkl.loc[:,'Res#']
+        ind = ref_pkl.loc[:,'ResNo']
         
         # reads size of reference index
         length_ind = ind.size 
@@ -836,7 +836,7 @@ residues.'.format(z, y, x)
         
         # expands the target peaklist to the new index
         target_pkl = \
-            target_pkl.set_index('Res#').\
+            target_pkl.set_index('ResNo').\
                              reindex(ind).\
                              reset_index().\
                              fillna(fillna)
@@ -855,8 +855,8 @@ residues.'.format(z, y, x)
         # reverts previous merge
         if resonance_type=='Sidechains':
             target_pkl.loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-            target_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
-            ref_pkl.loc[:,'Res#'] = ref_pkl.loc[:,'Res#'].str[:-1]
+            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
+            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
         
         return target_pkl, [target_ind_init_len, length_ind, 
                             target_ind_final_len]
@@ -1053,7 +1053,7 @@ residues.'.format(z, y, x)
             return
         
         if performed_cs_correction and resonance_type=='Backbone':
-            col_order = ['Res#',
+            col_order = ['ResNo',
                          '1-letter',
                          '3-letter',
                          'Peak Status',
@@ -1078,7 +1078,7 @@ residues.'.format(z, y, x)
                          'Pos F2 correction']
                          #                         'index',
         elif performed_cs_correction and resonance_type=='Sidechains':
-            col_order = ['Res#',
+            col_order = ['ResNo',
                          'ATOM',
                          '1-letter',
                          '3-letter',
@@ -1104,7 +1104,7 @@ residues.'.format(z, y, x)
                          'Pos F2 correction']
         
         elif not(performed_cs_correction) and resonance_type=='Backbone':
-            col_order = ['Res#',
+            col_order = ['ResNo',
                          '1-letter',
                          '3-letter',
                          'Peak Status',
@@ -1125,7 +1125,7 @@ residues.'.format(z, y, x)
                          'index']
         
         elif not(performed_cs_correction) and resonance_type=='Sidechains':
-            col_order = ['Res#',
+            col_order = ['ResNo',
                          'ATOM',
                          '1-letter',
                          '3-letter',
@@ -1270,7 +1270,7 @@ residues.'.format(z, y, x)
                 
                 # initiates series
                 
-                ## intermediate step to remove rows with NaN in Res# column
+                ## intermediate step to remove rows with NaN in ResNo column
                 ## this is necessary to solve issue_86 where NaN rows
                 ## are added if no fasta file is used to complete the residue
                 ## list and when different constrcuts are used along y
@@ -1280,7 +1280,7 @@ residues.'.format(z, y, x)
                 dfdict = {}
                 for item in fscube.loc[dp2, dp1, :, :, :].items:
                     df = fscube.loc[dp2, dp1, item, :, :]
-                    df.dropna(axis=0, how='any', subset=['Res#'], inplace=True)
+                    df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
                     dfdict[item] = df
                 
                 series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
@@ -1328,7 +1328,7 @@ residues.'.format(z, y, x)
         series_panel.create_attributes(**sc_kwargs)
         #
         
-        #series_panel.dropna(axis=0, how='any', subset=['Res#'])
+        #series_panel.dropna(axis=0, how='any', subset=['ResNo'])
         
         return series_panel
     
@@ -1574,16 +1574,16 @@ residues.'.format(z, y, x)
             f = list(self.allfasta[z][y].keys())[0]
             
             peaklist_first_residue = \
-                int(self.allpeaklists[z][y][x].loc[:,'Res#'].head(n=1))
+                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].head(n=1))
             
             peaklist_last_residue = \
-                int(self.allpeaklists[z][y][x].loc[:,'Res#'].tail(n=1))
+                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].tail(n=1))
             
             fasta_first_residue = \
-                int(self.allfasta[z][y][f].loc[:,'Res#'].head(n=1))
+                int(self.allfasta[z][y][f].loc[:,'ResNo'].head(n=1))
             
             fasta_last_residue = \
-                int(self.allfasta[z][y][f].loc[:,'Res#'].tail(n=1))
+                int(self.allfasta[z][y][f].loc[:,'ResNo'].tail(n=1))
             
             
             if fasta_first_residue <= peaklist_first_residue \
