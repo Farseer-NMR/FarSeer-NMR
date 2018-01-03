@@ -367,7 +367,6 @@ def parseCcpn(peaklist_file):
   peakList = []
   reader = csv.reader(fin)
   for row in reader:
-      print(row)
       atoms = []
       for v in res1to3dict.values():
           if v in row[4]:
