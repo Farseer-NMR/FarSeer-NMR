@@ -49,10 +49,10 @@ def write_peaklist_file(fin, peak_list):
             peak.volume,
             peak.linewidths[0],
             peak.linewidths[1],
-            None,
-            None,
-            None,
-            None
+            peak.merit,
+            peak.details,
+            peak.fit_method,
+            peak.volume_method
         ])
 
 def list_all_files_in_path(path):
