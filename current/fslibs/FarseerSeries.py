@@ -155,7 +155,7 @@ class FarseerSeries(pd.Panel):
         self.dim_comparison = dim_comparison
         self.resonance_type = resonance_type
         self.res_info = \
-            self.loc[:,:,['Res#','1-letter','3-letter','Peak Status']]
+            self.loc[:,:,['ResNo','1-letter','3-letter','Peak Status']]
         
         self.restraint_list = restraint_list
         
@@ -549,7 +549,7 @@ class FarseerSeries(pd.Panel):
             self.abort()
         
         # check tag residue
-        if not(any(self.loc['para',:,'Res#'].isin([tag]))):
+        if not(any(self.loc['para',:,'ResNo'].isin([tag]))):
             # DO
             msg = 'The residue number where the tag is placed according to the \*.pre file ({}) is not part of the protein sequence ({}-{}).'.\
             format(tag_num,
@@ -560,7 +560,7 @@ class FarseerSeries(pd.Panel):
             # DONE check
         
         self.loc['para',:,'tag'] = ''
-        tagmask = self.loc['para',:,'Res#'] == tag
+        tagmask = self.loc['para',:,'ResNo'] == tag
         self.loc['para',tagmask,'tag'] = '*'
         tagf.close()
         self.log_r(\
@@ -651,8 +651,8 @@ with window size {} and stdev {}'.\
         table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
-            table.loc[:,'Res#'] = \
-                table.loc[:,'Res#'] + self.ix[0,:,'ATOM']
+            table.loc[:,'ResNo'] = \
+                table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
         
         tablefolder = '{}/{}'.format(self.tables_and_plots_folder, 
                                      restraint_folder)
@@ -718,7 +718,7 @@ with window size {} and stdev {}'.\
         One file is exported for each experiment in the Series.
         
         Args:
-            resformat (str): the formating options for the 'Res#' column. 
+            resformat (str): the formating options for the 'ResNo' column. 
             This must match the residue selection command in Chimera.
             See:
             www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
@@ -732,7 +732,7 @@ with window size {} and stdev {}'.\
         resform = lambda x: "\t{}{}\t".format(resformat, x)
         colform = lambda x: colformat.format(x)
         
-        formatting = {'Res#': resform}
+        formatting = {'ResNo': resform}
         
         ####
         for item in self.items:
@@ -756,10 +756,10 @@ with window size {} and stdev {}'.\
 attribute: {}
 match mode: 1-to-1
 recipient: residues
-\t""".format(resformat + self.loc[item,mask_lost,'Res#'].\
+\t""".format(resformat + self.loc[item,mask_lost,'ResNo'].\
                 to_string(header=False, index=False).\
                     replace(' ', '').replace('\n', ','),
-             resformat + self.loc[item,mask_unassigned,'Res#'].\
+             resformat + self.loc[item,mask_unassigned,'ResNo'].\
                 to_string(header=False, index=False).\
                     replace(' ', '').replace('\n', ','),
              calccol.lower())
@@ -767,7 +767,7 @@ recipient: residues
             fileout.write(attheader)
             
             formatting[calccol] = colform
-            to_write = self.loc[item,mask_measured,['Res#',calccol]].\
+            to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
                         to_string(header=False, index=False,
                                 formatters=formatting,
                                 col_space=0).replace(' ', '')
@@ -956,16 +956,16 @@ recipient: residues
             # plot theoretical PRE
             if bartype == 'v':
                 axs.plot(self.loc[exp,:,'Theo PRE'],
-                         self.loc[exp,::-1,'Res#'].astype(float),
+                         self.loc[exp,::-1,'ResNo'].astype(float),
                          zorder=9, color=pre_color, lw=pre_lw)
             elif bartype == 'h':
-                axs.plot(self.loc[exp,:,'Res#'].astype(float),
+                axs.plot(self.loc[exp,:,'ResNo'].astype(float),
                          self.loc[exp,:,'Theo PRE'],
                          zorder=9, color=pre_color, lw=pre_lw)
             
             # plot tag position
             xtagm = self.loc[exp,:,'tag']=='*'
-            xtag = self.loc[exp,xtagm,'Res#'].astype(float)
+            xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
             
             if bartype in ['h', 'osci']:
                 axs.vlines(xtag, 0, y,
@@ -1098,7 +1098,7 @@ recipient: residues
             
             ticklabels = self.loc[experiment,\
                                   0::xtick_spacing,\
-                                  ['Res#','1-letter']].\
+                                  ['ResNo','1-letter']].\
                             apply(lambda x: ''.join(x), axis=1)
             
             # Configure XX ticks and Label
@@ -1136,10 +1136,10 @@ recipient: residues
             axs[i].set_xticks(self.major_axis)
         
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            print(self.loc[experiment,:,'Res#'])
+            print(self.loc[experiment,:,'ResNo'])
             
             axs[i].set_xticklabels(\
-                self.loc[experiment,:,['Res#','1-letter', 'ATOM']].\
+                self.loc[experiment,:,['ResNo','1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
                 fontname=x_ticks_fn,
                 fontsize=x_ticks_fs,
@@ -1155,7 +1155,7 @@ recipient: residues
                                       'unassigned':unassigned_color})
         
         elif plot_style == 'bar_compacted':
-            bars = axs[i].bar(self.loc[experiment,:,'Res#'].astype(float),
+            bars = axs[i].bar(self.loc[experiment,:,'ResNo'].astype(float),
                               self.loc[experiment,:,calccol].fillna(0),
                                width=bar_width,
                                align='center',
@@ -1163,8 +1163,8 @@ recipient: residues
                                linewidth=bar_linewidth,
                                zorder=4)
             
-            initialresidue = int(self.ix[0, 0, 'Res#'])
-            finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
+            initialresidue = int(self.ix[0, 0, 'ResNo'])
+            finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
             
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100*10
@@ -1184,7 +1184,7 @@ recipient: residues
             if unassigned_shade:
                 unassignedmask = \
                     self.loc[experiment, :, 'Peak Status'] == 'unassigned'
-                for residue in self.loc[experiment, unassignedmask, 'Res#']:
+                for residue in self.loc[experiment, unassignedmask, 'ResNo']:
                     residue = int(residue) - 0.5
                     axs[i].axvspan(residue, residue+1,
                                    color=unassigned_color,
@@ -1403,7 +1403,7 @@ recipient: residues
     
         # https://github.com/matplotlib/matplotlib/issues/6266
         axs[i].set_yticklabels(\
-            self.loc[experiment,0::xtick_spacing,['Res#','1-letter']].\
+            self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
                 apply(lambda x: ''.join(x), axis=1),
             fontname=x_ticks_fn,
             fontsize=x_ticks_fs-2,
@@ -1578,8 +1578,8 @@ recipient: residues
         """
         
         # Draws subplot title
-        res = self.ix[0,i,'Res#']
-        subtitle = self.ix[0,i,'Res#'] + self.ix[0,i,'1-letter']
+        res = self.ix[0,i,'ResNo']
+        subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
         axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
                          fontname=subtitle_fn, fontweight=subtitle_weight)
         
@@ -1818,7 +1818,7 @@ recipient: residues
                                rotation=y_ticks_rot)
         
         # Configure subtitle
-        subtitle = self.ix[0,i,'Res#'] + self.ix[0,i,'1-letter']
+        subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
         axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
                          fontname=subtitle_fn, fontweight=subtitle_weight)
         
@@ -2032,7 +2032,7 @@ recipient: residues
             axs[0].text(\
                 float(self.loc[mesmask,residue,'H1_delta'].tail(n=1))*1.05,
                 float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
-                self.ix[0,residue,'Res#'],
+                self.ix[0,residue,'ResNo'],
                 fontsize=4, color='#c99543', zorder=10)
         
         # Configure Axis Ticks
@@ -2169,8 +2169,8 @@ recipient: residues
             axs[i].get_xaxis().set_visible(True)
             axs[i].tick_params(axis='x', bottom='on', length=1.5)
             
-            initialresidue = int(self.ix[0, 0, 'Res#'])
-            finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
+            initialresidue = int(self.ix[0, 0, 'ResNo'])
+            finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
             
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100*10
@@ -2277,7 +2277,7 @@ recipient: residues
         # http://stackoverflow.com/questions/29437305/how-to-fix-attributeerror-series-object-has-no-attribute-find
         # plots dpre for first point in comparison
         #pmaskr = self.ix[0,:,calccol] > 0
-        axs[i].plot(self.ix[0,:,'Res#'].astype(float),
+        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
                     self.ix[0,:,calccol].astype(float),
                     'o',
                     markersize=dpre_ms,
@@ -2288,7 +2288,7 @@ recipient: residues
         
         # plots dpre for titration data point
         #pmaskd = self.loc[experiment,:,calccol] > 0
-        axs[i].plot(self.loc[experiment,:,'Res#'].astype(float),
+        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
                     self.loc[experiment,:,calccol].astype(float),
                     'o',
                     c=color,
@@ -2300,7 +2300,7 @@ recipient: residues
         
         # plots dpre_smooth for first data point in comparison
         #pmaskr = self.ix[0,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.ix[0,:,'Res#'].astype(float),
+        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
                     self.ix[0,:,calccol+'_smooth'].astype(float),
                     ls='-',
                     lw=smooth_lw,
@@ -2309,7 +2309,7 @@ recipient: residues
         
         # plots dpre_smooth for data point
         #pmaskd = self.loc[experiment,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.loc[experiment,:,'Res#'].astype(float),
+        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
                     self.loc[experiment,:,calccol+'_smooth'].astype(float),
                     ls='-',
                     lw=smooth_lw,
@@ -2321,8 +2321,8 @@ recipient: residues
                          fontname=subtitle_fn, fontweight=subtitle_weight)
         
         # Set Ticks
-        initialresidue = int(self.ix[0, 0, 'Res#'])
-        finalresidue = int(self.loc[experiment,:,'Res#'].tail(1))
+        initialresidue = int(self.ix[0, 0, 'ResNo'])
+        finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
         
         if self.shape[1] > 100:
             xtick_spacing = self.shape[1]//100*10
@@ -2396,7 +2396,7 @@ recipient: residues
         if res_highlight:
             for rr in res_hl_list:
                 axs[i].axvline(x=rr,ls=':', lw=0.3,  color=grid_color)
-                rrmask = self.ix[0,:,'Res#'] == str(rr)
+                rrmask = self.ix[0,:,'ResNo'] == str(rr)
                 l1 = list(self.loc[experiment,rrmask,'1-letter'])
                 axs[i].text(rr, y_lims[1]*res_highlight_y,
                             l1[0],
@@ -2643,7 +2643,7 @@ recipient: residues
         
         for row in self.major_axis:
             mmask = measured_mask.loc[row,:]
-            res = int(self.loc[self.items[0],row, 'Res#'])
+            res = int(self.loc[self.items[0],row, 'ResNo'])
             col_res = "{}_{}".format(col,res)
             
             xdata = pd.Series(x_values)[np.array(mmask)]
