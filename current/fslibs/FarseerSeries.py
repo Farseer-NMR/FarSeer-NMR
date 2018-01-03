@@ -629,7 +629,7 @@ with window size {} and stdev {}'.\
     def write_table(self, restraint_folder, tablecol,
                           resonance_type='Backbone'):
         """
-        Exports to .tsv file the columns along the series.
+        Exports to .csv file the columns along the series.
         
         Args:
             restraint_folder (str): the folder name relating to the restraint.
@@ -639,8 +639,16 @@ with window size {} and stdev {}'.\
             resonance_type (str): {'Backbone', 'Sidechains'}
         """
         # concatenates the values of the table with the residues numbers
-        table = pd.concat([self.res_info.iloc[0,:,[0]],
-                           self.loc[:,:,tablecol].astype(float)], axis=1)
+        
+        try:
+            data_table = self.loc[:,:,tablecol].astype(float)
+            is_float = True
+        except ValueError:
+            data_table = self.loc[:,:,tablecol]
+            is_float = False
+            
+        
+        table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
             table.loc[:,'Res#'] = \
@@ -652,7 +660,7 @@ with window size {} and stdev {}'.\
         if not(os.path.exists(tablefolder)):
             os.makedirs(tablefolder)
         
-        file_path = '{}/{}.tsv'.format(tablefolder, tablecol)
+        file_path = '{}/{}.csv'.format(tablefolder, tablecol)
         
         fileout = open(file_path, 'w')
         
@@ -678,8 +686,24 @@ with window size {} and stdev {}'.\
            tablecol, self.series_axis[-1])
         
         fileout.write(header)
-        fileout.write(table.to_csv(sep='\t', index=False,
-                      na_rep='NaN', float_format='%.4f'))
+        if is_float:
+            fileout.write(
+                table.to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    float_format='%.4f'
+                    )
+                )
+        else:
+            fileout.write(
+                table.to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    )
+                )
+        
         fileout.close()
         
         self.log_r('**Exported data table:** {}'.format(file_path))
@@ -758,14 +782,14 @@ recipient: residues
     def export_series_to_tsv(self):
         """
         Exports the experimental series with measured and
-        calculated data to .tsv files.
+        calculated data to .csv files.
         """
         
         for item in self.items:
             
-            file_path = '{}/{}.tsv'.format(self.export_series_folder, item)
+            file_path = '{}/{}.csv'.format(self.export_series_folder, item)
             fileout = open(file_path, 'w')
-            fileout.write(self.loc[item].to_csv(sep='\t',
+            fileout.write(self.loc[item].to_csv(sep=',',
                                                 index=False,
                                                 na_rep='NaN',
                                                 float_format='%.4f'))
@@ -2520,8 +2544,6 @@ recipient: residues
         self.write_plot(fig, plot_style, folder, calccol,
                         fig_file_type, fig_dpi)
         
-        if not(plot_style in ['cs_scatter', 'cs_scatter_flower']):
-            self.write_table(folder, calccol, resonance_type=resonance_type)
         
         plt.close('all')
         
