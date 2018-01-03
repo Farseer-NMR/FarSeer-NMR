@@ -962,7 +962,8 @@ def eval_series(series_dct, fsuv,
                 
                 exports_all_parameters(
                     series_dct[cond][dim2_pt][dim1_pt],
-                    fsuv
+                    fsuv,
+                    resonance_type=resonance_type
                     )
                 
                 # PLOTS DATA
@@ -1298,6 +1299,7 @@ def exports_all_parameters(farseer_series, fsuv,
     
     # Exports all observables and user annotations
     list_of_observables = [
+        "Peak Status",
         "Position F2",
         "Position F1",
         "Height",
