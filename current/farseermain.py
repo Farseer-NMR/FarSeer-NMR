@@ -49,14 +49,16 @@ import importlib.util
 import sys
 import os
 import shutil
-import datetime  # used to write the log file
-import pandas as pd
-#farseer_user_variables are imported in the if __main__ :
-from current.fslibs import FarseerCube as fcube
-from current.fslibs import FarseerSeries as fss
-from current.fslibs import Comparisons as fsc
-from current.fslibs import wet as fsw
 import json
+import datetime  # used to write the log file
+import itertools
+import pandas as pd
+
+import current.fslibs.FarseerCube as fcube
+import current.fslibs.FarseerSeries as fss
+import current.fslibs.Comparisons as fsc
+import current.fslibs.wet as fsw
+
 
 def read_user_variables(path, config_name):
     """
@@ -166,10 +168,14 @@ def config_user_variables(fsuv):
             ],
         
         'plt_y_axis_scl': [
-            (-plots_f1["yy_scale_PosF1_delta"],
-                plots_f1["yy_scale_PosF1_delta"]),
-            (-plots_f2["yy_scale_PosF2_delta"],
-                plots_f2["yy_scale_PosF2_delta"]),
+            (
+                -plots_f1["yy_scale_PosF1_delta"],
+                plots_f1["yy_scale_PosF1_delta"]
+                ),
+            (
+                -plots_f2["yy_scale_PosF2_delta"],
+                plots_f2["yy_scale_PosF2_delta"]
+                ),
             (0, plots_csp["yy_scale_CSP"]),
             (0, plots_height["yy_scale_Height_ratio"]),
             (0, plots_volume["yy_scale_Volume_ratio"])
@@ -218,7 +224,8 @@ def config_user_variables(fsuv):
     
     return fsuv
 
-def copy_Farseer_version(fsuv,
+def copy_Farseer_version(
+        fsuv,
         file_name='farseer_version',
         compress_type='zip'):
     """
@@ -233,28 +240,34 @@ def copy_Farseer_version(fsuv,
     """
     
     script_wd = os.path.dirname(os.path.realpath(__file__))
-    shutil.make_archive('{}/{}'.format(fsuv.cwd, file_name),
-                        compress_type,
-                        script_wd)
+    shutil.make_archive(
+        '{}/{}'.format(fsuv.cwd, file_name),
+        compress_type,
+        script_wd
+        )
     
     return 
 
-def log_time_stamp(logfile_name,
+def log_time_stamp(
+        logfile_name,
         mod='a',
         state='STARTED'):
     """Creates a time stamp for the log file."""
     
     log_title = \
         '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
-            format(79*'*',
-                   datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"),
-                   state)
+            format(
+                79*'*',
+                datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"),
+                state
+                )
     
     logs(log_title, logfile_name, mod=mod)
     
     return
 
-def logs(s, logfile_name,
+def logs(
+        s, logfile_name,
         mod='a'):
     """
     Prints <s> and writes it to log file.
@@ -384,7 +397,8 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
                 farseer_series.write_table(
                     restraint,
                     restraint,
-                    resonance_type=resonance_type)
+                    resonance_type=resonance_type
+                    )
             # DONE
         
         msg = "All potting flags are turned off. No plots will be drawn. Confirm in the Settings menu if this is the desired configuration. I won't leave you with empty hands though, all calculated restraints have been exported in nicely formated tables ;-)"
@@ -471,7 +485,8 @@ def checks_axis_coherency(dim, fsuv):
     fsuv["general_settings"]["logfile_name"]
     """
     
-    msg = 'You have activated the analysis along dimension/axis {}. However, there are no datapoints along this axis so that a series could not be created and analysed. Confirm the axis analysis flags are correctly set in the Run Settings.'.format(dim)
+    msg = 'You have activated the analysis along dimension/axis {}. However, there are no datapoints along this axis so that a series could not be created and analysed. Confirm the axis analysis flags are correctly set in the Run Settings.'.\
+        format(dim)
     
     logs(
         fsw.gen_wet('WARNING', msg, 20),
@@ -548,7 +563,8 @@ def identify_residues(exp):
     
     return
 
-def correct_shifts(exp, fsuv,
+def correct_shifts(
+        exp, fsuv,
         resonance_type='Backbone'):
     """
     Corrects chemical shifts for all the peaklists to a reference peak
@@ -584,7 +600,8 @@ def correct_shifts(exp, fsuv,
     
     return
 
-def fill_na(peak_status,
+def fill_na(
+        peak_status,
         merit=0,
         details='None'):
     """
@@ -604,19 +621,20 @@ def fill_na(peak_status,
     """
     if not(peak_status in ['lost', 'unassigned']):
         input(
-        'Choose a valid <peak_status> argument. Press Enter to continue.'
-        )
+            'Choose a valid <peak_status> argument. Press Enter to continue.'
+            )
         return
     
     d = {
-    'Peak Status': peak_status,
-    'Merit': merit,
-    'Details': details
-    }
+        'Peak Status': peak_status,
+        'Merit': merit,
+        'Details': details
+        }
     return d
 
 #def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
-def expand_lost(exp,
+def expand_lost(
+        exp,
         resonance_type='Backbone',
         dim='z'):
     """
@@ -652,7 +670,8 @@ def expand_lost(exp,
     
     return
 
-def add_missing(exp,
+def add_missing(
+        exp,
         peak_status='lost',
         resonance_type='Backbone'):
     """
@@ -689,7 +708,8 @@ def add_missing(exp,
     
     return
 
-def organize_columns(exp, fsuv,
+def organize_columns(
+        exp, fsuv,
         resonance_type='Backbone'):
     """
     Uses FarseerSet.organize_cols().
@@ -709,8 +729,8 @@ def organize_columns(exp, fsuv,
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
         input(
-        'Choose a valid <resonance_type> argument. Press Enter to continue.'
-        )
+            'Choose a valid <resonance_type> argument. Press Enter to continue.'
+            )
         return
     
     exp.organize_cols(
@@ -740,7 +760,8 @@ def init_fs_cube(exp, fsuv):
     
     return
 
-def series_kwargs(fsuv,
+def series_kwargs(
+        fsuv,
         resonance_type='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
@@ -762,8 +783,8 @@ def series_kwargs(fsuv,
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
         input(
-        'Choose a valid <resonance_type> argument. Press Enter to continue.'
-        )
+            'Choose a valid <resonance_type> argument. Press Enter to continue.'
+            )
         return
     
     dd = {
@@ -778,7 +799,9 @@ def series_kwargs(fsuv,
     
     return dd
 
-def gen_series_dcts(exp, series_class, fsuv,
+def gen_series_dcts(
+        exp, series_class,
+        fsuv,
         resonance_type='Backbone'):
     """
     Generates a nested dictionary, <D>, containing all possible series over all the 
@@ -852,10 +875,8 @@ def gen_series_dcts(exp, series_class, fsuv,
                 series_class,
                 along_axis='x',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(
-                    fsuv,
-                    resonance_type=resonance_type
-                    )
+                series_kwargs=\
+                    series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
     elif not(exp.hasxx) and fsuv["fitting_settings"]["do_cond1"]:
@@ -869,10 +890,8 @@ def gen_series_dcts(exp, series_class, fsuv,
                 series_class,
                 along_axis='y',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(
-                    fsuv,
-                    resonance_type=resonance_type
-                    )
+                series_kwargs=\
+                    series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
     elif not(exp.hasyy) and fsuv["fitting_settings"]["do_cond2"]:
@@ -886,10 +905,8 @@ def gen_series_dcts(exp, series_class, fsuv,
                 series_class,
                 along_axis='z',
                 resonance_type=resonance_type,
-                series_kwargs=series_kwargs(
-                    fsuv,
-                    resonance_type=resonance_type
-                    )
+                series_kwargs=\
+                    series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
     elif not(exp.haszz) and fsuv["fitting_settings"]["do_cond3"]:
@@ -904,7 +921,8 @@ def gen_series_dcts(exp, series_class, fsuv,
     
     return series_dct
 
-def eval_series(series_dct, fsuv,
+def eval_series(
+        series_dct, fsuv,
         resonance_type='Backbone'):
     """
     Executes the Farseer-NMR Analysis Routines over all the series of
@@ -1077,9 +1095,9 @@ def perform_fits(farseer_series, fsuv):
     """
     # fits are allowed only for X axis series
     if not(
-        fsuv["revo_settings"]["perform_resevo_fitting"] \
-            and farseer_series.series_axis == 'cond1'
-        ):
+            fsuv["revo_settings"]["perform_resevo_fitting"] \
+                and farseer_series.series_axis == 'cond1'
+            ):
         return
     
     checks_fit_input(farseer_series, fsuv)
@@ -1152,8 +1170,7 @@ def PRE_analysis(farseer_series, fsuv):
             farseer_series.prev_dim
             )
         
-        for sourcecol, targetcol in \
-            zip(
+        for sourcecol, targetcol in zip(
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
                 ):
@@ -1173,14 +1190,13 @@ def PRE_analysis(farseer_series, fsuv):
     if (iscond3 or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
         
         # do
-        for sourcecol, targetcol in \
-            zip(
+        for sourcecol, targetcol in zip(
                 list(fsuv["restraint_settings"].index[3:])*2,
                 ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
                 ):
             
             # only for the parameters allowed by the user
-            if fsuv["restraint_settings"].loc[sourcecol, 'calcs_restraint_flg']:
+            if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
                 
                 farseer_series.plot_base(
                     targetcol, 
@@ -1188,12 +1204,14 @@ def PRE_analysis(farseer_series, fsuv):
                     'heat_map',
                     fsuv["heat_map_settings"],
                     par_ylims=\
-                    fsuv["restraint_settings"].loc[sourcecol,'plt_y_axis_scl'],
+                        fsuv["restraint_settings"].\
+                            loc[sourcecol,'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv["restraint_settings"].loc[sourcecol,'plt_y_axis_lbl'],
+                        fsuv["restraint_settings"].\
+                            loc[sourcecol,'plt_y_axis_lbl'],
                     cols_per_page=1,
                     rows_per_page=\
-                    fsuv["heat_map_settings"]["rows"],
+                        fsuv["heat_map_settings"]["rows"],
                     fig_height=fsuv["general_settings"]["fig_height"],
                     fig_width=fsuv["general_settings"]["fig_width"],
                     fig_file_type=fsuv["general_settings"]["fig_file_type"],
@@ -1204,10 +1222,9 @@ def PRE_analysis(farseer_series, fsuv):
     # because DeltaPRE oscilation represents the results obtained only
     # for paramagnetic ('para') data.
     if (isc3 and (isprev_para or isnext_para)) \
-        and fsuv['plotting_flags']['do_dpre_osci']:
+            and fsuv['plotting_flags']['do_dpre_osci']:
         
-        for sourcecol, targetcols in \
-            zip(
+        for sourcecol, targetcols in zip(
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
                 ):
@@ -1218,9 +1235,9 @@ def PRE_analysis(farseer_series, fsuv):
                     'exp',
                     'delta_osci',
                     {
-                    **fsuv["series_plot_settings"], 
-                    **fsuv["dpre_osci_settings"]
-                    },
+                        **fsuv["series_plot_settings"], 
+                        **fsuv["dpre_osci_settings"]
+                        },
                     cols_per_page=1,
                     rows_per_page=fsuv["dpre_osci_settings"]["rows"],
                     fig_height=fsuv["general_settings"]["fig_height"],
@@ -1275,7 +1292,8 @@ def exports_chimera_att_files(farseer_series, fsuv):
     
     return
 
-def exports_all_parameters(farseer_series, fsuv,
+def exports_all_parameters(
+        farseer_series, fsuv,
         resonance_type='Backbone'):
     """
     Exports the evolution of all parameters in separated tables.
@@ -1284,8 +1302,9 @@ def exports_all_parameters(farseer_series, fsuv,
     """
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(\
-        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        input(
+            'Choose a valid <resonance_type> argument. Press Enter to continue.'
+            )
         return
     
     # Exports calculated parameters
@@ -1321,7 +1340,8 @@ def exports_all_parameters(farseer_series, fsuv,
     
     return
 
-def plots_data(farseer_series, fsuv,
+def plots_data(
+        farseer_series, fsuv,
         resonance_type='Backbone'):
     """
     Walks through the plotting routines and plots according to user
@@ -1375,81 +1395,105 @@ def plots_data(farseer_series, fsuv,
                 # Plot Extended Bar Plot
                 if fsuv["plotting_flags"]["do_ext_bar"]:
                     farseer_series.plot_base(
-                        restraint, 'exp', 'bar_extended',
-                        {**fsuv["series_plot_settings"],
-                         **fsuv["bar_plot_settings"],
-                         **fsuv["extended_bar_settings"]},
+                        restraint,
+                        'exp',
+                        'bar_extended',
+                        {
+                            **fsuv["series_plot_settings"],
+                            **fsuv["bar_plot_settings"],
+                            **fsuv["extended_bar_settings"]
+                            },
                         par_ylims=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_scl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_scl'],
                         ylabel=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_lbl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_lbl'],
                         hspace=fsuv["series_plot_settings"]["vspace"],
-                        cols_per_page=fsuv["extended_bar_settings"]["cols_page"],
-                        rows_per_page=fsuv["extended_bar_settings"]["rows_page"],
+                        cols_per_page=\
+                            fsuv["extended_bar_settings"]["cols_page"],
+                        rows_per_page=\
+                            fsuv["extended_bar_settings"]["rows_page"],
                         fig_height=fig_height,
                         fig_width=fig_width,
                         fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi)
+                        fig_dpi=fig_dpi
+                        )
                 
                 # Plot Compacted Bar Plot
                 if fsuv["plotting_flags"]["do_comp_bar"]:
                     
                     farseer_series.plot_base(\
-                        restraint, 'exp', 'bar_compacted',
-                        {**fsuv["series_plot_settings"],
-                         **fsuv["bar_plot_settings"],
-                         **fsuv["compact_bar_settings"]},
+                        restraint,
+                        'exp',
+                        'bar_compacted',
+                        {
+                            **fsuv["series_plot_settings"],
+                            **fsuv["bar_plot_settings"],
+                            **fsuv["compact_bar_settings"]
+                            },
                         par_ylims=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_scl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_scl'],
                         ylabel=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_lbl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_lbl'],
                         hspace=fsuv["series_plot_settings"]["vspace"],
-                        cols_per_page=fsuv["compact_bar_settings"]["cols_page"],
-                        rows_per_page=fsuv["compact_bar_settings"]["rows_page"],
+                        cols_per_page=\
+                            fsuv["compact_bar_settings"]["cols_page"],
+                        rows_per_page=\
+                            fsuv["compact_bar_settings"]["rows_page"],
                         fig_height=fig_height,
                         fig_width=fig_width,
                         fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi)
+                        fig_dpi=fig_dpi
+                        )
             
                 # Plot Vertical Bar Plot
                 if fsuv["plotting_flags"]["do_vert_bar"]:
                     farseer_series.plot_base(
-                        restraint, 'exp', 'bar_vertical',
-                        {**fsuv["series_plot_settings"],
-                         **fsuv["bar_plot_settings"],
-                         **fsuv["extended_bar_settings"]},
+                        restraint,
+                        'exp',
+                        'bar_vertical',
+                        {
+                            **fsuv["series_plot_settings"],
+                            **fsuv["bar_plot_settings"],
+                            **fsuv["extended_bar_settings"]
+                            },
                         par_ylims=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_scl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_scl'],
                         ylabel=\
-                        fsuv["restraint_settings"].loc[restraint,
-                                                 'plt_y_axis_lbl'],
+                            fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_lbl'],
                         cols_per_page=fsuv["vert_bar_settings"]["cols_page"],
                         rows_per_page=fsuv["vert_bar_settings"]["rows_page"],
                         fig_height=fig_height,
                         fig_width=fig_width,
                         fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi)
+                        fig_dpi=fig_dpi
+                        )
             
             # Sidechain data is represented in a different bar plot
             elif farseer_series.resonance_type == 'Sidechains'\
-                and (fsuv["plotting_flags"]["do_ext_bar"] or fsuv["plotting_flags"]["do_comp_bar"]):
+                    and (fsuv["plotting_flags"]["do_ext_bar"] \
+                    or fsuv["plotting_flags"]["do_comp_bar"]):
                 # DO ++++
                 farseer_series.plot_base(
-                    restraint, 'exp', 'bar_extended',
-                    {**fsuv["series_plot_settings"],
-                     **fsuv["bar_plot_settings"],
-                     **fsuv["extended_bar_settings"]},
+                    restraint,
+                    'exp',
+                    'bar_extended',
+                    {
+                        **fsuv["series_plot_settings"],
+                        **fsuv["bar_plot_settings"],
+                        **fsuv["extended_bar_settings"]
+                        },
                     par_ylims=\
-                    fsuv["restraint_settings"].loc[restraint,
-                                             'plt_y_axis_scl'],
+                        fsuv["restraint_settings"].\
+                            loc[restraint,'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv["restraint_settings"].loc[restraint,
-                                             'plt_y_axis_lbl'],
+                        fsuv["restraint_settings"].\
+                            loc[restraint,'plt_y_axis_lbl'],
                     hspace=fsuv["series_plot_settings"]["vspace"],
                     cols_per_page=fsuv["extended_bar_settings"]["cols_page"],
                     rows_per_page=fsuv["extended_bar_settings"]["rows_page"],
@@ -1457,71 +1501,84 @@ def plots_data(farseer_series, fsuv,
                     fig_height=fig_height,
                     fig_width=fig_width/2,
                     fig_file_type=fig_file_type,
-                    fig_dpi=fig_dpi)
+                    fig_dpi=fig_dpi
+                    )
                 # DONE ++++
             
             # Plots Parameter Evolution Plot
             if fsuv["plotting_flags"]["do_res_evo"]:
-                farseer_series.plot_base(\
-                    restraint, 'res', 'res_evo',
+                farseer_series.plot_base(
+                    restraint,
+                    'res',
+                    'res_evo',
                     {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
-                    par_ylims=  
-                    fsuv["restraint_settings"].loc[restraint,
-                                             'plt_y_axis_scl'],
+                    par_ylims=\
+                        fsuv["restraint_settings"].\
+                            loc[restraint,'plt_y_axis_scl'],
                     ylabel=\
-                    fsuv["restraint_settings"].loc[restraint,
-                                             'plt_y_axis_lbl'],
+                        fsuv["restraint_settings"].\
+                            loc[restraint,'plt_y_axis_lbl'],
                     cols_per_page=fsuv["res_evo_settings"]["cols_page"],
                     rows_per_page=fsuv["res_evo_settings"]["rows_page"],
                     fig_height=fig_height,
                     fig_width=fig_width,
                     fig_file_type=fig_file_type,
-                    fig_dpi=fig_dpi)
+                    fig_dpi=fig_dpi
+                    )
             
     if fsuv["plotting_flags"]["do_cs_scatter"] \
-        and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
+            and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
+                and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
             or fsuv["csp_settings"]["calcs_CSP"]):
         # DO ++++
-        farseer_series.plot_base('15N_vs_1H', 'res', 'cs_scatter',
-                            {**fsuv["revo_settings"],
-                             **fsuv["cs_scatter_settings"]},
-                            cols_per_page=fsuv["cs_scatter_settings"]["cols_page"],
-                            rows_per_page=fsuv["cs_scatter_settings"]["rows_page"],
-                            fig_height=fig_height,
-                            fig_width=fig_width,
-                            fig_file_type=fig_file_type,
-                            fig_dpi=fig_dpi)
+        farseer_series.plot_base(
+            '15N_vs_1H',
+            'res',
+            'cs_scatter',
+            {**fsuv["revo_settings"], **fsuv["cs_scatter_settings"]},
+            cols_per_page=fsuv["cs_scatter_settings"]["cols_page"],
+            rows_per_page=fsuv["cs_scatter_settings"]["rows_page"],
+            fig_height=fig_height,
+            fig_width=fig_width,
+            fig_file_type=fig_file_type,
+            fig_dpi=fig_dpi
+            )
     
     if fsuv["plotting_flags"]["do_cs_scatter_flower"] \
-        and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
+            and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
+                and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
             or fsuv["csp_settings"]["calcs_CSP"]):
         #DO ++++
-        farseer_series.plot_base('15N_vs_1H', 'single', 'cs_scatter_flower',
-                                  {**fsuv["revo_settings"],
-                                   **fsuv["cs_scatter_flower_settings"]},
-                                  cols_per_page=2,
-                                  rows_per_page=3,
-                                  fig_height=fig_height,
-                                  fig_width=fig_width,
-                                  fig_file_type=fig_file_type,
-                                  fig_dpi=fig_dpi)
+        farseer_series.plot_base(
+            '15N_vs_1H',
+            'single',
+            'cs_scatter_flower',
+            {**fsuv["revo_settings"], **fsuv["cs_scatter_flower_settings"]},
+            cols_per_page=2,
+            rows_per_page=3,
+            fig_height=fig_height,
+            fig_width=fig_width,
+            fig_file_type=fig_file_type,
+            fig_dpi=fig_dpi
+            )
         # DONE ++++
     
     for obs in fsuv["observables_settings"].index:
         if fsuv["observables_settings"].loc[obs,"obs_flags"]:
-            farseer_series.plot_base(\
-                    obs, 'res', 'res_evo',
-                    {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
-                    par_ylims=\
-                    fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
-                    ylabel=\
-                    fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
-                    cols_per_page=fsuv["res_evo_settings"]["cols_page"],
-                    rows_per_page=fsuv["res_evo_settings"]["rows_page"],
-                    fig_height=fig_height,
-                    fig_width=fig_width,
-                    fig_file_type=fig_file_type,
-                    fig_dpi=fig_dpi)
+            farseer_series.plot_base(
+            obs,
+            'res',
+            'res_evo',
+            {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
+            par_ylims=fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
+            ylabel=fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
+            cols_per_page=fsuv["res_evo_settings"]["cols_page"],
+            rows_per_page=fsuv["res_evo_settings"]["rows_page"],
+            fig_height=fig_height,
+            fig_width=fig_width,
+            fig_file_type=fig_file_type,
+            fig_dpi=fig_dpi
+            )
     
     return
 
@@ -1542,8 +1599,9 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
             data type. Detaults to 'Backbone'.
     """
     if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(\
-        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        input(
+            'Choose a valid <resonance_type> argument. Press Enter to continue.'
+            )
         return
     
     # EXPORTS FULLY PARSED PEAKLISTS
@@ -1559,8 +1617,9 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     
     return
 
-def analyse_comparisons(series_dct, fsuv,
-                        resonance_type='Backbone'):
+def analyse_comparisons(
+        series_dct, fsuv,
+        resonance_type='Backbone'):
     """
     Algorythm to perform data comparisons over analysed conditions.
     
@@ -1577,8 +1636,9 @@ def analyse_comparisons(series_dct, fsuv,
     """
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(\
-        'Choose a valid <resonance_type> argument. Press Enter to continue.')
+        input(
+            'Choose a valid <resonance_type> argument. Press Enter to continue.'
+            )
         return
     
     # kwargs passed to the parsed series of class fss.FarseerSeries
@@ -1586,9 +1646,11 @@ def analyse_comparisons(series_dct, fsuv,
     
     # ORDERED relation between dimension names
     # self: [next, prev]
-    series_dim_keys = {'cond1':['cond2','cond3'],
-                       'cond2':['cond3','cond1'],
-                       'cond3':['cond1','cond2']}
+    series_dim_keys = {
+        'cond1':['cond2','cond3'],
+        'cond2':['cond3','cond1'],
+        'cond3':['cond1','cond2']
+        }
     
     # stores all the comparison variables.
     comp_dct = {}
@@ -1600,9 +1662,11 @@ def analyse_comparisons(series_dct, fsuv,
         # DO
         
         # creates comparison
-        c = fsc.Comparisons(series_dct[dimension].copy(),
-                        selfdim=dimension,
-                        other_dim_keys=series_dim_keys[dimension])
+        c = fsc.Comparisons(
+            series_dct[dimension].copy(),
+            selfdim=dimension,
+            other_dim_keys=series_dim_keys[dimension]
+            )
         
         c.log_export_onthefly = True
         c.log_export_name = fsuv["general_settings"]["logfile_name"]
@@ -1624,15 +1688,23 @@ def analyse_comparisons(series_dct, fsuv,
                         c.all_next_dim[dp2][dp1].PRE_loaded = True
                     
                     # writes log
-                    c.all_next_dim[dp2][dp1].log_r(\
-                        'COMPARING... [{}][{}][{}] - [{}]'.format(\
-                            dimension, dp2, dp1, list(c.hyper_panel.labels)),
-                        istitle=True)
+                    c.all_next_dim[dp2][dp1].log_r(
+                        'COMPARING... [{}][{}][{}] - [{}]'.\
+                            format(
+                                dimension,
+                                dp2,
+                                dp1,
+                                list(c.hyper_panel.labels)
+                                ),
+                        istitle=True
+                        )
                     
                     # performs ploting routines
-                    comparison_analysis_routines(\
+                    comparison_analysis_routines(
                         c.all_next_dim[dp2][dp1],
-                        fsuv, resonance_type)
+                        fsuv,
+                        resonance_type
+                        )
                     
                     #c.log += c.all_next_dim[dim2_pt][dim1_pt].log
         
@@ -1647,14 +1719,21 @@ def analyse_comparisons(series_dct, fsuv,
                         c.all_prev_dim[dp2][dp1].PRE_loaded = True
                     
                     # writes log
-                    c.all_prev_dim[dp2][dp1].log_r(\
-                        'COMPARING... [{}][{}][{}] - [{}]'.format(\
-                            dimension, dp2, dp1, list(c.hyper_panel.cool)),
+                    c.all_prev_dim[dp2][dp1].log_r(
+                        'COMPARING... [{}][{}][{}] - [{}]'.\
+                            format(
+                                dimension,
+                                dp2,
+                                dp1,
+                                list(c.hyper_panel.cool)
+                                ),
                         istitle=True)
                     
-                    comparison_analysis_routines(\
+                    comparison_analysis_routines(
                         c.all_prev_dim[dp2][dp1],
-                        fsuv, resonance_type)
+                        fsuv,
+                        resonance_type
+                        )
                     #c.log += c.allCcool[dim2_pt][dim1_pt].log
         
     return comp_dct
@@ -1731,8 +1810,12 @@ def run_farseer(fsuv):
     # initiates a dictionary that contains all the series to be evaluated
     # along all the conditions.
     farseer_series_dct = \
-        gen_series_dcts(exp, fss.FarseerSeries, fsuv,
-                        resonance_type='Backbone')
+        gen_series_dcts(
+            exp,
+            fss.FarseerSeries,
+            fsuv,
+            resonance_type='Backbone'
+            )
     
     if not(farseer_series_dct):
         exp.exports_parsed_pkls()
@@ -1743,12 +1826,19 @@ def run_farseer(fsuv):
     if exp.has_sidechains and use_sidechains:
         # DO
         farseer_series_SD_dict = \
-            gen_series_dcts(exp, fss.FarseerSeries, fsuv,
-                                resonance_type='Sidechains')
+            gen_series_dcts(
+                exp,
+                fss.FarseerSeries,
+                fsuv,
+                resonance_type='Sidechains'
+                )
         
         if (farseer_series_SD_dict):
-            eval_series(farseer_series_SD_dict, fsuv,
-                        resonance_type='Sidechains')
+            eval_series(
+                farseer_series_SD_dict,
+                fsuv,
+                resonance_type='Sidechains'
+                )
         # DONE
     
     # Representing the results comparisons
@@ -1756,17 +1846,21 @@ def run_farseer(fsuv):
         
         # analyses comparisons.
         comparison_dict = \
-            analyse_comparisons(farseer_series_dct,
-                                fsuv,
-                                resonance_type='Backbone')
+            analyse_comparisons(
+                farseer_series_dct,
+                fsuv,
+                resonance_type='Backbone'
+                )
         
     if (fitting["perform_comparisons"] and farseer_series_dct) and \
         (exp.has_sidechains and use_sidechains):
         # DO
         comparison_dict_SD = \
-            analyse_comparisons(farseer_series_SD_dict,
-                                fsuv,
-                                resonance_type='Sidechains')
+            analyse_comparisons(
+                farseer_series_SD_dict,
+                fsuv,
+                resonance_type='Sidechains'
+                )
         # DONE
     
     
