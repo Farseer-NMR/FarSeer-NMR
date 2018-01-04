@@ -93,7 +93,7 @@ n: {:.3f}
 def fit_failed(res, x, y):
     s2w = \
 """
-Res#:  {}
+ResNo:  {}
 xdata: {}
 ydata: {}
 !¡FIT FAILED TO FIND MINIMIZATION!¡
@@ -105,7 +105,7 @@ ydata: {}
 def not_enough_data(res, x, y):
     s2w = \
 """
-Res#:  {}
+ResNo:  {}
 xdata: {}
 ydata: {}
 !¡NOT ENOUGH DATA POINTS - FIT NOT PERFORMED!¡
