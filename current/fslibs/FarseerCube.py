@@ -1178,122 +1178,135 @@ FASTA starting residue: {}  """.\
         elif resonance_type == 'Sidechains':
             target = self.allsidechains
         else:
-            msg = "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+            msg = \
+                "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
             self.log_r(msg)
             return
         
         if performed_cs_correction and resonance_type=='Backbone':
-            col_order = ['ResNo',
-                         '1-letter',
-                         '3-letter',
-                         'Peak Status',
-                         'Merit',
-                         'Position F1',
-                         'Position F2',
-                         'Height',
-                         'Volume',
-                         'Line Width F1 (Hz)',
-                         'Line Width F2 (Hz)',
-                         'Fit Method',
-                         'Vol. Method',
-                         'Assign F1',
-                         'Assign F2',
-                         'Details',
-                         '#',
-                         'Number',
-                         'index',
-                         'Position F1 original',
-                         'Position F2 original',
-                         'Pos F1 correction',
-                         'Pos F2 correction']
-                         #                         'index',
+            col_order = [
+                'ResNo',
+                '1-letter',
+                '3-letter',
+                'Peak Status',
+                'Merit',
+                'Position F1',
+                'Position F2',
+                'Height',
+                'Volume',
+                'Line Width F1 (Hz)',
+                'Line Width F2 (Hz)',
+                'Fit Method',
+                'Vol. Method',
+                'Assign F1',
+                'Assign F2',
+                'Details',
+                '#',
+                'Number',
+                'index',
+                'Position F1 original',
+                'Position F2 original',
+                'Pos F1 correction',
+                'Pos F2 correction'
+                ]
+                #                         'index',
         elif performed_cs_correction and resonance_type=='Sidechains':
-            col_order = ['ResNo',
-                         'ATOM',
-                         '1-letter',
-                         '3-letter',
-                         'Peak Status',
-                         'Merit',
-                         'Position F1',
-                         'Position F2',
-                         'Height',
-                         'Volume',
-                         'Line Width F1 (Hz)',
-                         'Line Width F2 (Hz)',
-                         'Fit Method',
-                         'Vol. Method',
-                         'Assign F1',
-                         'Assign F2',
-                         'Details',
-                         '#',
-                         'Number',
-                         'index',
-                         'Position F1 original',
-                         'Position F2 original',
-                         'Pos F1 correction',
-                         'Pos F2 correction']
+            col_order = [
+                'ResNo',
+                'ATOM',
+                '1-letter',
+                '3-letter',
+                'Peak Status',
+                'Merit',
+                'Position F1',
+                'Position F2',
+                'Height',
+                'Volume',
+                'Line Width F1 (Hz)',
+                'Line Width F2 (Hz)',
+                'Fit Method',
+                'Vol. Method',
+                'Assign F1',
+                'Assign F2',
+                'Details',
+                '#',
+                'Number',
+                'index',
+                'Position F1 original',
+                'Position F2 original',
+                'Pos F1 correction',
+                'Pos F2 correction'
+                ]
         
         elif not(performed_cs_correction) and resonance_type=='Backbone':
-            col_order = ['ResNo',
-                         '1-letter',
-                         '3-letter',
-                         'Peak Status',
-                         'Merit',
-                         'Position F1',
-                         'Position F2',
-                         'Height',
-                         'Volume',
-                         'Line Width F1 (Hz)',
-                         'Line Width F2 (Hz)',
-                         'Fit Method',
-                         'Vol. Method',
-                         'Assign F1',
-                         'Assign F2',
-                         'Details',
-                         'Number',
-                         '#',
-                         'index']
+            col_order = [
+                'ResNo',
+                '1-letter',
+                '3-letter',
+                'Peak Status',
+                'Merit',
+                'Position F1',
+                'Position F2',
+                'Height',
+                'Volume',
+                'Line Width F1 (Hz)',
+                'Line Width F2 (Hz)',
+                'Fit Method',
+                'Vol. Method',
+                'Assign F1',
+                'Assign F2',
+                'Details',
+                'Number',
+                '#',
+                'index'
+                ]
         
         elif not(performed_cs_correction) and resonance_type=='Sidechains':
-            col_order = ['ResNo',
-                         'ATOM',
-                         '1-letter',
-                         '3-letter',
-                         'Peak Status',
-                         'Merit',
-                         'Position F1',
-                         'Position F2',
-                         'Height',
-                         'Volume',
-                         'Line Width F1 (Hz)',
-                         'Line Width F2 (Hz)',
-                         'Fit Method',
-                         'Vol. Method',
-                         'Assign F1',
-                         'Assign F2',
-                         'Details',
-                         'Number',
-                         '#',
-                         'index']
+            col_order = [
+                'ResNo',
+                'ATOM',
+                '1-letter',
+                '3-letter',
+                'Peak Status',
+                'Merit',
+                'Position F1',
+                'Position F2',
+                'Height',
+                'Volume',
+                'Line Width F1 (Hz)',
+                'Line Width F2 (Hz)',
+                'Fit Method',
+                'Vol. Method',
+                'Assign F1',
+                'Assign F2',
+                'Details',
+                'Number',
+                '#',
+                'index'
+                ]
         
         
         title = "ORGANIZING PEAKLIST COLUMNS' ORDER for {}".\
             format(resonance_type)
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
+        for z, y, x in it.product(
+                self.zzcoords,
+                self.yycoords,
+                self.xxcoords):
             # DO
             target[z][y][x] = target[z][y][x][col_order]
-            self.log_r(\
-                '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x))
+            self.log_r(
+                '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
+                )
             # DONE
         
         return
         
     
-    def init_Farseer_cube(self, use_sidechains=False):
+    def init_Farseer_cube(
+            self,
+            use_sidechains=False):
         """
         Initiates the 5D Farseer-NMR Cube.
         
@@ -1313,15 +1326,15 @@ FASTA starting residue: {}  """.\
         
         if use_sidechains:
             self.sidechains_p5d = self.p5d(self.allsidechains.copy())
-            self.log_r(\
-                '> Created cube for all the sidechains peaklists - OK!')
+            self.log_r('> Created cube for all the sidechains peaklists - OK!')
             
         return
     
-    def export_series_dict_over_axis(self, series_class,
-                                           along_axis='x',
-                                           resonance_type='Backbone',
-                                           series_kwargs={}):
+    def export_series_dict_over_axis(
+            self, series_class,
+            along_axis='x',
+            resonance_type='Backbone',
+            series_kwargs={}):
         """
         Creates a nested dictionary containing all the experimental series
         along a given Farseer-NMR Cube axis.
@@ -1378,8 +1391,10 @@ FASTA starting residue: {}  """.\
         else:
             raise ValueError('Not a valid <along_axis> option.')
         
-        self.log_r('GENERATING DICTIONARY OF SERIES FOR {}'.\
-                    format(series_type), istitle=True)
+        self.log_r(
+            'GENERATING DICTIONARY OF SERIES FOR {}'.format(series_type), 
+            istitle=True
+            )
         
         # builds kwargs
         series_kwargs['series_axis'] = series_type
