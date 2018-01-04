@@ -93,7 +93,6 @@ def read_user_variables(path, config_name):
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     fsuv = json.load(open(os.path.join(cwd, config_name), 'r'))
-
     fsuv["cwd"] = cwd
     
     if not("input_spectra_path" in fsuv["general_settings"]):
@@ -303,7 +302,7 @@ def initial_checks(fsuv):
     # Farseer-NMR calculation. It would be a waste to have an error after 2h...
     if fsuv["pre_settings"]["apply_PRE_analysis"]:
         checks_PRE_analysis_flags(fsuv)
-        
+    
     return
 
 def checks_PRE_analysis_flags(fsuv):
@@ -322,24 +321,24 @@ def checks_PRE_analysis_flags(fsuv):
     # turned off:
     
     if not(fsuv["PRE_analysis_flags"]):
-        #DO
-        msg = "PRE Analysis is set to <{}> and depends on the following variables: do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || perform_comparisons :: <{}>. All these variables should be set to True for PRE Analysis to be executed.".\
+        msg = \
+"PRE Analysis is set to <{}> and depends on the following variables: \
+do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
+perform_comparisons :: <{}>. \
+All these variables should be set to True for PRE Analysis to be executed.".\
             format(
                 fsuv["pre_settings"]["apply_PRE_analysis"],
                 fsuv["fitting_settings"]["do_cond3"],
-                fsuv["Height_ratio_settings"]["calcs_Height_ratio"] or \
-                    fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
+                fsuv["Height_ratio_settings"]["calcs_Height_ratio"] \
+                    or fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
                 fsuv["fitting_settings"]["perform_comparisons"]
                 )
-           
         logs(
             fsw.gen_wet('ERROR', msg, 1),
             fsuv["general_settings"]["logfile_name"]
             )
-            
         logs(fsw.abort_msg, fsuv["general_settings"]["logfile_name"])
         fsw.abort()
-        #DONE
     
     return
 
@@ -356,16 +355,20 @@ def checks_cube_axes_flags(fsuv):
     fsuv.any_axis
     fsuv["general_settings"]["logfile_name"]
     """
+    
     if not(fsuv["any_axis"]):
-        # DO
-        msg = "Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. There is nothing to calculate. Confirm this is actually what you want."
-        
-        logs(fsw.gen_wet('NOTE', msg, 2),
-             fsuv["general_settings"]["logfile_name"])
-        # DONE
+        msg = \
+"Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
+There is nothing to calculate. Confirm this is actually what you want."
+        logs(
+            fsw.gen_wet('NOTE', msg, 2),
+            fsuv["general_settings"]["logfile_name"]
+            )
         return False
+    
     else:
         return True
+    
     return
 
 def checks_plotting_flags(farseer_series, fsuv, resonance_type):
@@ -388,24 +391,24 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     
     plot_bool = pd.Series([v for k,v in fsuv["plotting_flags"].items()])
     
+    # exports tables
     if not(plot_bool.any()):
-        # DO ++++
         for restraint in fsuv["restraint_settings"].index:
-            # DO export calculation tables
             if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
                 farseer_series.write_table(
                     restraint,
                     restraint,
                     resonance_type=resonance_type
                     )
-            # DONE
         
-        msg = "All potting flags are turned off. No plots will be drawn. Confirm in the Settings menu if this is the desired configuration. I won't leave you with empty hands though, all calculated restraints have been exported in nicely formated tables ;-)"
+        msg = \
+"All potting flags are turned off. No plots will be drawn. \
+Confirm in the Settings menu if this is the desired configuration. \
+I won't leave you with empty hands though, all calculated restraints \
+have been exported in nicely formated tables ;-)"
         
         farseer_series.log_r(fsw.gen_wet('NOTE', msg, 3))
-    
         return False
-        # DONE ++++ 
     
     return True
 
@@ -417,17 +420,16 @@ def checks_calculation_flags(fsuv):
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
     """
-    ######## WET#14
+    #WET#14
     if not(fsuv["calc_flags"]):
-        #DO
-        msg = "All restraints calculation routines are deactivated. Nothing will be calculated."
-        
+        msg = \
+"All restraints calculation routines are deactivated. \
+Nothing will be calculated."
         logs(
             fsw.gen_wet('WARNING', msg, 14),
             fsuv["general_settings"]["logfile_name"]
             )
-        #DONE
-    ########
+    
     return
 
 def checks_fit_input(series, fsuv):
@@ -444,29 +446,31 @@ def checks_fit_input(series, fsuv):
     x_values = fsuv["revo_settings"]["titration_x_values"]
     ######## WET#5, WET#6, WET#7
     if not(all([True if x>=0 else False for x in x_values])):
-        # DO
-        msg = 'There are negative values in titration_x_values variable. Fitting to the Hill Equation does not accept negative values. Please revisit your input'
-        
+        msg = \
+'There are negative values in titration_x_values variable. \
+Fitting to the Hill Equation does not accept negative values. \
+Please revisit your input'
         series.log_r(fsw.gen_wet('ERROR', msg, 6))
         series.abort()
-        # DONE
     
     elif len(x_values) != len(series.items):
-        # DO
-        msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}].".\
+        msg = \
+"The number of coordinate values defined for fitting/data respresentation, \
+<fitting_x_values> variable [{}], do not match the number of <cond1> data \
+points,i.e. input peaklists. Please correct <fitting_x_values> variable or \
+confirm you have not forgot any peaklist [{}].".\
             format(x_values, series.items)
-        
         series.log_r(fsw.gen_wet('ERROR', msg, 5))
         series.abort()
-        # DONE
     
     else:
-        # DO
-        msg = "The number of coordinate values for data fitting along X axis equals the number of input peaklists, and no negative value was found. Data fit to the Hill Equation will be performed with the following values: {}.".\
+        msg = \
+"The number of coordinate values for data fitting along X axis equals the \
+number of input peaklists, and no negative value was found. Data fit to the \
+Hill Equation will be performed with the following values: {}.".\
             format(x_values)
-        
         series.log_r(fsw.gen_wet('NOTE', msg, 7))
-        # DONE
+    
     return
 
 def checks_axis_coherency(dim, fsuv):
@@ -484,9 +488,12 @@ def checks_axis_coherency(dim, fsuv):
     fsuv["general_settings"]["logfile_name"]
     """
     
-    msg = 'You have activated the analysis along dimension/axis {}. However, there are no datapoints along this axis so that a series could not be created and analysed. Confirm the axis analysis flags are correctly set in the Run Settings.'.\
-        format(dim)
-    
+    msg = \
+'You have activated the analysis along dimension/axis {}. However, there are \
+no datapoints along this axis so that a series could not be created and \
+analysed. Confirm the axis analysis flags are correctly set in the Run \
+Settings.'.\
+        format(dim)    
     logs(
         fsw.gen_wet('WARNING', msg, 20),
         fsuv["general_settings"]["logfile_name"]
@@ -511,12 +518,12 @@ def creates_farseer_dataset(fsuv):
     fsuv.FASTAstart
     fsuv["general_settings"]["logfile_name"]
     """
+    
     exp = fcube.FarseerCube(
         fsuv["general_settings"]["input_spectra_path"],
         has_sidechains=fsuv["general_settings"]["has_sidechains"],
         FASTAstart=fsuv["fasta_settings"]["FASTAstart"]
         )
-    
     exp.log_export_onthefly = True
     exp.log_export_name = fsuv["general_settings"]["logfile_name"]
     
@@ -618,6 +625,7 @@ def fill_na(
     Return:
         Dictionary of kwargs.
     """
+    
     if not(peak_status in ['lost', 'unassigned']):
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
@@ -629,9 +637,9 @@ def fill_na(
         'Merit': merit,
         'Details': details
         }
+    
     return d
 
-#def expand_lost(exp, dataset_dct, acoords, bcoords, refcoord, dim='z'):
 def expand_lost(
         exp,
         resonance_type='Backbone',
@@ -753,6 +761,7 @@ def init_fs_cube(exp, fsuv):
     Depends on:
     fsuv.use_sidechains
     """
+    
     exp.init_Farseer_cube(
         use_sidechains=fsuv["general_settings"]["use_sidechains"]
         )
@@ -851,6 +860,7 @@ def gen_series_dcts(
     fsuv.do_cond2
     fsuv.do_cond3
     """
+    
     if not(resonance_type in ['Backbone', 'Sidechains']):
         input(
             'Choose a valid <resonance_type> argument. Press Enter to continue.'
@@ -860,7 +870,6 @@ def gen_series_dcts(
     if not(checks_cube_axes_flags(fsuv)):
         return None
     
-    # initiates dictionary
     series_dct = {}
     xx = False
     yy = False
@@ -912,7 +921,9 @@ def gen_series_dcts(
         checks_axis_coherency('z', fsuv)
     
     if not(any([xx, yy, zz])):
-        msg = 'The overall combination of data and calculation flags is not consistent and any series set was created along an axis. Nothing will be calculated.'
+        msg = \
+'The overall combination of data and calculation flags is not consistent and \
+any series set was created along an axis. Nothing will be calculated.'
         logs(
             fsw.gen_wet('WARNING', msg, 20),
             fsuv["general_settings"]["logfile_name"]
@@ -958,31 +969,23 @@ def eval_series(
                             dim1_pt
                             ),
                         istitle=True)
-                # DO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 # flags and checks are under each function.
-                
                 # performs the calculations
                 perform_calcs(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                
                 # PERFORMS FITS
                 perform_fits(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                
                 # Analysis of PRE data - only in cond3
                 PRE_analysis(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                
                 # EXPORTS FULLY PARSED PEAKLISTS
                 exports_series(series_dct[cond][dim2_pt][dim1_pt])
-                
                 # EXPORTS CHIMERA FILES
                 exports_chimera_att_files(\
                     series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                
                 exports_all_parameters(
                     series_dct[cond][dim2_pt][dim1_pt],
                     fsuv,
                     resonance_type=resonance_type
                     )
-                
                 # PLOTS DATA
                 # plots data are exported together with the plots in
                 # fsT.plot_base(), but can be used separatly with
@@ -992,9 +995,7 @@ def eval_series(
                     fsuv,
                     resonance_type=resonance_type
                     )
-                
-                #DONE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                
+    
     return
 
 def perform_calcs(farseer_series, fsuv):
@@ -1031,12 +1032,10 @@ def perform_calcs(farseer_series, fsuv):
             fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
             'Position F1'
             )
-        
         farseer_series.calc_cs_diffs(
             fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
             'Position F2'
             )
-    
         # Calculates CSPs
         farseer_series.calc_csp(
             calccol=fsuv["csp_settings"]["calccol_name_CSP"],
@@ -1101,11 +1100,8 @@ def perform_fits(farseer_series, fsuv):
     
     checks_fit_input(farseer_series, fsuv)
     
-    ####
     for restraint in fsuv["restraint_settings"].index:
-        
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
-            
             farseer_series.perform_fit(
                 restraint,
                 fsuv["revo_settings"]["titration_x_values"],
@@ -1114,9 +1110,7 @@ def perform_fits(farseer_series, fsuv):
                 )
     
     for obs in fsuv["observables_settings"].index:
-        
         if fsuv["observables_settings"].loc[obs, 'obs_flags']:
-            
             farseer_series.perform_fit(
                 obs,
                 fsuv["revo_settings"]["titration_x_values"],
@@ -1173,7 +1167,6 @@ def PRE_analysis(farseer_series, fsuv):
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
                 ):
-        
             # only in the parameters allowed by the user
             if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
                 farseer_series.calc_Delta_PRE(
@@ -1185,18 +1178,13 @@ def PRE_analysis(farseer_series, fsuv):
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
     # for cond3 and for comparison C3.
-    
     if (iscond3 or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
-        
-        # do
         for sourcecol, targetcol in zip(
                 list(fsuv["restraint_settings"].index[3:])*2,
                 ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
                 ):
-            
             # only for the parameters allowed by the user
             if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
-                
                 farseer_series.plot_base(
                     targetcol, 
                     'exp', 
@@ -1222,12 +1210,10 @@ def PRE_analysis(farseer_series, fsuv):
     # for paramagnetic ('para') data.
     if (isc3 and (isprev_para or isnext_para)) \
             and fsuv['plotting_flags']['do_dpre_osci']:
-        
         for sourcecol, targetcols in zip(
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
                 ):
-            # DO
             if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
                 farseer_series.plot_base(
                     targetcols,
@@ -1257,7 +1243,9 @@ def exports_series(farseer_series):
     Args:
         farseer_series (FarseerSeries instance)
     """
+    
     farseer_series.export_series_to_tsv()
+    
     return
 
 def exports_chimera_att_files(farseer_series, fsuv):
@@ -1381,16 +1369,16 @@ def plots_data(
     
     if not(are_plots):
         return
+    
     fig_height = fsuv["general_settings"]["fig_height"]
     fig_width = fsuv["general_settings"]["fig_width"]
     fig_dpi = fsuv["general_settings"]["fig_dpi"]
     fig_file_type = fsuv["general_settings"]["fig_file_type"]
-    # PLOTS DATA
+    
     for restraint in fsuv["restraint_settings"].index:
         # if the user has calculated this restraint
         if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
             if farseer_series.resonance_type == 'Backbone':
-                
                 # Plot Extended Bar Plot
                 if fsuv["plotting_flags"]["do_ext_bar"]:
                     farseer_series.plot_base(
@@ -1421,7 +1409,6 @@ def plots_data(
                 
                 # Plot Compacted Bar Plot
                 if fsuv["plotting_flags"]["do_comp_bar"]:
-                    
                     farseer_series.plot_base(\
                         restraint,
                         'exp',
@@ -1477,7 +1464,6 @@ def plots_data(
             elif farseer_series.resonance_type == 'Sidechains'\
                     and (fsuv["plotting_flags"]["do_ext_bar"] \
                     or fsuv["plotting_flags"]["do_comp_bar"]):
-                # DO ++++
                 farseer_series.plot_base(
                     restraint,
                     'exp',
@@ -1502,7 +1488,6 @@ def plots_data(
                     fig_file_type=fig_file_type,
                     fig_dpi=fig_dpi
                     )
-                # DONE ++++
             
             # Plots Parameter Evolution Plot
             if fsuv["plotting_flags"]["do_res_evo"]:
@@ -1524,12 +1509,11 @@ def plots_data(
                     fig_file_type=fig_file_type,
                     fig_dpi=fig_dpi
                     )
-            
+    
     if fsuv["plotting_flags"]["do_cs_scatter"] \
             and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
                 and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
             or fsuv["csp_settings"]["calcs_CSP"]):
-        # DO ++++
         farseer_series.plot_base(
             '15N_vs_1H',
             'res',
@@ -1547,7 +1531,6 @@ def plots_data(
             and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
                 and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
             or fsuv["csp_settings"]["calcs_CSP"]):
-        #DO ++++
         farseer_series.plot_base(
             '15N_vs_1H',
             'single',
@@ -1560,7 +1543,6 @@ def plots_data(
             fig_file_type=fig_file_type,
             fig_dpi=fig_dpi
             )
-        # DONE ++++
     
     for obs in fsuv["observables_settings"].index:
         if fsuv["observables_settings"].loc[obs,"obs_flags"]:
@@ -1597,6 +1579,7 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
         resonance_type (str): {'Backbone', 'Sidechains'}, depending on
             data type. Detaults to 'Backbone'.
     """
+    
     if not(resonance_type in ['Backbone', 'Sidechains']):
         input(
             'Choose a valid <resonance_type> argument. Press Enter to continue.'
@@ -1605,12 +1588,9 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     
     # EXPORTS FULLY PARSED PEAKLISTS
     exports_series(comp_panel)
-    
     # performs pre analysis
     PRE_analysis(comp_panel, fsuv)
-    
     exports_chimera_att_files(comp_panel, fsuv)
-    
     # plots data
     plots_data(comp_panel, fsuv, resonance_type='Backbone')
     
@@ -1642,7 +1622,6 @@ def analyse_comparisons(
     
     # kwargs passed to the parsed series of class fss.FarseerSeries
     comp_kwargs = series_kwargs(fsuv, resonance_type=resonance_type)
-    
     # ORDERED relation between dimension names
     # self: [next, prev]
     series_dim_keys = {
@@ -1650,7 +1629,6 @@ def analyse_comparisons(
         'cond2':['cond3','cond1'],
         'cond3':['cond1','cond2']
         }
-    
     # stores all the comparison variables.
     comp_dct = {}
     
@@ -1658,31 +1636,23 @@ def analyse_comparisons(
     # previously with fsuv.do_cond1, fsuv.do_cond2, fsuv.do_cond3
     for dimension in sorted(series_dct.keys()):
         # sends, cond1, cond2 and cond3.
-        # DO
-        
         # creates comparison
         c = fsc.Comparisons(
             series_dct[dimension].copy(),
             selfdim=dimension,
             other_dim_keys=series_dim_keys[dimension]
             )
-        
         c.log_export_onthefly = True
         c.log_export_name = fsuv["general_settings"]["logfile_name"]
-        ###
-                
         # stores comparison in a dictionary
         comp_dct.setdefault(dimension, c)
-        
         # generates set of PARSED FarseerSeries along the
         # next and previous dimensions
         c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
         
         if c.has_points_next_dim:
             for dp2 in sorted(c.all_next_dim.keys()):
-                
                 for dp1 in sorted(c.all_next_dim[dp2].keys()):
-                    
                     if fsuv["pre_settings"]["apply_PRE_analysis"]:
                         c.all_next_dim[dp2][dp1].PRE_loaded = True
                     
@@ -1697,23 +1667,18 @@ def analyse_comparisons(
                                 ),
                         istitle=True
                         )
-                    
                     # performs ploting routines
                     comparison_analysis_routines(
                         c.all_next_dim[dp2][dp1],
                         fsuv,
                         resonance_type
                         )
-                    
-                    #c.log += c.all_next_dim[dim2_pt][dim1_pt].log
         
         c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
         
         if c.has_points_prev_dim:
             for dp2 in sorted(c.all_prev_dim.keys()):
-                
                 for dp1 in sorted(c.all_prev_dim[dp2].keys()):
-                    
                     if fsuv["pre_settings"]["apply_PRE_analysis"]:
                         c.all_prev_dim[dp2][dp1].PRE_loaded = True
                     
@@ -1727,14 +1692,12 @@ def analyse_comparisons(
                                 list(c.hyper_panel.cool)
                                 ),
                         istitle=True)
-                    
                     comparison_analysis_routines(
                         c.all_prev_dim[dp2][dp1],
                         fsuv,
                         resonance_type
                         )
-                    #c.log += c.allCcool[dim2_pt][dim1_pt].log
-        
+    
     return comp_dct
 
 def run_farseer(fsuv):
@@ -1745,6 +1708,7 @@ def run_farseer(fsuv):
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
     """
+    
     general = fsuv["general_settings"]
     fitting = fsuv["fitting_settings"]
     cs = fsuv["cs_settings"]
@@ -1753,18 +1717,13 @@ def run_farseer(fsuv):
     use_sidechains = general["use_sidechains"]
     # Initiates the log
     log_time_stamp(general["logfile_name"], mod='w')
-    
     # performs initial checks
     initial_checks(fsuv)
-    
     # Initiates Farseer
     exp = creates_farseer_dataset(fsuv)
-        
     # reads input
     reads_peaklists(exp, fsuv)
-    
     #inits_coords_names(exp)
-    
     # identify residues
     identify_residues(exp)
     
@@ -1805,7 +1764,6 @@ def run_farseer(fsuv):
         organize_columns(exp, fsuv, resonance_type='Sidechains')
     
     init_fs_cube(exp, fsuv)
-    
     # initiates a dictionary that contains all the series to be evaluated
     # along all the conditions.
     farseer_series_dct = \
@@ -1818,12 +1776,12 @@ def run_farseer(fsuv):
     
     if not(farseer_series_dct):
         exp.exports_parsed_pkls()
+    
     else:
         # evaluates the series and plots the data
         eval_series(farseer_series_dct, fsuv)
     
     if exp.has_sidechains and use_sidechains:
-        # DO
         farseer_series_SD_dict = \
             gen_series_dcts(
                 exp,
@@ -1838,11 +1796,9 @@ def run_farseer(fsuv):
                 fsuv,
                 resonance_type='Sidechains'
                 )
-        # DONE
     
     # Representing the results comparisons
     if fitting["perform_comparisons"] and (farseer_series_dct):
-        
         # analyses comparisons.
         comparison_dict = \
             analyse_comparisons(
@@ -1850,18 +1806,15 @@ def run_farseer(fsuv):
                 fsuv,
                 resonance_type='Backbone'
                 )
-        
+    
     if (fitting["perform_comparisons"] and farseer_series_dct) and \
         (exp.has_sidechains and use_sidechains):
-        # DO
         comparison_dict_SD = \
             analyse_comparisons(
                 farseer_series_SD_dict,
                 fsuv,
                 resonance_type='Sidechains'
                 )
-        # DONE
-    
     
     logs(fsw.end_good(), fsuv["general_settings"]["logfile_name"])
     log_time_stamp(fsuv["general_settings"]["logfile_name"], state='ENDED')
@@ -1871,7 +1824,6 @@ def run_farseer(fsuv):
 if __name__ == '__main__':
     
     fsuv = read_user_variables(sys.argv[1], sys.argv[2])
-    
     # copy_Farseer_version(fsuv)
     
     # path evaluations now consider the absolute path, always.
@@ -1881,7 +1833,5 @@ if __name__ == '__main__':
     # path to the 'spectra/' folder.
     # if running from the actual folder, use:
     # $ python farseer_main.py .
-    
     run_farseer(fsuv)
-    
     print('Farseermain.py finished with __name__ == "__main__"')
