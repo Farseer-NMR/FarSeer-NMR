@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-from current.fslibs import wet as fsw
+
+import current.fslibs.wet as fsw
 
 class FarseerCube:
     """
@@ -95,9 +96,11 @@ class FarseerCube:
             .checks_xy_datapoints_coherency()
             .check_ref_res()
     """
-    def __init__(self, spectra_path, has_sidechains=False,
-                                     applyFASTA=False,
-                                     FASTAstart=1):
+    def __init__(
+            self, spectra_path,
+            has_sidechains=False,
+            applyFASTA=False,
+            FASTAstart=1):
         """
         Initiates the object,
         
@@ -116,10 +119,12 @@ class FarseerCube:
         # Decomposing the spectra/ path
         # self.paths will be used in load_experiments()
         # http://stackoverflow.com/questions/14798220/how-can-i-search-sub-folders-using-glob-glob-module-in-python
-        self.paths = sorted([os.path.join(dirpath, f) \
-                            for dirpath, dirnames, files \
-                            in os.walk(spectra_path) \
-                            for f in files])
+        self.paths = \
+            sorted(
+                [os.path.join(dirpath, f) 
+                    for dirpath, dirnames, files in os.walk(spectra_path) 
+                        for f in files]
+                )
         
         # Initiates the different nested dictionaries
         self.allpeaklists = {}
@@ -155,66 +160,77 @@ class FarseerCube:
         input_log = \
 """path: {}  
 side chains: {}  
-FASTA starting residue: {}  """.format(spectra_path,
-                                       self.has_sidechains,
-                                       self.FASTAstart)
+FASTA starting residue: {}  """.\
+            format(
+                spectra_path,
+                self.has_sidechains,
+                self.FASTAstart
+                )
         
         self.log_r(input_log)
         
-        self.p5d = pd.core.panelnd.create_nd_panel_factory(\
+        self.p5d = pd.core.panelnd.create_nd_panel_factory(
             klass_name='Panel5D',
             orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
-            slices={'labels': 'labels',
-                    'items': 'items',
-                    'major_axis': 'major_axis',
-                    'minor_axis': 'minor_axis'},
+            slices={
+                'labels': 'labels',
+                'items': 'items',
+                'major_axis': 'major_axis',
+                'minor_axis': 'minor_axis'
+                },
             slicer=pd.Panel4D,
             aliases={'major': 'index', 'minor': 'minor_axis'},
-            stat_axis=2)
+            stat_axis=2
+            )
         
-        self.aal3tol1 = {"Ala": "A",
-                        "Arg": "R",
-                        "Asn": "N",
-                        "Asp": "D",
-                        "Cys": "C",
-                        "Glu": "E",
-                        "Gln": "Q",
-                        "Gly": "G",
-                        "His": "H",
-                        "Ile": "I",
-                        "Leu": "L",
-                        "Lys": "K",
-                        "Met": "M",
-                        "Phe": "F",
-                        "Pro": "P",
-                        "Ser": "S",
-                        "Thr": "T",
-                        "Trp": "W",
-                        "Tyr": "Y",
-                        "Val": "V"}
+        self.aal3tol1 = {
+            "Ala": "A",
+            "Arg": "R",
+            "Asn": "N",
+            "Asp": "D",
+            "Cys": "C",
+            "Glu": "E",
+            "Gln": "Q",
+            "Gly": "G",
+            "His": "H",
+            "Ile": "I",
+            "Leu": "L",
+            "Lys": "K",
+            "Met": "M",
+            "Phe": "F",
+            "Pro": "P",
+            "Ser": "S",
+            "Thr": "T",
+            "Trp": "W",
+            "Tyr": "Y",
+            "Val": "V"
+            }
+            
         self.aal1tol3 = {
-                        "A": "Ala",
-                        "R": "Arg",
-                        "N": "Asn",
-                        "D": "Asp",
-                        "C": "Cys",
-                        "E": "Glu",
-                        "Q": "Gln",
-                        "G": "Gly",
-                        "H": "His",
-                        "I": "Ile",
-                        "L": "Leu",
-                        "K": "Lys",
-                        "M": "Met",
-                        "F": "Phe",
-                        "P": "Pro",
-                        "S": "Ser",
-                        "T": "Thr",
-                        "W": "Trp",
-                        "Y": "Tyr",
-                        "V": "Val"}
+            "A": "Ala",
+            "R": "Arg",
+            "N": "Asn",
+            "D": "Asp",
+            "C": "Cys",
+            "E": "Glu",
+            "Q": "Gln",
+            "G": "Gly",
+            "H": "His",
+            "I": "Ile",
+            "L": "Leu",
+            "K": "Lys",
+            "M": "Met",
+            "F": "Phe",
+            "P": "Pro",
+            "S": "Ser",
+            "T": "Thr",
+            "W": "Trp",
+            "Y": "Tyr",
+            "V": "Val"
+            }
     
-    def log_r(self, logstr, istitle=False):
+    def log_r(self, logstr,
+            istitle=False):
         """
         Registers the log string and prints it.
         
@@ -223,11 +239,14 @@ FASTA starting residue: {}  """.format(spectra_path,
         """
         # formats logstr
         if istitle:
-            logstr = """
+            logstr = \
+"""
 {0}  
 {1}  
 {0}  
-""".format('*'*79, logstr.upper())
+""".\
+        format('*'*79, logstr.upper())
+        
         else:
             logstr += '  \n'
         
@@ -241,7 +260,10 @@ FASTA starting residue: {}  """.format(spectra_path,
                 logfile.write(logstr)
         return
     
-    def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
+    def exports_log(
+            self,
+            mod='w',
+            logfile_name='FarseerSet_log.md'):
         """Exports log to external file.
         
         mod (str): python.open() arg mode.
@@ -257,7 +279,10 @@ FASTA starting residue: {}  """.format(spectra_path,
         fsw.abort()
         return
     
-    def load_experiments(self, filetype='.csv', resonance_type='Backbone'):
+    def load_experiments(
+            self,
+            filetype='.csv',
+            resonance_type='Backbone'):
         """
         Loads the <filetype> files in self.paths into nested dictionaries as 
         pd.DataFrames.
@@ -350,7 +375,9 @@ FASTA starting residue: {}  """.format(spectra_path,
             target = self.allsidechains
             
         else:
-            self.log_r('Arguments passed for <filetype> and/or <resonance_type> do not match the possible options.')
+            self.log_r(
+                'Arguments passed for <filetype> and/or <resonance_type> do not match the possible options.'
+                )
             return
         
         # loads files in nested dictionaries
@@ -368,7 +395,8 @@ FASTA starting residue: {}  """.format(spectra_path,
                 try:
                     branch[lessparts] = branch.get(parts[-1], f(p))
                 except pd.errors.EmptyDataError:
-                    msg = "The file {} is empty. To introduce an empty data point, add the header.".format(filetype)
+                    msg = "The file {} is empty. To introduce an empty data point, add the header.".\
+                        format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
         
@@ -422,30 +450,46 @@ FASTA starting residue: {}  """.format(spectra_path,
         # later on the finds_missing function.
         #
         dd = {}
-        dd["ResNo"] = [str(i) for i in range(self.FASTAstart,
-                                           (self.FASTAstart + len(FASTA)))]
+        dd["ResNo"] = \
+            [str(i) for i in range(
+                self.FASTAstart,
+                (self.FASTAstart + len(FASTA))
+                )
+            ]
         dd["1-letter"] = list(FASTA)
         # aal1tol3 dictionary is defined at the end of this module
         dd["3-letter"] = [self.aal1tol3[i] for i in FASTA]
         #
         # Assign F1 is generated here because it will serve in future
         # functions.
-        atomtype = self.allpeaklists[self.zzref][self.yyref][self.xxref].\
-                        loc[0,'Assign F1'][-1]
-        dd["Assign F1"] = [str(i + j + atomtype) for i, j in zip(dd["ResNo"], 
-                                                            dd["3-letter"])]
+        atomtype = \
+            self.allpeaklists[self.zzref][self.yyref][self.xxref].\
+                loc[0,'Assign F1'][-1]
         
-        atomtype = self.allpeaklists[self.zzref][self.yyref][self.xxref].\
+        dd["Assign F1"] = \
+            [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
+        
+        atomtype = \
+            self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                         loc[0,'Assign F2'][-1]
-        dd["Assign F2"] = [str(i + j + atomtype) for i, j in zip(dd["ResNo"], 
-                                                            dd["3-letter"])]
+        
+        dd["Assign F2"] = \
+            [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
         
         # Details set to 'None' as it is by default in CCPNMRv2 peaklists
         dd['Details'] = ['None' for i in FASTA]
 
-        df = pd.DataFrame(dd, 
-                          columns=['ResNo', '3-letter', '1-letter',
-                                   'Assign F1', 'Assign F2', 'Details'])
+        df = pd.DataFrame(
+            dd, 
+            columns=[
+                'ResNo',
+                '3-letter',
+                '1-letter',
+                'Assign F1',
+                'Assign F2',
+                'Details'
+                ]
+            )
         
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         
@@ -475,12 +519,14 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.zzcoords = sorted(self.allpeaklists)
         self.zzref = self.zzcoords[0]
         # identifies if there is information in this dimension
+       
         if len(self.zzcoords) > 1:
             self.haszz = True
         
         # keys for all the conditions in the 2nd dimension - middle level
         self.yycoords = sorted(self.allpeaklists[self.zzcoords[0]])
         self.yyref = self.yycoords[0]
+        
         if len(self.yycoords) > 1:
             self.hasyy = True
         
@@ -488,15 +534,17 @@ FASTA starting residue: {}  """.format(spectra_path,
         self.xxcoords = \
             sorted(self.allpeaklists[self.zzcoords[0]][self.yycoords[0]])
         self.xxref = self.xxcoords[0]
+        
         if len(self.xxcoords) > 1:
             self.hasxx = True
         
-        logs = '''\
+        logs = \
+"""
 * Farseer Cube X axis variables (cond1): {}
 * Farseer Cube Y axis variables (cond2): {}
 * Farseer Cube Z axis variables (cond3): {}
-'''.format(self.xxcoords, self.yycoords, self.zzcoords)
-        
+""".\
+        format(self.xxcoords, self.yycoords, self.zzcoords)
         self.log_r(logs)
         
         return
@@ -550,14 +598,16 @@ FASTA starting residue: {}  """.format(spectra_path,
         
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
+        for z, y, x in it.product(
+                self.zzcoords,
+                self.yycoords,
+                self.xxcoords):
             # DO Cicle coords
             
             # Step 1
-            resInfo = self.allpeaklists[z][y][x].\
-                loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
+            resInfo = \
+                self.allpeaklists[z][y][x].\
+                    loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
             
             resInfo.columns = ['ResNo', '3-letter']
     
@@ -581,24 +631,37 @@ FASTA starting residue: {}  """.format(spectra_path,
                 # if the peaklist is an empty file containing only the header.
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][self.xxref].copy()
-                self.allpeaklists[z][y][x].loc[:,['Peak Status',
-                                                  'Merit',
-                                                  'Position F1',
-                                                  'Position F2',
-                                                  'Height',
-                                                  'Volume',
-                                                  'Line Width F1 (Hz)',
-                                                  'Line Width F2 (Hz)']] =\
-                    ['lost',np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]
+                
+                self.allpeaklists[z][y][x].\
+                    loc[:,[
+                        'Peak Status',
+                        'Merit',
+                        'Position F1',
+                        'Position F2',
+                        'Height',
+                        'Volume',
+                        'Line Width F1 (Hz)',
+                        'Line Width F2 (Hz)'
+                        ]
+                    ] = [
+                            'lost',
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan,
+                            np.nan
+                            ]
             
             # Step 4
             self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-            self.allpeaklists[z][y][x]['ResNo'].astype(int)
+                self.allpeaklists[z][y][x]['ResNo'].astype(int)
             
             self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
             
             self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-            self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
+                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
             
             self.allpeaklists[z][y][x].reset_index(inplace=True)
             
@@ -606,14 +669,15 @@ FASTA starting residue: {}  """.format(spectra_path,
             # use of regex: http://www.regular-expressions.info/tutorial.html
             # identify the sidechain rows
             sidechains_bool = \
-                self.allpeaklists[z][y][x].loc[:,'Assign F1'].str.match('\w+[ab]$')
+                self.allpeaklists[z][y][x].\
+                    loc[:,'Assign F1'].str.match('\w+[ab]$')
             
             # initiates SD counter
             sd_count = {True:0}
             
             # if the user says it has sidechains and there are actually sidechains.
-            if self.has_sidechains and \
-                (True in sidechains_bool.value_counts()):
+            if self.has_sidechains \
+                and (True in sidechains_bool.value_counts()):
                 # DO if ++++ 
                 
                 # two condition are evaluated in case the user has set 
@@ -628,7 +692,6 @@ FASTA starting residue: {}  """.format(spectra_path,
                 # adds 'a' or 'b'
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                     self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
-                
                 
                 self.allsidechains[z][y][x].reset_index(inplace=True)
                 
@@ -649,22 +712,27 @@ FASTA starting residue: {}  """.format(spectra_path,
             
             # Writes sanity check
             if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
-               issubset(self.allpeaklists[z][y][x].columns):
+                    issubset(self.allpeaklists[z][y][x].columns):
                 columns_OK = 'OK'
             
             # the script does not correct for the fact that the user sets
             # no sidechains but that actually are sidechains, 
             # though the log file register such occurrence.
-            logs = '**[{}][{}][{}]** new columns inserted:  {}  \
+            logs = \
+'**[{}][{}][{}]** new columns inserted:  {}  \
 | sidechains user setting: {} \
 | sidechains identified: {} | SD count: {}'.\
-                format(z,y,x,columns_OK,
-                       self.has_sidechains,
-                       (True in sidechains_bool.value_counts()),
-                        sd_count[True])
+                format(
+                    z,
+                    y,
+                    x,
+                    columns_OK,
+                    self.has_sidechains,
+                    (True in sidechains_bool.value_counts()),
+                    sd_count[True]
+                    )
             
             self.log_r(logs)
-            
             # DONE Cycle coords
         
         return
@@ -688,18 +756,21 @@ FASTA starting residue: {}  """.format(spectra_path,
             self.log_r(msg)
             return
         
-        self.check_ref_res(\
+        self.check_ref_res(
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
-                loc[:,'ResNo'], ref_res)
+                loc[:,'ResNo'],
+            ref_res
+            )
         
         title = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A RESIDUE {}'.\
             format(ref_res)
         self.log_r(title, istitle=True)
         
         ref_data = {}
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
+        for z, y, x in it.product(
+                self.zzcoords,
+                self.yycoords,
+                self.xxcoords):
             # DO Cicle coords
             dp_res_mask = \
                 self.allpeaklists[z][y][x].loc[:,'ResNo'] == ref_res
@@ -728,10 +799,10 @@ FASTA starting residue: {}  """.format(spectra_path,
             F2_cs_diff = float(dp_F2_cs) - float(ref_data['F2_cs'])
         
             # copies the chemical shift data to a backup column
-            self.allpeaklists[z][y][x].loc[:,'Position F1 original'] =\
+            self.allpeaklists[z][y][x].loc[:,'Position F1 original'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F1']
             
-            self.allpeaklists[z][y][x].loc[:,'Position F2 original'] =\
+            self.allpeaklists[z][y][x].loc[:,'Position F2 original'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F2']
         
             # records the used correction factor
@@ -748,9 +819,13 @@ FASTA starting residue: {}  """.format(spectra_path,
             # curr-ref=corr
             logs = \
 '**[{}][{}][{}]** | F1: {:.4f}-{:.4f}={:.4f} | F2: {:.4f}-{:.4f}={:.4f}'.\
-            format(z,y,x,
-                   float(dp_F1_cs), float(ref_data['F1_cs']), F1_cs_diff, 
-                   float(dp_F2_cs), float(ref_data['F2_cs']), F2_cs_diff)
+                format(
+                    z,
+                    y,
+                    x,
+                    float(dp_F1_cs), float(ref_data['F1_cs']), F1_cs_diff, 
+                    float(dp_F2_cs), float(ref_data['F2_cs']), F2_cs_diff
+                    )
         
             self.log_r(logs)
             # DONE Cycle coords
@@ -770,20 +845,22 @@ FASTA starting residue: {}  """.format(spectra_path,
         backbone correction'
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
+        for z, y, x in it.product(
+                self.zzcoords,
+                self.yycoords,
+                self.xxcoords):
             # DO Cycle coords
             self.allsidechains[z][y][x].loc[:,'Position F1'] = \
-                self.allsidechains[z][y][x].loc[:,'Position F1'].sub(\
-                    self.allpeaklists[z][y][x].loc[0,'Pos F1 correction'])
+                self.allsidechains[z][y][x].loc[:,'Position F1'].\
+                    sub(self.allpeaklists[z][y][x].loc[0,'Pos F1 correction'])
         
             self.allsidechains[z][y][x].loc[:,'Position F2'] = \
-                self.allsidechains[z][y][x].loc[:,'Position F2'].sub(\
-                    self.allpeaklists[z][y][x].loc[0,'Pos F2 correction'])
+                self.allsidechains[z][y][x].loc[:,'Position F2'].\
+                    sub(self.allpeaklists[z][y][x].loc[0,'Pos F2 correction'])
             
-            s2w = '**[{}][{}][{}]** Corrected chemical shift fot sidechain \
-residues.'.format(z, y, x)
+            s2w = \
+'**[{}][{}][{}]** Corrected chemical shift fot sidechain residues.'.\
+                format(z, y, x)
             self.log_r(s2w)
             
             # DONE Cycle coords
@@ -816,8 +893,9 @@ residues.'.format(z, y, x)
         # merges ResNo and ATOM cols to keep sorted
         if resonance_type=='Sidechains':
             # DO merge res and atom
-            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,['ResNo', 'ATOM']].\
-                apply(lambda x: ''.join(x), axis=1)
+            ref_pkl.loc[:,'ResNo'] = \
+                ref_pkl.loc[:,['ResNo', 'ATOM']].\
+                    apply(lambda x: ''.join(x), axis=1)
         
             target_pkl.loc[:,'ResNo'] = \
                 target_pkl.loc[:,['ResNo', 'ATOM']].\
@@ -837,9 +915,7 @@ residues.'.format(z, y, x)
         # expands the target peaklist to the new index
         target_pkl = \
             target_pkl.set_index('ResNo').\
-                             reindex(ind).\
-                             reset_index().\
-                             fillna(fillna)
+                reindex(ind).reset_index().fillna(fillna)
         
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
@@ -858,11 +934,18 @@ residues.'.format(z, y, x)
             target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
             ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
         
-        return target_pkl, [target_ind_init_len, length_ind, 
-                            target_ind_final_len]
+        return \
+            target_pkl, \
+            [
+                target_ind_init_len, 
+                length_ind, 
+                target_ind_final_len
+                ]
     
-    def compares_references(self, fillna_dict, along_axis='z',
-                                               resonance_type='Backbone'):
+    def compares_references(
+            self, fillna_dict,
+            along_axis='z',
+            resonance_type='Backbone'):
         """
         Compares reference experiments along Y and Z axis and adds missing
         residues considering [xxref][yyref][zzref] as the main reference.
@@ -901,7 +984,7 @@ residues.'.format(z, y, x)
             self.log_r(msg)
             return
         elif (along_axis == 'y' and not(self.hasyy)) \
-            or (along_axis == 'z' and not(self.haszz)):
+                or (along_axis == 'z' and not(self.haszz)):
             # DO
             msg = 'There are no data points along dimension {}. This function has no effect.'.format(along_axis.upper())
             self.log_r(fsw.gen_wet('NOTE', msg, 19))
@@ -916,15 +999,29 @@ residues.'.format(z, y, x)
                     refy = y
         
                 target[z][y][self.xxref], popi = \
-                    self.seq_expand(ref_pkl, target[z][y][self.xxref],
-                                    resonance_type, fillna_dict)
+                    self.seq_expand(
+                        ref_pkl, 
+                        target[z][y][self.xxref],
+                        resonance_type,
+                        fillna_dict
+                        )
             
                 logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
-| Target final length :: {}".format(z, y , self.xxref,
-                                    refz, refy, self.xxref,
-                                    popi[0], popi[1], popi[2])
+| Target final length :: {}".\
+                    format(
+                        z,
+                        y,
+                        self.xxref,
+                        refz,
+                        refy,
+                        self.xxref,
+                        popi[0],
+                        popi[1],
+                        popi[2]
+                        )
+                
                 self.log_r(logs)
                 # DONE
         
@@ -937,23 +1034,38 @@ residues.'.format(z, y, x)
                     refy = y
         
                 target[z][y][self.xxref], popi = \
-                    self.seq_expand(ref_pkl, target[z][y][self.xxref],
-                                    resonance_type, fillna_dict)
+                    self.seq_expand(
+                        ref_pkl,
+                        target[z][y][self.xxref],
+                        resonance_type,
+                        fillna_dict
+                        )
                 
                 logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
-| Target final length :: {}".format(z, y, self.xxref,
-                                    refz, refy, self.xxref,
-                                    popi[0], popi[1], popi[2])
+| Target final length :: {}".\
+                    format(
+                        z,
+                        y,
+                        self.xxref,
+                        refz,
+                        refy,
+                        self.xxref,
+                        popi[0],
+                        popi[1],
+                        popi[2]
+                        )
+                
                 self.log_r(logs)
                 # DONE Y
         
         return
     
-    def finds_missing(self, fillna_dict, 
-                            missing='lost',
-                            resonance_type='Backbone'):
+    def finds_missing(
+            self, fillna_dict, 
+            missing='lost',
+            resonance_type='Backbone'):
         """
         Finds missing residues.
         
@@ -996,13 +1108,15 @@ residues.'.format(z, y, x)
         elif resonance_type == 'Sidechains':
             target = self.allsidechains
         else:
-            msg = "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+            msg = \
+                "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
             self.log_r(msg)
             return
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
+        for z, y, x in it.product(
+                self.zzcoords,
+                self.yycoords,
+                self.xxcoords):
             # DO
             # sets the reference peaklist
             if x == self.xxref and missing == 'lost':
@@ -1018,21 +1132,37 @@ residues.'.format(z, y, x)
                 refx = ref_fasta_key
             
             target[z][y][x], popi = \
-                self.seq_expand(ref_pkl, target[z][y][x],
-                                resonance_type, fillna_dict)
+                self.seq_expand(
+                    ref_pkl,
+                    target[z][y][x],
+                    resonance_type,
+                    fillna_dict
+                    )
             
             logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
-| Target final length :: {}".format(z, y, x,
-                                    refz, refy, refx,
-                                    popi[0], popi[1], popi[2])
+| Target final length :: {}".\
+                format(
+                    z,
+                    y,
+                    x,
+                    refz,
+                    refy,
+                    refx,
+                    popi[0],
+                    popi[1],
+                    popi[2]
+                    )
+            
             self.log_r(logs)
             
         return
         
-    def organize_cols(self, performed_cs_correction=False,
-                            resonance_type='Backbone'):
+    def organize_cols(
+            self,
+            performed_cs_correction=False,
+            resonance_type='Backbone'):
         """
         Orders columns in DataFrames for better visualization.
         

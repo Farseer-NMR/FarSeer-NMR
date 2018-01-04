@@ -51,7 +51,6 @@ import os
 import shutil
 import json
 import datetime  # used to write the log file
-import itertools
 import pandas as pd
 
 import current.fslibs.FarseerCube as fcube
