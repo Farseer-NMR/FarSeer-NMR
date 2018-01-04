@@ -1807,8 +1807,8 @@ def run_farseer(fsuv):
                 resonance_type='Backbone'
                 )
     
-    if (fitting["perform_comparisons"] and farseer_series_dct) and \
-        (exp.has_sidechains and use_sidechains):
+    if (fitting["perform_comparisons"] and farseer_series_dct) \
+            and (exp.has_sidechains and use_sidechains):
         comparison_dict_SD = \
             analyse_comparisons(
                 farseer_series_SD_dict,
