@@ -130,20 +130,16 @@ class FarseerCube:
         self.allpeaklists = {}
         self.allsidechains = {}
         self.allfasta = {}
-        
         # Initiates helper variables
         self.tmp_vars = {}
-        
         # loads information into the object
         self.has_sidechains = has_sidechains
         self.FASTAstart = FASTAstart
-        
         # lists the names of the different axes point names which are given by 
         # the spectra/ folder hierarchy
         self.zzcoords = None
         self.yycoords = None
         self.xxcoords = None
-        
         # Flags if there are more than 1 data point in each axis
         # (a.k.a. condition)
         # if no more than 1 data point is found,
@@ -151,11 +147,10 @@ class FarseerCube:
         self.haszz = False
         self.hasyy = False
         self.hasxx = False
-        
-        self.log = ''  # all log goes here
+        # all log goes here
+        self.log = ''
         self.log_export_onthefly = False
         self.log_export_name = 'FarseerNMR_Cube_log.md'
-        
         self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
 """path: {}  
@@ -166,9 +161,7 @@ FASTA starting residue: {}  """.\
                 self.has_sidechains,
                 self.FASTAstart
                 )
-        
         self.log_r(input_log)
-        
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
             klass_name='Panel5D',
             orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
@@ -182,7 +175,6 @@ FASTA starting residue: {}  """.\
             aliases={'major': 'index', 'minor': 'minor_axis'},
             stat_axis=2
             )
-        
         self.aal3tol1 = {
             "Ala": "A",
             "Arg": "R",
@@ -205,7 +197,6 @@ FASTA starting residue: {}  """.\
             "Tyr": "Y",
             "Val": "V"
             }
-            
         self.aal1tol3 = {
             "A": "Ala",
             "R": "Arg",
@@ -245,7 +236,7 @@ FASTA starting residue: {}  """.\
 {1}  
 {0}  
 """.\
-        format('*'*79, logstr.upper())
+                format('*'*79, logstr.upper())
         
         else:
             logstr += '  \n'
@@ -258,6 +249,7 @@ FASTA starting residue: {}  """.\
         if self.log_export_onthefly:
             with open(self.log_export_name, 'a') as logfile:
                 logfile.write(logstr)
+        
         return
     
     def exports_log(
@@ -269,14 +261,18 @@ FASTA starting residue: {}  """.\
         mod (str): python.open() arg mode.
         logfile_name (str): the external log file name.
         """
+        
         with open(logfile_name, mod) as logfile:
             logfile.write(self.log)
+        
         return
     
     def abort(self):
         """Aborts run with message."""
+        
         self.log_r(fsw.abort_msg)
         fsw.abort()
+        
         return
     
     def load_experiments(
@@ -350,12 +346,10 @@ FASTA starting residue: {}  """.\
         
         title = \
             'READING INPUT FILES ({}) for {}'.format(filetype, resonance_type)
-        
         self.log_r(title, istitle=True)
-        
         self.checks_filetype(filetype)
-        
         main_peaklists=False
+        
         if filetype == '.csv' and resonance_type == 'Backbone':
             f = pd.read_csv
             target = self.allpeaklists
@@ -366,7 +360,6 @@ FASTA starting residue: {}  """.\
                 #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
                 #self.log_r(fsw.gen_wet('ERROR', msg, 21))
                 #self.abort()
-            
             f = self.read_FASTA
             target = self.allfasta
             
@@ -376,7 +369,8 @@ FASTA starting residue: {}  """.\
             
         else:
             self.log_r(
-                'Arguments passed for <filetype> and/or <resonance_type> do not match the possible options.'
+'Arguments passed for <filetype> and/or <resonance_type> do not match \
+the possible options.'
                 )
             return
         
@@ -385,17 +379,22 @@ FASTA starting residue: {}  """.\
         for p in self.paths:
             parts = p.split('spectra')[-1].split('/')
             branch = target
+            
             for part in parts[1:-1]:
                 branch = branch.setdefault(part, {})
+            
             # reads the .csv file to a pd.DataFrame removes
             # the '.csv' from the key name to increase asthetics in output
             if parts[-1].lower().endswith(filetype):
                 self.log_r('* {}'.format(p))
                 lessparts = parts[-1].split('.')[0]
+                
                 try:
                     branch[lessparts] = branch.get(parts[-1], f(p))
+                
                 except pd.errors.EmptyDataError:
-                    msg = "The file {} is empty. To introduce an empty data point, add the header.".\
+                    msg = \
+"The file {} is empty. To introduce an empty data point, add the header.".\
                         format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
@@ -430,22 +429,26 @@ FASTA starting residue: {}  """.\
         
         # Generates a single string from the FASTA file
         FASTA = ''
+        
         for i in fl:
             if i.startswith('>'):
                 continue
+            
             else:
                 FASTA += i.replace(' ', '').replace('\n', '').upper()
         
         if ''.join(c for c in FASTA if c.isdigit()):
-            msg = 'We found digits in your FASTA string coming from file {}. Be aware of mistakes resulting from wrong FASTA file. You may wish to abort and correct the file. If you choose continue, Farseer-NMR will parse out the digits.'.\
+            msg = \
+'We found digits in your FASTA string coming from file {}. Be aware of \
+mistakes resulting from wrong FASTA file. You may wish to abort \
+and correct the file. \
+If you choose continue, Farseer-NMR will parse out the digits.'.\
                 format(FASTApath)
             self.log_r(fsw.gen_wet('WARNING', msg, 22))
             fsw.continue_abort()
-            
             FASTA = ''.join(c for c in FASTA if not c.isdigit())
         
         FASTAfile.close()
-
         # ResNo is kept as str() to allow reindexing
         # later on the finds_missing function.
         #
@@ -465,22 +468,17 @@ FASTA starting residue: {}  """.\
         atomtype = \
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                 loc[0,'Assign F1'][-1]
-        
         dd["Assign F1"] = \
             [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
-        
         atomtype = \
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                         loc[0,'Assign F2'][-1]
-        
         dd["Assign F2"] = \
             [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
-        
         # Details set to 'None' as it is by default in CCPNMRv2 peaklists
         dd['Details'] = ['None' for i in FASTA]
-
         df = pd.DataFrame(
-            dd, 
+            dd,
             columns=[
                 'ResNo',
                 '3-letter',
@@ -490,11 +488,8 @@ FASTA starting residue: {}  """.\
                 'Details'
                 ]
             )
-        
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
-        
         self.log_r(logs)
-        
         self.check_fasta(df, FASTApath)
         
         return df
@@ -514,7 +509,6 @@ FASTA starting residue: {}  """.\
         """
         
         self.log_r('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
-        
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
         self.zzref = self.zzcoords[0]
@@ -544,7 +538,7 @@ FASTA starting residue: {}  """.\
 * Farseer Cube Y axis variables (cond2): {}
 * Farseer Cube Z axis variables (cond3): {}
 """.\
-        format(self.xxcoords, self.yycoords, self.zzcoords)
+            format(self.xxcoords, self.yycoords, self.zzcoords)
         self.log_r(logs)
         
         return
@@ -598,17 +592,11 @@ FASTA starting residue: {}  """.\
         
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(
-                self.zzcoords,
-                self.yycoords,
-                self.xxcoords):
-            # DO Cicle coords
-            
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # Step 1
             resInfo = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
-            
             resInfo.columns = ['ResNo', '3-letter']
     
             # Step 2
@@ -627,11 +615,11 @@ FASTA starting residue: {}  """.\
             # peaks will be label as 'lost' or 'unassigned'.
             try:
                 self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
+            
             except ValueError:
                 # if the peaklist is an empty file containing only the header.
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][self.xxref].copy()
-                
                 self.allpeaklists[z][y][x].\
                     loc[:,[
                         'Peak Status',
@@ -657,58 +645,41 @@ FASTA starting residue: {}  """.\
             # Step 4
             self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
                 self.allpeaklists[z][y][x]['ResNo'].astype(int)
-            
             self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
-            
             self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
                 self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
-            
             self.allpeaklists[z][y][x].reset_index(inplace=True)
-            
             # sidechains entries always end with an 'a' or 'b' in the AssignF1
             # use of regex: http://www.regular-expressions.info/tutorial.html
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.match('\w+[ab]$')
-            
             # initiates SD counter
             sd_count = {True:0}
             
             # if the user says it has sidechains and there are actually sidechains.
             if self.has_sidechains \
-                and (True in sidechains_bool.value_counts()):
-                # DO if ++++ 
-                
+                    and (True in sidechains_bool.value_counts()):
                 # two condition are evaluated in case the user has set 
                 #sidechains to True but there are actually no sidechains.
-                
                 sd_count = sidechains_bool.value_counts()
-                
                 # DataFrame with side chains
                 self.allsidechains[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-    
                 # adds 'a' or 'b'
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                     self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
-                
                 self.allsidechains[z][y][x].reset_index(inplace=True)
-                
                 self.allsidechains[z][y][x].loc[:,'ResNo'] = \
                     self.allsidechains[z][y][x]['ResNo'].astype(int)
-                
                 self.allsidechains[z][y][x].\
                     sort_values(by=['ResNo','ATOM'] , inplace=True)
-                
                 self.allsidechains[z][y][x].loc[:,'ResNo'] = \
                     self.allsidechains[z][y][x]['ResNo'].astype(str)
-                
                 # creates backbone peaklist without sidechains
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
-                
-                # DONE if ++++ 
             
             # Writes sanity check
             if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
@@ -751,9 +722,12 @@ FASTA starting residue: {}  """.\
 
         if isinstance(ref_res, int):
             ref_res = str(ref_res)
+        
         else:
-            msg = 'Argument ref_res for method .correct_shifts_backbone() must be of type <int>.'
+            msg = \
+'Argument ref_res for method .correct_shifts_backbone() must be of type <int>.'
             self.log_r(msg)
+            
             return
         
         self.check_ref_res(
@@ -761,60 +735,45 @@ FASTA starting residue: {}  """.\
                 loc[:,'ResNo'],
             ref_res
             )
-        
         title = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A RESIDUE {}'.\
             format(ref_res)
         self.log_r(title, istitle=True)
-        
         ref_data = {}
-        for z, y, x in it.product(
-                self.zzcoords,
-                self.yycoords,
-                self.xxcoords):
-            # DO Cicle coords
+        
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             dp_res_mask = \
                 self.allpeaklists[z][y][x].loc[:,'ResNo'] == ref_res
-            
             dp_F1_cs = \
                 self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F1']
-            
             dp_F2_cs = \
                 self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F2']
-        
+            
             # Reads the information of the selected peak in the reference 
             # spectrum
             if x == self.xxref:
-                # DO 
                 # loads the chemical shift for F1 of the ref res
                 ref_data['F1_cs'] = dp_F1_cs
-                
                 # loads the chemical shift for the F2 of the ref res
                 ref_data['F2_cs'] = dp_F2_cs
-                # DONE
-        
+            
             # For the reference residue, calculates the difference between the 
             # chemical shift in the reference and the current spectra. If 
             # current == reference, difference should yield 0.
             F1_cs_diff = float(dp_F1_cs) - float(ref_data['F1_cs'])
             F2_cs_diff = float(dp_F2_cs) - float(ref_data['F2_cs'])
-        
             # copies the chemical shift data to a backup column
             self.allpeaklists[z][y][x].loc[:,'Position F1 original'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F1']
-            
             self.allpeaklists[z][y][x].loc[:,'Position F2 original'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F2']
-        
             # records the used correction factor
             self.allpeaklists[z][y][x].loc[:,'Pos F1 correction'] = F1_cs_diff
             self.allpeaklists[z][y][x].loc[:,'Pos F2 correction'] = F2_cs_diff
-        
             # corrects the chemical shift by applying a subtration
             self.allpeaklists[z][y][x].loc[:,'Position F1'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F1'].sub(F1_cs_diff)
             self.allpeaklists[z][y][x].loc[:,'Position F2'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F2'].sub(F2_cs_diff)
-        
             # logs the operation
             # curr-ref=corr
             logs = \
@@ -826,9 +785,7 @@ FASTA starting residue: {}  """.\
                     float(dp_F1_cs), float(ref_data['F1_cs']), F1_cs_diff, 
                     float(dp_F2_cs), float(ref_data['F2_cs']), F2_cs_diff
                     )
-        
             self.log_r(logs)
-            # DONE Cycle coords
         
         return
     
@@ -841,29 +798,21 @@ FASTA starting residue: {}  """.\
         Cycles over all the Z and Y data points.
         """
         
-        title = 'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON Previous \
-        backbone correction'
+        title = \
+'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON Previous backbone correction'
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(
-                self.zzcoords,
-                self.yycoords,
-                self.xxcoords):
-            # DO Cycle coords
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             self.allsidechains[z][y][x].loc[:,'Position F1'] = \
                 self.allsidechains[z][y][x].loc[:,'Position F1'].\
                     sub(self.allpeaklists[z][y][x].loc[0,'Pos F1 correction'])
-        
             self.allsidechains[z][y][x].loc[:,'Position F2'] = \
                 self.allsidechains[z][y][x].loc[:,'Position F2'].\
                     sub(self.allpeaklists[z][y][x].loc[0,'Pos F2 correction'])
-            
             s2w = \
 '**[{}][{}][{}]** Corrected chemical shift fot sidechain residues.'.\
                 format(z, y, x)
             self.log_r(s2w)
-            
-            # DONE Cycle coords
         
         return
     
@@ -892,35 +841,26 @@ FASTA starting residue: {}  """.\
         """
         # merges ResNo and ATOM cols to keep sorted
         if resonance_type=='Sidechains':
-            # DO merge res and atom
             ref_pkl.loc[:,'ResNo'] = \
                 ref_pkl.loc[:,['ResNo', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1)
-        
             target_pkl.loc[:,'ResNo'] = \
                 target_pkl.loc[:,['ResNo', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1)
-            # DONE
         
         # creates an index based on the residue numbers of the reference
         # peaklist
         ind = ref_pkl.loc[:,'ResNo']
-        
         # reads size of reference index
         length_ind = ind.size 
-        
         # reads size of target peaklist
         target_ind_init_len = target_pkl.shape[0]
-        
         # expands the target peaklist to the new index
         target_pkl = \
             target_pkl.set_index('ResNo').\
                 reindex(ind).reset_index().fillna(fillna)
-        
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
-        
-        
         # transfers information of the different columns
         # from the reference to the expanded peaklist
         target_pkl.loc[:,'3-letter'] = ref_pkl.loc[:,'3-letter']
@@ -972,8 +912,10 @@ FASTA starting residue: {}  """.\
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
+        
         elif resonance_type == 'Sidechains':
             target = self.allsidechains
+        
         else:
             msg = 'Argument <resonance_type> is not valid.'
             self.log_r(msg)
@@ -983,21 +925,23 @@ FASTA starting residue: {}  """.\
             msg = 'Argument <along_axis> is not valid.'
             self.log_r(msg)
             return
+        
         elif (along_axis == 'y' and not(self.hasyy)) \
                 or (along_axis == 'z' and not(self.haszz)):
             # DO
-            msg = 'There are no data points along dimension {}. This function has no effect.'.format(along_axis.upper())
+            msg = \
+'There are no data points along dimension {}. This function has no effect.'.\
+                format(along_axis.upper())
             self.log_r(fsw.gen_wet('NOTE', msg, 19))
             return
-            # DONE
+            
         elif along_axis == 'z':
             for y, z in it.product(self.yycoords, self.zzcoords):
-                # DO
                 if z == self.zzref:
                     ref_pkl = target[z][y][self.xxref]
                     refz = z
                     refy = y
-        
+                
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
                         ref_pkl, 
@@ -1005,8 +949,8 @@ FASTA starting residue: {}  """.\
                         resonance_type,
                         fillna_dict
                         )
-            
-                logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+                logs = \
+"**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
 | Target final length :: {}".\
@@ -1021,13 +965,10 @@ FASTA starting residue: {}  """.\
                         popi[1],
                         popi[2]
                         )
-                
                 self.log_r(logs)
-                # DONE
         
         elif along_axis == 'y':
             for z, y in it.product(self.zzcoords, self.yycoords):
-                # DO Y
                 if y == self.yyref:
                     ref_pkl = target[z][y][self.xxref]
                     refz = z
@@ -1040,8 +981,8 @@ FASTA starting residue: {}  """.\
                         resonance_type,
                         fillna_dict
                         )
-                
-                logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+                logs = \
+"**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
 | Target final length :: {}".\
@@ -1056,9 +997,7 @@ FASTA starting residue: {}  """.\
                         popi[1],
                         popi[2]
                         )
-                
                 self.log_r(logs)
-                # DONE Y
         
         return
     
@@ -1105,25 +1044,24 @@ FASTA starting residue: {}  """.\
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
+        
         elif resonance_type == 'Sidechains':
             target = self.allsidechains
+        
         else:
             msg = \
-                "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+"<resonance_type> argument must be 'Backbone' or 'Sidechains'."
             self.log_r(msg)
             return
         
-        for z, y, x in it.product(
-                self.zzcoords,
-                self.yycoords,
-                self.xxcoords):
-            # DO
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # sets the reference peaklist
             if x == self.xxref and missing == 'lost':
                 ref_pkl = target[z][y][x]
                 refz = z
                 refy = y
                 refx = x
+            
             elif x == self.xxref and missing == 'unassigned':
                 ref_fasta_key = list(self.allfasta[z][y].keys())[0]
                 ref_pkl = self.allfasta[z][y][ref_fasta_key]
@@ -1139,7 +1077,8 @@ FASTA starting residue: {}  """.\
                     fillna_dict
                     )
             
-            logs = "**[{}][{}][{}]** vs. [{}][{}][{}] \
+            logs = \
+"**[{}][{}][{}]** vs. [{}][{}][{}] \
 | Target Initial Length :: {} \
 | Template Length :: {} \
 | Target final length :: {}".\
@@ -1154,7 +1093,6 @@ FASTA starting residue: {}  """.\
                     popi[1],
                     popi[2]
                     )
-            
             self.log_r(logs)
             
         return
@@ -1175,11 +1113,13 @@ FASTA starting residue: {}  """.\
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
+        
         elif resonance_type == 'Sidechains':
             target = self.allsidechains
+        
         else:
             msg = \
-                "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+"<resonance_type> argument must be 'Backbone' or 'Sidechains'."
             self.log_r(msg)
             return
         
@@ -1285,24 +1225,17 @@ FASTA starting residue: {}  """.\
                 'index'
                 ]
         
-        
         title = "ORGANIZING PEAKLIST COLUMNS' ORDER for {}".\
             format(resonance_type)
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(
-                self.zzcoords,
-                self.yycoords,
-                self.xxcoords):
-            # DO
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             target[z][y][x] = target[z][y][x][col_order]
             self.log_r(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
                 )
-            # DONE
         
         return
-        
     
     def init_Farseer_cube(
             self,
@@ -1327,7 +1260,7 @@ FASTA starting residue: {}  """.\
         if use_sidechains:
             self.sidechains_p5d = self.p5d(self.allsidechains.copy())
             self.log_r('> Created cube for all the sidechains peaklists - OK!')
-            
+        
         return
     
     def export_series_dict_over_axis(
@@ -1364,8 +1297,10 @@ FASTA starting residue: {}  """.\
         
         if resonance_type == 'Backbone':
             fscube = self.peaklists_p5d
+        
         elif resonance_type == 'Sidechains':
             fscube = self.sidechains_p5d
+        
         else:
             raise ValueError('Not a valid <resonance_type> option.')
         
@@ -1375,6 +1310,7 @@ FASTA starting residue: {}  """.\
             owndim_pts=self.xxcoords
             next_axis = self.yycoords
             next_axis_2 = self.zzcoords
+        
         elif along_axis=='y':
             self.compare_fastas()
             series_type='cond2'
@@ -1382,12 +1318,14 @@ FASTA starting residue: {}  """.\
             owndim_pts=self.yycoords
             next_axis = self.zzcoords
             next_axis_2 = self.xxcoords
+        
         elif along_axis=='z':
             series_type='cond3'
             fscube = fscube.transpose(1,2,0,3,4, copy=True)
             owndim_pts=self.zzcoords
             next_axis = self.xxcoords
             next_axis_2 = self.yycoords
+        
         else:
             raise ValueError('Not a valid <along_axis> option.')
         
@@ -1395,52 +1333,44 @@ FASTA starting residue: {}  """.\
             'GENERATING DICTIONARY OF SERIES FOR {}'.format(series_type), 
             istitle=True
             )
-        
         # builds kwargs
         series_kwargs['series_axis'] = series_type
         series_kwargs['series_dps'] = owndim_pts
-        
         # prepares dictionary
         series_dct = {}
-        
-        # assembles dictionary
-        for dp2 in next_axis_2:
+        # assembles dictionary       
+        for dp2, dp1 in it.product(next_axis_2, next_axis):
             series_dct.setdefault(dp2, {})
-            for dp1 in next_axis:
-                # DO
-                
-                # builds kwargs
-                series_kwargs['prev_dim'] = dp2
-                series_kwargs['next_dim'] = dp1
-                
-                # initiates series
-                
-                ## intermediate step to remove rows with NaN in ResNo column
-                ## this is necessary to solve issue_86 where NaN rows
-                ## are added if no fasta file is used to complete the residue
-                ## list and when different constrcuts are used along y
-                ## which may lead to different number of rows when generating
-                ## the 5D panel - creating NaN rows that later conflict with
-                ## parameter calculation.
-                dfdict = {}
-                for item in fscube.loc[dp2, dp1, :, :, :].items:
-                    df = fscube.loc[dp2, dp1, item, :, :]
-                    df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
-                    dfdict[item] = df
-                
-                series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
-                
-                series_dct[dp2][dp1] = \
-                    self.gen_series(series_panel_NaN_filtered,
-                                    series_class,
-                                    series_kwargs)
-                
-                # writes to log
-                self.log_r(\
+            # builds kwargs
+            series_kwargs['prev_dim'] = dp2
+            series_kwargs['next_dim'] = dp1
+            # initiates series
+            ## intermediate step to remove rows with NaN in ResNo column
+            ## this is necessary to solve issue_86 where NaN rows
+            ## are added if no fasta file is used to complete the residue
+            ## list and when different constrcuts are used along y
+            ## which may lead to different number of rows when generating
+            ## the 5D panel - creating NaN rows that later conflict with
+            ## parameter calculation.
+            dfdict = {}
+            
+            for item in fscube.loc[dp2, dp1, :, :, :].items:
+                df = fscube.loc[dp2, dp1, item, :, :]
+                df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
+                dfdict[item] = df
+            
+            series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
+            series_dct[dp2][dp1] = \
+                self.gen_series(
+                    series_panel_NaN_filtered,
+                    series_class,
+                    series_kwargs
+                    )
+            # writes to log
+            self.log_r(
                 '**Experimental Series [{}][{}] ** with data points {}'.\
-                    format(dp2, dp1, list(series_dct[dp2][dp1].items)))
-                
-                # DONE
+                    format(dp2, dp1, list(series_dct[dp2][dp1].items))
+                )
         
         return series_dct
     
@@ -1464,16 +1394,14 @@ FASTA starting residue: {}  """.\
         """
         
         series_panel = \
-            series_class(np.array(series_panel),
-                            items=series_panel.items,
-                            minor_axis=series_panel.minor_axis,
-                            major_axis=series_panel.major_axis)
-             
+            series_class(
+                np.array(series_panel),
+                items=series_panel.items,
+                minor_axis=series_panel.minor_axis,
+                major_axis=series_panel.major_axis
+                )
         # activates the series attibutes
         series_panel.create_attributes(**sc_kwargs)
-        #
-        
-        #series_panel.dropna(axis=0, how='any', subset=['ResNo'])
         
         return series_panel
     
@@ -1483,42 +1411,43 @@ FASTA starting residue: {}  """.\
         title = 'EXPORTS PARSED PEAKLISTS FROM FARSEER-NMR CUBE'
         self.log_r(title, istitle=True)
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
-            # DO cycle coords
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             folder = 'spectra_parsed/{}/{}'.format(z,y)
+            
             if not(os.path.exists(folder)):
                 os.makedirs(folder)
+            
             fpath = '{}/{}.csv'.format(folder, x)
             fileout = open(fpath, 'w')
-            fileout.write(self.allpeaklists[z][y][x].to_csv(sep=',',
-                                                    index=False,
-                                                    na_rep='NaN',
-                                                    float_format='%.4f'))
+            fileout.write(
+                self.allpeaklists[z][y][x].to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    float_format='%.4f')
+                )
             fileout.close()
-        
             msg = "**Saved:** {}".format(fpath)
             self.log_r(msg)
         
             if self.has_sidechains:
-                # DO sidechains
                 folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
+                
                 if not(os.path.exists(folder)):
                     os.makedirs(folder)
+                
                 fpath = '{}/{}.csv'.format(folder, x)
                 fileout = open(fpath, 'w')
-                fileout.write(self.allsidechains[z][y][x].to_csv(sep=',',
-                                                        index=False,
-                                                        na_rep='NaN',
-                                                        float_format='%.4f'))
-                
+                fileout.write(
+                    self.allsidechains[z][y][x].to_csv(
+                        sep=',',
+                        index=False,
+                        na_rep='NaN',
+                        float_format='%.4f')
+                    )
                 fileout.close()
-                
                 msg = "**Saved:** {}".format(fpath)
                 self.log_r(msg)
-                # DONE sidechains
-            # DONE cycle coords
         return
     
     def checks_filetype(self, filetype):
@@ -1535,17 +1464,17 @@ FASTA starting residue: {}  """.\
         
         # check filetype fits usable formats
         if not(filetype in ['.csv', '.fasta']):
-            msg = "File type {} not recognized. Why you want to read these files if Farseer-NMR can't do nothing with them? :-)".\
+            msg = \
+"File type {} not recognized. Why you want to read these files \
+if Farseer-NMR can't do nothing with them? :-)".\
                 format(filetype)
             self.log_r(fsw.gen_wet('ERROR', msg, 13))
             self.abort()
         
         # checks if files exists
         if not(any([p.endswith(filetype) for p in self.paths])):
-            
             msg = "There are no files in spectra/ with extension {}".\
-                  format(filetype)
-            
+                format(filetype)
             self.log_r(fsw.gen_wet('ERROR', msg, 9))
             self.abort()
             
@@ -1578,15 +1507,15 @@ FASTA starting residue: {}  """.\
         zkeys = list(target.keys())
         ykeys = list(target[zkeys[0]].keys())
         xkeys = list(target[zkeys[0]][ykeys[0]].keys())
-        
         key_len = len(zkeys) * len(ykeys) * len(xkeys)
-        
         ### Checks coherency of y folders
-        all_y_folders = set(\
-            [y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
+        all_y_folders = \
+            set([y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
         
         if len(set(all_y_folders)) > len(ykeys):
-            msg = "Y axis folder names are not coherent. Names must be equal accross every Z axis datapoint folder."
+            msg = \
+"Y axis folder names are not coherent. \
+Names must be equal accross every Z axis datapoint folder."
             self.log_r(fsw.gen_wet('ERROR', msg, 11))
             self.abort()
         
@@ -1596,27 +1525,33 @@ FASTA starting residue: {}  """.\
             
             
             if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
-                msg = "There are too many or missing {0} files. Confirm there is only ONE {0} file for each Y datapoint folder.".format(filetype)
+                msg = \
+"There are too many or missing {0} files. \
+Confirm there is only ONE {0} file for each Y datapoint folder.".\
+                    format(filetype)
                 self.log_r(fsw.gen_wet('ERROR', msg, 12))
                 self.abort()
         
         ### Checks coherency of x files
         elif filetype == '.csv':
-            
-            if key_len != \
-                len([x for x in self.paths if x.endswith(filetype)]):
-                #DO
-                msg =  'The no. of files of type {} is not the same for every series folder. Check for the missing ones!'.format(filetype)
-                
+            if key_len \
+                    != len([x for x in self.paths if x.endswith(filetype)]):
+                msg =  \
+'The no. of files of type {} is not the same for every series folder. \
+Check for the missing ones!'.\
+                    format(filetype)
                 self.log_r(fsw.gen_wet('ERROR', msg, 8))
                 self.abort()
             
-            x_files_names = set(\
-                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)])
+            x_files_names = set(
+                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+                )
             
             if (len(x_files_names) > len(xkeys)):
-                msg = "X axis datapoints file names are not coherent. Names must be equal accross every Y axis datapoint folder.".\
-                format(filetype)
+                msg = \
+"X axis datapoints file names are not coherent. \
+Names must be equal accross every Y axis datapoint folder.".\
+                    format(filetype)
                 self.log_r(fsw.gen_wet('ERROR', msg, 10))
                 self.abort()
         
@@ -1634,13 +1569,19 @@ FASTA starting residue: {}  """.\
             
             ref_res (int): the residue number.
         """
+        
         if any(series.isin([ref_res])):
             return
+        
         else:
-            msg = 'The reference residue you selected, {}, is not part of the protein sequence or is an <unassigned> or <lost> residue. Correct the reference residue in the Settings Menu.'.\
-            format(ref_res)
+            msg = \
+'The reference residue you selected, {}, is not part of the protein sequence \
+or is an <unassigned> or <lost> residue. \
+Correct the reference residue in the Settings Menu.'.\
+                format(ref_res)
             self.log_r(fsw.gen_wet('ERROR', msg, 16))
             self.abort()
+        
         return
 
     def check_fasta(self, df, fasta_path):
@@ -1657,15 +1598,17 @@ FASTA starting residue: {}  """.\
             
             fasta_path (srt): the .fasta file path.
         """
-        if df.shape[0] < \
-            self.allpeaklists[self.zzref][self.yyref][self.xxref].shape[0]:
-            # DO
-            msg = 'The .fasta file in {} has less residue entries than the protein sequence of the reference experiment [{}][{}][{}]'.\
+        
+        if df.shape[0] \
+                < self.allpeaklists[self.zzref][self.yyref][self.xxref].\
+                    shape[0]:
+            msg = \
+'The .fasta file in {} has less residue entries than the protein sequence \
+of the reference experiment [{}][{}][{}]'.\
                 format(fasta_path, self.zzref, self.yyref, self.xxref)
-            
             self.log_r(fsw.gen_wet('ERROR', msg, 18))
             self.abort()
-            # DONE
+        
         return
 
     def compare_fastas(self):
@@ -1674,25 +1617,28 @@ FASTA starting residue: {}  """.\
         Farseer cannot operate fasta of different lengths if analysing on 
         the y dimension.
         """
+        
         l = []
         is_bigger = False
+        
         for z in self.zzcoords:
-            # DO
             for y in self.yycoords:
-                # DO
                 key = list(self.allfasta[z][y].keys())[0]
                 l.append(self.allfasta[z][y][key].shape[0])
-                # DONE
             
             if len(set(l)) > 1:
                 is_bigger = True
+            
             l = []
-            # DONE
         
         if is_bigger:
-            msg = '.fasta files have not the same size and they should have the same size when performing calculations along the Y axis. Please correct your .fasta files.'
+            msg = \
+'.fasta files have not the same size and they should have the same size \
+when performing calculations along the Y axis. \
+Please correct your .fasta files.'
             self.log_r(fsw.gen_wet('ERROR', msg, 21))
             self.abort()
+        
         return
         
     def checks_fasta_start_number(self):
@@ -1707,45 +1653,46 @@ FASTA starting residue: {}  """.\
         """
         
         if not(self.zzcoords and self.allfasta):
-            msg = "Operation cannot complete as Cube coordinates have not been set or fasta files have not yet been read."
+            msg = \
+"Operation cannot complete because Cube coordinates have not been set \
+or fasta files have not yet been read."
             print(msg)
+            
             return
         
-        for z, y, x in it.product(self.zzcoords,
-                                  self.yycoords,
-                                  self.xxcoords):
-            # DO
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # name of the fasta file being read
             f = list(self.allfasta[z][y].keys())[0]
-            
             peaklist_first_residue = \
                 int(self.allpeaklists[z][y][x].loc[:,'ResNo'].head(n=1))
-            
             peaklist_last_residue = \
                 int(self.allpeaklists[z][y][x].loc[:,'ResNo'].tail(n=1))
-            
             fasta_first_residue = \
                 int(self.allfasta[z][y][f].loc[:,'ResNo'].head(n=1))
-            
             fasta_last_residue = \
                 int(self.allfasta[z][y][f].loc[:,'ResNo'].tail(n=1))
             
-            
             if fasta_first_residue <= peaklist_first_residue \
-                and fasta_last_residue >= peaklist_last_residue:
+                    and fasta_last_residue >= peaklist_last_residue:
                 continue
             
             elif fasta_first_residue > peaklist_first_residue:
-                msg = "The first residue of your fasta file is greater than your protein first residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
+                msg = \
+"The first residue of your fasta file is greater than your protein first \
+residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
+which will results in peaklist truncation. \
+You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
-                
                 self.log_r(fsw.gen_wet('ERROR', msg, 22))
                 self.abort()
             
             elif fasta_last_residue < peaklist_last_residue:
-                msg = "The last residue of your fasta file is minor than your protein last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], which will results in peaklist truncation. You should verify that your start Fasta residue number is correct.".\
+                msg = \
+"The last residue of your fasta file is minor than your protein \
+last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
+which will results in peaklist truncation. \
+You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
-                    
                 self.log_r(fsw.gen_wet('ERROR', msg, 22))
                 self.abort()
             
@@ -1753,7 +1700,7 @@ FASTA starting residue: {}  """.\
                 msg = 'Something is wrong in .checks_fasta_start_number()'
                 self.log_r(fsw.gen_wet('DEVELOPER ISSUE', msg, 0))
                 self.abort()
-            # DONE
+            
         else:
             msg = "> FASTA files starting number is consistent with peaklists"
             self.log_r(msg)
