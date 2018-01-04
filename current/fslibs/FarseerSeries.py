@@ -1967,50 +1967,49 @@ or confirm you have not forgot any peaklist [{}].".\
         return
     
     
-    def plot_cs_scatter(self, axs, i, row_number,
-                     
-                     subtitle_fn='Arial',
-                     subtitle_fs=8,
-                     subtitle_pad=0.98,
-                     subtitle_weight='normal',
-                     x_label='1H (ppm)',
-                     x_label_fn='Arial',
-                     x_label_fs=3,
-                     x_label_pad=2,
-                     x_label_weight='normal',
-                     y_label='15N (ppm)',
-                     y_label_fn='Arial',
-                     y_label_fs=6 ,
-                     y_label_pad=2,
-                     y_label_weight='normal',
-                     x_ticks_fn='Arial',
-                     x_ticks_fs=5,
-                     x_ticks_pad=1,
-                     x_ticks_weight=1,
-                     x_ticks_rot=0,
-                     x_ticks_len=2,
-                     y_ticks_fn='Arial',
-                     y_ticks_fs=5,
-                     y_ticks_pad=1,
-                     y_ticks_weight=1,
-                     y_ticks_rot=0,
-                     y_ticks_len=2,
-                     
-                     mksize=20,
-                     scale=0.01,
-                     mk_type='color',
-                     mk_start_color='#cdcdcd',
-                     mk_end_color='#000000',
-                     markers=['^','>','v','<','s','p','h','8','*','D'],
-                     mk_color=['none'],
-                     mk_edgecolors='black',
-                     mk_lost_color='red',
-                     hide_lost=False,
-                     titration_x_values='',
-                     rows_page='',
-                     cols_page='',
-                     perform_resevo_fitting=''
-                        ):
+    def plot_cs_scatter(
+            self, axs,
+            i, row_number,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label='1H (ppm)',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label='15N (ppm)',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_rot=0,
+            y_ticks_len=2,
+            mksize=20,
+            scale=0.01,
+            mk_type='color',
+            mk_start_color='#cdcdcd',
+            mk_end_color='#000000',
+            markers=['^','>','v','<','s','p','h','8','*','D'],
+            mk_color=['none'],
+            mk_edgecolors='black',
+            mk_lost_color='red',
+            hide_lost=False,
+            titration_x_values='',
+            rows_page='',
+            cols_page='',
+            perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         along the series for the current residue.
@@ -2024,69 +2023,95 @@ or confirm you have not forgot any peaklist [{}].".\
             
             row_number (int): the index of the current residue.
         """
+        
         def set_tick_labels():
             # adjust the ticks to a maximum of 4.
             # http://stackoverflow.com/questions/6682784/how-to-reduce-number-of-ticks-with-matplotlib
             axs[i].locator_params(axis='both', tight=True, nbins=4)
-            
-            axs[i].set_xticklabels(axs[i].get_xticks(),
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
-            axs[i].set_yticklabels(axs[i].get_yticks(),
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
+            axs[i].set_xticklabels(
+                axs[i].get_xticks(),
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
+            axs[i].set_yticklabels(
+                axs[i].get_yticks(),
+                fontname=y_ticks_fn,
+                fontsize=y_ticks_fs,
+                fontweight=y_ticks_weight,
+                rotation=y_ticks_rot
+                )
         
         # Configure subtitle
         subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
-        axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
+        axs[i].set_title(
+            subtitle,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # Configure Axis Ticks
         axs[i].xaxis.tick_bottom()
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
         axs[i].yaxis.tick_left()
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[i].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[i].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
+        axs[i].set_ylabel(
+            y_label,
+              fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         
         # check assignment
         # if residue is unassigned, identifies in the subplot
         if self.ix[0,row_number,'Peak Status'] == 'unassigned':
-            axs[i].text(0, 0, 'unassigned', fontsize=7, fontname='Arial',
-                               va='center', ha='center')
+            axs[i].text(
+                0,
+                0,
+                'unassigned',
+                fontsize=7,
+                fontname='Arial',
+                va='center',
+                ha='center'
+                )
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
             return
         
         elif not(self.ix[:,i,'H1_delta'].any()) \
-             and not(self.ix[:,i,'N15_delta'].any()):
-            # do 
-            axs[i].text(0, 0, 'all data lost', fontsize=7, fontname='Arial',
-                              va='center', ha='center')
+                and not(self.ix[:,i,'N15_delta'].any()):
+            axs[i].text(
+                0,
+                0,
+                'all data lost',
+                fontsize=7,
+                fontname='Arial',
+                va='center',
+                ha='center'
+                )
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
@@ -2098,89 +2123,120 @@ or confirm you have not forgot any peaklist [{}].".\
             mcycle = it.cycle(markers)
             ccycle = it.cycle(mk_color)
             cedge = it.cycle(mk_edgecolors)
+            
             for k, j in enumerate(self.items):
-                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned']\
-                and hide_lost:
-                    #do
+                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned'] \
+                        and hide_lost:
                     next(mcycle)
                     next(ccycle)
                     next(cedge)
                 
                 elif self.ix[j,i,'Peak Status'] == 'lost':
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker=next(mcycle),
-                                   s=mksize,
-                                   color=next(ccycle),
-                                   edgecolors=mk_lost_color)
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker=next(mcycle),
+                        s=mksize,
+                        color=next(ccycle),
+                        edgecolors=mk_lost_color
+                        )
                     next(cedge)
+                
                 else:
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker=next(mcycle),
-                                   s=mksize, color=next(ccycle),
-                                   edgecolors=next(cedge))
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker=next(mcycle),
+                        s=mksize, color=next(ccycle),
+                        edgecolors=next(cedge)
+                        )
         
         elif mk_type == 'color':
-            
             # represents the points as circles with a gradient of color
-            mk_color = self.linear_gradient(mk_start_color,
-                                            finish_hex=mk_end_color,
-                                            n=self.shape[0])
+            mk_color = self.linear_gradient(
+                mk_start_color,
+                finish_hex=mk_end_color,
+                n=self.shape[0]
+                )
             # this is used instead of passing a list to .scatter because
             # of colouring in red the lost peaks.
             mccycle = it.cycle(mk_color['hex'])
             
             for j in self.items:
                 if self.ix[j,i,'Peak Status'] == 'lost':
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker='o',
-                                   s=mksize, c=mk_lost_color,
-                                   edgecolors='none')
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker='o',
+                        s=mksize, c=mk_lost_color,
+                        edgecolors='none'
+                        )
+                
                 else:
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker='o', s=mksize, c=next(mccycle),
-                                   edgecolors='none')
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker='o', s=mksize, c=next(mccycle),
+                        edgecolors='none'
+                        )
         
         measured = self.ix[:,i,'Peak Status'] == 'measured'
-        xlimmin = -scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).min()*1.5
-        
-        xlimmax = scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).max()*1.5
-        
-        ylimmin = -scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).min()*1.5
-        
-        ylimmax = scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).max()*1.5
-        
+        xlimmin = \
+            -scale*2 \
+            if self.ix[measured,i,'H1_delta'].fillna(value=0).min() > -scale \
+            else self.ix[measured,i,'H1_delta'].fillna(value=0).min()*1.5
+        xlimmax = \
+            scale*2 \
+            if self.ix[measured,i,'H1_delta'].fillna(value=0).max() < scale \
+            else self.ix[measured,i,'H1_delta'].fillna(value=0).max()*1.5
+        ylimmin = \
+            -scale*2 \
+            if self.ix[measured,i,'N15_delta'].fillna(value=0).min() > -scale \
+            else self.ix[measured,i,'N15_delta'].fillna(value=0).min()*1.5
+        ylimmax = \
+            scale*2 \
+            if self.ix[measured,i,'N15_delta'].fillna(value=0).max() < scale \
+            else self.ix[measured,i,'N15_delta'].fillna(value=0).max()*1.5
         axs[i].set_xlim(xlimmin, xlimmax)
         axs[i].set_ylim(ylimmin, ylimmax)
-        
         ## Invert axes for representation as in a spectrum
         axs[i].invert_xaxis()
         axs[i].invert_yaxis()
-        
         set_tick_labels()
-        
         # draws axis 0 dotted line
-        axs[i].hlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        axs[i].vlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-    
+        axs[i].hlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
+        axs[i].vlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
         # draws center scale
-        axs[i].hlines(0,-scale,scale, colors='darkblue',
-                      linestyles='-', linewidth=1)
-        axs[i].vlines(0,-scale,scale, colors='darkblue',
-                      linestyles='-', linewidth=1)
+        axs[i].hlines(
+            0,
+            -scale,
+            scale,
+            colors='darkblue',
+            linestyles='-',
+            linewidth=1
+            )
+        axs[i].vlines(
+            0,
+            -scale,
+            scale,
+            colors='darkblue',
+            linestyles='-',
+            linewidth=1
+            )
         
         return
     
