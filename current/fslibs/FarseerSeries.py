@@ -1451,72 +1451,72 @@ recipient: residues
                 tag_lw=tag_cartoon_lw
                 )
     
-    def plot_bar_vertical(self, calccol, axs, i, experiment,
-                          y_lims=(0,1),
-                          ylabel='ppm or ratio',
-                          
-                          measured_color='black',
-                          status_color_flag=True,
-                          lost_color='red',
-                          unassigned_color='grey',
-                          bar_width=0.7,
-                          bar_alpha=1,
-                          bar_linewidth=0,
-                          subtitle_fn='Arial',
-                          subtitle_fs=8,
-                          subtitle_pad=1.05,
-                          subtitle_weight='normal',
-                          threshold_flag=True,
-                          threshold_color='red',
-                          threshold_linewidth=1,
-                          threshold_alpha=1,
-                          threshold_zorder=5,
-                          x_label_fn='Arial',
-                          x_label_fs=8, 
-                          x_label_pad=2,
-                          x_label_weight='bold',
-                          x_label_rot=-90,
-                          y_label_fn='Arial',
-                          y_label_fs=8,
-                          y_label_pad=2,
-                          y_label_weight='bold',
-                          y_label_rot=90,
-                          x_ticks_pad=2,
-                          x_ticks_len=1,
-                          y_ticks_fn='Arial',
-                          y_ticks_fs=9,
-                          y_ticks_pad=-3,
-                          y_ticks_weight='normal',
-                          y_ticks_nbins=8,
-                          y_ticks_len=2,
-                          y_ticks_rot=0,
-                          y_grid_flag=True,
-                          y_grid_color='lightgrey',
-                          y_grid_linestyle='-',
-                          y_grid_linewidth=0.2,
-                          y_grid_alpha=1,
-                          mark_fontsize=3,
-                          mark_prolines_flag=True,
-                          mark_prolines_symbol='P',
-                          mark_user_details_flag=False,
-                          color_user_details_flag=False,
-                          user_marks_dict={},
-                          user_bar_colors_dict={},
-                          theo_pre_color='red',
-                          theo_pre_lw=0.2,
-                          tag_cartoon_color='magenta',
-                          tag_cartoon_lw=0.2,
-                          tag_cartoon_ls=':',
-                          
-                          x_ticks_color_flag=True,
-                          x_ticks_fn='monospace',
-                          x_ticks_fs=6,
-                          x_ticks_weight='normal',
-                          x_ticks_rot=0,
-                          vspace='',
-                          rows_page='',
-                          cols_page=''
-                          ):
+    def plot_bar_vertical(
+            self, calccol,
+            axs, i,
+            experiment,
+            y_lims=(0,1),
+            ylabel='ppm or ratio',
+            measured_color='black',
+            status_color_flag=True,
+            lost_color='red',
+            unassigned_color='grey',
+            bar_width=0.7,
+            bar_alpha=1,
+            bar_linewidth=0,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=1.05,
+            subtitle_weight='normal',
+            threshold_flag=True,
+            threshold_color='red',
+            threshold_linewidth=1,
+            threshold_alpha=1,
+            threshold_zorder=5,
+            x_label_fn='Arial',
+            x_label_fs=8, 
+            x_label_pad=2,
+            x_label_weight='bold',
+            x_label_rot=-90,
+            y_label_fn='Arial',
+            y_label_fs=8,
+            y_label_pad=2,
+            y_label_weight='bold',
+            y_label_rot=90,
+            x_ticks_pad=2,
+            x_ticks_len=1,
+            y_ticks_fn='Arial',
+            y_ticks_fs=9,
+            y_ticks_pad=-3,
+            y_ticks_weight='normal',
+            y_ticks_nbins=8,
+            y_ticks_len=2,
+            y_ticks_rot=0,
+            y_grid_flag=True,
+            y_grid_color='lightgrey',
+            y_grid_linestyle='-',
+            y_grid_linewidth=0.2,
+            y_grid_alpha=1,
+            mark_fontsize=3,
+            mark_prolines_flag=True,
+            mark_prolines_symbol='P',
+            mark_user_details_flag=False,
+            color_user_details_flag=False,
+            user_marks_dict={},
+            user_bar_colors_dict={},
+            theo_pre_color='red',
+            theo_pre_lw=0.2,
+            tag_cartoon_color='magenta',
+            tag_cartoon_lw=0.2,
+            tag_cartoon_ls=':',
+            x_ticks_color_flag=True,
+            x_ticks_fn='monospace',
+            x_ticks_fs=6,
+            x_ticks_weight='normal',
+            x_ticks_rot=0,
+            vspace='',
+            rows_page='',
+            cols_page=''):
         """
         Plots vertical bar plots.
         
@@ -1534,199 +1534,229 @@ recipient: residues
         # fillna(0) is added because nan conflicts with text_maker()
         # .iloc[::-1]
         # in bat.get_height() which return nan
-        bars = axs[i].barh(self.major_axis,
-                           self.loc[experiment,:,calccol].fillna(0),
-                           height=bar_width,
-                           align='center',
-                           alpha=bar_alpha,
-                           linewidth=bar_linewidth,
-                           zorder=4)
-        
+        bars = axs[i].barh(
+            self.major_axis,
+            self.loc[experiment,:,calccol].fillna(0),
+            height=bar_width,
+            align='center',
+            alpha=bar_alpha,
+            linewidth=bar_linewidth,
+            zorder=4
+            )
         axs[i].invert_yaxis()
-        
         # Set subplot titles
-        axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, weight=subtitle_weight)
-        
+        axs[i].set_title(
+            experiment,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            weight=subtitle_weight
+            )
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
         axs[i].spines['left'].set_zorder(10)
         axs[i].spines['right'].set_zorder(10)
-        
         ## Configure XX ticks and Label
         axs[i].margins(y=0.01)
         
         if self.shape[1] > 100:
             xtick_spacing = self.shape[1]//100
+        
         else:
             xtick_spacing = 1
         
         axs[i].set_yticks(self.major_axis)
-    
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_yticklabels(\
+        axs[i].set_yticklabels(
             self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
                 apply(lambda x: ''.join(x), axis=1),
             fontname=x_ticks_fn,
             fontsize=x_ticks_fs-2,
             fontweight=x_ticks_weight,
-            rotation=0)
-            
+            rotation=0
+            )
         ## defines colors
-        self.set_item_colors(bars,
-                             self.loc[experiment,:,'Peak Status'],
-                             {'measured':measured_color,
-                              'lost':lost_color,
-                              'unassigned':unassigned_color})
+        self.set_item_colors(
+            bars,
+            self.loc[experiment,:,'Peak Status'],
+            {
+                'measured':measured_color,
+                'lost':lost_color,
+                'unassigned':unassigned_color
+                }
+            )
         
         if x_ticks_color_flag:
-            self.set_item_colors(axs[i].get_yticklabels(),
-                                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
-                                 {'measured':measured_color,
-                                  'lost':lost_color,
-                                  'unassigned':unassigned_color})
+            self.set_item_colors(
+                axs[i].get_yticklabels(),
+                self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                {
+                    'measured':measured_color,
+                    'lost':lost_color,
+                    'unassigned':unassigned_color
+                    }
+                )
         
         ## Configures YY ticks
         axs[i].set_xlim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='x', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_xticklabels(['{:.2f}'.format(xx) \
-                                    for xx in axs[i].get_xticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=-45)
-        
+        axs[i].set_xticklabels(
+            ['{:.2f}'.format(xx) for xx in axs[i].get_xticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=-45
+            )
         # configures tick params
-        axs[i].tick_params(axis='y',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-                           
-        axs[i].tick_params(axis='x',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='y',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='x',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         # Set axes labels
-        axs[i].set_ylabel('Residue',
-                          fontname=x_label_fn,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad+6,
-                          weight=x_label_weight,
-                          rotation=x_label_rot)
-        
-        axs[i].set_xlabel(ylabel,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight,
-                          rotation=0)
+        axs[i].set_ylabel(
+            'Residue',
+            fontname=x_label_fn,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad+6,
+            weight=x_label_weight,
+            rotation=x_label_rot
+            )
+        axs[i].set_xlabel(
+            ylabel,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight,
+            rotation=0
+            )
         
         # Adds grid
         if y_grid_flag:
-            axs[i].xaxis.grid(color=y_grid_color,
-                              linestyle=y_grid_linestyle,
-                              linewidth=y_grid_linewidth,
-                              alpha=y_grid_alpha,
-                              zorder=0)
+            axs[i].xaxis.grid(
+                color=y_grid_color,
+                linestyle=y_grid_linestyle,
+                linewidth=y_grid_linewidth,
+                alpha=y_grid_alpha,
+                zorder=0
+                )
         
         # Adds red line to identify significant changes.
         if threshold_flag and (calccol in self.restraint_list[:3]):
-            self.plot_threshold(axs[i],
-                                self.loc[experiment,:,calccol],
-                                threshold_color,
-                                threshold_linewidth,
-                                threshold_alpha,
-                                orientation='vertical',
-                                zorder=threshold_zorder)
+            self.plot_threshold(
+                axs[i],
+                self.loc[experiment,:,calccol],
+                threshold_color,
+                threshold_linewidth,
+                threshold_alpha,
+                orientation='vertical',
+                zorder=threshold_zorder
+                )
         
         if mark_prolines_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'1-letter'],
-                              {'P':mark_prolines_symbol},
-                              y_lims[1]*0.6,
-                              fs=mark_fontsize,
-                              orientation='vertical')
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'1-letter'],
+                {'P':mark_prolines_symbol},
+                y_lims[1]*0.6,
+                fs=mark_fontsize,
+                orientation='vertical'
+                )
         
         if mark_user_details_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'Details'],
-                              user_marks_dict,
-                              y_lims[1]*0.6,
-                              fs=mark_fontsize,
-                              orientation='vertical')
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_marks_dict,
+                y_lims[1]*0.6,
+                fs=mark_fontsize,
+                orientation='vertical'
+                )
         
         if color_user_details_flag:
-            self.set_item_colors(bars,
-                                 self.loc[experiment,:,'Details'],
-                                 user_bar_colors_dict)
+            self.set_item_colors(
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_bar_colors_dict
+                )
         
         if self.PRE_loaded and (calccol in self.restraint_list[3:]):
-            self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
-                              bartype='v',
-                              pre_color=theo_pre_color,
-                              pre_lw=theo_pre_lw,
-                              tag_color=tag_cartoon_color,
-                              tag_ls=tag_cartoon_ls,
-                              tag_lw=tag_cartoon_lw)
+            self.plot_theo_pre(
+                axs[i],
+                experiment,
+                y_lims[1]*0.1,
+                bartype='v',
+                pre_color=theo_pre_color,
+                pre_lw=theo_pre_lw,
+                tag_color=tag_cartoon_color,
+                tag_ls=tag_cartoon_ls,
+                tag_lw=tag_cartoon_lw
+                )
         
         return
     
     
-    def plot_res_evo(self, calccol, axs, i, row_number,
-                     y_lims=(0,1),
-                     y_label='ppm or ratio',
-                     subtitle_fn='Arial',
-                     subtitle_fs=8,
-                     subtitle_pad=0.98,
-                     subtitle_weight='normal',
-                     x_label_fn='Arial',
-                     x_label_fs=3,
-                     x_label_pad=2,
-                     x_label_weight='normal',
-                     y_label_fn='Arial',
-                     y_label_fs=6 ,
-                     y_label_pad=2,
-                     y_label_weight='normal',
-                     x_ticks_fn='Arial',
-                     x_ticks_fs=5,
-                     x_ticks_pad=1,
-                     x_ticks_weight=1,
-                     x_ticks_rot=0,
-                     x_ticks_len=2,
-                     x_ticks_nbins=5,
-                     y_ticks_fn='Arial',
-                     y_ticks_fs=5,
-                     y_ticks_pad=1,
-                     y_ticks_weight=1,
-                     y_ticks_len=2,
-                     y_ticks_rot=0,
-                     y_ticks_nbins=8,
-                    
-                     x_label='[Ligand]',
-                     set_x_values=True,
-                     line_style='-',
-                     line_width=1,
-                     line_color='r',
-                     marker_style='o',
-                     marker_color='darkred',
-                     marker_size=3,
-                     fill_between=True,
-                     fill_color='pink',
-                     fill_alpha=0.5,
-                     fit_line_color = 'black',
-                     fit_line_width = 1,
-                     fit_line_style = '-',
-                     
-                     titration_x_values=None,
-                     vspace='',
-                     rows_page='',
-                     cols_page='',
-                     perform_resevo_fitting=''
-                     ):
+    def plot_res_evo(
+            self, calccol,
+            axs, i,
+            row_number,
+            y_lims=(0,1),
+            y_label='ppm or ratio',
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            x_ticks_nbins=5,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_len=2,
+            y_ticks_rot=0,
+            y_ticks_nbins=8,
+            x_label='[Ligand]',
+            set_x_values=True,
+            line_style='-',
+            line_width=1,
+            line_color='r',
+            marker_style='o',
+            marker_color='darkred',
+            marker_size=3,
+            fill_between=True,
+            fill_color='pink',
+            fill_alpha=0.5,
+            fit_line_color = 'black',
+            fit_line_width = 1,
+            fit_line_style = '-',
+            titration_x_values=None,
+            vspace='',
+            rows_page='',
+            cols_page='',
+            perform_resevo_fitting=''):
         """
         Plots the evolution of a restraint along the series of a residue.
         
@@ -1743,30 +1773,37 @@ recipient: residues
         # Draws subplot title
         res = self.ix[0,i,'ResNo']
         subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
-        axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
-        
+        axs[i].set_title(
+            subtitle,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # PREPARING DATA
         y = np.array(self.loc[:,row_number,calccol].fillna(value=0))
         
         # if the user wants to represent the condition in the x axis
         # for the first dimension
-        if set_x_values and \
-            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
-            # do
+        if set_x_values \
+                and (self.series_axis == 'cond1' \
+                    or self.dim_comparison == 'cond1'):
             if len(titration_x_values) != len(self.items):
-                msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}]."\
-                    .format(titration_x_values, self.items)
+                msg = \
+"The number of coordinate values defined for fitting/data respresentation, \
+<fitting_x_values> variable [{}], do not match the number of <cond1> \
+data points,i.e. input peaklists. Please correct <fitting_x_values> variable \
+or confirm you have not forgot any peaklist [{}].".\
+                    format(titration_x_values, self.items)
                 self.log_r(fsw.gen_wet('ERROR', msg, 5))
                 self.abort()
+            
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
         elif (self.series_axis in ['cond2', 'cond3']) \
-            or (self.dim_comparison in ['cond2', 'cond3']):
-            #do
+                or (self.dim_comparison in ['cond2', 'cond3']):
             x = np.arange(0, len(y))
             xmax = len(y)-1
             axs[i].set_xticks(x)
@@ -1785,9 +1822,9 @@ recipient: residues
         axs[i].set_xlim(0, xmax)
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
-        if set_x_values and \
-            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
-                #do
+        if set_x_values \
+                and (self.series_axis == 'cond1' \
+                    or self.dim_comparison == 'cond1'):
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
             
             def eval_tick(x):
@@ -1805,77 +1842,93 @@ recipient: residues
         axs[i].spines['top'].set_zorder(10)
         axs[i].spines['left'].set_zorder(10)
         axs[i].spines['right'].set_zorder(10)
-        
-        axs[i].set_xticklabels(xlabels,
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
+        axs[i].set_xticklabels(
+            xlabels,
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
         axs[i].locator_params(axis='y', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_yticklabels(['{:.2f}'.format(yy) \
-                                    for yy in axs[i].get_yticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-                               
+        axs[i].set_yticklabels(
+            ['{:.2f}'.format(yy) for yy in axs[i].get_yticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         axs[i].xaxis.tick_bottom()
         axs[i].yaxis.tick_left()
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[i].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[i].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
+        axs[i].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         
         # writes unassigned in the center of the plot for unassigned peaks
         # and plots nothing
         if self.ix[0,row_number,'Peak Status'] == 'unassigned':
-            axs[i].text((x[0] + x[-1]) / 2,
-                        (y_lims[0]+y_lims[1])/2,
-                        'unassigned',
-                        fontsize=8,
-                        fontname='Arial',
-                        va='center', ha='center')
+            axs[i].text(
+                (x[0] + x[-1]) / 2,
+                (y_lims[0]+y_lims[1])/2,
+                'unassigned',
+                fontsize=8,
+                fontname='Arial',
+                va='center', ha='center')
+            
             return
         
         # do not represent the lost peaks.
         mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'lost')
         y = y[mes_mask]
         x = x[mes_mask]
-        
-        
         # Plots data
-        axs[i].plot(x, y, ls=line_style,
-                          color=line_color,
-                          marker=marker_style,
-                          mfc=marker_color,
-                          markersize=marker_size,
-                          lw=line_width,
-                          zorder=5)
+        axs[i].plot(
+            x,
+            y,
+            ls=line_style,
+            color=line_color,
+            marker=marker_style,
+            mfc=marker_color,
+            markersize=marker_size,
+            lw=line_width,
+            zorder=5
+            )
         
         if fill_between:
-            axs[i].fill_between(x, 0, y,
-                                facecolor=fill_color, alpha=fill_alpha)
+            axs[i].fill_between(
+                x,
+                0,
+                y,
+                facecolor=fill_color,
+                alpha=fill_alpha
+                )
         
         fit_res_col = "{}_{}".format(calccol, res)
+        
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
                 and self.fit_okay[fit_res_col]:
@@ -1883,25 +1936,33 @@ recipient: residues
             print(self.xfit)
             print(self.fit_plot_ydata[fit_res_col])
             # plot fit
-            axs[i].plot(self.xfit,
-                        self.fit_plot_ydata[fit_res_col],
-                        fit_line_style,
-                        lw=fit_line_width,
-                        color=fit_line_color, zorder=6)
-            
-            
+            axs[i].plot(
+                self.xfit,
+                self.fit_plot_ydata[fit_res_col],
+                fit_line_style,
+                lw=fit_line_width,
+                color=fit_line_color, zorder=6
+                )
             # write text
-            
-            axs[i].text(xmax*0.05, y_lims[1]*0.97,
-                        self.fit_plot_text[fit_res_col],
-                        ha='left', va='top', fontsize=4)
+            axs[i].text(
+                xmax*0.05,
+                y_lims[1]*0.97,
+                self.fit_plot_text[fit_res_col],
+                ha='left',
+                va='top',
+                fontsize=4
+                )
         
         elif self.fit_performed and self.series_axis == 'cond1' \
-            and not(self.fit_okay[fit_res_col]):
-                
-            axs[i].text(xmax*0.05, y_lims[1]*0.97,
-                        self.fit_plot_text[fit_res_col],
-                        ha='left', va='top', fontsize=4)
+                and not(self.fit_okay[fit_res_col]):
+            axs[i].text(
+                xmax*0.05,
+                y_lims[1]*0.97,
+                self.fit_plot_text[fit_res_col],
+                ha='left',
+                va='top',
+                fontsize=4
+                )
         
         return
     
