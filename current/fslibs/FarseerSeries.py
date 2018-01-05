@@ -2393,28 +2393,31 @@ or confirm you have not forgot any peaklist [{}].".\
         
         return
     
-    def plot_DPRE_heatmap(self, calccol, fig, axs, i, experiment,
-                          y_lims=(0,1),
-                          vmin=0,
-                          vmax=1,
-                          ylabel='DELTA PRE',
-                          x_ticks_fs=4,
-                          x_ticks_rot=0,
-                          x_ticks_fn='Arial',
-                          x_ticks_pad=1,
-                          x_ticks_weight='normal',
-                          y_label_fs=6,
-                          y_label_pad=2,
-                          y_label_fn='Arial',
-                          y_label_weight='bold',
-                          right_margin=0.1,
-                          bottom_margin=0.1,
-                          top_margin=0.9,
-                          cbar_font_size=4,
-                          tag_line_color='red',
-                          tag_line_lw=0.3,
-                          tag_line_ls='-',
-                          rows=''):
+    def plot_DPRE_heatmap(
+            self, calccol,
+            fig, axs,
+            i, experiment,
+            y_lims=(0,1),
+            vmin=0,
+            vmax=1,
+            ylabel='DELTA PRE',
+            x_ticks_fs=4,
+            x_ticks_rot=0,
+            x_ticks_fn='Arial',
+            x_ticks_pad=1,
+            x_ticks_weight='normal',
+            y_label_fs=6,
+            y_label_pad=2,
+            y_label_fn='Arial',
+            y_label_weight='bold',
+            right_margin=0.1,
+            bottom_margin=0.1,
+            top_margin=0.9,
+            cbar_font_size=4,
+            tag_line_color='red',
+            tag_line_lw=0.3,
+            tag_line_ls='-',
+            rows=''):
         """
         Plots Delta PRE heatmaps.
         
@@ -2433,131 +2436,146 @@ or confirm you have not forgot any peaklist [{}].".\
             
             experiment (srt): the name of the data point.
         """
-        Dcmap = np.array((self.loc[experiment,:,calccol].fillna(0),
-                         self.loc[experiment,:,calccol].fillna(0)))
-        cleg = axs[i].pcolor(Dcmap, cmap='binary', vmin=vmin, vmax=vmax)
         
+        Dcmap = np.array(
+            (
+                self.loc[experiment,:,calccol].fillna(0),
+                self.loc[experiment,:,calccol].fillna(0)
+                )
+            )
+        cleg = axs[i].pcolor(Dcmap, cmap='binary', vmin=vmin, vmax=vmax)
         axs[i].tick_params(axis='y', left='off')
         axs[i].tick_params(axis='x', bottom='off')
         # http://stackoverflow.com/questions/2176424/hiding-axis-text-in-matplotlib-plots
         axs[i].get_yaxis().set_ticks([])
         axs[i].get_xaxis().set_visible(False)
-        
-        axs[i].set_ylabel(experiment,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
-        
+        axs[i].set_ylabel(
+            experiment,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        
-        self.plot_theo_pre(axs[i], experiment, 2,
-                           bartype = 'hm',
-                           tag_color=tag_line_color,
-                           tag_ls=tag_line_ls,
-                           tag_lw=tag_line_lw)
+        self.plot_theo_pre(
+            axs[i],
+            experiment,
+            2,
+            bartype = 'hm',
+            tag_color=tag_line_color,
+            tag_ls=tag_line_ls,
+            tag_lw=tag_line_lw
+            )
         
         if i == len(self.items)-1:
-            cbar = plt.colorbar(cleg,
-                                ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
-                                orientation='vertical',
-                                cax = fig.add_axes(
-                                    [right_margin+right_margin*0.05, 
-                                    bottom_margin, 
-                                    right_margin*0.05, 
-                                    top_margin-bottom_margin]))
+            cbar = plt.colorbar(
+                cleg,
+                ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
+                orientation='vertical',
+                cax = fig.add_axes(
+                    [
+                        right_margin+right_margin*0.05, 
+                        bottom_margin, 
+                        right_margin*0.05, 
+                        top_margin-bottom_margin
+                        ]
+                    )
+                )
             
             cbar.ax.tick_params(labelsize=cbar_font_size)
             axs[i].get_xaxis().set_visible(True)
             axs[i].tick_params(axis='x', bottom='on', length=1.5)
-            
             initialresidue = int(self.ix[0, 0, 'ResNo'])
             finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
             
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100*10
+            
             else:
                 xtick_spacing = 10
             
             first_tick = ceil(initialresidue/10)*xtick_spacing
             xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
             axs[i].set_xticks(xtickarange)
-            
             # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(xtickarange,
-                                   fontname=x_ticks_fn,
-                                   fontsize=x_ticks_fs,
-                                   fontweight=x_ticks_weight,
-                                   rotation=x_ticks_rot)
-                               
+            axs[i].set_xticklabels(
+                xtickarange,
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
             axs[i].tick_params(axis='x', which='major', pad=x_ticks_pad)
-            fig.subplots_adjust(right=right_margin,
-                                bottom=bottom_margin,
-                                top=top_margin,
-                                hspace=0)
+            fig.subplots_adjust(
+                right=right_margin,
+                bottom=bottom_margin,
+                top=top_margin,
+                hspace=0
+                )
+        
         return
     
-    def plot_delta_osci(self, calccol, axs, i ,experiment,
-                        ymax=1.0,
-                        y_label='DPRE',
-                        
-                        subtitle_fn= 'Arial',
-                        subtitle_fs= 8,
-                        subtitle_pad= 0.99,
-                        subtitle_weight= 'normal',
-                        x_label_fn= 'Arial',
-                        x_label_fs= 8,
-                        x_label_pad= 2,
-                        x_label_weight= 'bold',
-                        x_label_rot=0,
-                        y_label_fn= 'Arial',
-                        y_label_fs= 8,
-                        y_label_pad=3,
-                        y_label_weight= 'bold',
-                        y_label_rot=90,
-                        x_ticks_fn='Arial',
-                        x_ticks_fs=5,
-                        x_ticks_weight = 'normal',
-                        x_ticks_pad=2,
-                        x_ticks_len=2,
-                        x_ticks_rot=0,
-                        y_ticks_fn='Arial',
-                        y_ticks_fs=7,
-                        y_ticks_rot=0,
-                        y_ticks_pad=1,
-                        y_ticks_weight= 'normal',
-                        y_ticks_len=2,
-                        y_ticks_nbins=8,
-                        y_grid_flag=True,
-                        y_grid_color='lightgrey',
-                        y_grid_linestyle='-',
-                        y_grid_linewidth=0.2,
-                        y_grid_alpha=1,
-                        tag_cartoon_color='blue',
-                        tag_cartoon_lw=0.5,
-                        tag_cartoon_ls=':',
-                        
-                        dpre_ms=2,
-                        dpre_alpha=0.5,
-                        smooth_lw=1,
-                        color=None,
-                        ref_color='black',
-                        color_init='#ff00ff',
-                        color_end='#0000ff',
-                        grid_color='grey',
-                        shade = False,
-                        shade_regions = [(23,37),(0,0),(0,0)],
-                        res_highlight=True,
-                        res_hl_list=[25,32,54,64,66,47],
-                        res_highlight_fs=4,
-                        res_highlight_y=0.9,
-
-                        theo_pre_color='',
-                        theo_pre_lw='',
-                        vspace='',
-                        rows='',
-                        width=''):
+    def plot_delta_osci(
+            self, calccol,
+            axs, i,
+            experiment,
+            ymax=1.0,
+            y_label='DPRE',
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.99,
+            subtitle_weight='normal',
+            x_label_fn='Arial',
+            x_label_fs=8,
+            x_label_pad=2,
+            x_label_weight='bold',
+            x_label_rot=0,
+            y_label_fn='Arial',
+            y_label_fs=8,
+            y_label_pad=3,
+            y_label_weight='bold',
+            y_label_rot=90,
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_weight='normal',
+            x_ticks_pad=2,
+            x_ticks_len=2,
+            x_ticks_rot=0,
+            y_ticks_fn='Arial',
+            y_ticks_fs=7,
+            y_ticks_rot=0,
+            y_ticks_pad=1,
+            y_ticks_weight='normal',
+            y_ticks_len=2,
+            y_ticks_nbins=8,
+            y_grid_flag=True,
+            y_grid_color='lightgrey',
+            y_grid_linestyle='-',
+            y_grid_linewidth=0.2,
+            y_grid_alpha=1,
+            tag_cartoon_color='blue',
+            tag_cartoon_lw=0.5,
+            tag_cartoon_ls=':',
+            dpre_ms=2,
+            dpre_alpha=0.5,
+            smooth_lw=1,
+            color=None,
+            ref_color='black',
+            color_init='#ff00ff',
+            color_end='#0000ff',
+            grid_color='grey',
+            shade=False,
+            shade_regions=[(23,37),(0,0),(0,0)],
+            res_highlight=True,
+            res_hl_list=[25,32,54,64,66,47],
+            res_highlight_fs=4,
+            res_highlight_y=0.9,
+            theo_pre_color='',
+            theo_pre_lw='',
+            vspace='',
+            rows='',
+            width=''):
         """
         Plots the Delta PRE data in scatter points and the gaussian
         smoothed curved.
@@ -2575,60 +2593,69 @@ or confirm you have not forgot any peaklist [{}].".\
             
             experiment (srt): the name of the data point.
         """
+       
         y_lims = (0, ymax)
         # to solve .find Attribute Error
         # http://stackoverflow.com/questions/29437305/how-to-fix-attributeerror-series-object-has-no-attribute-find
         # plots dpre for first point in comparison
         #pmaskr = self.ix[0,:,calccol] > 0
-        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
-                    self.ix[0,:,calccol].astype(float),
-                    'o',
-                    markersize=dpre_ms,
-                    markeredgewidth=0.0,
-                    c=ref_color,
-                    alpha=dpre_alpha,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.ix[0,:,'ResNo'].astype(float),
+            self.ix[0,:,calccol].astype(float),
+            'o',
+            markersize=dpre_ms,
+            markeredgewidth=0.0,
+            c=ref_color,
+            alpha=dpre_alpha,
+            zorder=10
+            )
         # plots dpre for titration data point
         #pmaskd = self.loc[experiment,:,calccol] > 0
-        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
-                    self.loc[experiment,:,calccol].astype(float),
-                    'o',
-                    c=color,
-                    markersize=dpre_ms,
-                    markeredgewidth=0.0,
-                    alpha=dpre_alpha,
-                    zorder=10)
-        
-        
+        axs[i].plot(
+            self.loc[experiment,:,'ResNo'].astype(float),
+            self.loc[experiment,:,calccol].astype(float),
+            'o',
+            c=color,
+            markersize=dpre_ms,
+            markeredgewidth=0.0,
+            alpha=dpre_alpha,
+            zorder=10
+            )
         # plots dpre_smooth for first data point in comparison
         #pmaskr = self.ix[0,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
-                    self.ix[0,:,calccol+'_smooth'].astype(float),
-                    ls='-',
-                    lw=smooth_lw,
-                    c=ref_color,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.ix[0,:,'ResNo'].astype(float),
+            self.ix[0,:,calccol+'_smooth'].astype(float),
+            ls='-',
+            lw=smooth_lw,
+            c=ref_color,
+            zorder=10
+            )
         # plots dpre_smooth for data point
         #pmaskd = self.loc[experiment,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
-                    self.loc[experiment,:,calccol+'_smooth'].astype(float),
-                    ls='-',
-                    lw=smooth_lw,
-                    c=color,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.loc[experiment,:,'ResNo'].astype(float),
+            self.loc[experiment,:,calccol+'_smooth'].astype(float),
+            ls='-',
+            lw=smooth_lw,
+            c=color,
+            zorder=10
+            )
         # Configure subplot title
-        axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
+        axs[i].set_title(
+            experiment,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # Set Ticks
         initialresidue = int(self.ix[0, 0, 'ResNo'])
         finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
         
         if self.shape[1] > 100:
             xtick_spacing = self.shape[1]//100*10
+        
         else:
             xtick_spacing = 10
         
@@ -2636,81 +2663,100 @@ or confirm you have not forgot any peaklist [{}].".\
         xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
         axs[i].set_xticks(xtickarange)
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_xticklabels(xtickarange,
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
+        axs[i].set_xticklabels(
+            xtickarange,
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        
         # Configures YY ticks
         axs[i].set_ylim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='y', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_yticklabels(['{:.2f}'.format(yy) \
-                                    for yy in axs[i].get_yticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-        
+        axs[i].set_yticklabels(
+            ['{:.2f}'.format(yy) for yy in axs[i].get_yticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         # configures tick params
         axs[i].margins(x=0.01)
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-                           
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         # Set axes labels
-        axs[i].set_xlabel('Residue',
-                          fontname=x_label_fn,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          weight=x_label_weight,
-                          rotation=x_label_rot)
-        
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight,
-                          rotation=y_label_rot)
+        axs[i].set_xlabel(
+            'Residue',
+            fontname=x_label_fn,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            weight=x_label_weight,
+            rotation=x_label_rot
+            )
+        axs[i].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight,
+            rotation=y_label_rot
+            )
         
         # Adds grid
         if y_grid_flag:
-            axs[i].yaxis.grid(color=y_grid_color,
-                              linestyle=y_grid_linestyle,
-                              linewidth=y_grid_linewidth,
-                              alpha=y_grid_alpha,
-                              zorder=0)
+            axs[i].yaxis.grid(
+                color=y_grid_color,
+                linestyle=y_grid_linestyle,
+                linewidth=y_grid_linewidth,
+                alpha=y_grid_alpha,
+                zorder=0
+                )
         
         if shade:
             for lmargin, rmargin in shade_regions:
-                axs[i].fill([lmargin,rmargin,
-                             rmargin, lmargin],
-                            [0,0,2,2], grid_color, alpha=0.2)
+                axs[i].fill(
+                    [lmargin,rmargin,rmargin, lmargin],
+                    [0,0,2,2],
+                    grid_color,
+                    alpha=0.2
+                    )
+        
         if res_highlight:
             for rr in res_hl_list:
-                axs[i].axvline(x=rr,ls=':', lw=0.3,  color=grid_color)
+                axs[i].axvline(x=rr, ls=':', lw=0.3, color=grid_color)
                 rrmask = self.ix[0,:,'ResNo'] == str(rr)
                 l1 = list(self.loc[experiment,rrmask,'1-letter'])
-                axs[i].text(rr, y_lims[1]*res_highlight_y,
-                            l1[0],
-                            ha='center', va='center',
-                            fontsize=res_highlight_fs)
+                axs[i].text(
+                    rr,
+                    y_lims[1]*res_highlight_y,
+                    l1[0],
+                    ha='center',
+                    va='center',
+                    fontsize=res_highlight_fs
+                    )
         
-        self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
-                           bartype = 'osci',
-                           tag_color=tag_cartoon_color,
-                           tag_ls=tag_cartoon_ls,
-                           tag_lw=tag_cartoon_lw)
+        self.plot_theo_pre(
+            axs[i],
+            experiment,
+            y_lims[1]*0.1,
+            bartype = 'osci',
+            tag_color=tag_cartoon_color,
+            tag_ls=tag_cartoon_ls,
+            tag_lw=tag_cartoon_lw
+            )
         
         return
     
