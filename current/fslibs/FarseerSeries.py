@@ -2240,46 +2240,45 @@ or confirm you have not forgot any peaklist [{}].".\
         
         return
     
-    def plot_cs_scatter_flower(self, axs,
-                               subtitle_fn='Arial',
-                             subtitle_fs=8,
-                             subtitle_pad=0.98,
-                             subtitle_weight='normal',
-                             x_label='1H (ppm)',
-                             x_label_fn='Arial',
-                             x_label_fs=3,
-                             x_label_pad=2,
-                             x_label_weight='normal',
-                             y_label='15N (ppm)',
-                             y_label_fn='Arial',
-                             y_label_fs=6 ,
-                             y_label_pad=2,
-                             y_label_weight='normal',
-                             x_ticks_fn='Arial',
-                             x_ticks_fs=5,
-                             x_ticks_pad=1,
-                             x_ticks_weight=1,
-                             x_ticks_rot=0,
-                             x_ticks_len=2,
-                             y_ticks_fn='Arial',
-                             y_ticks_fs=5,
-                             y_ticks_pad=1,
-                             y_ticks_weight=1,
-                             y_ticks_rot=0,
-                             y_ticks_len=2,
-                             
-                             x_max=0.2,
-                             x_min=-0.2,
-                             y_max=1,
-                             y_min=-1,
-                             
-                             mksize=2,
-                             color_grad=True,
-                             color_list=[],
-                             mk_start_color="#ff0000",
-                             mk_end_color='#30ff00',
-                             titration_x_values='',
-                             perform_resevo_fitting=''):
+    def plot_cs_scatter_flower(
+            self, axs,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label='1H (ppm)',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label='15N (ppm)',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_rot=0,
+            y_ticks_len=2,
+            x_max=0.2,
+            x_min=-0.2,
+            y_max=1,
+            y_min=-1,
+            mksize=2,
+            color_grad=True,
+            color_list=[],
+            mk_start_color="#ff0000",
+            mk_end_color='#30ff00',
+            titration_x_values='',
+            perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         for all the residues in a single plot.
@@ -2288,11 +2287,16 @@ or confirm you have not forgot any peaklist [{}].".\
             
             axs (matplotlib subplot axis): the subplot axis array.
         """
-        if color_grad:
-            mk_color = self.linear_gradient(mk_start_color,
-                                        finish_hex=mk_end_color,
-                                        n=len(self.items))['hex']
         
+        # if the user wants a gradient of color
+        if color_grad:
+            mk_color = self.linear_gradient(
+                mk_start_color,
+                finish_hex=mk_end_color,
+                n=len(self.items)
+                )['hex']  # function returns a dictionary
+        
+        # otherwise the user has input a list of colors
         else: 
             mk_color = color_list
         
@@ -2302,71 +2306,90 @@ or confirm you have not forgot any peaklist [{}].".\
                 continue
             
             mesmask = self.loc[:,residue,'Peak Status'] == 'measured'
-            
-            axs[0].scatter(self.loc[mesmask,residue,'H1_delta'],
-                           self.loc[mesmask,residue,'N15_delta'],
-                           c=mk_color,
-                           s=mksize,
-                           zorder=9)
-            
-            axs[0].text(\
+            axs[0].scatter(
+                self.loc[mesmask,residue,'H1_delta'],
+                self.loc[mesmask,residue,'N15_delta'],
+                c=mk_color,
+                s=mksize,
+                zorder=9
+                )
+            axs[0].text(
                 float(self.loc[mesmask,residue,'H1_delta'].tail(n=1))*1.05,
                 float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
                 self.ix[0,residue,'ResNo'],
-                fontsize=4, color='#c99543', zorder=10)
+                fontsize=4,
+                color='#c99543',
+                zorder=10
+                )
         
         # Configure Axis Ticks
         axs[0].xaxis.tick_bottom()
-        axs[0].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
+        axs[0].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
         axs[0].yaxis.tick_left()
-        axs[0].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[0].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[0].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[0].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[0].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
-        
+        axs[0].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         # draws axis 0 dotted line
-        axs[0].hlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        axs[0].vlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        
+        axs[0].hlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
+        axs[0].vlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
         axs[0].set_xlim(x_min, x_max)
         axs[0].set_ylim(y_min, y_max)
-        
         # remember in NMR spectra the ppm scale is 'inverted' :-)
         axs[0].invert_xaxis()
         axs[0].invert_yaxis()
-        
         axs[0].locator_params(axis='both', tight=True, nbins=10)
-        
-        axs[0].set_xticklabels(axs[0].get_xticks(),
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
-        axs[0].set_yticklabels(axs[0].get_yticks(),
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
+        axs[0].set_xticklabels(
+            axs[0].get_xticks(),
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
+        axs[0].set_yticklabels(
+            axs[0].get_yticks(),
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         
         return
     
