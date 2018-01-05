@@ -2762,28 +2762,36 @@ or confirm you have not forgot any peaklist [{}].".\
     
     def clean_subplots(self, axs, start, end):
         """Hides/Removes the unused subplots from the plotting figure."""
+        
         for i in range(start, end):
-            
             axs[i].spines['bottom'].set_visible(False)
             axs[i].spines['top'].set_visible(False)
             axs[i].spines['right'].set_visible(False)
             axs[i].spines['left'].set_visible(False)
-            
-            axs[i].tick_params(axis='both', bottom='off', left='off',
-                               labelleft='off', labelbottom='off')
+            axs[i].tick_params(
+                axis='both',
+                bottom='off',
+                left='off',
+                labelleft='off',
+                labelbottom='off'
+                )
+        
         return
     
-    def plot_base(self, calccol, plot_type, plot_style, param_dict,
-                     par_ylims=(0,1),
-                     ylabel='ppm or ratio',
-                     hspace=0.5,
-                     rows_per_page=5,
-                     cols_per_page=1,
-                     resonance_type='Backbone',
-                     fig_height=11.69,
-                     fig_width=8.69,
-                     fig_file_type='pdf',
-                     fig_dpi=300):
+    def plot_base(
+            self, calccol,
+            plot_type, plot_style,
+            param_dict,
+            par_ylims=(0,1),
+            ylabel='ppm or ratio',
+            hspace=0.5,
+            rows_per_page=5,
+            cols_per_page=1,
+            resonance_type='Backbone',
+            fig_height=11.69,
+            fig_width=8.69,
+            fig_file_type='pdf',
+            fig_dpi=300):
         """
         The main function that calls and builds the different plots.
         
@@ -2800,63 +2808,85 @@ or confirm you have not forgot any peaklist [{}].".\
         """
         
         self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
-        
         # this to allow folder change in PRE_analysis
         folder = calccol
         
         if plot_type == 'exp':
             num_subplots = len(self.items)
+        
         elif plot_type == 'res':
             num_subplots = len(self.major_axis)
+        
         elif plot_type == 'single':
             num_subplots = 1
+        
         else:
             raise ValueError('Not a valid Farseer plot type')
         
         numrows = ceil(num_subplots/cols_per_page)
         real_fig_height = (fig_height / rows_per_page) * numrows
-        
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
-        fig, axs = plt.subplots(nrows=numrows, ncols=cols_per_page,
-                                figsize=(fig_width, real_fig_height))
-        
+        fig, axs = plt.subplots(
+            nrows=numrows,
+            ncols=cols_per_page,
+            figsize=(fig_width, real_fig_height)
+            )
         axs = axs.ravel()
-        plt.tight_layout(rect=[0.01,0.01,0.995,0.995],
-                         h_pad=fig_height/rows_per_page)
+        plt.tight_layout(
+            rect=[0.01,0.01,0.995,0.995],
+            h_pad=fig_height/rows_per_page
+            )
+        
         # Plots yy axis title
         # http://www.futurile.net/2016/03/01/text-handling-in-matplotlib/
-        
         if plot_style in ['bar_extended', 'bar_compacted']:
-            
             for i, experiment in enumerate(self):
-                self.plot_bar_horizontal(plot_style, calccol, axs, i,
-                                         experiment, y_lims=par_ylims,
-                                         ylabel=ylabel, **param_dict)
+                self.plot_bar_horizontal(
+                    plot_style,
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
                 fig.subplots_adjust(hspace=hspace)
-                
+            
             else:
                 self.clean_subplots(axs, len(self), len(axs))
-                
-        elif plot_style == 'bar_vertical':
         
+        elif plot_style == 'bar_vertical':
             for i, experiment in enumerate(self):
-                self.plot_bar_vertical(calccol, axs, i, experiment,
-                                       y_lims=par_ylims, ylabel=ylabel,
-                                       **param_dict)
+                self.plot_bar_vertical(
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
+            
             else:
                 self.clean_subplots(axs, len(self), len(axs))
         
         elif plot_style == 'res_evo':
-            
             for i, row_number in enumerate(self.major_axis):
-                self.plot_res_evo(calccol, axs, i, row_number,
-                                  y_lims=par_ylims, y_label=ylabel,
-                                  **param_dict)
+                self.plot_res_evo(
+                    calccol,
+                    axs,
+                    i,
+                    row_number,
+                    y_lims=par_ylims,
+                    y_label=ylabel,
+                    **param_dict
+                    )
+            
             else:
                 self.clean_subplots(axs, len(self.major_axis), len(axs))
         
         elif plot_style == 'cs_scatter':
-            
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(axs, i, row_number, **param_dict)
         
@@ -2866,40 +2896,58 @@ or confirm you have not forgot any peaklist [{}].".\
         
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
-                self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment,
-                                       y_lims=par_ylims, ylabel=ylabel,
-                                       **param_dict)
+                self.plot_DPRE_heatmap(
+                    calccol,
+                    fig,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             
         elif plot_style == 'delta_osci':
-            
-            dp_colors = self.linear_gradient(param_dict['color_init'],
-                                            param_dict['color_end'],
-                                            n=self.shape[0])
-            
-            
+            dp_colors = self.linear_gradient(
+                param_dict['color_init'],
+                param_dict['color_end'],
+                n=self.shape[0]
+                )
             dp_color = it.cycle(dp_colors['hex'])
             
             for i, experiment in enumerate(self):
-                self.plot_delta_osci(calccol, axs, i, experiment,
-                                     color=next(dp_color),
-                                     **param_dict)
-                pass
+                self.plot_delta_osci(
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    color=next(dp_color),
+                    **param_dict
+                    )
+            
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
         
-        self.write_plot(fig, plot_style, folder, calccol,
-                        fig_file_type, fig_dpi)
-        
-        
+        self.write_plot(
+            fig,
+            plot_style,
+            folder,
+            calccol,
+            fig_file_type,
+            fig_dpi
+            )
         plt.close('all')
         
         return
     
-    def write_plot(self, fig, plot_name, folder, calccol, fig_file_type, 
-                         fig_dpi):
+    def write_plot(
+            self, fig,
+            plot_name, folder,
+            calccol, fig_file_type, 
+            fig_dpi):
         """
         Saves plot figure to a file.
         
@@ -2922,11 +2970,13 @@ or confirm you have not forgot any peaklist [{}].".\
         if not(os.path.exists(plot_folder)):
             os.makedirs(plot_folder)
         
-        file_path = '{}/{}_{}.{}'.format(plot_folder, calccol, plot_name,
-                                         fig_file_type)
-        
+        file_path = '{}/{}_{}.{}'.format(
+            plot_folder,
+            calccol,
+            plot_name,
+            fig_file_type
+            )
         fig.savefig(file_path, dpi=fig_dpi)
-        
         self.log_r('**Plot Saved** {}'.format(file_path))
         
         return
@@ -2950,74 +3000,70 @@ or confirm you have not forgot any peaklist [{}].".\
         
         self.fit_performed = True
         
-        # checks correct input
+        # checks correct input. As new functions are added, those options
+        # should be appended to the list.
         if fit_function not in ('hill'):
-            self.abort(\
+            self.abort(
                 "Chosen fiting function <{}> not an available option.".\
-                format(fit_function))
+                    format(fit_function))
         
-        # add new fitting functions and related in these dictionaries
+        # new functions should be appended to the dictionaries
         fitting_functions = {
-        "hill":fsfit.fitting_hill
-        }
-        
+            "hill":fsfit.fitting_hill
+            }
         not_enough_data_funcs = {
-        "hill":fsfit.hill_results
-        }
-        
+            "hill":fsfit.hill_results
+            }
         # logging ###
-        
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
+        
         if not(os.path.exists(col_path)):
             os.makedirs(col_path)
         
-        logf = \
-        '{0}/{1}/{1}_fit_report.log'.format(self.tables_and_plots_folder, col)
+        logf = '{0}/{1}/{1}_fit_report.log'.format(
+            self.tables_and_plots_folder,
+            col
+            )
         logfout = open(logf, 'w')
         logfout.write(fsfit.fit_log_head(fit_function, col))
-        
-        logresults = \
-        '{0}/{1}/{1}_fit_results.csv'.format(self.tables_and_plots_folder, col)
+        logresults = '{0}/{1}/{1}_fit_results.csv'.format(
+            self.tables_and_plots_folder,
+            col
+            )
         logrout = open(logresults, 'w')
         logrout.write(fsfit.fit_results_head(fit_function))
-        
         self.log_r('** Performing fitting for {}...'.format(col))
-        
-        #
-        
-        measured_mask = \
-            self.loc[:,:, 'Peak Status'] == 'measured'
-        
+        measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
         
         for row in self.major_axis:
             mmask = measured_mask.loc[row,:]
             res = int(self.loc[self.items[0],row, 'ResNo'])
             col_res = "{}_{}".format(col,res)
-            
             xdata = pd.Series(x_values)[np.array(mmask)]
             # .fillna is used to avoid minpack.error:
             # Result from function call is not a proper array of floats.
             ydata = self.loc[mmask,row,col].fillna(value=0.0)
-            
             xdata.index = ydata.index
             
             if mmask.sum() < mindp:
                 # residue does not have enough data to perform fit
                 logfout.write(fsfit.not_enough_data(res, xdata, ydata))
-                logrout.write(\
-                    not_enough_data_funcs[fit_function](\
-                        res, xdata, ydata, status='not_enough_data'))
-                
+                logrout.write(
+                    not_enough_data_funcs[fit_function](
+                        res,
+                        xdata,
+                        ydata,
+                        status='not_enough_data'
+                        )
+                    )
                 self.fit_okay[col_res] = False
                 self.fit_plot_text[col_res] = "not enough data"
                 self.fit_plot_ydata[col_res] = None
-                
                 continue
             
             a, b, c, d, e = \
                 fitting_functions[fit_function](xdata, ydata, res, self.xfit)
-            
             logfout.write(a)
             logrout.write(b)
             self.fit_plot_text[col_res] = c
@@ -3026,5 +3072,6 @@ or confirm you have not forgot any peaklist [{}].".\
         
         logfout.close()
         logrout.close()
+        
         return
     
