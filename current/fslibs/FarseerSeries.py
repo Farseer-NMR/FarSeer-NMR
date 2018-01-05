@@ -3063,7 +3063,12 @@ or confirm you have not forgot any peaklist [{}].".\
                 continue
             
             a, b, c, d, e = \
-                fitting_functions[fit_function](xdata, ydata, res, self.xfit)
+                fitting_functions[fit_function](
+                    xdata,
+                    ydata,
+                    res,
+                    self.xfit
+                    )
             logfout.write(a)
             logrout.write(b)
             self.fit_plot_text[col_res] = c
