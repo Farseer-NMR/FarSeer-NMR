@@ -20,35 +20,39 @@ import numpy as np
 
 # FITTING EQUATIONS:
 def hill_equation(L0, Vmax, n, kd):
-            """
-            The Hill Equation.
-            
-            https://en.wikipedia.org/wiki/Hill_equation_(biochemistry)
-            
-            http://www.physiologyweb.com/calculators/hill_equation_interactive_graph.html
-            """
-            return (Vmax*L0**n)/(kd**n+L0**n)
+    """
+    The Hill Equation.
+    
+    https://en.wikipedia.org/wiki/Hill_equation_(biochemistry)
+    
+    http://www.physiologyweb.com/calculators/hill_equation_interactive_graph.html
+    """
+    return (Vmax*L0**n)/(kd**n+L0**n)
 
 # FITTING LOG FILES HEAD:
-
 def fit_log_head(fit, col):
+    """Library with the different headers for the implemented functions."""
+    
     if fit == 'hill':
         s2w = \
 """# fitting for parameter: '{}'
 #fit performed: Hill Equation
 #(Vmax*[S]**n)/(K0.5**n+[S]**n)
-""".format(col)
+""".\
+            format(col)
+        
         return s2w
 
 # FITTING RESULTS FILE HEAD
-
 def fit_results_head(fit):
+    """Library with the different columns header for the fit results table."""
+    
     if fit == 'hill':
         return "#res,fit,ymax,yhalf,kd,n\n"
-        
+    
+    return
 
-# FITTING LOG FILE OKAY TEXT:
-
+# FITTING LOG FILE TEXT FOR SUCCESSFUL FITS:
 def hill_log_okay(res, x, y, popt, pcov):
     s2w = \
 """
@@ -66,18 +70,23 @@ pcov: {}
     return s2w
 
 # FITTING RESULTS TEXT:
-
 def hill_results(res,popt,yhalf,status='okay'):
     if status == 'okay':
-        return "{},{},{},{},{},{}\n".format(res,status,popt[0],
-                                          yhalf,popt[2],popt[1])
+        row = "{},{},{},{},{},{}\n".format(
+            res,
+            status,
+            popt[0],
+            yhalf,
+            popt[2],
+            popt[1]
+            )
+        
+        return row
+    
     else:
         return "{},{},,,,,\n".format(res,status)
 
-
-
 # FITTING TEXT TO GO IN PLOT:
-
 def hill_txt_plot(popt, yhalf):
     s2w = \
 """
@@ -85,11 +94,12 @@ ymax: {:.3f}
 yhalf: {:.3f}
 K0.5: {:.3f}
 n: {:.3f}
-""".format(popt[0],yhalf,popt[2],popt[1])
+""".\
+        format(popt[0],yhalf,popt[2],popt[1])
+    
     return s2w
 
 # FITTING LOG FILE FAILED:
-
 def fit_failed(res, x, y):
     s2w = \
 """
@@ -98,11 +108,14 @@ xdata: {}
 ydata: {}
 !¡FIT FAILED TO FIND MINIMIZATION!¡
 **************************
-""".format(res, list(x), list(y))
+""".\
+        format(res, list(x), list(y))
+    
     return s2w
 
 # NOT ENOUGH DATA
 def not_enough_data(res, x, y):
+    
     s2w = \
 """
 ResNo:  {}
@@ -110,12 +123,12 @@ xdata: {}
 ydata: {}
 !¡NOT ENOUGH DATA POINTS - FIT NOT PERFORMED!¡
 **************************
-""".format(res, list(x), list(y))
+""".\
+        format(res, list(x), list(y))
+    
     return s2w
 
-
 # FITTING WORKFLOWS:
-
 def fitting_hill(x, y, res, xfit):
     """Workflow for fitting data with the Hill Equation."""
     
@@ -123,11 +136,8 @@ def fitting_hill(x, y, res, xfit):
     
     try:
         popt, pcov = sciopt.curve_fit(hill_equation, x, y, p0=p_guess)
-        
         yhalf = popt[0]/2
-        
         print("*** Fit residue {} - OK!".format(res))
-        
         a = hill_log_okay(res, x, y, popt, pcov)
         b = hill_results(res, popt, yhalf)
         c = hill_txt_plot(popt, yhalf)

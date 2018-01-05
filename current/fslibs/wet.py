@@ -29,23 +29,29 @@ def gen_wet(t, s, n):
 {}
 {}
 
-""".format(title(t),
-           line(),
-           "\n".join(map(format_msg, textwrap.wrap(s, width=67))),
-           line(),
-           referwet(n),
-           bottom())
+""".\
+        format(
+            title(t),
+            line(),
+             "\n".join(map(format_msg, textwrap.wrap(s, width=67))),
+            line(),
+            referwet(n),
+            bottom()
+            )
+    
     return ws
 
 def continue_abort():
     """ Asks user to decide behaviour. """
     choice = 'z'
+    
     while not(choice in ['A', 'C']):
         choice = \
             input('> What do you want to do? [C]ontinue or [A]bort? ').upper()
     
     if choice == 'A':
         abort(abort_msg)
+    
     elif choice == 'C':
         return 'Continuing...'
 
@@ -54,24 +60,32 @@ def abort(m=''):
     return
 
 def end_good():
-    s = """
+    s = \
+"""
 {}
 {}
 {}
 {}
-""".format(bottom(), 
-           line('Farseer-NMR completed correctly'),
-           line('Bye :-)'),
-           bottom())
+""".\
+        format(
+            bottom(), 
+            line('Farseer-NMR completed correctly'),
+            line('Bye :-)'),
+            bottom()
+            )
     
     return s
 
-abort_msg = """
+abort_msg = \
+"""
 {}
 {}
 {}
 {}
-""".format(bottom(), 
-           line('Farseer-NMR aborted'),
-           line('Bye :-('),
-           bottom())
+""".\
+    format(
+        bottom(), 
+        line('Farseer-NMR aborted'),
+        line('Bye :-('),
+        bottom()
+        )
