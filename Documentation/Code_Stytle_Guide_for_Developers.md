@@ -1,24 +1,20 @@
-I am revisiting the whole code and cleaning it to be consistent with [PEP8](https://www.python.org/dev/peps/pep-0008/) and consistent with itself throughout our own code. Following PEP8 I allow myself a personal touch :-P
+# Farseer-NMR code style
 
-I will update in this post my suggestions.  
+This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gathers rules/suggestions to uniform the coding style of Farseer-NMR. Please follow these rules and submitting a Pull Request.
 
-Please add your comments and suggestions so that we unify a unique writing style.  
-
-I have created a branch so that we can work on this there: [PEP8_2018](https://github.com/joaomcteixeira/FarSeer-NMR/tree/PEP8_2018)
-
-I am creating from this post a Code Style Guide for developers to add to Documentation/ folder.
+These rules mainly apply when command does not fit a single line.
 
 ## Length of line
+
 Maximum line length 79 chars
 
 ## Indentation
 
 Indentation are 4 spaces
 
-
 ## Function call
 
-Whenever a function call cannot fit a single line, **all** arguments should be followed by newlines such as, closing the call should be aligned with args:
+Whenever a function call cannot fit a single line, **all** arguments should be followed by newlines and an extra identation, closing the call should be aligned with args:
 
 ```
 func(
@@ -79,8 +75,10 @@ def long_function_name(
 In if statements newlines should be followed by double indentation to separate from nested code and followed by the necessary subindentation.
 
 ```
-if (isc3 and (isprev_para or isnext_para)) \
-        and fsuv['plotting_flags']['do_dpre_osci']:
+if (True and (True or False)) \
+        and (True \
+            or False) \
+        and False:
 ```
 
 ## List, Dictionaries and alike
@@ -112,7 +110,7 @@ for sourcecol, targetcol in zip(
 
 ### Nested loops
 
-Use itertool library whenever possible
+Use itertool library whenever possible.
 
 Yes:
 ```
