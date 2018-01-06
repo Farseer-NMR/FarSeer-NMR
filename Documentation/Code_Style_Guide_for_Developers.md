@@ -37,7 +37,7 @@ foo = long_function_name(var_one, var_two,
 
 Passing results from function calls as kwargs:
 
-Yes:
+Preferable, if series_kwargs() call fit a single line:
 ```
 func(
     posvar1,
@@ -46,7 +46,7 @@ func(
     )
 ```
     
-No:
+Yes, if series_kwargs() call cannot fit a single line:
 ```
 func(
     posvar1,
