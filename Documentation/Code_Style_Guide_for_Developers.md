@@ -1,21 +1,32 @@
 # Farseer-NMR code style
 
-This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gathers rules/suggestions to uniform the coding style of Farseer-NMR. Please follow these rules and submitting a Pull Request.
+This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gathers rules/suggestions to uniform the coding style of Farseer-NMR. Please follow these rules when submitting a Pull Request.
 
-These rules mainly apply when command does not fit a single line.
+These rules mainly apply when operations do not fit a single line.
 
 ## Length of line
 
-Maximum line length 79 chars
+Maximum line length 79 chars.
+Maximum docstring length 72 chars.
 
 ## Indentation
 
-Indentation are 4 spaces
+Indentations are 4 spaces.
+
+## Method call
+
+If method call cannot fit one line, break the line after the "." followed by an extra indentation to the current indentation block. Continue this proceedure for consecutive calls.
+
+```
+"my name is {}".\
+    format(name)
+```
 
 ## Function call
 
 Whenever a function call cannot fit a single line, **all** arguments should be followed by newlines and an extra identation, closing the call should be aligned with args:
 
+Yes:
 ```
 func(
     positional_arg1,
@@ -27,7 +38,9 @@ func(
 
 ### Alignment
 
-Aligned with opening delimiter it's feasible, but annoying and difficult to maintain because introduces partial indentation blocks. Let's not use it.
+Alignment with opening delimiter it's feasible, but annoying and difficult to maintain because introduces partial indentation blocks. Let's not use it.
+
+No:
 ```
 foo = long_function_name(var_one, var_two,
                          var_three, var_four)
@@ -35,7 +48,7 @@ foo = long_function_name(var_one, var_two,
 
 ### Kwargs
 
-Passing results from function calls as kwargs:
+Create a line break "\" after the assignment statement of the kwarg if the argument can, in this way, fit a new line. Otherwise proceed as in [Function Call] and [Method Call].
 
 Preferable, if series_kwargs() call fit a single line:
 ```
@@ -57,9 +70,23 @@ func(
     )
 ```
 
-## Defining a function,
+Usage in case of method calls:
+```
+func(
+    posvar1,
+    message="this a big string with several {} {} {}".\
+        format(
+            a,
+            b,
+            c
+            )
+    kwargs=var1
+    )
+```
 
-Positional arguments should follow each other unless they don't fit all in a single line, in that case rule#2 applies allowing two args per line. Kwargs should **always** be preceded by 2 indents and followed by newline.
+## Defining a function
+
+In case all the positional args and kwargs can fit a single line, break line after "(" and give an extra indent. Organize positional args in new lines allowing up to two args per line, followed by 1 kwarg per line. Give a blank line after the function definition.
 
 ```
 def long_function_name(
@@ -67,12 +94,17 @@ def long_function_name(
         var_three, var_four
         kwarg1='default',
         kwarg2=0.0):
+    
     print(var_one)
 ```
 
+### Return statement
+
+Citing PEP8: "Be consistent in return statements. Either all return statements in a function should return an expression, or none of them should."
+
 ## Conditionals
 
-In if statements newlines should be followed by double indentation to separate from nested code and followed by the necessary subindentation.
+In if statements newlines should be followed by double indentation to separate from nested code and followed by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary short alias.
 
 ```
 if (True and (True or False)) \
@@ -83,7 +115,7 @@ if (True and (True or False)) \
 
 ## List, Dictionaries and alike
 
-Use the following.
+Use the following. This applies also in function calls.
 ```
 my_list = [
     value1,
@@ -125,15 +157,6 @@ for dp2 in next_axis_2:
         # DO
 ```
 
-## Method call
-
-If method call cannot fit one line, break the line after the "." followed by an extra indentation to the current indentation block.
-
-```
-"my name is {}".\
-    format(name)
-```
-
 ## Break in binary operators.
 
 [Break before as in PEP8](https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator).
@@ -149,7 +172,15 @@ msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
 ```
 
-Otherwise break the string in logical parts with the ```\```. And break again to apply format. You can/should avoid the use of indentation.
+even:
+```
+        msg = \
+"<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+```
+
+Otherwise break the string in logical parts with the ```\```. And break again to apply format. You can/should avoid the use of indentation because this will be passed to the string.
+
+If the string has to be formatted, break the method call to a new line and assign and additional indent.
 
 ```
 logs = \
@@ -165,9 +196,10 @@ logs = \
 
 ### Multiline
 
-In multiline strings receiving variables, even if the string does not reach the end of the line, using the following notation:
+In multiline strings always break the assignment statement to a new line and describe the string without indentation. If the string has to be formatted, break the method call and give an additional indentation considering the indentation of the varible to which the string is assigned:
 
 ```
+        msg = \
 """path: {}  
 side chains: {}  
 FASTA starting residue: {}  """.\
@@ -182,15 +214,15 @@ FASTA starting residue: {}  """.\
 
 Follow the [rules of PEP8](https://www.python.org/dev/peps/pep-0008/#imports).
 
-Inside the same indentation block, write the operations consecutively. Optionally you can separate relevant logical blocks by new lines or by comments (better).
-
 ## Blank lines and Whitespaces
 
 Follow the [general rules of PEP8](https://www.python.org/dev/peps/pep-0008/#whitespace-in-expressions-and-statements).
 
-### Separating indents
+Inside the same indentation block, write the operations consecutively. Optionally you can separate relevant logical blocks by new lines or, preferable, by comments.
 
-Separate a conditional or loop block with a preceeding and succeeding blank line.
+### Separating indentation blocks
+
+Separate a new indentation block with a preceeding and succeeding blank line.
 Start the block right after the header. If a block initiates right after another avoid the preceeding blank line.
 
 ```
@@ -207,7 +239,7 @@ or
 
 ```
 for char in string:
-    for digit in big_number:
+    for digit in dct[char]:
         # Do something here
         # in the second for loop
     

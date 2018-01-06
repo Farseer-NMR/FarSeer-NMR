@@ -275,10 +275,7 @@ FASTA starting residue: {}  """.\
         
         return
     
-    def load_experiments(
-            self,
-            filetype='.csv',
-            resonance_type='Backbone'):
+    def load_experiments(self, filetype='.csv', resonance_type='Backbone'):
         """
         Loads the <filetype> files in self.paths into nested dictionaries as 
         pd.DataFrames.
@@ -704,7 +701,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                     )
             
             self.log_r(logs)
-            # DONE Cycle coords
         
         return
 

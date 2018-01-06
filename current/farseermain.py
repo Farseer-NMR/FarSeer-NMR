@@ -369,7 +369,7 @@ There is nothing to calculate. Confirm this is actually what you want."
     else:
         return True
     
-    return
+    return None
 
 def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     """
@@ -606,10 +606,7 @@ def correct_shifts(
     
     return
 
-def fill_na(
-        peak_status,
-        merit=0,
-        details='None'):
+def fill_na(peak_status, merit=0, details='None'):
     """
     A dictionary that configures how the fields of the added rows for 
     missing residues are fill.
@@ -630,7 +627,7 @@ def fill_na(
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
             )
-        return
+        return None
     
     d = {
         'Peak Status': peak_status,
@@ -640,10 +637,7 @@ def fill_na(
     
     return d
 
-def expand_lost(
-        exp,
-        resonance_type='Backbone',
-        dim='z'):
+def expand_lost(exp, resonance_type='Backbone', dim='z'):
     """
     Checks for 'lost' residues accross the reference experiments
     for Y and Z axes.
@@ -677,10 +671,7 @@ def expand_lost(
     
     return
 
-def add_missing(
-        exp,
-        peak_status='lost',
-        resonance_type='Backbone'):
+def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
     Uses FarseerCube.finds_missing().
@@ -715,9 +706,7 @@ def add_missing(
     
     return
 
-def organize_columns(
-        exp, fsuv,
-        resonance_type='Backbone'):
+def organize_columns(exp, fsuv, resonance_type='Backbone'):
     """
     Uses FarseerSet.organize_cols().
     
@@ -768,9 +757,7 @@ def init_fs_cube(exp, fsuv):
     
     return
 
-def series_kwargs(
-        fsuv,
-        resonance_type='Backbone'):
+def series_kwargs(fsuv, resonance_type='Backbone'):
     """
     Defines the kwargs dictionary that will be used to generate
     the FarseerSeries object based on the user defined preferences.
@@ -793,7 +780,7 @@ def series_kwargs(
         input(
             'Choose a valid <resonance_type> argument. Press Enter to continue.'
             )
-        return
+        return None
     
     dd = {
         'resonance_type':resonance_type,
@@ -807,10 +794,7 @@ def series_kwargs(
     
     return dd
 
-def gen_series_dcts(
-        exp, series_class,
-        fsuv,
-        resonance_type='Backbone'):
+def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     """
     Generates a nested dictionary, <D>, containing all possible series over all the 
     three Farseer-NMR Cube axis.
@@ -865,7 +849,7 @@ def gen_series_dcts(
         input(
             'Choose a valid <resonance_type> argument. Press Enter to continue.'
             )
-        return
+        return None
     
     if not(checks_cube_axes_flags(fsuv)):
         return None
@@ -931,9 +915,7 @@ any series set was created along an axis. Nothing will be calculated.'
     
     return series_dct
 
-def eval_series(
-        series_dct, fsuv,
-        resonance_type='Backbone'):
+def eval_series(series_dct, fsuv, resonance_type='Backbone'):
     """
     Executes the Farseer-NMR Analysis Routines over all the series of
     the activated Farseer-NMR Cube Axes.
@@ -1279,9 +1261,7 @@ def exports_chimera_att_files(farseer_series, fsuv):
     
     return
 
-def exports_all_parameters(
-        farseer_series, fsuv,
-        resonance_type='Backbone'):
+def exports_all_parameters(farseer_series, fsuv, resonance_type='Backbone'):
     """
     Exports the evolution of all parameters in separated tables.
     
@@ -1327,9 +1307,7 @@ def exports_all_parameters(
     
     return
 
-def plots_data(
-        farseer_series, fsuv,
-        resonance_type='Backbone'):
+def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     """
     Walks through the plotting routines and plots according to user
     preferences.
@@ -1596,9 +1574,7 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     
     return
 
-def analyse_comparisons(
-        series_dct, fsuv,
-        resonance_type='Backbone'):
+def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     """
     Algorythm to perform data comparisons over analysed conditions.
     
@@ -1618,7 +1594,7 @@ def analyse_comparisons(
         input(
             'Choose a valid <resonance_type> argument. Press Enter to continue.'
             )
-        return
+        return None
     
     # kwargs passed to the parsed series of class fss.FarseerSeries
     comp_kwargs = series_kwargs(fsuv, resonance_type=resonance_type)

@@ -136,13 +136,6 @@ def fitting_hill(x, y, res, xfit):
     
     try:
         popt, pcov = sciopt.curve_fit(hill_equation, x, y, p0=p_guess)
-        yhalf = popt[0]/2
-        print("*** Fit residue {} - OK!".format(res))
-        a = hill_log_okay(res, x, y, popt, pcov)
-        b = hill_results(res, popt, yhalf)
-        c = hill_txt_plot(popt, yhalf)
-        d = True
-        e = hill_equation(xfit, popt[0], popt[1], popt[2])
     
     except:
         print("*** Fit residue {} - Failed!".format(res))
@@ -151,5 +144,14 @@ def fitting_hill(x, y, res, xfit):
         c = "fit failed"
         d = False
         e = None
+        return a, b, c, d, e
+    
+    yhalf = popt[0]/2
+    print("*** Fit residue {} - OK!".format(res))
+    a = hill_log_okay(res, x, y, popt, pcov)
+    b = hill_results(res, popt, yhalf)
+    c = hill_txt_plot(popt, yhalf)
+    d = True
+    e = hill_equation(xfit, popt[0], popt[1], popt[2])
     
     return a, b, c, d, e
