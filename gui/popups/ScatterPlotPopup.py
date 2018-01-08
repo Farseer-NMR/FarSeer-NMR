@@ -10,6 +10,10 @@ from gui.components.ColourBox import ColourBox
 from gui.gui_utils import defaults, colours
 from functools import partial
 
+# https://stackoverflow.com/questions/34293875/how-to-remove-punctuation-marks-from-a-string-in-python-3-x-using-translate
+import string
+translator = str.maketrans('', '', string.punctuation+" ")
+
 class ScatterPlotPopup(QDialog):
 
     def __init__(self, parent=None, variables=None, **kw):
@@ -95,8 +99,12 @@ class ScatterPlotPopup(QDialog):
         self.variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
         self.variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
         self.variables["markers"] = [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
-        self.variables["mk_color"] = [x.strip().strip("'") for x in self.cs_scatter_mk_color.field.text().split(',')]
-        self.variables["mk_edgecolors"] = [x.strip().strip("'") for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
+        self.variables["mk_color"] = \
+            [x.translate(translator) \
+                for x in self.cs_scatter_mk_color.field.text().split(',')]
+        self.variables["mk_edgecolors"] = \
+            [x.translate(translator) \
+                for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
         self.variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
         self.variables["hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
         variables["cs_scatter_settings"] = self.variables

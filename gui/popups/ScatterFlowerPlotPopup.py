@@ -11,9 +11,9 @@ from gui.components.FontComboBox import FontComboBox
 from functools import partial
 from gui.gui_utils import font_weights, defaults, colours
 
-#from string import maketrans
-
-bad_list_chars = " \"'"
+# https://stackoverflow.com/questions/34293875/how-to-remove-punctuation-marks-from-a-string-in-python-3-x-using-translate
+import string
+translator = str.maketrans('', '', string.punctuation+" ")
 
 class ScatterFlowerPlotPopup(QDialog):
 
@@ -106,7 +106,7 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_color_grad.setChecked(self.default["color_grad"])
         self.cs_scatter_flower_color_start.select(self.default["mk_start_color"])
         self.cs_scatter_flower_color_end.select(self.default["mk_end_color"])
-        self.cs_scatter_flower_color_list.field.setText(', '.join(self.default["color_list"]))
+        self.cs_scatter_flower_color_list.field.setText(','.join(self.default["color_list"]))
 
         self.cs_scatter_flower_x_label_fn.select(self.default["x_label_fn"])
         self.cs_scatter_flower_x_label_fs.setValue(self.default["x_label_fs"])
@@ -165,11 +165,11 @@ class ScatterFlowerPlotPopup(QDialog):
         self.variables["y_ticks_pad"] = self.cs_scatter_flower_y_ticks_pad.field.value()
         self.variables["y_ticks_weight"] = self.cs_scatter_flower_y_ticks_weight.fields.currentText()
         self.variables["y_ticks_rot"] = self.cs_scatter_flower_y_ticks_rot.field.value()
-        #self.variables["color_list"] = [x.strip().strip("'") for x in self.cs_scatter_flower_color_list.field.text().split(',')]
         self.variables["color_list"] = \
-            self.cs_scatter_flower_color_list.field.text().\
-                translate(str.maketrans(bad_list_chars, "NoneNoneNone")).split(',')
-
+            [x.translate(translator) \
+                for x in self.cs_scatter_flower_color_list.field.text().\
+                    split(',')]
+        
         variables["cs_scatter_flower_settings"] = self.variables
         self.accept()
 
@@ -181,7 +181,7 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_color_grad.setChecked(self.variables["color_grad"])
         self.cs_scatter_flower_color_start.select(self.variables["mk_start_color"])
         self.cs_scatter_flower_color_end.select(self.variables["mk_end_color"])
-        self.cs_scatter_flower_color_list.field.setText(', '.join(self.variables["color_list"]))
+        self.cs_scatter_flower_color_list.field.setText(','.join(self.variables["color_list"]))
 
         self.cs_scatter_flower_x_label_fn.select(self.variables["x_label_fn"])
         self.cs_scatter_flower_x_label_fs.setValue(self.variables["x_label_fs"])
