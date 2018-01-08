@@ -11,6 +11,9 @@ from gui.components.FontComboBox import FontComboBox
 from functools import partial
 from gui.gui_utils import font_weights, defaults, colours
 
+#from string import maketrans
+
+bad_list_chars = " \"'"
 
 class ScatterFlowerPlotPopup(QDialog):
 
@@ -162,7 +165,10 @@ class ScatterFlowerPlotPopup(QDialog):
         self.variables["y_ticks_pad"] = self.cs_scatter_flower_y_ticks_pad.field.value()
         self.variables["y_ticks_weight"] = self.cs_scatter_flower_y_ticks_weight.fields.currentText()
         self.variables["y_ticks_rot"] = self.cs_scatter_flower_y_ticks_rot.field.value()
-        self.variables["color_list"] = self.cs_scatter_flower_color_list.field.text().split(',')
+        #self.variables["color_list"] = [x.strip().strip("'") for x in self.cs_scatter_flower_color_list.field.text().split(',')]
+        self.variables["color_list"] = \
+            self.cs_scatter_flower_color_list.field.text().\
+                translate(str.maketrans(bad_list_chars, "NoneNoneNone")).split(',')
 
         variables["cs_scatter_flower_settings"] = self.variables
         self.accept()

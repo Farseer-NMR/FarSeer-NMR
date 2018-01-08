@@ -94,9 +94,9 @@ class ScatterPlotPopup(QDialog):
         self.variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
         self.variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
         self.variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
-        self.variables["markers"] = self.cs_scatter_markers.field.text().split(',')
-        self.variables["mk_color"] = self.cs_scatter_mk_color.field.text().split(',')
-        self.variables["mk_edgecolors"] = self.cs_scatter_mk_edgecolors.field.text().split(',')
+        self.variables["markers"] = [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
+        self.variables["mk_color"] = [x.strip().strip("'") for x in self.cs_scatter_mk_color.field.text().split(',')]
+        self.variables["mk_edgecolors"] = [x.strip().strip("'") for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
         self.variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
         self.variables["hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
         variables["cs_scatter_settings"] = self.variables
