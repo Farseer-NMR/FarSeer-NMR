@@ -2,12 +2,13 @@ import glob
 import os
 import numpy as np
 import pandas as pd
-from math import ceil
-import scipy.optimize as sciopt
 import itertools as it
+import scipy.optimize as sciopt
+from math import ceil
 from matplotlib import pyplot as plt
-from current.fslibs import wet as fsw
-from current.fslibs import fitting as fsfit
+
+import current.fslibs.wet as fsw
+import current.fslibs.fitting as fsfit
 
 class FarseerSeries(pd.Panel):
     """
@@ -113,6 +114,7 @@ class FarseerSeries(pd.Panel):
             .write_Chimera_attributes()
             .export_series_to_tsv()
     """
+    
     # folder names
     calc_folder = 'Calculations'  
     comparison_folder = 'Comparisons'  
@@ -120,30 +122,33 @@ class FarseerSeries(pd.Panel):
     chimera_att_folder = 'ChimeraAttributeFiles'
     export_series_folder = 'FullPeaklists'
     
-    def create_attributes(self, series_axis='cond',
-                                  series_dps=['foo'],
-                                  next_dim='bar',
-                                  prev_dim='zoo',
-                                  dim_comparison='not_applied',
-                                  resonance_type='Backbone',
-                                  csp_alpha4res=0.14,
-                                  csp_res_exceptions={'G':0.2},
-                                  cs_lost='prev',
-                                  restraint_list=['H1_delta',
-                                                  'N15_delta',
-                                                  'CSP',
-                                                  'Height_ratio',
-                                                  'Vol_ratio'],
-                                  log_export_onthefly=False,
-                                  log_export_name='FarseerSet_log.md'):
-                                                                 
-        #I couldn't initialise all these parameters with the .__init__()
+    def create_attributes(
+            self,
+            series_axis='cond',
+            series_dps=['foo'],
+            next_dim='bar',
+            prev_dim='zoo',
+            dim_comparison='not_applied',
+            resonance_type='Backbone',
+            csp_alpha4res=0.14,
+            csp_res_exceptions={'G':0.2},
+            cs_lost='prev',
+            restraint_list=[
+                'H1_delta',
+                'N15_delta',
+                'CSP',
+                'Height_ratio',
+                'Vol_ratio'
+                ],
+            log_export_onthefly=False,
+            log_export_name='FarseerSet_log.md'):
+        """Creates the instance attributes."""
         
         self.cs_lost = cs_lost
-        
         # normalization value for F2 dimension.
-        self.csp_alpha4res = {key:csp_alpha4res \
-                              for key in 'ARNDCEQGHILKMFPSTWYV'}
+        self.csp_alpha4res = \
+            {key:csp_alpha4res for key in 'ARNDCEQGHILKMFPSTWYV'}
+        
         for k, v in csp_res_exceptions.items():
             self.csp_alpha4res[k] = v
         
@@ -156,20 +161,15 @@ class FarseerSeries(pd.Panel):
         self.resonance_type = resonance_type
         self.res_info = \
             self.loc[:,:,['ResNo','1-letter','3-letter','Peak Status']]
-        
         self.restraint_list = restraint_list
-        
         # dictionary to store dataframes with information on fitting results
         self.fit_plot_text = {}
         self.fit_plot_ydata = {}
         self.fit_okay = {}
-        
         # becomes if perform_fit() runs.
         # affects plot_res_evo()
         self.fit_performed = False 
-        
         self.PRE_loaded = False  # True after .load_theoretical_PRE
-        
         # log related variables
         self.log = ''
         self.log_export_onthefly = log_export_onthefly
@@ -178,19 +178,24 @@ class FarseerSeries(pd.Panel):
         # defines the path to store the calculations
         # if stores the result of a calculation
         if series_axis.startswith('cond'):
-            self.calc_path = '{}/{}/{}/{}/{}'.format(self.resonance_type,
-                                                     self.calc_folder,
-                                                     self.series_axis,
-                                                     self.prev_dim,
-                                                     self.next_dim)
+            self.calc_path = '{}/{}/{}/{}/{}'.format(
+                self.resonance_type,
+                self.calc_folder,
+                self.series_axis,
+                self.prev_dim,
+                self.next_dim
+                )
+        
         # if stores comparisons among calculations
         elif series_axis.startswith('C'):
-            self.calc_path = '{}/{}/{}/{}/{}/{}'.format(self.resonance_type,
-                                                        self.comparison_folder,
-                                                        self.series_axis,
-                                                        self.dim_comparison,
-                                                        self.prev_dim,
-                                                        self.next_dim)
+            self.calc_path = '{}/{}/{}/{}/{}/{}'.format(
+                self.resonance_type,
+                self.comparison_folder,
+                self.series_axis,
+                self.dim_comparison,
+                self.prev_dim,
+                self.next_dim
+                )
         
         # Creates all the folders necessary to store the data.
         # folders are created here when generating the object to avoid having
@@ -199,18 +204,21 @@ class FarseerSeries(pd.Panel):
         if not(os.path.exists(self.calc_path)):
             os.makedirs(self.calc_path)
         
-        self.chimera_att_folder = '{}/{}'.format(self.calc_path,
-                                                 self.chimera_att_folder)
+        self.chimera_att_folder = \
+            "{}/{}".format(self.calc_path, self.chimera_att_folder)
+        
         if not(os.path.exists(self.chimera_att_folder)):
             os.makedirs(self.chimera_att_folder)
         
         self.tables_and_plots_folder = \
             '{}/{}'.format(self.calc_path, self.tables_and_plots_folder)
+        
         if not(os.path.exists(self.tables_and_plots_folder)):
             os.makedirs(self.tables_and_plots_folder)
         
-        self.export_series_folder = '{}/{}'.format(self.calc_path,
-                                                self.export_series_folder)
+        self.export_series_folder = \
+            '{}/{}'.format(self.calc_path, self.export_series_folder)
+        
         if not(os.path.exists(self.export_series_folder)):
             os.makedirs(self.export_series_folder)
         
@@ -226,12 +234,15 @@ class FarseerSeries(pd.Panel):
         logstr (str): the string to be registered in the log.
         istitle (bool): flag to format logstr as a title.
         """
+        
         if istitle:
-            logstr = """
+            logstr = \
+"""
 {0}  
 {1}  
 {0}  
 """.format('*'*79, logstr)
+        
         else:
             logstr += '  \n'
         
@@ -242,22 +253,27 @@ class FarseerSeries(pd.Panel):
         if self.log_export_onthefly:
             with open(self.log_export_name, 'a') as logfile:
                 logfile.write(logstr)
+        
         return
     
-    def exports_log(self, mod='a', path='farseer.log'):
+    def exports_log( self, mod='a', path='farseer.log'):
         """Exports log to external file.
         
         mod (str): python.open() arg mode.
         logfile_name (str): the external log file name.
         """
+        
         with open(path, mod) as logfile:
             logfile.write(self.log)
+        
         return
     
     def abort(self):
         """Aborts run with message."""
+        
         self.log_r(fsw.abort_msg)
         fsw.abort()
+        
         return
     
     def hex_to_RGB(self, hexx):
@@ -323,7 +339,10 @@ class FarseerSeries(pd.Panel):
         """
         # Components need to be integers for hex to make sense
         RGB = [int(x) for x in RGB]
-        return "#"+"".join(["0{0:x}".format(v) if v < 16 else "{0:x}".format(v) for v in RGB])
+        hexx = "#"+"".join(
+            ["0{0:x}".format(v) if v < 16 else "{0:x}".format(v) for v in RGB]
+            )
+        return hexx
     
     def color_dict(self, gradient):
         """
@@ -356,10 +375,14 @@ class FarseerSeries(pd.Panel):
         colors in RGB and hex form for use in a graphing function
         defined later on.
         """
-        return {"hex":[self.RGB_to_hex(RGB) for RGB in gradient],
+        d = {
+            "hex":[self.RGB_to_hex(RGB) for RGB in gradient],
             "r":[RGB[0] for RGB in gradient],
             "g":[RGB[1] for RGB in gradient],
-            "b":[RGB[2] for RGB in gradient]}
+            "b":[RGB[2] for RGB in gradient]
+            }
+        
+        return d
     
     
     def linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
@@ -410,7 +433,6 @@ class FarseerSeries(pd.Panel):
             RGB_list.append(curr_vector)
         return self.color_dict(RGB_list)
     
-    
     def calc_cs_diffs(self, calccol, sourcecol):
         """
         Calculates the difference between two columns along a Series 
@@ -419,6 +441,7 @@ class FarseerSeries(pd.Panel):
         
         Calculation results are stored in a new column for each DataFrame.
         """
+        
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
         
@@ -451,9 +474,11 @@ class FarseerSeries(pd.Panel):
         
         Calculation result is stored in a new column of each DataFrame.
         """
+        
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
         self.log_r('**Calculated** {}'.format(calccol))
+        
         return
     
     def csp_willi(self, s):
@@ -476,9 +501,7 @@ class FarseerSeries(pd.Panel):
         """
         return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2])**2))
     
-    def calc_csp(self, calccol='CSP',
-                       pos1='PosF1_delta',
-                       pos2='PosF2_delta'):
+    def calc_csp(self, calccol='CSP', pos1='PosF1_delta', pos2='PosF2_delta'):
         """
         Calculates the Chemical Shift Perturbation (CSP) values
         based on a formula.
@@ -513,64 +536,73 @@ class FarseerSeries(pd.Panel):
         Modifies: 
             self: added columns 'tag', 'Theo PRE'.
         """
-        self.PRE_loaded = True
         
+        self.PRE_loaded = True
         target_folder = '{}/para/{}/'.format(spectra_path, datapoint)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
         if len(pre_file) > 1:
-            raise ValueError(\
+            raise ValueError(
                 '@@@ There are more than one .pre file in the folder {}'.\
-                format(target_folder))
+                    format(target_folder)
+                )
+        
         elif len(pre_file) < 1:
             raise ValueError('@@@ There is no .pre file in folder {}'.\
                 format(target_folder))
         
         # loads theoretical PRE data to 'Theo PRE' new column
         # sets 1 to the diamagnetic Item.
-        predf = pd.read_csv(pre_file[0], sep='\s+', usecols=[1],
-                                         names=['Theo PRE'], comment='#')
-        self.log_r(\
-            '**Added Theoretical PRE file** {}'.format(pre_file[0]))
-        self.log_r(\
-            '*Theoretical PRE for diamagnetic set to 1 by default*')
+        predf = pd.read_csv(
+            pre_file[0],
+            sep='\s+',
+            usecols=[1],
+            names=['Theo PRE'],
+            comment='#'
+            )
+        self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
+        self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
         self.loc['para',:,'Theo PRE'] = predf.loc[:,'Theo PRE']
-        
         # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
         
         try:
             tag_num = int(tag)
+        
         except ValueError:
-            msg = "Theoretical PRE file incomplete. Header with tag number is missing."
+            msg = \
+"Theoretical PRE file incomplete. Header with tag number is missing."
             self.log_r(fsw.gen_wet('ERROR', msg, 15))
             self.abort()
         
         # check tag residue
         if not(any(self.loc['para',:,'ResNo'].isin([tag]))):
-            # DO
-            msg = 'The residue number where the tag is placed according to the \*.pre file ({}) is not part of the protein sequence ({}-{}).'.\
-            format(tag_num,
-                   int(self.res_info.iloc[0,0,0]),
-                   int(self.res_info.iloc[0,:,0].tail(n=1)))
+            msg = \
+'The residue number where the tag is placed according to the \*.pre file ({}) \
+is not part of the protein sequence ({}-{}).'.\
+                format(
+                    tag_num,
+                    int(self.res_info.iloc[0,0,0]),
+                    int(self.res_info.iloc[0,:,0].tail(n=1))
+                    )
             self.log_r(fsw.gen_wet('ERROR', msg, 17))
             self.abort()
-            # DONE check
         
         self.loc['para',:,'tag'] = ''
         tagmask = self.loc['para',:,'ResNo'] == tag
         self.loc['para',tagmask,'tag'] = '*'
         tagf.close()
-        self.log_r(\
-            '**Tag position found** at residue {}'.format(tag_num))
+        self.log_r('**Tag position found** at residue {}'.format(tag_num))
         
         return
         
-    def calc_Delta_PRE(self, sourcecol, targetcol,
-                       guass_x_size=7,
-                       gaussian_stddev=1):
+    def calc_Delta_PRE(
+            self, sourcecol,
+            targetcol,
+            guass_x_size=7,
+            gaussian_stddev=1):
         """
         Calculates DELTA PRE.
         
@@ -592,42 +624,34 @@ class FarseerSeries(pd.Panel):
         
         # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
         gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
-        
         self.loc[:,:,targetcol] = \
             self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
-        
-        self.log_r(\
-            '**Calculated DELTA PRE** for source {} in target {}'.\
-            format(sourcecol, targetcol))
+        self.log_r('**Calculated DELTA PRE** for source {} in target {}'.\
+                format(sourcecol, targetcol))
         
         for exp in self.items:
             # converts to 0 negative values
             negmask = self.loc[exp,:,targetcol] < 0
             self.loc[exp,negmask,targetcol] = 0
-            
             # aplies convolution with a normalized 1D Gaussian kernel
-            
             smooth_col = '{}_smooth'.format(targetcol)
-            self.loc[exp,:,smooth_col] = \
-                convolve(np.array(self.loc[exp,:,targetcol]),
-                         gauss,
-                         boundary='extend',
-                         normalize_kernel=True)
-            
-            """
-            print(self.loc[exp,:,smooth_col])
-            print(self.loc[exp,:,targetcol])
-            input()
-            """
-        
+            self.loc[exp,:,smooth_col] = convolve(
+                np.array(self.loc[exp,:,targetcol]),
+                gauss,
+                boundary='extend',
+                normalize_kernel=True
+                )
         self.log_r(\
-        '**Calculated DELTA PRE Smoothed** for source {} in target {} \
+'**Calculated DELTA PRE Smoothed** for source {} in target {} \
 with window size {} and stdev {}'.\
             format(sourcecol, smooth_col, guass_x_size, gaussian_stddev))
+
         return
     
-    def write_table(self, restraint_folder, tablecol,
-                          resonance_type='Backbone'):
+    def write_table(
+            self, restraint_folder,
+            tablecol,
+            resonance_type='Backbone'):
         """
         Exports to .csv file the columns along the series.
         
@@ -638,30 +662,30 @@ with window size {} and stdev {}'.\
             
             resonance_type (str): {'Backbone', 'Sidechains'}
         """
-        # concatenates the values of the table with the residues numbers
         
+        # concatenates the values of the table with the residues numbers
         try:
             data_table = self.loc[:,:,tablecol].astype(float)
             is_float = True
+        
         except ValueError:
             data_table = self.loc[:,:,tablecol]
             is_float = False
             
-        
         table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
-            table.loc[:,'ResNo'] = \
-                table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
+            table.loc[:,'ResNo'] = table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
         
-        tablefolder = '{}/{}'.format(self.tables_and_plots_folder, 
-                                     restraint_folder)
+        tablefolder = '{}/{}'.format(
+            self.tables_and_plots_folder, 
+            restraint_folder
+            )
         
         if not(os.path.exists(tablefolder)):
             os.makedirs(tablefolder)
         
         file_path = '{}/{}.csv'.format(tablefolder, tablecol)
-        
         fileout = open(file_path, 'w')
         
         if self.series_axis.startswith('cond'):
@@ -671,8 +695,15 @@ with window size {} and stdev {}'.\
 # ranging datapoints '{2}', where:
 # conditions '{3}' and '{4}' are kept constants.
 # {5} data.
-""".format(self.resonance_type, self.series_axis, list(self.series_datapoints),
-           self.prev_dim, self.next_dim, tablecol)
+""".\
+                format(
+                    self.resonance_type,
+                    self.series_axis,
+                    list(self.series_datapoints),
+                    self.prev_dim,
+                    self.next_dim,
+                    tablecol
+                    )
         
         elif self.series_axis.startswith('C'):
             header = \
@@ -681,11 +712,19 @@ with window size {} and stdev {}'.\
 # across variable '{2}' which ranges datapoints '{3}', where:
 # conditions '{4}' and '{5}' are kept constants.
 # {6} data.
-""".format(self.resonance_type, self.series_axis, self.dim_comparison,
-           list(self.series_datapoints), self.prev_dim, self.next_dim,
-           tablecol, self.series_axis[-1])
-        
+""".\
+                format(
+                    self.resonance_type,
+                    self.series_axis,
+                    self.dim_comparison,
+                    list(self.series_datapoints),
+                    self.prev_dim,
+                    self.next_dim,
+                    tablecol,
+                    self.series_axis[-1]
+                    )
         fileout.write(header)
+        
         if is_float:
             fileout.write(
                 table.to_csv(
@@ -695,6 +734,7 @@ with window size {} and stdev {}'.\
                     float_format='%.4f'
                     )
                 )
+        
         else:
             fileout.write(
                 table.to_csv(
@@ -705,12 +745,14 @@ with window size {} and stdev {}'.\
                 )
         
         fileout.close()
-        
         self.log_r('**Exported data table:** {}'.format(file_path))
+        
         return
     
-    def write_Chimera_attributes(self, calccol, resformat=':',
-                                 colformat='{:.5f}'):
+    def write_Chimera_attributes(
+            self, calccol,
+            resformat=':',
+            colformat='{:.5f}'):
         """
         Exports values in column to Chimera Attribute files.
         http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
@@ -727,27 +769,25 @@ with window size {} and stdev {}'.\
             
             colformat (str): formatting code.
         """
-        s2w = ''
         
+        s2w = ''
         resform = lambda x: "\t{}{}\t".format(resformat, x)
         colform = lambda x: colformat.format(x)
-        
         formatting = {'ResNo': resform}
         
-        ####
         for item in self.items:
             mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
             mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
             mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
-            
             file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
+            
             if not(os.path.exists(file_path)):
                 os.makedirs(file_path)
             
             file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
             fileout = open(file_name, 'w')
-            
-            attheader = """#
+            attheader = \
+"""#
 #
 # lost peaks {}
 #
@@ -756,27 +796,29 @@ with window size {} and stdev {}'.\
 attribute: {}
 match mode: 1-to-1
 recipient: residues
-\t""".format(resformat + self.loc[item,mask_lost,'ResNo'].\
-                to_string(header=False, index=False).\
-                    replace(' ', '').replace('\n', ','),
-             resformat + self.loc[item,mask_unassigned,'ResNo'].\
-                to_string(header=False, index=False).\
-                    replace(' ', '').replace('\n', ','),
-             calccol.lower())
-             
+\t""".\
+                format(
+                    resformat+self.loc[item,mask_lost,'ResNo'].\
+                        to_string(header=False, index=False).\
+                            replace(' ', '').replace('\n', ','),
+                    resformat+self.loc[item,mask_unassigned,'ResNo'].\
+                        to_string(header=False, index=False).\
+                            replace(' ', '').replace('\n', ','),
+                    calccol.lower()
+                    )
             fileout.write(attheader)
-            
             formatting[calccol] = colform
             to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
-                        to_string(header=False, index=False,
-                                formatters=formatting,
-                                col_space=0).replace(' ', '')
-            
+                to_string(
+                    header=False,
+                    index=False,
+                    formatters=formatting,
+                    col_space=0
+                    ).replace(' ', '')
             fileout.write(to_write)
-                
             fileout.close()
-            
             self.log_r('**Exported Chimera Att** {}'.format(file_name))
+        
         return
     
     def export_series_to_tsv(self):
@@ -786,15 +828,17 @@ recipient: residues
         """
         
         for item in self.items:
-            
             file_path = '{}/{}.csv'.format(self.export_series_folder, item)
             fileout = open(file_path, 'w')
-            fileout.write(self.loc[item].to_csv(sep=',',
-                                                index=False,
-                                                na_rep='NaN',
-                                                float_format='%.4f'))
-            self.log_r(\
-            '**Exported parsed peaklist** {}'.format(file_path))
+            fileout.write(
+                self.loc[item].to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    float_format='%.4f'
+                    )
+                )
+            self.log_r('**Exported parsed peaklist** {}'.format(file_path))
             fileout.close()
         
         return
@@ -813,16 +857,21 @@ recipient: residues
         Returns:
             None, series are changed in place.
         """
+        
         for i, it in zip(series.index, items):
             if series[i] in d.keys():
                 it.set_color(d[series[i]])
+            
             else:
                 continue
         return
     
-    def text_marker(self, ax, axbar, series, d, yy_scale,
-                          fs=3,
-                          orientation='horizontal'):
+    def text_marker(
+            self, ax,
+            axbar, series,
+            d, yy_scale,
+            fs=3,
+            orientation='horizontal'):
         """
         Places a text mark over the bars of a Bar Plot.
         
@@ -842,6 +891,7 @@ recipient: residues
             orientation (str): {'horizontal', 'vertical'} wheter plotting in a
                 vertical or horizontal barplot.
         """
+        
         def vpos_sign(x, y):
             """Scales to the vertical position - positive and negative."""
             if y>=0:
@@ -869,14 +919,25 @@ recipient: residues
                     hpos = bar.get_x() + bar.get_width() / 2.5
                     vaa='bottom'
                 
-                ax.text(hpos, vpos, d[series[i]],
-                        ha='center', va=vaa, fontsize=fs)
+                ax.text(
+                    hpos,
+                    vpos,
+                    d[series[i]],
+                    ha='center',
+                    va=vaa,
+                    fontsize=fs
+                    )
             else:
                 continue
+        
         return
     
-    def plot_threshold(self, ax, series, color, lw, alpha,
-                       orientation = 'horizontal', zorder=5):
+    def plot_threshold(
+            self, ax,
+            series, color,
+            lw, alpha,
+            orientation = 'horizontal',
+            zorder=5):
         """
         Plots threshold line that identifies relevant perturnations.
         
@@ -900,32 +961,54 @@ recipient: residues
         sorted_cs = series.abs().sort_values().dropna()
         firstdecile = sorted_cs[0:ceil(0.1*len(sorted_cs))]
         threshold = firstdecile.mean() + 5*firstdecile.std()
+        
         if orientation == 'horizontal':
-            ax.axhline(y=threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
-            
+            ax.axhline(
+                y=threshold,
+                color=color, 
+                linewidth=lw,
+                alpha=alpha,
+                zorder=zorder
+                )
             # in case there are negative numbers, plots the threshold,
             # if there are not negative numbers, this line is never displayed
-            ax.axhline(y=-threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+            ax.axhline(
+                y=-threshold,
+                color=color, 
+                linewidth=lw,
+                alpha=alpha,
+                zorder=zorder
+                )
+        
         elif orientation == 'vertical':
-            ax.axvline(x=threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
-            
+            ax.axvline(
+                x=threshold,
+                color=color, 
+                linewidth=lw,
+                alpha=alpha,
+                zorder=zorder
+                )
             # in case there are negative numbers, plots the threshold,
             # if there are not negative numbers, this line is never displayed
-            ax.axvline(x=-threshold, color=color, 
-                       linewidth=lw, alpha=alpha, zorder=zorder)
+            ax.axvline(
+                x=-threshold,
+                color=color, 
+                linewidth=lw,
+                alpha=alpha,
+                zorder=zorder
+                )
         
         return
     
-    def plot_theo_pre(self, axs, exp, y,
-                      bartype='h',
-                      pre_color='lightblue',
-                      pre_lw=1,
-                      tag_color='red',
-                      tag_ls='-',
-                      tag_lw=0.1):
+    def plot_theo_pre(
+            self, axs,
+            exp, y,
+            bartype='h',
+            pre_color='lightblue',
+            pre_lw=1,
+            tag_color='red',
+            tag_ls='-',
+            tag_lw=0.1):
         """
         Plots theoretical PRE.
         
@@ -951,115 +1034,152 @@ recipient: residues
         """
         
         if (self.series_axis == 'cond3' and exp == 'para') \
-            or (self.series_axis == 'C3' \
-                and ( self.next_dim == 'para' or self.prev_dim == 'para')):
+                or (self.series_axis == 'C3' \
+                    and ( self.next_dim == 'para' or self.prev_dim == 'para')):
             # plot theoretical PRE
             if bartype == 'v':
-                axs.plot(self.loc[exp,:,'Theo PRE'],
-                         self.loc[exp,::-1,'ResNo'].astype(float),
-                         zorder=9, color=pre_color, lw=pre_lw)
+                axs.plot(
+                    self.loc[exp,:,'Theo PRE'],
+                    self.loc[exp,::-1,'ResNo'].astype(float),
+                    zorder=9,
+                    color=pre_color,
+                    lw=pre_lw
+                    )
+            
             elif bartype == 'h':
-                axs.plot(self.loc[exp,:,'ResNo'].astype(float),
-                         self.loc[exp,:,'Theo PRE'],
-                         zorder=9, color=pre_color, lw=pre_lw)
+                axs.plot(
+                    self.loc[exp,:,'ResNo'].astype(float),
+                    self.loc[exp,:,'Theo PRE'],
+                    zorder=9,
+                    color=pre_color,
+                    lw=pre_lw
+                    )
             
             # plot tag position
             xtagm = self.loc[exp,:,'tag']=='*'
             xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
             
             if bartype in ['h', 'osci']:
-                axs.vlines(xtag, 0, y,
-                          colors=tag_color, linestyle=tag_ls,
-                          linewidth=tag_lw, zorder=10)
-                axs.plot(xtag,
-                         y, 'o',
-                         zorder=10, color='red', markersize=2)
+                axs.vlines(
+                    xtag,
+                    0,
+                    y,
+                    colors=tag_color,
+                    linestyle=tag_ls,
+                    linewidth=tag_lw,
+                    zorder=10
+                    )
+                axs.plot(
+                    xtag,
+                    y,
+                    'o',
+                    zorder=10,
+                    color='red',
+                    markersize=2
+                    )
             
             elif bartype == 'v':
                 xtag = self.shape[1]-xtag+1
-                axs.hlines(xtag, 0, y,
-                          colors=tag_color, linestyle=tag_ls,
-                          linewidth=tag_lw, zorder=10)
-                axs.plot(y, xtag,
-                         'o',
-                         zorder=10, color='red', markersize=2)
+                axs.hlines(
+                    xtag,
+                    0,
+                    y,
+                    colors=tag_color,
+                    linestyle=tag_ls,
+                    linewidth=tag_lw,
+                    zorder=10
+                    )
+                axs.plot(
+                    y,
+                    xtag,
+                    'o',
+                    zorder=10,
+                    color='red',
+                    markersize=2
+                    )
             
             elif bartype == 'hm':
-                
-                axs.vlines(xtag-0.5, 0, y,
-                          colors=tag_color, linestyle=tag_ls,
-                          linewidth=tag_lw, zorder=10)
+                axs.vlines(
+                    xtag-0.5,
+                    0,
+                    y,
+                    colors=tag_color,
+                    linestyle=tag_ls,
+                    linewidth=tag_lw,
+                    zorder=10
+                    )
         
         else:
             return
     
-    def plot_bar_horizontal(self, plot_style, calccol, axs, i, experiment,
-                          y_lims=(0,1),
-                          ylabel='ppm or ratio',
-                          
-                          measured_color='black',
-                          status_color_flag=True,
-                          lost_color='red',
-                          unassigned_color='grey',
-                          bar_width=0.7,
-                          bar_alpha=1,
-                          bar_linewidth=0,
-                          subtitle_fn='Arial',
-                          subtitle_fs=8,
-                          subtitle_pad=1.05,
-                          subtitle_weight='normal',
-                          threshold_flag=True,
-                          threshold_color='red',
-                          threshold_linewidth=1,
-                          threshold_alpha=1,
-                          threshold_zorder=5,
-                          x_label_fn='Arial',
-                          x_label_fs=8, 
-                          x_label_pad=2,
-                          x_label_weight='bold',
-                          x_label_rot=0,
-                          y_label_fn='Arial',
-                          y_label_fs=8,
-                          y_label_pad=2,
-                          y_label_weight='bold',
-                          y_label_rot=90,
-                          x_ticks_pad=2,
-                          x_ticks_len=1,
-                          y_ticks_fn='Arial',
-                          y_ticks_fs=9,
-                          y_ticks_pad=-3,
-                          y_ticks_weight='normal',
-                          y_ticks_nbins=8,
-                          y_ticks_len=2,
-                          y_ticks_rot=0,
-                          y_grid_flag=True,
-                          y_grid_color='lightgrey',
-                          y_grid_linestyle='-',
-                          y_grid_linewidth=0.2,
-                          y_grid_alpha=1,
-                          mark_fontsize=3,
-                          mark_prolines_flag=True,
-                          mark_prolines_symbol='P',
-                          mark_user_details_flag=False,
-                          color_user_details_flag=False,
-                          user_marks_dict={},
-                          user_bar_colors_dict={},
-                          theo_pre_color='red',
-                          theo_pre_lw=0.2,
-                          tag_cartoon_color='magenta',
-                          tag_cartoon_lw=0.2,
-                          tag_cartoon_ls=':',
-                          x_ticks_color_flag=True,
-                          x_ticks_fn='monospace',
-                          x_ticks_fs=6,
-                          x_ticks_weight='normal',
-                          x_ticks_rot=90,
-                          unassigned_shade=False,
-                          unassigned_shade_alpha=0.5,
-                          vspace='',
-                          rows_page='',
-                          cols_page=''
-                            ):
+    def plot_bar_horizontal(
+        self, plot_style,
+        calccol, axs,
+        i, experiment,
+        y_lims=(0,1),
+        ylabel='ppm or ratio',
+        measured_color='black',
+        status_color_flag=True,
+        lost_color='red',
+        unassigned_color='grey',
+        bar_width=0.7,
+        bar_alpha=1,
+        bar_linewidth=0,
+        subtitle_fn='Arial',
+        subtitle_fs=8,
+        subtitle_pad=1.05,
+        subtitle_weight='normal',
+        threshold_flag=True,
+        threshold_color='red',
+        threshold_linewidth=1,
+        threshold_alpha=1,
+        threshold_zorder=5,
+        x_label_fn='Arial',
+        x_label_fs=8, 
+        x_label_pad=2,
+        x_label_weight='bold',
+        x_label_rot=0,
+        y_label_fn='Arial',
+        y_label_fs=8,
+        y_label_pad=2,
+        y_label_weight='bold',
+        y_label_rot=90,
+        x_ticks_pad=2,
+        x_ticks_len=1,
+        y_ticks_fn='Arial',
+        y_ticks_fs=9,
+        y_ticks_pad=-3,
+        y_ticks_weight='normal',
+        y_ticks_nbins=8,
+        y_ticks_len=2,
+        y_ticks_rot=0,
+        y_grid_flag=True,
+        y_grid_color='lightgrey',
+        y_grid_linestyle='-',
+        y_grid_linewidth=0.2,
+        y_grid_alpha=1,
+        mark_fontsize=3,
+        mark_prolines_flag=True,
+        mark_prolines_symbol='P',
+        mark_user_details_flag=False,
+        color_user_details_flag=False,
+        user_marks_dict={},
+        user_bar_colors_dict={},
+        theo_pre_color='red',
+        theo_pre_lw=0.2,
+        tag_cartoon_color='magenta',
+        tag_cartoon_lw=0.2,
+        tag_cartoon_ls=':',
+        x_ticks_color_flag=True,
+        x_ticks_fn='monospace',
+        x_ticks_fs=6,
+        x_ticks_weight='normal',
+        x_ticks_rot=90,
+        unassigned_shade=False,
+        unassigned_shade_alpha=0.5,
+        vspace='',
+        rows_page='',
+        cols_page=''):
         """
         Plots horizontal bar plots.
         
@@ -1079,95 +1199,105 @@ recipient: residues
         if plot_style == 'bar_extended' and self.resonance_type == 'Backbone':
             # fillna(0) is added because nan conflicts with text_maker()
             # in bar.get_height() which return nan
-            
-            bars = axs[i].bar(self.major_axis,
-                              self.loc[experiment,:,calccol].fillna(0),
-                              width=bar_width,
-                              align='center',
-                              alpha=bar_alpha,
-                              linewidth=bar_linewidth,
-                              zorder=4)
+            bars = axs[i].bar(
+                self.major_axis,
+                self.loc[experiment,:,calccol].fillna(0),
+                width=bar_width,
+                align='center',
+                alpha=bar_alpha,
+                linewidth=bar_linewidth,
+                zorder=4
+                )
             
             # ticks positions:
             # this is used to fit both applyFASTA=True or False
             # reduces xticks to 100 as maximum to avoid ticklabel overlap
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100
+            
             else:
                 xtick_spacing = 1
             
-            ticklabels = self.loc[experiment,\
-                                  0::xtick_spacing,\
-                                  ['ResNo','1-letter']].\
-                            apply(lambda x: ''.join(x), axis=1)
-            
+            ticklabels = \
+                self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
+                    apply(lambda x: ''.join(x), axis=1)
             # Configure XX ticks and Label
             axs[i].set_xticks(self.major_axis)
-        
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(ticklabels,
-                                    fontname=x_ticks_fn,
-                                    fontsize=x_ticks_fs,
-                                    fontweight=x_ticks_weight,
-                                    rotation=x_ticks_rot)
-                
+            axs[i].set_xticklabels(
+                ticklabels,
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
+            
             # defines xticks colors
             if x_ticks_color_flag:
-                self.set_item_colors(axs[i].get_xticklabels(),
-                                     self.loc[experiment,\
-                                              0::xtick_spacing,\
-                                              'Peak Status'],
-                                     {'measured':measured_color,
-                                      'lost':lost_color,
-                                      'unassigned':unassigned_color})
+                self.set_item_colors(
+                    axs[i].get_xticklabels(),
+                    self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                    {
+                        'measured':measured_color,
+                        'lost':lost_color,
+                        'unassigned':unassigned_color
+                        }
+                    )
             
         elif plot_style == 'bar_extended' \
-            and self.resonance_type == 'Sidechains':
-            #do
-            bars = axs[i].bar(self.major_axis,
-                            self.loc[experiment,:,calccol].fillna(0),
-                            width=bar_width,
-                            align='center',
-                            alpha=bar_alpha,
-                            linewidth=bar_linewidth,
-                            zorder=4)
+                and self.resonance_type == 'Sidechains':
+            bars = axs[i].bar(
+                self.major_axis,
+                self.loc[experiment,:,calccol].fillna(0),
+                width=bar_width,
+                align='center',
+                alpha=bar_alpha,
+                linewidth=bar_linewidth,
+                zorder=4
+                )
         
             # Configure XX ticks and Label
             axs[i].set_xticks(self.major_axis)
-        
             ## https://github.com/matplotlib/matplotlib/issues/6266
             print(self.loc[experiment,:,'ResNo'])
-            
-            axs[i].set_xticklabels(\
+            axs[i].set_xticklabels(
                 self.loc[experiment,:,['ResNo','1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
                 fontname=x_ticks_fn,
                 fontsize=x_ticks_fs,
                 fontweight=x_ticks_weight,
-                rotation=x_ticks_rot)
+                rotation=x_ticks_rot
+                )
             
             # defines xticks colors
             if x_ticks_color_flag:
-                self.set_item_colors(axs[i].get_xticklabels(),
-                                     self.loc[experiment, :, 'Peak Status'],
-                                     {'measured':measured_color,
-                                      'lost':lost_color,
-                                      'unassigned':unassigned_color})
+                self.set_item_colors(
+                    axs[i].get_xticklabels(),
+                    self.loc[experiment, :, 'Peak Status'],
+                    {
+                        'measured':measured_color,
+                        'lost':lost_color,
+                        'unassigned':unassigned_color
+                        }
+                    )
         
         elif plot_style == 'bar_compacted':
-            bars = axs[i].bar(self.loc[experiment,:,'ResNo'].astype(float),
-                              self.loc[experiment,:,calccol].fillna(0),
-                               width=bar_width,
-                               align='center',
-                               alpha=bar_alpha,
-                               linewidth=bar_linewidth,
-                               zorder=4)
+            bars = axs[i].bar(
+                self.loc[experiment,:,'ResNo'].astype(float),
+                self.loc[experiment,:,calccol].fillna(0),
+                width=bar_width,
+                align='center',
+                alpha=bar_alpha,
+                linewidth=bar_linewidth,
+                zorder=4
+                )
             
             initialresidue = int(self.ix[0, 0, 'ResNo'])
             finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
             
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100*10
+            
             else:
                 xtick_spacing = 10
             
@@ -1175,185 +1305,218 @@ recipient: residues
             xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
             axs[i].set_xticks(xtickarange)
             # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(xtickarange,
-                                   fontname=x_ticks_fn,
-                                   fontsize=x_ticks_fs,
-                                   fontweight=x_ticks_weight,
-                                   rotation=x_ticks_rot)
+            axs[i].set_xticklabels(
+                xtickarange,
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
             
             if unassigned_shade:
                 unassignedmask = \
                     self.loc[experiment, :, 'Peak Status'] == 'unassigned'
+                
                 for residue in self.loc[experiment, unassignedmask, 'ResNo']:
                     residue = int(residue) - 0.5
-                    axs[i].axvspan(residue, residue+1,
-                                   color=unassigned_color,
-                                   alpha=unassigned_shade_alpha,
-                                   lw=0)
+                    axs[i].axvspan(
+                        residue,
+                        residue+1,
+                        color=unassigned_color,
+                        alpha=unassigned_shade_alpha,
+                        lw=0
+                        )
         
         # Set subplot titles
-        axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, weight=subtitle_weight)
-        
+        axs[i].set_title(
+            experiment,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            weight=subtitle_weight
+            )
         # defines bars colors
-        self.set_item_colors(bars, self.loc[experiment,:,'Peak Status'],
-                             {'measured':measured_color,
-                              'lost':lost_color,
-                              'unassigned':unassigned_color})
-        
+        self.set_item_colors(
+            bars,
+            self.loc[experiment,:,'Peak Status'],
+            {
+                'measured':measured_color,
+                'lost':lost_color,
+                'unassigned':unassigned_color
+                }
+            )
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        
-        
         # cConfigures YY ticks
         axs[i].set_ylim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='y', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_yticklabels(['{:.2f}'.format(yy) \
-                                    for yy in axs[i].get_yticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-        
+        axs[i].set_yticklabels(
+            ['{:.2f}'.format(yy) for yy in axs[i].get_yticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         # configures tick params
         axs[i].margins(x=0.01)
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-                           
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         # Set axes labels
-        axs[i].set_xlabel('Residue',
-                          fontname=x_label_fn,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          weight=x_label_weight,
-                          rotation=x_label_rot)
-        
-        axs[i].set_ylabel(ylabel,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight,
-                          rotation=y_label_rot)
+        axs[i].set_xlabel(
+            'Residue',
+            fontname=x_label_fn,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            weight=x_label_weight,
+            rotation=x_label_rot
+            )
+        axs[i].set_ylabel(
+            ylabel,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight,
+            rotation=y_label_rot
+            )
         
         # Adds grid
         if y_grid_flag:
-            axs[i].yaxis.grid(color=y_grid_color,
-                              linestyle=y_grid_linestyle,
-                              linewidth=y_grid_linewidth,
-                              alpha=y_grid_alpha,
-                              zorder=0)
-                              
+            axs[i].yaxis.grid(
+                color=y_grid_color,
+                linestyle=y_grid_linestyle,
+                linewidth=y_grid_linewidth,
+                alpha=y_grid_alpha,
+                zorder=0
+                )
+        
         # Adds red line to identify significant changes.
         if threshold_flag and (calccol in self.restraint_list[:3]):
-            self.plot_threshold(axs[i], self.loc[experiment,:,calccol],
-                                threshold_color,
-                                threshold_linewidth,
-                                threshold_alpha,
-                                zorder=threshold_zorder)
+            self.plot_threshold(
+                axs[i],
+                self.loc[experiment,:,calccol],
+                threshold_color,
+                threshold_linewidth,
+                threshold_alpha,
+                zorder=threshold_zorder
+                )
         
         if mark_prolines_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'1-letter'],
-                              {'P':mark_prolines_symbol},
-                              y_lims[1],
-                              fs=mark_fontsize)
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'1-letter'],
+                {'P':mark_prolines_symbol},
+                y_lims[1],
+                fs=mark_fontsize
+                )
         
         if mark_user_details_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'Details'],
-                              user_marks_dict,
-                              y_lims[1],
-                              fs=mark_fontsize)
-                          
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_marks_dict,
+                y_lims[1],
+                fs=mark_fontsize
+                )
+        
         if color_user_details_flag:
-            self.set_item_colors(bars, self.loc[experiment,:,'Details'],
-                                  user_bar_colors_dict)
+            self.set_item_colors(
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_bar_colors_dict
+                )
         
         if self.PRE_loaded and (calccol in self.restraint_list[3:]):
-            self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.05,
-                              bartype='h',
-                              pre_color=theo_pre_color,
-                              pre_lw=theo_pre_lw,
-                              tag_color=tag_cartoon_color,
-                              tag_ls=tag_cartoon_ls,
-                              tag_lw=tag_cartoon_lw)
+            self.plot_theo_pre(
+                axs[i],
+                experiment,
+                y_lims[1]*0.05,
+                bartype='h',
+                pre_color=theo_pre_color,
+                pre_lw=theo_pre_lw,
+                tag_color=tag_cartoon_color,
+                tag_ls=tag_cartoon_ls,
+                tag_lw=tag_cartoon_lw
+                )
     
-    def plot_bar_vertical(self, calccol, axs, i, experiment,
-                          y_lims=(0,1),
-                          ylabel='ppm or ratio',
-                          
-                          measured_color='black',
-                          status_color_flag=True,
-                          lost_color='red',
-                          unassigned_color='grey',
-                          bar_width=0.7,
-                          bar_alpha=1,
-                          bar_linewidth=0,
-                          subtitle_fn='Arial',
-                          subtitle_fs=8,
-                          subtitle_pad=1.05,
-                          subtitle_weight='normal',
-                          threshold_flag=True,
-                          threshold_color='red',
-                          threshold_linewidth=1,
-                          threshold_alpha=1,
-                          threshold_zorder=5,
-                          x_label_fn='Arial',
-                          x_label_fs=8, 
-                          x_label_pad=2,
-                          x_label_weight='bold',
-                          x_label_rot=-90,
-                          y_label_fn='Arial',
-                          y_label_fs=8,
-                          y_label_pad=2,
-                          y_label_weight='bold',
-                          y_label_rot=90,
-                          x_ticks_pad=2,
-                          x_ticks_len=1,
-                          y_ticks_fn='Arial',
-                          y_ticks_fs=9,
-                          y_ticks_pad=-3,
-                          y_ticks_weight='normal',
-                          y_ticks_nbins=8,
-                          y_ticks_len=2,
-                          y_ticks_rot=0,
-                          y_grid_flag=True,
-                          y_grid_color='lightgrey',
-                          y_grid_linestyle='-',
-                          y_grid_linewidth=0.2,
-                          y_grid_alpha=1,
-                          mark_fontsize=3,
-                          mark_prolines_flag=True,
-                          mark_prolines_symbol='P',
-                          mark_user_details_flag=False,
-                          color_user_details_flag=False,
-                          user_marks_dict={},
-                          user_bar_colors_dict={},
-                          theo_pre_color='red',
-                          theo_pre_lw=0.2,
-                          tag_cartoon_color='magenta',
-                          tag_cartoon_lw=0.2,
-                          tag_cartoon_ls=':',
-                          
-                          x_ticks_color_flag=True,
-                          x_ticks_fn='monospace',
-                          x_ticks_fs=6,
-                          x_ticks_weight='normal',
-                          x_ticks_rot=0,
-                          vspace='',
-                          rows_page='',
-                          cols_page=''
-                          ):
+    def plot_bar_vertical(
+            self, calccol,
+            axs, i,
+            experiment,
+            y_lims=(0,1),
+            ylabel='ppm or ratio',
+            measured_color='black',
+            status_color_flag=True,
+            lost_color='red',
+            unassigned_color='grey',
+            bar_width=0.7,
+            bar_alpha=1,
+            bar_linewidth=0,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=1.05,
+            subtitle_weight='normal',
+            threshold_flag=True,
+            threshold_color='red',
+            threshold_linewidth=1,
+            threshold_alpha=1,
+            threshold_zorder=5,
+            x_label_fn='Arial',
+            x_label_fs=8, 
+            x_label_pad=2,
+            x_label_weight='bold',
+            x_label_rot=-90,
+            y_label_fn='Arial',
+            y_label_fs=8,
+            y_label_pad=2,
+            y_label_weight='bold',
+            y_label_rot=90,
+            x_ticks_pad=2,
+            x_ticks_len=1,
+            y_ticks_fn='Arial',
+            y_ticks_fs=9,
+            y_ticks_pad=-3,
+            y_ticks_weight='normal',
+            y_ticks_nbins=8,
+            y_ticks_len=2,
+            y_ticks_rot=0,
+            y_grid_flag=True,
+            y_grid_color='lightgrey',
+            y_grid_linestyle='-',
+            y_grid_linewidth=0.2,
+            y_grid_alpha=1,
+            mark_fontsize=3,
+            mark_prolines_flag=True,
+            mark_prolines_symbol='P',
+            mark_user_details_flag=False,
+            color_user_details_flag=False,
+            user_marks_dict={},
+            user_bar_colors_dict={},
+            theo_pre_color='red',
+            theo_pre_lw=0.2,
+            tag_cartoon_color='magenta',
+            tag_cartoon_lw=0.2,
+            tag_cartoon_ls=':',
+            x_ticks_color_flag=True,
+            x_ticks_fn='monospace',
+            x_ticks_fs=6,
+            x_ticks_weight='normal',
+            x_ticks_rot=0,
+            vspace='',
+            rows_page='',
+            cols_page=''):
         """
         Plots vertical bar plots.
         
@@ -1371,199 +1534,229 @@ recipient: residues
         # fillna(0) is added because nan conflicts with text_maker()
         # .iloc[::-1]
         # in bat.get_height() which return nan
-        bars = axs[i].barh(self.major_axis,
-                           self.loc[experiment,:,calccol].fillna(0),
-                           height=bar_width,
-                           align='center',
-                           alpha=bar_alpha,
-                           linewidth=bar_linewidth,
-                           zorder=4)
-        
+        bars = axs[i].barh(
+            self.major_axis,
+            self.loc[experiment,:,calccol].fillna(0),
+            height=bar_width,
+            align='center',
+            alpha=bar_alpha,
+            linewidth=bar_linewidth,
+            zorder=4
+            )
         axs[i].invert_yaxis()
-        
         # Set subplot titles
-        axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, weight=subtitle_weight)
-        
+        axs[i].set_title(
+            experiment,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            weight=subtitle_weight
+            )
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
         axs[i].spines['left'].set_zorder(10)
         axs[i].spines['right'].set_zorder(10)
-        
         ## Configure XX ticks and Label
         axs[i].margins(y=0.01)
         
         if self.shape[1] > 100:
             xtick_spacing = self.shape[1]//100
+        
         else:
             xtick_spacing = 1
         
         axs[i].set_yticks(self.major_axis)
-    
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_yticklabels(\
+        axs[i].set_yticklabels(
             self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
                 apply(lambda x: ''.join(x), axis=1),
             fontname=x_ticks_fn,
             fontsize=x_ticks_fs-2,
             fontweight=x_ticks_weight,
-            rotation=0)
-            
+            rotation=0
+            )
         ## defines colors
-        self.set_item_colors(bars,
-                             self.loc[experiment,:,'Peak Status'],
-                             {'measured':measured_color,
-                              'lost':lost_color,
-                              'unassigned':unassigned_color})
+        self.set_item_colors(
+            bars,
+            self.loc[experiment,:,'Peak Status'],
+            {
+                'measured':measured_color,
+                'lost':lost_color,
+                'unassigned':unassigned_color
+                }
+            )
         
         if x_ticks_color_flag:
-            self.set_item_colors(axs[i].get_yticklabels(),
-                                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
-                                 {'measured':measured_color,
-                                  'lost':lost_color,
-                                  'unassigned':unassigned_color})
+            self.set_item_colors(
+                axs[i].get_yticklabels(),
+                self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                {
+                    'measured':measured_color,
+                    'lost':lost_color,
+                    'unassigned':unassigned_color
+                    }
+                )
         
         ## Configures YY ticks
         axs[i].set_xlim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='x', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_xticklabels(['{:.2f}'.format(xx) \
-                                    for xx in axs[i].get_xticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=-45)
-        
+        axs[i].set_xticklabels(
+            ['{:.2f}'.format(xx) for xx in axs[i].get_xticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=-45
+            )
         # configures tick params
-        axs[i].tick_params(axis='y',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-                           
-        axs[i].tick_params(axis='x',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='y',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='x',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         # Set axes labels
-        axs[i].set_ylabel('Residue',
-                          fontname=x_label_fn,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad+6,
-                          weight=x_label_weight,
-                          rotation=x_label_rot)
-        
-        axs[i].set_xlabel(ylabel,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight,
-                          rotation=0)
+        axs[i].set_ylabel(
+            'Residue',
+            fontname=x_label_fn,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad+6,
+            weight=x_label_weight,
+            rotation=x_label_rot
+            )
+        axs[i].set_xlabel(
+            ylabel,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight,
+            rotation=0
+            )
         
         # Adds grid
         if y_grid_flag:
-            axs[i].xaxis.grid(color=y_grid_color,
-                              linestyle=y_grid_linestyle,
-                              linewidth=y_grid_linewidth,
-                              alpha=y_grid_alpha,
-                              zorder=0)
+            axs[i].xaxis.grid(
+                color=y_grid_color,
+                linestyle=y_grid_linestyle,
+                linewidth=y_grid_linewidth,
+                alpha=y_grid_alpha,
+                zorder=0
+                )
         
         # Adds red line to identify significant changes.
         if threshold_flag and (calccol in self.restraint_list[:3]):
-            self.plot_threshold(axs[i],
-                                self.loc[experiment,:,calccol],
-                                threshold_color,
-                                threshold_linewidth,
-                                threshold_alpha,
-                                orientation='vertical',
-                                zorder=threshold_zorder)
+            self.plot_threshold(
+                axs[i],
+                self.loc[experiment,:,calccol],
+                threshold_color,
+                threshold_linewidth,
+                threshold_alpha,
+                orientation='vertical',
+                zorder=threshold_zorder
+                )
         
         if mark_prolines_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'1-letter'],
-                              {'P':mark_prolines_symbol},
-                              y_lims[1]*0.6,
-                              fs=mark_fontsize,
-                              orientation='vertical')
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'1-letter'],
+                {'P':mark_prolines_symbol},
+                y_lims[1]*0.6,
+                fs=mark_fontsize,
+                orientation='vertical'
+                )
         
         if mark_user_details_flag:
-            self.text_marker(axs[i],
-                              bars,
-                              self.loc[experiment,:,'Details'],
-                              user_marks_dict,
-                              y_lims[1]*0.6,
-                              fs=mark_fontsize,
-                              orientation='vertical')
+            self.text_marker(
+                axs[i],
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_marks_dict,
+                y_lims[1]*0.6,
+                fs=mark_fontsize,
+                orientation='vertical'
+                )
         
         if color_user_details_flag:
-            self.set_item_colors(bars,
-                                 self.loc[experiment,:,'Details'],
-                                 user_bar_colors_dict)
+            self.set_item_colors(
+                bars,
+                self.loc[experiment,:,'Details'],
+                user_bar_colors_dict
+                )
         
         if self.PRE_loaded and (calccol in self.restraint_list[3:]):
-            self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
-                              bartype='v',
-                              pre_color=theo_pre_color,
-                              pre_lw=theo_pre_lw,
-                              tag_color=tag_cartoon_color,
-                              tag_ls=tag_cartoon_ls,
-                              tag_lw=tag_cartoon_lw)
+            self.plot_theo_pre(
+                axs[i],
+                experiment,
+                y_lims[1]*0.1,
+                bartype='v',
+                pre_color=theo_pre_color,
+                pre_lw=theo_pre_lw,
+                tag_color=tag_cartoon_color,
+                tag_ls=tag_cartoon_ls,
+                tag_lw=tag_cartoon_lw
+                )
         
         return
     
     
-    def plot_res_evo(self, calccol, axs, i, row_number,
-                     y_lims=(0,1),
-                     y_label='ppm or ratio',
-                     subtitle_fn='Arial',
-                     subtitle_fs=8,
-                     subtitle_pad=0.98,
-                     subtitle_weight='normal',
-                     x_label_fn='Arial',
-                     x_label_fs=3,
-                     x_label_pad=2,
-                     x_label_weight='normal',
-                     y_label_fn='Arial',
-                     y_label_fs=6 ,
-                     y_label_pad=2,
-                     y_label_weight='normal',
-                     x_ticks_fn='Arial',
-                     x_ticks_fs=5,
-                     x_ticks_pad=1,
-                     x_ticks_weight=1,
-                     x_ticks_rot=0,
-                     x_ticks_len=2,
-                     x_ticks_nbins=5,
-                     y_ticks_fn='Arial',
-                     y_ticks_fs=5,
-                     y_ticks_pad=1,
-                     y_ticks_weight=1,
-                     y_ticks_len=2,
-                     y_ticks_rot=0,
-                     y_ticks_nbins=8,
-                    
-                     x_label='[Ligand]',
-                     set_x_values=True,
-                     line_style='-',
-                     line_width=1,
-                     line_color='r',
-                     marker_style='o',
-                     marker_color='darkred',
-                     marker_size=3,
-                     fill_between=True,
-                     fill_color='pink',
-                     fill_alpha=0.5,
-                     fit_line_color = 'black',
-                     fit_line_width = 1,
-                     fit_line_style = '-',
-                     
-                     titration_x_values=None,
-                     vspace='',
-                     rows_page='',
-                     cols_page='',
-                     perform_resevo_fitting=''
-                     ):
+    def plot_res_evo(
+            self, calccol,
+            axs, i,
+            row_number,
+            y_lims=(0,1),
+            y_label='ppm or ratio',
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            x_ticks_nbins=5,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_len=2,
+            y_ticks_rot=0,
+            y_ticks_nbins=8,
+            x_label='[Ligand]',
+            set_x_values=True,
+            line_style='-',
+            line_width=1,
+            line_color='r',
+            marker_style='o',
+            marker_color='darkred',
+            marker_size=3,
+            fill_between=True,
+            fill_color='pink',
+            fill_alpha=0.5,
+            fit_line_color = 'black',
+            fit_line_width = 1,
+            fit_line_style = '-',
+            titration_x_values=None,
+            vspace='',
+            rows_page='',
+            cols_page='',
+            perform_resevo_fitting=''):
         """
         Plots the evolution of a restraint along the series of a residue.
         
@@ -1580,30 +1773,37 @@ recipient: residues
         # Draws subplot title
         res = self.ix[0,i,'ResNo']
         subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
-        axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
-        
+        axs[i].set_title(
+            subtitle,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # PREPARING DATA
         y = np.array(self.loc[:,row_number,calccol].fillna(value=0))
         
         # if the user wants to represent the condition in the x axis
         # for the first dimension
-        if set_x_values and \
-            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
-            # do
+        if set_x_values \
+                and (self.series_axis == 'cond1' \
+                    or self.dim_comparison == 'cond1'):
             if len(titration_x_values) != len(self.items):
-                msg = "The number of coordinate values defined for fitting/data respresentation, <fitting_x_values> variable [{}], do not match the number of <cond1> data points,i.e. input peaklists. Please correct <fitting_x_values> variable or confirm you have not forgot any peaklist [{}]."\
-                    .format(titration_x_values, self.items)
+                msg = \
+"The number of coordinate values defined for fitting/data respresentation, \
+<fitting_x_values> variable [{}], do not match the number of <cond1> \
+data points,i.e. input peaklists. Please correct <fitting_x_values> variable \
+or confirm you have not forgot any peaklist [{}].".\
+                    format(titration_x_values, self.items)
                 self.log_r(fsw.gen_wet('ERROR', msg, 5))
                 self.abort()
+            
             x = np.array(titration_x_values)
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
         elif (self.series_axis in ['cond2', 'cond3']) \
-            or (self.dim_comparison in ['cond2', 'cond3']):
-            #do
+                or (self.dim_comparison in ['cond2', 'cond3']):
             x = np.arange(0, len(y))
             xmax = len(y)-1
             axs[i].set_xticks(x)
@@ -1622,9 +1822,9 @@ recipient: residues
         axs[i].set_xlim(0, xmax)
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
-        if set_x_values and \
-            (self.series_axis == 'cond1' or self.dim_comparison == 'cond1'):
-                #do
+        if set_x_values \
+                and (self.series_axis == 'cond1' \
+                    or self.dim_comparison == 'cond1'):
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
             
             def eval_tick(x):
@@ -1642,77 +1842,93 @@ recipient: residues
         axs[i].spines['top'].set_zorder(10)
         axs[i].spines['left'].set_zorder(10)
         axs[i].spines['right'].set_zorder(10)
-        
-        axs[i].set_xticklabels(xlabels,
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
+        axs[i].set_xticklabels(
+            xlabels,
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
         axs[i].locator_params(axis='y', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_yticklabels(['{:.2f}'.format(yy) \
-                                    for yy in axs[i].get_yticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-                               
+        axs[i].set_yticklabels(
+            ['{:.2f}'.format(yy) for yy in axs[i].get_yticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         axs[i].xaxis.tick_bottom()
         axs[i].yaxis.tick_left()
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[i].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[i].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
+        axs[i].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         
         # writes unassigned in the center of the plot for unassigned peaks
         # and plots nothing
         if self.ix[0,row_number,'Peak Status'] == 'unassigned':
-            axs[i].text((x[0] + x[-1]) / 2,
-                        (y_lims[0]+y_lims[1])/2,
-                        'unassigned',
-                        fontsize=8,
-                        fontname='Arial',
-                        va='center', ha='center')
+            axs[i].text(
+                (x[0] + x[-1]) / 2,
+                (y_lims[0]+y_lims[1])/2,
+                'unassigned',
+                fontsize=8,
+                fontname='Arial',
+                va='center', ha='center')
+            
             return
         
         # do not represent the lost peaks.
         mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'lost')
         y = y[mes_mask]
         x = x[mes_mask]
-        
-        
         # Plots data
-        axs[i].plot(x, y, ls=line_style,
-                          color=line_color,
-                          marker=marker_style,
-                          mfc=marker_color,
-                          markersize=marker_size,
-                          lw=line_width,
-                          zorder=5)
+        axs[i].plot(
+            x,
+            y,
+            ls=line_style,
+            color=line_color,
+            marker=marker_style,
+            mfc=marker_color,
+            markersize=marker_size,
+            lw=line_width,
+            zorder=5
+            )
         
         if fill_between:
-            axs[i].fill_between(x, 0, y,
-                                facecolor=fill_color, alpha=fill_alpha)
+            axs[i].fill_between(
+                x,
+                0,
+                y,
+                facecolor=fill_color,
+                alpha=fill_alpha
+                )
         
         fit_res_col = "{}_{}".format(calccol, res)
+        
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
                 and self.fit_okay[fit_res_col]:
@@ -1720,73 +1936,80 @@ recipient: residues
             print(self.xfit)
             print(self.fit_plot_ydata[fit_res_col])
             # plot fit
-            axs[i].plot(self.xfit,
-                        self.fit_plot_ydata[fit_res_col],
-                        fit_line_style,
-                        lw=fit_line_width,
-                        color=fit_line_color, zorder=6)
-            
-            
+            axs[i].plot(
+                self.xfit,
+                self.fit_plot_ydata[fit_res_col],
+                fit_line_style,
+                lw=fit_line_width,
+                color=fit_line_color, zorder=6
+                )
             # write text
-            
-            axs[i].text(xmax*0.05, y_lims[1]*0.97,
-                        self.fit_plot_text[fit_res_col],
-                        ha='left', va='top', fontsize=4)
+            axs[i].text(
+                xmax*0.05,
+                y_lims[1]*0.97,
+                self.fit_plot_text[fit_res_col],
+                ha='left',
+                va='top',
+                fontsize=4
+                )
         
         elif self.fit_performed and self.series_axis == 'cond1' \
-            and not(self.fit_okay[fit_res_col]):
-                
-            axs[i].text(xmax*0.05, y_lims[1]*0.97,
-                        self.fit_plot_text[fit_res_col],
-                        ha='left', va='top', fontsize=4)
+                and not(self.fit_okay[fit_res_col]):
+            axs[i].text(
+                xmax*0.05,
+                y_lims[1]*0.97,
+                self.fit_plot_text[fit_res_col],
+                ha='left',
+                va='top',
+                fontsize=4
+                )
         
         return
     
     
-    def plot_cs_scatter(self, axs, i, row_number,
-                     
-                     subtitle_fn='Arial',
-                     subtitle_fs=8,
-                     subtitle_pad=0.98,
-                     subtitle_weight='normal',
-                     x_label='1H (ppm)',
-                     x_label_fn='Arial',
-                     x_label_fs=3,
-                     x_label_pad=2,
-                     x_label_weight='normal',
-                     y_label='15N (ppm)',
-                     y_label_fn='Arial',
-                     y_label_fs=6 ,
-                     y_label_pad=2,
-                     y_label_weight='normal',
-                     x_ticks_fn='Arial',
-                     x_ticks_fs=5,
-                     x_ticks_pad=1,
-                     x_ticks_weight=1,
-                     x_ticks_rot=0,
-                     x_ticks_len=2,
-                     y_ticks_fn='Arial',
-                     y_ticks_fs=5,
-                     y_ticks_pad=1,
-                     y_ticks_weight=1,
-                     y_ticks_rot=0,
-                     y_ticks_len=2,
-                     
-                     mksize=20,
-                     scale=0.01,
-                     mk_type='color',
-                     mk_start_color='#cdcdcd',
-                     mk_end_color='#000000',
-                     markers=['^','>','v','<','s','p','h','8','*','D'],
-                     mk_color=['none'],
-                     mk_edgecolors='black',
-                     mk_lost_color='red',
-                     hide_lost=False,
-                     titration_x_values='',
-                     rows_page='',
-                     cols_page='',
-                     perform_resevo_fitting=''
-                        ):
+    def plot_cs_scatter(
+            self, axs,
+            i, row_number,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label='1H (ppm)',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label='15N (ppm)',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_rot=0,
+            y_ticks_len=2,
+            mksize=20,
+            scale=0.01,
+            mk_type='color',
+            mk_start_color='#cdcdcd',
+            mk_end_color='#000000',
+            markers=['^','>','v','<','s','p','h','8','*','D'],
+            mk_color=['none'],
+            mk_edgecolors='black',
+            mk_lost_color='red',
+            hide_lost=False,
+            titration_x_values='',
+            rows_page='',
+            cols_page='',
+            perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         along the series for the current residue.
@@ -1800,69 +2023,95 @@ recipient: residues
             
             row_number (int): the index of the current residue.
         """
+        
         def set_tick_labels():
             # adjust the ticks to a maximum of 4.
             # http://stackoverflow.com/questions/6682784/how-to-reduce-number-of-ticks-with-matplotlib
             axs[i].locator_params(axis='both', tight=True, nbins=4)
-            
-            axs[i].set_xticklabels(axs[i].get_xticks(),
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
-            axs[i].set_yticklabels(axs[i].get_yticks(),
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
+            axs[i].set_xticklabels(
+                axs[i].get_xticks(),
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
+            axs[i].set_yticklabels(
+                axs[i].get_yticks(),
+                fontname=y_ticks_fn,
+                fontsize=y_ticks_fs,
+                fontweight=y_ticks_weight,
+                rotation=y_ticks_rot
+                )
         
         # Configure subtitle
         subtitle = self.ix[0,i,'ResNo'] + self.ix[0,i,'1-letter']
-        axs[i].set_title(subtitle, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
+        axs[i].set_title(
+            subtitle,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # Configure Axis Ticks
         axs[i].xaxis.tick_bottom()
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
         axs[i].yaxis.tick_left()
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[i].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[i].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
+        axs[i].set_ylabel(
+            y_label,
+              fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         
         # check assignment
         # if residue is unassigned, identifies in the subplot
         if self.ix[0,row_number,'Peak Status'] == 'unassigned':
-            axs[i].text(0, 0, 'unassigned', fontsize=7, fontname='Arial',
-                               va='center', ha='center')
+            axs[i].text(
+                0,
+                0,
+                'unassigned',
+                fontsize=7,
+                fontname='Arial',
+                va='center',
+                ha='center'
+                )
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
             return
         
         elif not(self.ix[:,i,'H1_delta'].any()) \
-             and not(self.ix[:,i,'N15_delta'].any()):
-            # do 
-            axs[i].text(0, 0, 'all data lost', fontsize=7, fontname='Arial',
-                              va='center', ha='center')
+                and not(self.ix[:,i,'N15_delta'].any()):
+            axs[i].text(
+                0,
+                0,
+                'all data lost',
+                fontsize=7,
+                fontname='Arial',
+                va='center',
+                ha='center'
+                )
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
@@ -1874,132 +2123,166 @@ recipient: residues
             mcycle = it.cycle(markers)
             ccycle = it.cycle(mk_color)
             cedge = it.cycle(mk_edgecolors)
+            
             for k, j in enumerate(self.items):
-                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned']\
-                and hide_lost:
-                    #do
+                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned'] \
+                        and hide_lost:
                     next(mcycle)
                     next(ccycle)
                     next(cedge)
                 
                 elif self.ix[j,i,'Peak Status'] == 'lost':
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker=next(mcycle),
-                                   s=mksize,
-                                   color=next(ccycle),
-                                   edgecolors=mk_lost_color)
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker=next(mcycle),
+                        s=mksize,
+                        c=next(ccycle),
+                        edgecolors=mk_lost_color
+                        )
                     next(cedge)
+                
                 else:
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker=next(mcycle),
-                                   s=mksize, color=next(ccycle),
-                                   edgecolors=next(cedge))
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker=next(mcycle),
+                        s=mksize,
+                        c=next(ccycle),
+                        edgecolors=next(cedge)
+                        )
         
         elif mk_type == 'color':
-            
             # represents the points as circles with a gradient of color
-            mk_color = self.linear_gradient(mk_start_color,
-                                            finish_hex=mk_end_color,
-                                            n=self.shape[0])
+            mk_color = self.linear_gradient(
+                mk_start_color,
+                finish_hex=mk_end_color,
+                n=self.shape[0]
+                )
             # this is used instead of passing a list to .scatter because
             # of colouring in red the lost peaks.
             mccycle = it.cycle(mk_color['hex'])
             
             for j in self.items:
                 if self.ix[j,i,'Peak Status'] == 'lost':
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker='o',
-                                   s=mksize, c=mk_lost_color,
-                                   edgecolors='none')
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker='o',
+                        s=mksize,
+                        c=mk_lost_color,
+                        edgecolors='none'
+                        )
+                
                 else:
-                    axs[i].scatter(self.ix[j,i,'H1_delta'],
-                                   self.ix[j,i,'N15_delta'],
-                                   marker='o', s=mksize, c=next(mccycle),
-                                   edgecolors='none')
+                    axs[i].scatter(
+                        self.ix[j,i,'H1_delta'],
+                        self.ix[j,i,'N15_delta'],
+                        marker='o',
+                        s=mksize,
+                        c=next(mccycle),
+                        edgecolors='none'
+                        )
         
         measured = self.ix[:,i,'Peak Status'] == 'measured'
-        xlimmin = -scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).min()*1.5
-        
-        xlimmax = scale*2 \
-                  if self.ix[measured,i,'H1_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'H1_delta'].fillna(value=0).max()*1.5
-        
-        ylimmin = -scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).min() > -scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).min()*1.5
-        
-        ylimmax = scale*2 \
-                  if self.ix[measured,i,'N15_delta'].fillna(value=0).max() < scale \
-                  else self.ix[measured,i,'N15_delta'].fillna(value=0).max()*1.5
-        
+        xlimmin = \
+            -scale*2 \
+            if self.ix[measured,i,'H1_delta'].fillna(value=0).min() > -scale \
+            else self.ix[measured,i,'H1_delta'].fillna(value=0).min()*1.5
+        xlimmax = \
+            scale*2 \
+            if self.ix[measured,i,'H1_delta'].fillna(value=0).max() < scale \
+            else self.ix[measured,i,'H1_delta'].fillna(value=0).max()*1.5
+        ylimmin = \
+            -scale*2 \
+            if self.ix[measured,i,'N15_delta'].fillna(value=0).min() > -scale \
+            else self.ix[measured,i,'N15_delta'].fillna(value=0).min()*1.5
+        ylimmax = \
+            scale*2 \
+            if self.ix[measured,i,'N15_delta'].fillna(value=0).max() < scale \
+            else self.ix[measured,i,'N15_delta'].fillna(value=0).max()*1.5
         axs[i].set_xlim(xlimmin, xlimmax)
         axs[i].set_ylim(ylimmin, ylimmax)
-        
         ## Invert axes for representation as in a spectrum
         axs[i].invert_xaxis()
         axs[i].invert_yaxis()
-        
         set_tick_labels()
-        
         # draws axis 0 dotted line
-        axs[i].hlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        axs[i].vlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-    
+        axs[i].hlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
+        axs[i].vlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
         # draws center scale
-        axs[i].hlines(0,-scale,scale, colors='darkblue',
-                      linestyles='-', linewidth=1)
-        axs[i].vlines(0,-scale,scale, colors='darkblue',
-                      linestyles='-', linewidth=1)
+        axs[i].hlines(
+            0,
+            -scale,
+            scale,
+            colors='darkblue',
+            linestyles='-',
+            linewidth=1
+            )
+        axs[i].vlines(
+            0,
+            -scale,
+            scale,
+            colors='darkblue',
+            linestyles='-',
+            linewidth=1
+            )
         
         return
     
-    def plot_cs_scatter_flower(self, axs,
-                               subtitle_fn='Arial',
-                             subtitle_fs=8,
-                             subtitle_pad=0.98,
-                             subtitle_weight='normal',
-                             x_label='1H (ppm)',
-                             x_label_fn='Arial',
-                             x_label_fs=3,
-                             x_label_pad=2,
-                             x_label_weight='normal',
-                             y_label='15N (ppm)',
-                             y_label_fn='Arial',
-                             y_label_fs=6 ,
-                             y_label_pad=2,
-                             y_label_weight='normal',
-                             x_ticks_fn='Arial',
-                             x_ticks_fs=5,
-                             x_ticks_pad=1,
-                             x_ticks_weight=1,
-                             x_ticks_rot=0,
-                             x_ticks_len=2,
-                             y_ticks_fn='Arial',
-                             y_ticks_fs=5,
-                             y_ticks_pad=1,
-                             y_ticks_weight=1,
-                             y_ticks_rot=0,
-                             y_ticks_len=2,
-                             
-                             x_max=0.2,
-                             x_min=-0.2,
-                             y_max=1,
-                             y_min=-1,
-                             
-                             mksize=2,
-                             color_grad=True,
-                             color_list=[],
-                             mk_start_color="#ff0000",
-                             mk_end_color='#30ff00',
-                             titration_x_values='',
-                             perform_resevo_fitting=''):
+    def plot_cs_scatter_flower(
+            self, axs,
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.98,
+            subtitle_weight='normal',
+            x_label='1H (ppm)',
+            x_label_fn='Arial',
+            x_label_fs=3,
+            x_label_pad=2,
+            x_label_weight='normal',
+            y_label='15N (ppm)',
+            y_label_fn='Arial',
+            y_label_fs=6 ,
+            y_label_pad=2,
+            y_label_weight='normal',
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_pad=1,
+            x_ticks_weight=1,
+            x_ticks_rot=0,
+            x_ticks_len=2,
+            y_ticks_fn='Arial',
+            y_ticks_fs=5,
+            y_ticks_pad=1,
+            y_ticks_weight=1,
+            y_ticks_rot=0,
+            y_ticks_len=2,
+            x_max=0.2,
+            x_min=-0.2,
+            y_max=1,
+            y_min=-1,
+            mksize=2,
+            color_grad=True,
+            color_list=[],
+            mk_start_color="#ff0000",
+            mk_end_color='#30ff00',
+            titration_x_values='',
+            perform_resevo_fitting=''):
         """
         Plots the chemical shift evolution normalized to zero (reference) 
         for all the residues in a single plot.
@@ -2008,11 +2291,16 @@ recipient: residues
             
             axs (matplotlib subplot axis): the subplot axis array.
         """
-        if color_grad:
-            mk_color = self.linear_gradient(mk_start_color,
-                                        finish_hex=mk_end_color,
-                                        n=len(self.items))['hex']
         
+        # if the user wants a gradient of color
+        if color_grad:
+            mk_color = self.linear_gradient(
+                mk_start_color,
+                finish_hex=mk_end_color,
+                n=len(self.items)
+                )['hex']  # function returns a dictionary
+        
+        # otherwise the user has input a list of colors
         else: 
             mk_color = color_list
         
@@ -2022,96 +2310,118 @@ recipient: residues
                 continue
             
             mesmask = self.loc[:,residue,'Peak Status'] == 'measured'
-            
-            axs[0].scatter(self.loc[mesmask,residue,'H1_delta'],
-                           self.loc[mesmask,residue,'N15_delta'],
-                           c=mk_color,
-                           s=mksize,
-                           zorder=9)
-            
-            axs[0].text(\
+            axs[0].scatter(
+                self.loc[mesmask,residue,'H1_delta'],
+                self.loc[mesmask,residue,'N15_delta'],
+                c=mk_color,
+                s=mksize,
+                zorder=9
+                )
+            axs[0].text(
                 float(self.loc[mesmask,residue,'H1_delta'].tail(n=1))*1.05,
                 float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
                 self.ix[0,residue,'ResNo'],
-                fontsize=4, color='#c99543', zorder=10)
+                fontsize=4,
+                color='#c99543',
+                zorder=10
+                )
         
         # Configure Axis Ticks
         axs[0].xaxis.tick_bottom()
-        axs[0].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
+        axs[0].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
         axs[0].yaxis.tick_left()
-        axs[0].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[0].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         ## Configure axes labels
-        axs[0].set_xlabel(x_label,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          fontname=x_label_fn,
-                          weight=x_label_weight)
-        
+        axs[0].set_xlabel(
+            x_label,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            fontname=x_label_fn,
+            weight=x_label_weight
+            )
         ## Configure YY ticks/label
-        axs[0].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
-        
+        axs[0].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         # draws axis 0 dotted line
-        axs[0].hlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        axs[0].vlines(0,-100,100, colors='black',
-                      linestyles='dotted', linewidth=0.25)
-        
+        axs[0].hlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
+        axs[0].vlines(
+            0,
+            -100,
+            100,
+            colors='black',
+            linestyles='dotted',
+            linewidth=0.25
+            )
         axs[0].set_xlim(x_min, x_max)
         axs[0].set_ylim(y_min, y_max)
-        
         # remember in NMR spectra the ppm scale is 'inverted' :-)
         axs[0].invert_xaxis()
         axs[0].invert_yaxis()
-        
         axs[0].locator_params(axis='both', tight=True, nbins=10)
-        
-        axs[0].set_xticklabels(axs[0].get_xticks(),
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
-        axs[0].set_yticklabels(axs[0].get_yticks(),
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
+        axs[0].set_xticklabels(
+            axs[0].get_xticks(),
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
+        axs[0].set_yticklabels(
+            axs[0].get_yticks(),
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         
         return
     
-    def plot_DPRE_heatmap(self, calccol, fig, axs, i, experiment,
-                          y_lims=(0,1),
-                          vmin=0,
-                          vmax=1,
-                          ylabel='DELTA PRE',
-                          x_ticks_fs=4,
-                          x_ticks_rot=0,
-                          x_ticks_fn='Arial',
-                          x_ticks_pad=1,
-                          x_ticks_weight='normal',
-                          y_label_fs=6,
-                          y_label_pad=2,
-                          y_label_fn='Arial',
-                          y_label_weight='bold',
-                          right_margin=0.1,
-                          bottom_margin=0.1,
-                          top_margin=0.9,
-                          cbar_font_size=4,
-                          tag_line_color='red',
-                          tag_line_lw=0.3,
-                          tag_line_ls='-',
-                          rows=''):
+    def plot_DPRE_heatmap(
+            self, calccol,
+            fig, axs,
+            i, experiment,
+            y_lims=(0,1),
+            vmin=0,
+            vmax=1,
+            ylabel='DELTA PRE',
+            x_ticks_fs=4,
+            x_ticks_rot=0,
+            x_ticks_fn='Arial',
+            x_ticks_pad=1,
+            x_ticks_weight='normal',
+            y_label_fs=6,
+            y_label_pad=2,
+            y_label_fn='Arial',
+            y_label_weight='bold',
+            right_margin=0.1,
+            bottom_margin=0.1,
+            top_margin=0.9,
+            cbar_font_size=4,
+            tag_line_color='red',
+            tag_line_lw=0.3,
+            tag_line_ls='-',
+            rows=''):
         """
         Plots Delta PRE heatmaps.
         
@@ -2130,131 +2440,146 @@ recipient: residues
             
             experiment (srt): the name of the data point.
         """
-        Dcmap = np.array((self.loc[experiment,:,calccol].fillna(0),
-                         self.loc[experiment,:,calccol].fillna(0)))
-        cleg = axs[i].pcolor(Dcmap, cmap='binary', vmin=vmin, vmax=vmax)
         
+        Dcmap = np.array(
+            (
+                self.loc[experiment,:,calccol].fillna(0),
+                self.loc[experiment,:,calccol].fillna(0)
+                )
+            )
+        cleg = axs[i].pcolor(Dcmap, cmap='binary', vmin=vmin, vmax=vmax)
         axs[i].tick_params(axis='y', left='off')
         axs[i].tick_params(axis='x', bottom='off')
         # http://stackoverflow.com/questions/2176424/hiding-axis-text-in-matplotlib-plots
         axs[i].get_yaxis().set_ticks([])
         axs[i].get_xaxis().set_visible(False)
-        
-        axs[i].set_ylabel(experiment,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight)
-        
+        axs[i].set_ylabel(
+            experiment,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight
+            )
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        
-        self.plot_theo_pre(axs[i], experiment, 2,
-                           bartype = 'hm',
-                           tag_color=tag_line_color,
-                           tag_ls=tag_line_ls,
-                           tag_lw=tag_line_lw)
+        self.plot_theo_pre(
+            axs[i],
+            experiment,
+            2,
+            bartype = 'hm',
+            tag_color=tag_line_color,
+            tag_ls=tag_line_ls,
+            tag_lw=tag_line_lw
+            )
         
         if i == len(self.items)-1:
-            cbar = plt.colorbar(cleg,
-                                ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
-                                orientation='vertical',
-                                cax = fig.add_axes(
-                                    [right_margin+right_margin*0.05, 
-                                    bottom_margin, 
-                                    right_margin*0.05, 
-                                    top_margin-bottom_margin]))
+            cbar = plt.colorbar(
+                cleg,
+                ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
+                orientation='vertical',
+                cax = fig.add_axes(
+                    [
+                        right_margin+right_margin*0.05, 
+                        bottom_margin, 
+                        right_margin*0.05, 
+                        top_margin-bottom_margin
+                        ]
+                    )
+                )
             
             cbar.ax.tick_params(labelsize=cbar_font_size)
             axs[i].get_xaxis().set_visible(True)
             axs[i].tick_params(axis='x', bottom='on', length=1.5)
-            
             initialresidue = int(self.ix[0, 0, 'ResNo'])
             finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
             
             if self.shape[1] > 100:
                 xtick_spacing = self.shape[1]//100*10
+            
             else:
                 xtick_spacing = 10
             
             first_tick = ceil(initialresidue/10)*xtick_spacing
             xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
             axs[i].set_xticks(xtickarange)
-            
             # https://github.com/matplotlib/matplotlib/issues/6266
-            axs[i].set_xticklabels(xtickarange,
-                                   fontname=x_ticks_fn,
-                                   fontsize=x_ticks_fs,
-                                   fontweight=x_ticks_weight,
-                                   rotation=x_ticks_rot)
-                               
+            axs[i].set_xticklabels(
+                xtickarange,
+                fontname=x_ticks_fn,
+                fontsize=x_ticks_fs,
+                fontweight=x_ticks_weight,
+                rotation=x_ticks_rot
+                )
             axs[i].tick_params(axis='x', which='major', pad=x_ticks_pad)
-            fig.subplots_adjust(right=right_margin,
-                                bottom=bottom_margin,
-                                top=top_margin,
-                                hspace=0)
+            fig.subplots_adjust(
+                right=right_margin,
+                bottom=bottom_margin,
+                top=top_margin,
+                hspace=0
+                )
+        
         return
     
-    def plot_delta_osci(self, calccol, axs, i ,experiment,
-                        ymax=1.0,
-                        y_label='DPRE',
-                        
-                        subtitle_fn= 'Arial',
-                        subtitle_fs= 8,
-                        subtitle_pad= 0.99,
-                        subtitle_weight= 'normal',
-                        x_label_fn= 'Arial',
-                        x_label_fs= 8,
-                        x_label_pad= 2,
-                        x_label_weight= 'bold',
-                        x_label_rot=0,
-                        y_label_fn= 'Arial',
-                        y_label_fs= 8,
-                        y_label_pad=3,
-                        y_label_weight= 'bold',
-                        y_label_rot=90,
-                        x_ticks_fn='Arial',
-                        x_ticks_fs=5,
-                        x_ticks_weight = 'normal',
-                        x_ticks_pad=2,
-                        x_ticks_len=2,
-                        x_ticks_rot=0,
-                        y_ticks_fn='Arial',
-                        y_ticks_fs=7,
-                        y_ticks_rot=0,
-                        y_ticks_pad=1,
-                        y_ticks_weight= 'normal',
-                        y_ticks_len=2,
-                        y_ticks_nbins=8,
-                        y_grid_flag=True,
-                        y_grid_color='lightgrey',
-                        y_grid_linestyle='-',
-                        y_grid_linewidth=0.2,
-                        y_grid_alpha=1,
-                        tag_cartoon_color='blue',
-                        tag_cartoon_lw=0.5,
-                        tag_cartoon_ls=':',
-                        
-                        dpre_ms=2,
-                        dpre_alpha=0.5,
-                        smooth_lw=1,
-                        color=None,
-                        ref_color='black',
-                        color_init='#ff00ff',
-                        color_end='#0000ff',
-                        grid_color='grey',
-                        shade = False,
-                        shade_regions = [(23,37),(0,0),(0,0)],
-                        res_highlight=True,
-                        res_hl_list=[25,32,54,64,66,47],
-                        res_highlight_fs=4,
-                        res_highlight_y=0.9,
-
-                        theo_pre_color='',
-                        theo_pre_lw='',
-                        vspace='',
-                        rows='',
-                        width=''):
+    def plot_delta_osci(
+            self, calccol,
+            axs, i,
+            experiment,
+            ymax=1.0,
+            y_label='DPRE',
+            subtitle_fn='Arial',
+            subtitle_fs=8,
+            subtitle_pad=0.99,
+            subtitle_weight='normal',
+            x_label_fn='Arial',
+            x_label_fs=8,
+            x_label_pad=2,
+            x_label_weight='bold',
+            x_label_rot=0,
+            y_label_fn='Arial',
+            y_label_fs=8,
+            y_label_pad=3,
+            y_label_weight='bold',
+            y_label_rot=90,
+            x_ticks_fn='Arial',
+            x_ticks_fs=5,
+            x_ticks_weight='normal',
+            x_ticks_pad=2,
+            x_ticks_len=2,
+            x_ticks_rot=0,
+            y_ticks_fn='Arial',
+            y_ticks_fs=7,
+            y_ticks_rot=0,
+            y_ticks_pad=1,
+            y_ticks_weight='normal',
+            y_ticks_len=2,
+            y_ticks_nbins=8,
+            y_grid_flag=True,
+            y_grid_color='lightgrey',
+            y_grid_linestyle='-',
+            y_grid_linewidth=0.2,
+            y_grid_alpha=1,
+            tag_cartoon_color='blue',
+            tag_cartoon_lw=0.5,
+            tag_cartoon_ls=':',
+            dpre_ms=2,
+            dpre_alpha=0.5,
+            smooth_lw=1,
+            color=None,
+            ref_color='black',
+            color_init='#ff00ff',
+            color_end='#0000ff',
+            grid_color='grey',
+            shade=False,
+            shade_regions=[(23,37),(0,0),(0,0)],
+            res_highlight=True,
+            res_hl_list=[25,32,54,64,66,47],
+            res_highlight_fs=4,
+            res_highlight_y=0.9,
+            theo_pre_color='',
+            theo_pre_lw='',
+            vspace='',
+            rows='',
+            width=''):
         """
         Plots the Delta PRE data in scatter points and the gaussian
         smoothed curved.
@@ -2272,60 +2597,69 @@ recipient: residues
             
             experiment (srt): the name of the data point.
         """
+       
         y_lims = (0, ymax)
         # to solve .find Attribute Error
         # http://stackoverflow.com/questions/29437305/how-to-fix-attributeerror-series-object-has-no-attribute-find
         # plots dpre for first point in comparison
         #pmaskr = self.ix[0,:,calccol] > 0
-        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
-                    self.ix[0,:,calccol].astype(float),
-                    'o',
-                    markersize=dpre_ms,
-                    markeredgewidth=0.0,
-                    c=ref_color,
-                    alpha=dpre_alpha,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.ix[0,:,'ResNo'].astype(float),
+            self.ix[0,:,calccol].astype(float),
+            'o',
+            markersize=dpre_ms,
+            markeredgewidth=0.0,
+            c=ref_color,
+            alpha=dpre_alpha,
+            zorder=10
+            )
         # plots dpre for titration data point
         #pmaskd = self.loc[experiment,:,calccol] > 0
-        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
-                    self.loc[experiment,:,calccol].astype(float),
-                    'o',
-                    c=color,
-                    markersize=dpre_ms,
-                    markeredgewidth=0.0,
-                    alpha=dpre_alpha,
-                    zorder=10)
-        
-        
+        axs[i].plot(
+            self.loc[experiment,:,'ResNo'].astype(float),
+            self.loc[experiment,:,calccol].astype(float),
+            'o',
+            c=color,
+            markersize=dpre_ms,
+            markeredgewidth=0.0,
+            alpha=dpre_alpha,
+            zorder=10
+            )
         # plots dpre_smooth for first data point in comparison
         #pmaskr = self.ix[0,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.ix[0,:,'ResNo'].astype(float),
-                    self.ix[0,:,calccol+'_smooth'].astype(float),
-                    ls='-',
-                    lw=smooth_lw,
-                    c=ref_color,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.ix[0,:,'ResNo'].astype(float),
+            self.ix[0,:,calccol+'_smooth'].astype(float),
+            ls='-',
+            lw=smooth_lw,
+            c=ref_color,
+            zorder=10
+            )
         # plots dpre_smooth for data point
         #pmaskd = self.loc[experiment,:,calccol+'_smooth'] > 0
-        axs[i].plot(self.loc[experiment,:,'ResNo'].astype(float),
-                    self.loc[experiment,:,calccol+'_smooth'].astype(float),
-                    ls='-',
-                    lw=smooth_lw,
-                    c=color,
-                    zorder=10)
-        
+        axs[i].plot(
+            self.loc[experiment,:,'ResNo'].astype(float),
+            self.loc[experiment,:,calccol+'_smooth'].astype(float),
+            ls='-',
+            lw=smooth_lw,
+            c=color,
+            zorder=10
+            )
         # Configure subplot title
-        axs[i].set_title(experiment, y=subtitle_pad, fontsize=subtitle_fs,
-                         fontname=subtitle_fn, fontweight=subtitle_weight)
-        
+        axs[i].set_title(
+            experiment,
+            y=subtitle_pad,
+            fontsize=subtitle_fs,
+            fontname=subtitle_fn,
+            fontweight=subtitle_weight
+            )
         # Set Ticks
         initialresidue = int(self.ix[0, 0, 'ResNo'])
         finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
         
         if self.shape[1] > 100:
             xtick_spacing = self.shape[1]//100*10
+        
         else:
             xtick_spacing = 10
         
@@ -2333,108 +2667,135 @@ recipient: residues
         xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
         axs[i].set_xticks(xtickarange)
         # https://github.com/matplotlib/matplotlib/issues/6266
-        axs[i].set_xticklabels(xtickarange,
-                               fontname=x_ticks_fn,
-                               fontsize=x_ticks_fs,
-                               fontweight=x_ticks_weight,
-                               rotation=x_ticks_rot)
-        
+        axs[i].set_xticklabels(
+            xtickarange,
+            fontname=x_ticks_fn,
+            fontsize=x_ticks_fs,
+            fontweight=x_ticks_weight,
+            rotation=x_ticks_rot
+            )
         # configures spines
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        
         # Configures YY ticks
         axs[i].set_ylim(y_lims[0], y_lims[1])
         axs[i].locator_params(axis='y', tight=True, nbins=y_ticks_nbins)
-        axs[i].set_yticklabels(['{:.2f}'.format(yy) \
-                                    for yy in axs[i].get_yticks()],
-                               fontname=y_ticks_fn,
-                               fontsize=y_ticks_fs,
-                               fontweight=y_ticks_weight,
-                               rotation=y_ticks_rot)
-        
+        axs[i].set_yticklabels(
+            ['{:.2f}'.format(yy) for yy in axs[i].get_yticks()],
+            fontname=y_ticks_fn,
+            fontsize=y_ticks_fs,
+            fontweight=y_ticks_weight,
+            rotation=y_ticks_rot
+            )
         # configures tick params
         axs[i].margins(x=0.01)
-        axs[i].tick_params(axis='x',
-                           pad=x_ticks_pad,
-                           length=x_ticks_len,
-                           direction='out')
-                           
-        axs[i].tick_params(axis='y',
-                           pad=y_ticks_pad,
-                           length=y_ticks_len,
-                           direction='out')
-        
+        axs[i].tick_params(
+            axis='x',
+            pad=x_ticks_pad,
+            length=x_ticks_len,
+            direction='out'
+            )
+        axs[i].tick_params(
+            axis='y',
+            pad=y_ticks_pad,
+            length=y_ticks_len,
+            direction='out'
+            )
         # Set axes labels
-        axs[i].set_xlabel('Residue',
-                          fontname=x_label_fn,
-                          fontsize=x_label_fs,
-                          labelpad=x_label_pad,
-                          weight=x_label_weight,
-                          rotation=x_label_rot)
-        
-        axs[i].set_ylabel(y_label,
-                          fontsize=y_label_fs,
-                          labelpad=y_label_pad,
-                          fontname=y_label_fn,
-                          weight=y_label_weight,
-                          rotation=y_label_rot)
+        axs[i].set_xlabel(
+            'Residue',
+            fontname=x_label_fn,
+            fontsize=x_label_fs,
+            labelpad=x_label_pad,
+            weight=x_label_weight,
+            rotation=x_label_rot
+            )
+        axs[i].set_ylabel(
+            y_label,
+            fontsize=y_label_fs,
+            labelpad=y_label_pad,
+            fontname=y_label_fn,
+            weight=y_label_weight,
+            rotation=y_label_rot
+            )
         
         # Adds grid
         if y_grid_flag:
-            axs[i].yaxis.grid(color=y_grid_color,
-                              linestyle=y_grid_linestyle,
-                              linewidth=y_grid_linewidth,
-                              alpha=y_grid_alpha,
-                              zorder=0)
+            axs[i].yaxis.grid(
+                color=y_grid_color,
+                linestyle=y_grid_linestyle,
+                linewidth=y_grid_linewidth,
+                alpha=y_grid_alpha,
+                zorder=0
+                )
         
         if shade:
             for lmargin, rmargin in shade_regions:
-                axs[i].fill([lmargin,rmargin,
-                             rmargin, lmargin],
-                            [0,0,2,2], grid_color, alpha=0.2)
+                axs[i].fill(
+                    [lmargin,rmargin,rmargin, lmargin],
+                    [0,0,2,2],
+                    grid_color,
+                    alpha=0.2
+                    )
+        
         if res_highlight:
             for rr in res_hl_list:
-                axs[i].axvline(x=rr,ls=':', lw=0.3,  color=grid_color)
+                axs[i].axvline(x=rr, ls=':', lw=0.3, color=grid_color)
                 rrmask = self.ix[0,:,'ResNo'] == str(rr)
                 l1 = list(self.loc[experiment,rrmask,'1-letter'])
-                axs[i].text(rr, y_lims[1]*res_highlight_y,
-                            l1[0],
-                            ha='center', va='center',
-                            fontsize=res_highlight_fs)
+                axs[i].text(
+                    rr,
+                    y_lims[1]*res_highlight_y,
+                    l1[0],
+                    ha='center',
+                    va='center',
+                    fontsize=res_highlight_fs
+                    )
         
-        self.plot_theo_pre(axs[i], experiment, y_lims[1]*0.1,
-                           bartype = 'osci',
-                           tag_color=tag_cartoon_color,
-                           tag_ls=tag_cartoon_ls,
-                           tag_lw=tag_cartoon_lw)
+        self.plot_theo_pre(
+            axs[i],
+            experiment,
+            y_lims[1]*0.1,
+            bartype = 'osci',
+            tag_color=tag_cartoon_color,
+            tag_ls=tag_cartoon_ls,
+            tag_lw=tag_cartoon_lw
+            )
         
         return
     
     def clean_subplots(self, axs, start, end):
         """Hides/Removes the unused subplots from the plotting figure."""
+        
         for i in range(start, end):
-            
             axs[i].spines['bottom'].set_visible(False)
             axs[i].spines['top'].set_visible(False)
             axs[i].spines['right'].set_visible(False)
             axs[i].spines['left'].set_visible(False)
-            
-            axs[i].tick_params(axis='both', bottom='off', left='off',
-                               labelleft='off', labelbottom='off')
+            axs[i].tick_params(
+                axis='both',
+                bottom='off',
+                left='off',
+                labelleft='off',
+                labelbottom='off'
+                )
+        
         return
     
-    def plot_base(self, calccol, plot_type, plot_style, param_dict,
-                     par_ylims=(0,1),
-                     ylabel='ppm or ratio',
-                     hspace=0.5,
-                     rows_per_page=5,
-                     cols_per_page=1,
-                     resonance_type='Backbone',
-                     fig_height=11.69,
-                     fig_width=8.69,
-                     fig_file_type='pdf',
-                     fig_dpi=300):
+    def plot_base(
+            self, calccol,
+            plot_type, plot_style,
+            param_dict,
+            par_ylims=(0,1),
+            ylabel='ppm or ratio',
+            hspace=0.5,
+            rows_per_page=5,
+            cols_per_page=1,
+            resonance_type='Backbone',
+            fig_height=11.69,
+            fig_width=8.69,
+            fig_file_type='pdf',
+            fig_dpi=300):
         """
         The main function that calls and builds the different plots.
         
@@ -2451,63 +2812,85 @@ recipient: residues
         """
         
         self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
-        
         # this to allow folder change in PRE_analysis
         folder = calccol
         
         if plot_type == 'exp':
             num_subplots = len(self.items)
+        
         elif plot_type == 'res':
             num_subplots = len(self.major_axis)
+        
         elif plot_type == 'single':
             num_subplots = 1
+        
         else:
             raise ValueError('Not a valid Farseer plot type')
         
         numrows = ceil(num_subplots/cols_per_page)
         real_fig_height = (fig_height / rows_per_page) * numrows
-        
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
-        fig, axs = plt.subplots(nrows=numrows, ncols=cols_per_page,
-                                figsize=(fig_width, real_fig_height))
-        
+        fig, axs = plt.subplots(
+            nrows=numrows,
+            ncols=cols_per_page,
+            figsize=(fig_width, real_fig_height)
+            )
         axs = axs.ravel()
-        plt.tight_layout(rect=[0.01,0.01,0.995,0.995],
-                         h_pad=fig_height/rows_per_page)
+        plt.tight_layout(
+            rect=[0.01,0.01,0.995,0.995],
+            h_pad=fig_height/rows_per_page
+            )
+        
         # Plots yy axis title
         # http://www.futurile.net/2016/03/01/text-handling-in-matplotlib/
-        
         if plot_style in ['bar_extended', 'bar_compacted']:
-            
             for i, experiment in enumerate(self):
-                self.plot_bar_horizontal(plot_style, calccol, axs, i,
-                                         experiment, y_lims=par_ylims,
-                                         ylabel=ylabel, **param_dict)
+                self.plot_bar_horizontal(
+                    plot_style,
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
                 fig.subplots_adjust(hspace=hspace)
-                
+            
             else:
                 self.clean_subplots(axs, len(self), len(axs))
-                
-        elif plot_style == 'bar_vertical':
         
+        elif plot_style == 'bar_vertical':
             for i, experiment in enumerate(self):
-                self.plot_bar_vertical(calccol, axs, i, experiment,
-                                       y_lims=par_ylims, ylabel=ylabel,
-                                       **param_dict)
+                self.plot_bar_vertical(
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
+            
             else:
                 self.clean_subplots(axs, len(self), len(axs))
         
         elif plot_style == 'res_evo':
-            
             for i, row_number in enumerate(self.major_axis):
-                self.plot_res_evo(calccol, axs, i, row_number,
-                                  y_lims=par_ylims, y_label=ylabel,
-                                  **param_dict)
+                self.plot_res_evo(
+                    calccol,
+                    axs,
+                    i,
+                    row_number,
+                    y_lims=par_ylims,
+                    y_label=ylabel,
+                    **param_dict
+                    )
+            
             else:
                 self.clean_subplots(axs, len(self.major_axis), len(axs))
         
         elif plot_style == 'cs_scatter':
-            
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(axs, i, row_number, **param_dict)
         
@@ -2517,40 +2900,58 @@ recipient: residues
         
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
-                self.plot_DPRE_heatmap(calccol, fig, axs, i, experiment,
-                                       y_lims=par_ylims, ylabel=ylabel,
-                                       **param_dict)
+                self.plot_DPRE_heatmap(
+                    calccol,
+                    fig,
+                    axs,
+                    i,
+                    experiment,
+                    y_lims=par_ylims,
+                    ylabel=ylabel,
+                    **param_dict
+                    )
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             
         elif plot_style == 'delta_osci':
-            
-            dp_colors = self.linear_gradient(param_dict['color_init'],
-                                            param_dict['color_end'],
-                                            n=self.shape[0])
-            
-            
+            dp_colors = self.linear_gradient(
+                param_dict['color_init'],
+                param_dict['color_end'],
+                n=self.shape[0]
+                )
             dp_color = it.cycle(dp_colors['hex'])
             
             for i, experiment in enumerate(self):
-                self.plot_delta_osci(calccol, axs, i, experiment,
-                                     color=next(dp_color),
-                                     **param_dict)
-                pass
+                self.plot_delta_osci(
+                    calccol,
+                    axs,
+                    i,
+                    experiment,
+                    color=next(dp_color),
+                    **param_dict
+                    )
+            
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
         
-        self.write_plot(fig, plot_style, folder, calccol,
-                        fig_file_type, fig_dpi)
-        
-        
+        self.write_plot(
+            fig,
+            plot_style,
+            folder,
+            calccol,
+            fig_file_type,
+            fig_dpi
+            )
         plt.close('all')
         
         return
     
-    def write_plot(self, fig, plot_name, folder, calccol, fig_file_type, 
-                         fig_dpi):
+    def write_plot(
+            self, fig,
+            plot_name, folder,
+            calccol, fig_file_type, 
+            fig_dpi):
         """
         Saves plot figure to a file.
         
@@ -2573,11 +2974,13 @@ recipient: residues
         if not(os.path.exists(plot_folder)):
             os.makedirs(plot_folder)
         
-        file_path = '{}/{}_{}.{}'.format(plot_folder, calccol, plot_name,
-                                         fig_file_type)
-        
+        file_path = '{}/{}_{}.{}'.format(
+            plot_folder,
+            calccol,
+            plot_name,
+            fig_file_type
+            )
         fig.savefig(file_path, dpi=fig_dpi)
-        
         self.log_r('**Plot Saved** {}'.format(file_path))
         
         return
@@ -2601,74 +3004,75 @@ recipient: residues
         
         self.fit_performed = True
         
-        # checks correct input
+        # checks correct input. As new functions are added, those options
+        # should be appended to the list.
         if fit_function not in ('hill'):
-            self.abort(\
+            self.abort(
                 "Chosen fiting function <{}> not an available option.".\
-                format(fit_function))
+                    format(fit_function))
         
-        # add new fitting functions and related in these dictionaries
+        # new functions should be appended to the dictionaries
         fitting_functions = {
-        "hill":fsfit.fitting_hill
-        }
-        
+            "hill":fsfit.fitting_hill
+            }
         not_enough_data_funcs = {
-        "hill":fsfit.hill_results
-        }
-        
+            "hill":fsfit.hill_results
+            }
         # logging ###
-        
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
+        
         if not(os.path.exists(col_path)):
             os.makedirs(col_path)
         
-        logf = \
-        '{0}/{1}/{1}_fit_report.log'.format(self.tables_and_plots_folder, col)
+        logf = '{0}/{1}/{1}_fit_report.log'.format(
+            self.tables_and_plots_folder,
+            col
+            )
         logfout = open(logf, 'w')
         logfout.write(fsfit.fit_log_head(fit_function, col))
-        
-        logresults = \
-        '{0}/{1}/{1}_fit_results.csv'.format(self.tables_and_plots_folder, col)
+        logresults = '{0}/{1}/{1}_fit_results.csv'.format(
+            self.tables_and_plots_folder,
+            col
+            )
         logrout = open(logresults, 'w')
         logrout.write(fsfit.fit_results_head(fit_function))
-        
         self.log_r('** Performing fitting for {}...'.format(col))
-        
-        #
-        
-        measured_mask = \
-            self.loc[:,:, 'Peak Status'] == 'measured'
-        
+        measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
         
         for row in self.major_axis:
             mmask = measured_mask.loc[row,:]
             res = int(self.loc[self.items[0],row, 'ResNo'])
             col_res = "{}_{}".format(col,res)
-            
             xdata = pd.Series(x_values)[np.array(mmask)]
             # .fillna is used to avoid minpack.error:
             # Result from function call is not a proper array of floats.
             ydata = self.loc[mmask,row,col].fillna(value=0.0)
-            
             xdata.index = ydata.index
             
             if mmask.sum() < mindp:
                 # residue does not have enough data to perform fit
                 logfout.write(fsfit.not_enough_data(res, xdata, ydata))
-                logrout.write(\
-                    not_enough_data_funcs[fit_function](\
-                        res, xdata, ydata, status='not_enough_data'))
-                
+                logrout.write(
+                    not_enough_data_funcs[fit_function](
+                        res,
+                        xdata,
+                        ydata,
+                        status='not_enough_data'
+                        )
+                    )
                 self.fit_okay[col_res] = False
                 self.fit_plot_text[col_res] = "not enough data"
                 self.fit_plot_ydata[col_res] = None
-                
                 continue
             
             a, b, c, d, e = \
-                fitting_functions[fit_function](xdata, ydata, res, self.xfit)
-            
+                fitting_functions[fit_function](
+                    xdata,
+                    ydata,
+                    res,
+                    self.xfit
+                    )
             logfout.write(a)
             logrout.write(b)
             self.fit_plot_text[col_res] = c
@@ -2677,5 +3081,6 @@ recipient: residues
         
         logfout.close()
         logrout.close()
+        
         return
     
