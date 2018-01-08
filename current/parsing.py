@@ -389,8 +389,9 @@ def parseSparkyPeakList(peaklist_file):
       lines = f.readlines()[1:]
       f.close()
       for ii, line in enumerate(lines):
-
           l = line.strip().split()
+          if len(l) < 4:
+              continue
           if '?' in l[0]:
               continue
           assignment = re.sub(r"([A-Z])([0-9]+)([A-Z])","\\1 \\2 \\3",l[0]).split()
@@ -420,19 +421,20 @@ def read_peaklist(fin, prot_file=None, seq_file=None):
 
   peaklist_file = fixpath(fin)
   file_format = getPeakListFileFormat(peaklist_file)
+  print(fin)
 
   if file_format == 'ANSIG':
       return parseAnsig(peaklist_file)
-  elif file_format == 'CYANA':
-      return parseXeasy(peaklist_file, prot_file, seq_file)
+  # elif file_format == 'CYANA':
+  #     return parseXeasy(peaklist_file, prot_file, seq_file)
   elif file_format == 'NMRDRAW':
       return parseNmrDraw(peaklist_file)
   elif file_format == 'NMRVIEW':
       return parseNmrView(peaklist_file)
   elif file_format == 'SPARKY':
       return parseSparkyPeakList(peaklist_file)
-  elif file_format == 'XEASY':
-      return parseXeasy(peaklist_file, prot_file, seq_file)
+  # elif file_format == 'XEASY':
+  #     return parseXeasy(peaklist_file, prot_file, seq_file)
   elif file_format == 'CCPN':
       return parseCcpn(peaklist_file)
 
