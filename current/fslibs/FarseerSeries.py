@@ -2147,7 +2147,8 @@ or confirm you have not forgot any peaklist [{}].".\
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker=next(mcycle),
-                        s=mksize, color=next(ccycle),
+                        s=mksize,
+                        color=next(ccycle),
                         edgecolors=next(cedge)
                         )
         
