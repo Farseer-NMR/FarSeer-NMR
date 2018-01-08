@@ -162,7 +162,7 @@ class ScatterFlowerPlotPopup(QDialog):
         self.variables["y_ticks_pad"] = self.cs_scatter_flower_y_ticks_pad.field.value()
         self.variables["y_ticks_weight"] = self.cs_scatter_flower_y_ticks_weight.fields.currentText()
         self.variables["y_ticks_rot"] = self.cs_scatter_flower_y_ticks_rot.field.value()
-        self.variables["color_list"] = list(self.cs_scatter_flower_color_list.field.text())
+        self.variables["color_list"] = self.cs_scatter_flower_color_list.field.text().split(',')
 
         variables["cs_scatter_flower_settings"] = self.variables
         self.accept()
