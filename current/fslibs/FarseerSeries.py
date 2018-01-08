@@ -2137,7 +2137,7 @@ or confirm you have not forgot any peaklist [{}].".\
                         self.ix[j,i,'N15_delta'],
                         marker=next(mcycle),
                         s=mksize,
-                        color=next(ccycle),
+                        c=next(ccycle),
                         edgecolors=mk_lost_color
                         )
                     next(cedge)
@@ -2148,7 +2148,7 @@ or confirm you have not forgot any peaklist [{}].".\
                         self.ix[j,i,'N15_delta'],
                         marker=next(mcycle),
                         s=mksize,
-                        color=next(ccycle),
+                        c=next(ccycle),
                         edgecolors=next(cedge)
                         )
         
@@ -2169,7 +2169,8 @@ or confirm you have not forgot any peaklist [{}].".\
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker='o',
-                        s=mksize, c=mk_lost_color,
+                        s=mksize,
+                        c=mk_lost_color,
                         edgecolors='none'
                         )
                 
@@ -2177,7 +2178,9 @@ or confirm you have not forgot any peaklist [{}].".\
                     axs[i].scatter(
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
-                        marker='o', s=mksize, c=next(mccycle),
+                        marker='o',
+                        s=mksize,
+                        c=next(mccycle),
                         edgecolors='none'
                         )
         
