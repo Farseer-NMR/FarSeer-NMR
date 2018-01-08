@@ -98,10 +98,10 @@ class TabWidget(QTabWidget):
 
 
     def load_peak_lists(self, path=None):
-        print('load')
         if os.path.exists(path):
             self.interface.sideBar.load_from_path(path)
             self.interface.sideBar.update_from_config(self.variables)
+            self.interface.sideBar.refresh_sidebar()
 
     def save_config(self, variables, path=None):
         print(variables["peaklists"], 'saving')
@@ -489,7 +489,6 @@ class Settings(QWidget):
         self.spectrum_path.setText(path)
         self.variables["general_settings"]["spectra_path"] = path
         self.parent().parent().parent().load_peak_lists(path)
-
 
 
     def set_output_path_text(self, path=None):
