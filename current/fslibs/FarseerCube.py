@@ -10,8 +10,9 @@ class FarseerCube:
     The Farseer-NMR Data set.
     
     Reads all the experimental input peaklists to a hierarchycal nested
-    dictionary where the hierarchy is dictated by the acquisition schedule
-    of the different measured variables (temperature, ligand ratio, etc...).
+    dictionary where the hierarchy is dictated by the acquisition
+    schedule of the different measured variables (temperature,
+    ligand ratio, etc...).
     Peaklists should be stored in a spectra/ folder.
     
     Peaklists in dicitonary are read as pd.DataFrames.
@@ -24,15 +25,15 @@ class FarseerCube:
     Args:
         paths (list): absolute paths of all the input peaklists
         
-        allpeaklists (dict): nested dictionary created from spectra/. Stores
-            all the peaklists (.csv) in pd.DataFrame format. Only data
-            regarding Backbone atoms.
+        allpeaklists (dict): nested dictionary created from spectra/.
+            Stores all the peaklists (.csv) in pd.DataFrame format.
+            Only data regarding Backbone atoms.
         
-        allsidechains (dict): same as allpeaklists but only Sidechains parsed
-            data.
+        allsidechains (dict): same as allpeaklists but only Sidechains
+            parsed data.
         
-        allfasta (dict): nested dictionary containing the FASTA information
-            for each Y data point as a pd.DataFrame.
+        allfasta (dict): nested dictionary containing the FASTA
+            information for each Y data point as a pd.DataFrame.
         
         FASTAstart (int): The number of the first residue of the FASTA
             secuence.
@@ -41,13 +42,13 @@ class FarseerCube:
             information.
         
         xxcoords, yycoords, zzcoords (list): the Farseer-NMR Cube axes 
-        coordinate names.
+            coordinate names.
         
-        xxref, yyref, zzref (str): the names of the first data point for each
-            dimension. Created in .init_coords_names().
+        xxref, yyref, zzref (str): the names of the first data point
+            for eachdimension. Created in .init_coords_names().
         
-        hasxx, hasyy, haszz (bool): True if there are more than 1 data point
-            along that dimension. False otherwise (default).
+        hasxx, hasyy, haszz (bool): True if there are more than one data
+            point along that dimension. False otherwise (default).
         
         log (str): stores the whole log.
         
@@ -59,10 +60,10 @@ class FarseerCube:
         
         p5d (pandas.Panel): a 5-dimension pandas.Panel.
         
-        aal3tol1, aal1tol3 (dict): translate between 3-letter and 1-letter
-            aminoacid codes.
+        aal3tol1, aal1tol3 (dict): translate between 3-letter and
+            1-letter aminoacid codes.
         
-        tmp_vars (dict): stored temporary variables useful for functions.
+        tmp_vars (dict): stored temporary variables for functions.
         
     Methods:
     
@@ -110,8 +111,8 @@ class FarseerCube:
         has_sidechains (bool): True if the peaklists contain information 
             on Sidechains residues. False otherwise (default).
         
-        applyFASTA (bool): True to complete sequence with FASTA information.
-            Defaults to False.
+        applyFASTA (bool): True to complete sequence with FASTA
+            information. Defaults to False.
         
         FASTAstart (int): The first residue in the FASTA file.
         """
@@ -125,32 +126,30 @@ class FarseerCube:
                     for dirpath, dirnames, files in os.walk(spectra_path) 
                         for f in files]
                 )
-        
         # Initiates the different nested dictionaries
         self.allpeaklists = {}
         self.allsidechains = {}
         self.allfasta = {}
-        # Initiates helper variables
+        # Initiates dictionary for helper variables
         self.tmp_vars = {}
-        # loads information into the object
+        # loads user input information into the instance
         self.has_sidechains = has_sidechains
         self.FASTAstart = FASTAstart
-        # lists the names of the different axes point names which are given by 
-        # the spectra/ folder hierarchy
+        # lists that contain axes datapoint names
         self.zzcoords = None
         self.yycoords = None
         self.xxcoords = None
-        # Flags if there are more than 1 data point in each axis
-        # (a.k.a. condition)
-        # if no more than 1 data point is found,
-        # there is no activity on that dimension
+        # Bool. True if axis has more than one datapoint.
+        # False if axis has only one data point.
+        # evaluated in .init_coords_names()
         self.haszz = False
         self.hasyy = False
         self.hasxx = False
-        # all log goes here
-        self.log = ''
-        self.log_export_onthefly = False
+        # Log related variables
+        self.log = ''  # stores the whole log
+        self.log_export_onthefly = False  # export log on the fly?
         self.log_export_name = 'FarseerNMR_Cube_log.md'
+        # writes to log
         self.log_r('Initiates Farseer Set', istitle=True)
         input_log = \
 """path: {}  
@@ -162,6 +161,8 @@ FASTA starting residue: {}  """.\
                 self.FASTAstart
                 )
         self.log_r(input_log)
+        # initiates panel 5D object to initiate Farseer-NMR Cube
+        # in .init_Farseer_cube()
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
             klass_name='Panel5D',
             orders=['cool', 'labels', 'items', 'major_axis', 'minor_axis'],
@@ -175,6 +176,7 @@ FASTA starting residue: {}  """.\
             aliases={'major': 'index', 'minor': 'minor_axis'},
             stat_axis=2
             )
+        # translation dictionaries
         self.aal3tol1 = {
             "Ala": "A",
             "Arg": "R",
@@ -220,10 +222,9 @@ FASTA starting residue: {}  """.\
             "V": "Val"
             }
     
-    def log_r(self, logstr,
-            istitle=False):
+    def log_r(self, logstr, istitle=False):
         """
-        Registers the log string and prints it.
+        Registers activity to the log string and prints it.
         
         logstr (str): the string to be registered in the log.
         istitle (bool): flag to format logstr as a title.
@@ -252,11 +253,9 @@ FASTA starting residue: {}  """.\
         
         return
     
-    def exports_log(
-            self,
-            mod='w',
-            logfile_name='FarseerSet_log.md'):
-        """Exports log to external file.
+    def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
+        """
+        Exports log to external file.
         
         mod (str): python.open() arg mode.
         logfile_name (str): the external log file name.
@@ -277,19 +276,16 @@ FASTA starting residue: {}  """.\
     
     def load_experiments(self, filetype='.csv', resonance_type='Backbone'):
         """
-        Loads the <filetype> files in self.paths into nested dictionaries as 
-        pd.DataFrames.
+        Loads the <filetype> files in self.paths into nested
+        dictionaries as pd.DataFrames.
         
         Datapoint names should be singular for each dimension.
         
         Args:
-            target (dict): a dictionary where files converted to 
-                pd.DataFrames will be stored.
-            
             filetype (str): {'.csv', '.fasta'}
             
-            resonance_type (str): {'Backbone', 'Sidechains'}. 'Sidechains' only
-                available for '.csv' <filetype>.
+            resonance_type (str): {'Backbone', 'Sidechains'}.
+                'Sidechains' only available for '.csv' <filetype>.
         
         If filetype='.csv' and resonance_type='Backbone' executes
         self.init_coords_names()
@@ -340,13 +336,14 @@ FASTA starting residue: {}  """.\
         ---> l4.csv
         ---> seq.fasta
         """
-        
+        # writes title to log
         title = \
             'READING INPUT FILES ({}) for {}'.format(filetype, resonance_type)
         self.log_r(title, istitle=True)
         self.checks_filetype(filetype)
         main_peaklists=False
         
+        # defines functions to use and target storage dictionaries
         if filetype == '.csv' and resonance_type == 'Backbone':
             f = pd.read_csv
             target = self.allpeaklists
@@ -372,7 +369,7 @@ the possible options.'
             return
         
         # loads files in nested dictionaries
-        # piece of code found in stackoverflow
+        # piece of code found in stackoverflow, reference lost
         for p in self.paths:
             parts = p.split('spectra')[-1].split('/')
             branch = target
@@ -409,9 +406,7 @@ the possible options.'
         
         Args:
             FASTApath (str): the FASTA file path.
-
-        Procedure:
-
+        
         Reads the FASTA file and generates a 5 column DataFrame
         with the information ready to be incorporated in the peaklists
         dataframes.
@@ -446,10 +441,10 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             FASTA = ''.join(c for c in FASTA if not c.isdigit())
         
         FASTAfile.close()
+        # Generates FASTA reference dataframe
+        dd = {}
         # ResNo is kept as str() to allow reindexing
         # later on the finds_missing function.
-        #
-        dd = {}
         dd["ResNo"] = \
             [str(i) for i in range(
                 self.FASTAstart,
@@ -457,11 +452,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 )
             ]
         dd["1-letter"] = list(FASTA)
-        # aal1tol3 dictionary is defined at the end of this module
         dd["3-letter"] = [self.aal1tol3[i] for i in FASTA]
-        #
-        # Assign F1 is generated here because it will serve in future
-        # functions.
+        # Assign F1 is generated here because it will serve in future functions.
         atomtype = \
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                 loc[0,'Assign F1'][-1]
@@ -500,7 +492,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             self.xxcoords
             self.yycoords
             self.zzcoords
-            self.xxref (str): the name of the first data point along axis.
+            self.xxref (str): the name of the first axis datapoint.
             self.yyref (str): idem
             self.zzref (str): idem
         """
@@ -509,8 +501,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
         self.zzref = self.zzcoords[0]
+        
         # identifies if there is information in this dimension
-       
         if len(self.zzcoords) > 1:
             self.haszz = True
         
@@ -550,24 +542,25 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         ['ResNo', '1-letter', '3-letter', 'Peak Status']
 
         where:
-        - 'ResNo' is the residue number
-        - '1-letter', is the 1-letter code residue name
-        - '3-letter', is the 3-letter code residue name
-          if the assignment belongs to a side-chain resonance, a character
-          'a' or 'b' is added to the '1-letter' and '3-letter' codes.
-        - 'Peak Status', assigns string 'measured' to identify the
-          peaks present in this peaklist as experimentally measured.
-
+        'ResNo' is the residue number
+        '1-letter', is the 1-letter code residue name
+        '3-letter', is the 3-letter code residue name if the assignment
+            belongs to a side-chain resonance, a character 'a' or 'b'
+            is added to the '1-letter' and '3-letter' codes.
+        'Peak Status', assigns string 'measured' to identify the peaks
+            present in this peaklist as experimentally measured.
+        
         Procedure:
-
+        
         1. Extracts residue information from 'Assigned F1' column,
-        separating the residue name from the residue number. This creates
-        a new pd.DataFrame with column names 'ResNo' and '3-letter'.
-
+        separating the residue name from the residue number. This
+        creates a new pd.DataFrame with column names 'ResNo' and
+        '3-letter'.
+        
             '1MetH' -> '1' and 'Met'
-
-        2. Generates the 1-letter column code from the 3-letter code column.
-        In the same pd.DataFrame. 
+        
+        2. Generates the 1-letter column code from the 3-letter code
+        column. In the same pd.DataFrame. 
         
         3. Concatenates the new generated pd.DataFrame with the input
         peaklist pd.Dataframe. And adds column 'Peak Status' with value
@@ -575,18 +568,17 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
             3.1 if peaklist is empty adds all dummy rows of type <lost>.
         
-        4. Sorts the peaklist according to 'ResNo' just in case the original
-        .CSV file was not sorted. For correct sorting 'ResNo' as to be set
-        astype int and returned back to str.
+        4. Sorts the peaklist according to 'ResNo' just in case the
+        original .CSV file was not sorted. For correct sorting 'ResNo'
+        as to be set astype int and returned back to str.
 
         (conditional). If sidechains are present in the peaklist:
-        identifies the sidechains entries (rows) and counts the number of
-        sidechain entries. Adds the letter 'a' or 'b' to new column
+        identifies the sidechains entries (rows) and counts the number
+        of sidechain entries. Adds the letter 'a' or 'b' to new column
         'ATOM' to identify the two sidechains resonances.
         """
         
         title = 'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN'
-        
         self.log_r(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
@@ -667,11 +659,15 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # adds 'a' or 'b'
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                     self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
+                # resets index
                 self.allsidechains[z][y][x].reset_index(inplace=True)
+                # ResNo column to int preparing for reindex
                 self.allsidechains[z][y][x].loc[:,'ResNo'] = \
                     self.allsidechains[z][y][x]['ResNo'].astype(int)
+                # sorted dataframe based on ResNo and ATOM 'a' 'b' type
                 self.allsidechains[z][y][x].\
                     sort_values(by=['ResNo','ATOM'] , inplace=True)
+                # revers ResNo to string
                 self.allsidechains[z][y][x].loc[:,'ResNo'] = \
                     self.allsidechains[z][y][x]['ResNo'].astype(str)
                 # creates backbone peaklist without sidechains
@@ -709,13 +705,14 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         Corrects Chemical Shifts in a peaklist according to an internal 
         reference peak.
         
-        This function operates only along the X axis and for Backbone entries.
+        This function operates only along the X axis and for Backbone.
         Cycles over all the Z and Y data points.
         
         Args:
             ref_res (int): the reference residue number.
         """
-
+        
+        # confirms correct input
         if isinstance(ref_res, int):
             ref_res = str(ref_res)
         
@@ -744,7 +741,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             dp_F2_cs = \
                 self.allpeaklists[z][y][x].loc[dp_res_mask,'Position F2']
             
-            # Reads the information of the selected peak in the reference 
+            # Reads the information of the selected peak in the reference
             # spectrum
             if x == self.xxref:
                 # loads the chemical shift for F1 of the ref res
@@ -771,7 +768,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             self.allpeaklists[z][y][x].loc[:,'Position F2'] = \
                 self.allpeaklists[z][y][x].loc[:,'Position F2'].sub(F2_cs_diff)
             # logs the operation
-            # curr-ref=corr
             logs = \
 '**[{}][{}][{}]** | F1: {:.4f}-{:.4f}={:.4f} | F2: {:.4f}-{:.4f}={:.4f}'.\
                 format(
@@ -787,10 +783,11 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
     
     def correct_shifts_sidechains(self):
         """
-        Corrects Chemical Shifts in a peaklist according to a prior execution
-        of .correct_shifts_backbone().
+        Corrects Chemical Shifts to a reference peak in ref spectrum.
         
-        This function operates only along the X axis and for Sidechain entries.
+        Can only be performed after .correct_shifts_backbone().
+        
+        This function operates only along the X axis and for Backbone.
         Cycles over all the Z and Y data points.
         """
         
@@ -822,7 +819,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             
             target_pkl (pd.DataFrame): the target peaklist
             
-            resonance_type (str):
+            resonance_type (str): {'Backbone'. 'Sidechain'}
             
             fillna (dict): a dictionary of kwargs that define the column
                 values of the newly generated rows. Example:
@@ -883,13 +880,17 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             along_axis='z',
             resonance_type='Backbone'):
         """
-        Compares reference experiments along Y and Z axis and adds missing
-        residues considering [xxref][yyref][zzref] as the main reference.
+        Assigns missing residues for reference of Y and Z based on X.
+        
+        
+        Compares reference experiments along Y and Z axis and adds
+        missing residues considering [xxref][yyref][zzref] as the main
+        reference.
         
         Uses .seq_expand().
         
         Args:
-            fillna_dict (dict): a dictionary of kwargs that define the column
+            fillna_dict (dict): a dictionary of kwargs that define
                 values of the newly generated rows. Example:
                     {'Peak Status': <missing>,
                      'Merit': 0.0,
@@ -1004,13 +1005,14 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         """
         Finds missing residues.
         
-        Runs over each X axis series and finds the missing residues comparing
-        each data point to the reference experiment on that series.
+        Runs over each X axis series and finds the missing residues
+        comparing each data point to the reference experiment on that
+        series.
         
         Missing residues can be of type 'lost' or 'unassigned'.
         
         Args:
-            fillna_dict (dict): a dictionary of kwargs that define the column
+            fillna_dict (dict): a dictionary of kwargs that define
                 values of the newly generated rows. Example:
                     {'Peak Status': <missing>,
                      'Merit': 0.0,
@@ -1018,7 +1020,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             
             missing (str): {'lost', 'unassigned'}
             
-            resonance_type (str): either 'Backbone' or 'Sidechains'.
+            resonance_type (str): {'Backbone', 'Sidechains'}
         
         Modifies:
             The values in self.allpeaklists or self.allsidechains.
@@ -1233,19 +1235,21 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         return
     
-    def init_Farseer_cube(
-            self,
-            use_sidechains=False):
+    def init_Farseer_cube(self, use_sidechains=False):
         """
         Initiates the 5D Farseer-NMR Cube.
         
-        Uses self.p5d to create a 5D matrix with the information of all the 
-        peaklists in the experimental dataset. The Cube will be accessed and 
-        used later to create the FarseerSeries objects, upon each the Farseer 
-        Analysis routines will be performed.
+        Uses self.p5d to create a 5D matrix with the information of all
+        the peaklists in the experimental dataset. The Cube will be
+        accessed and used later to create the FarseerSeries objects,
+        upon each the Farseer Analysis routines will be performed.
         
-        If there are sidechains, creates a Panel5D for the sidechains, which
-        are treated separately from the backbone residues.
+        If there are sidechains, creates a Panel5D for the sidechains,
+        which are treated separately from the backbone residues.
+        
+        Generates:
+            - self.peaklists_p5d
+            - self.sidechains_p5d
         """
         
         self.log_r('INITIATING FARSEER CUBE', istitle=True)
@@ -1265,28 +1269,29 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             resonance_type='Backbone',
             series_kwargs={}):
         """
-        Creates a nested dictionary containing all the experimental series
-        along a given Farseer-NMR Cube axis.
+        Creates a nested dictionary containing all the experimental
+        series along a given Farseer-NMR Cube axis.
         
-        The series of experiments are initiated as <series_class> object.
-        <series_class> object has to be coordinated with this function.
+        Nested dictionary contains <series_class> instances from
+        FarseerSeries, representing each series.
         
         Example:
         
-            If along_axis='x', the nested dictionary will contain first level
-            keys zzcoods and second level keys yycoords, and values 
-            FarseerSeries.
+            If along_axis='x', the nested dictionary will contain first
+            level keys zzcoods and second level keys yycoords,
+            and values FarseerSeries.
         
         Args:
             series_class (class): Farseer Series class.
             
-            along_axis (str): {'x', 'y', 'z'} the axis along which series 
-                will be generated.
+            along_axis (str): {'x', 'y', 'z'} the axis along which
+                series will be generated.
             
             series_kwargs (dict): kwargs to be passed to the 
                 series_class.__init__.
         
             resonance_type (str): {'Backbone', 'Sidechains'}
+        
         Returns:
             The nested dictionary of Farseer Series objects.
         """
@@ -1377,8 +1382,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         Argument initiation has to be synchronized with the class needs.
         
         Args:
-            series_panel (pd.Panel): contains the series to be converted to 
-                series_class instance.
+            series_panel (pd.Panel): contains the series to be converted
+                to series_class instance.
             
             series_class (class): Farseer Series class.
             
@@ -1402,7 +1407,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         return series_panel
     
     def exports_parsed_pkls(self):
-        """Exports the parsed peaklists."""
+        """Exports the parsed peaklists of the whole dataset."""
         
         title = 'EXPORTS PARSED PEAKLISTS FROM FARSEER-NMR CUBE'
         self.log_r(title, istitle=True)
@@ -1480,14 +1485,14 @@ if Farseer-NMR can't do nothing with them? :-)".\
         """
         Confirms axis names along Y folders and X files.
         
-        Confirms that the Y folder names are equal accross every Z folder.
+        Confirms Y folder names are equal accross every Z folder.
         Raises WET#11 otherwise.
         
         Confirms each Y folder has one and ONLY on .fasta file.
         Raises WET#12 otherwise.
         
-        Confirms wether the number of files of <filetype> is the same in every
-        subdirectory of spectra/.
+        Confirms wether the number of files of <filetype> is the same
+        in every subdirectory of spectra/.
         Raises WET#8 otherwise.
         
         Confirms that the files of <filetype> have the same names in all
@@ -1495,7 +1500,8 @@ if Farseer-NMR can't do nothing with them? :-)".\
         Raises names mismatches with WET#10.
         
         Args:
-            target (dict): nested dictionary representing the tree in spectra/
+            target (dict): nested dictionary representing the
+                folder tree in spectra/
             
             filetype (str): {'.csv', '.fasta'}
         """
@@ -1589,8 +1595,8 @@ Correct the reference residue in the Settings Menu.'.\
         WET#18
         
         Args:
-            df (pd.DataFrame): contains the FASTA loaded data in DataFrame 
-                format as prepared by .read_FASTA().
+            df (pd.DataFrame): contains the FASTA loaded data in
+                DataFrame format as prepared by .read_FASTA().
             
             fasta_path (srt): the .fasta file path.
         """
@@ -1610,8 +1616,8 @@ of the reference experiment [{}][{}][{}]'.\
     def compare_fastas(self):
         """
         Compares all .fasta files to confirm they have the same size.
-        Farseer cannot operate fasta of different lengths if analysing on 
-        the y dimension.
+        Farseer cannot operate FASTA of different lengths if analysing
+        on the y dimension.
         """
         
         l = []
