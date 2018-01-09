@@ -13,6 +13,13 @@ border: 0;
 }
 
 
+QWidget#BaseWidget {
+background-color: #08F2EE;
+background-image: url(:/gradient-box-bg);
+background-repeat: repeat-x;
+border: 6px solid #FAFAF7
+}
+
 QWidget#MainWidget {
 background-color: #001450;
 }
@@ -187,6 +194,20 @@ margin-bottom: 2px;
 }
 
 #SettingsWidget  {
+background-color: #08F2EE;
+background-image: url(:/gradient-box-bg);
+background-repeat: repeat-x;
+border: 6px solid #FAFAF7
+}
+
+#ParaSetWidget  {
+background-color: #08F2EE;
+background-image: url(:/gradient-box-bg);
+background-repeat: repeat-x;
+border: 6px solid #FAFAF7
+}
+
+BaseWidget  {
 background-color: #08F2EE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
