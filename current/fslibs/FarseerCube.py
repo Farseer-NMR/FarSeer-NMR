@@ -22,7 +22,7 @@ class FarseerCube:
     Generates the Farseer-NMR Cube: a 5-dimension Panel containing the
     whole data set.
     
-    Args:
+    Parameters:
         paths (list): absolute paths of all the input peaklists
         
         allpeaklists (dict): nested dictionary created from spectra/.
@@ -281,7 +281,7 @@ FASTA starting residue: {}  """.\
         
         Datapoint names should be singular for each dimension.
         
-        Args:
+        Parameters:
             filetype (str): {'.csv', '.fasta'}
             
             resonance_type (str): {'Backbone', 'Sidechains'}.
@@ -404,7 +404,7 @@ the possible options.'
         """
         Reads a FASTA file to a pd.DataFrame.
         
-        Args:
+        Parameters:
             FASTApath (str): the FASTA file path.
         
         Reads the FASTA file and generates a 5 column DataFrame
@@ -708,7 +708,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         This function operates only along the X axis and for Backbone.
         Cycles over all the Z and Y data points.
         
-        Args:
+        Parameters:
             ref_res (int): the reference residue number.
         """
         
@@ -814,7 +814,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         Expands a <target> peaklist to the size of the <reference>.
         Adds rows of missing residues.
         
-        Args:
+        Parameters:
             ref_pkl (pd.DataFrame): the reference peaklist
             
             target_pkl (pd.DataFrame): the target peaklist
@@ -889,7 +889,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         Uses .seq_expand().
         
-        Args:
+        Parameters:
             fillna_dict (dict): a dictionary of kwargs that define
                 values of the newly generated rows. Example:
                     {'Peak Status': <missing>,
@@ -1011,7 +1011,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         Missing residues can be of type 'lost' or 'unassigned'.
         
-        Args:
+        Parameters:
             fillna_dict (dict): a dictionary of kwargs that define
                 values of the newly generated rows. Example:
                     {'Peak Status': <missing>,
@@ -1102,7 +1102,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         """
         Orders columns in DataFrames for better visualization.
         
-        Args:
+        Parameters:
             performed_cs_correction (bool): whether .correct_shift_*()
                 was previously executed.
         
@@ -1281,7 +1281,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             level keys zzcoods and second level keys yycoords,
             and values FarseerSeries.
         
-        Args:
+        Parameters:
             series_class (class): Farseer Series class.
             
             along_axis (str): {'x', 'y', 'z'} the axis along which
@@ -1381,7 +1381,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         Argument initiation has to be synchronized with the class needs.
         
-        Args:
+        Parameters:
             series_panel (pd.Panel): contains the series to be converted
                 to series_class instance.
             
@@ -1459,7 +1459,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         If file not .csv or .fasta, call WET#13.
         
-        Args:
+        Parameters:
             filytype (str): {'.csv', '.fasta'}
         """
         
@@ -1499,7 +1499,7 @@ if Farseer-NMR can't do nothing with them? :-)".\
         the Y datapoints subfolders.
         Raises names mismatches with WET#10.
         
-        Args:
+        Parameters:
             target (dict): nested dictionary representing the
                 folder tree in spectra/
             
@@ -1566,7 +1566,7 @@ Names must be equal accross every Y axis datapoint folder.".\
         """
         Checks if the reference residue is part of the protein sequence.
         
-        Args:
+        Parameters:
             series (pd.Series): the protein primary sequence.
             
             ref_res (int): the residue number.
@@ -1594,7 +1594,7 @@ Correct the reference residue in the Settings Menu.'.\
         FASTA cannot has less rows than the reference experiment.
         WET#18
         
-        Args:
+        Parameters:
             df (pd.DataFrame): contains the FASTA loaded data in
                 DataFrame format as prepared by .read_FASTA().
             

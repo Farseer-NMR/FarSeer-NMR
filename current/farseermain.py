@@ -64,7 +64,7 @@ def read_user_variables(path, config_name):
     Reads user defined preferences from file and prepares the module of 
     variables necessary for Farseermain.
     
-    Args:
+    Parameters:
         path (str): path to farseer_user_variables.py.
     
     Returns:
@@ -229,9 +229,9 @@ def copy_Farseer_version(
     """
     Makes a copy of the running version.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.cwd
@@ -270,7 +270,7 @@ def logs(
     """
     Prints <s> and writes it to log file.
     
-    Args:
+    Parameters:
         s (str): the string to write.
         
         logfile_name (str): the log file name.
@@ -287,12 +287,12 @@ def logs(
 
 def initial_checks(fsuv):
     """
-    Performs checks that are useful to be executed at the beginning of the
-    Farseer-NMR calculation run.
+    Performs checks that are useful to be executed at the beginning
+    of the Farseer-NMR calculation run.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.apply_PRE_analysis
@@ -309,9 +309,9 @@ def checks_PRE_analysis_flags(fsuv):
     """
     Checks flag compatibility in PRE Analysis routines.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.PRE_analysis_flags
@@ -347,9 +347,9 @@ def checks_cube_axes_flags(fsuv):
     Checks if the user wants to perform any analysis
     on the Farseer-NMR Cube.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.any_axis
@@ -375,12 +375,12 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     """
     Checks whether any plotting flag is activated.
     
-    Args:
-        farseer_series (FarseerSeries instance): contains the experiments
-            of the series.
+    Parameters:
+        farseer_series (FarseerSeries instance): contains the
+            experiments of the series.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
         
         resonance_type (str): {'Backbone', 'Sidechains'}
      
@@ -416,7 +416,7 @@ def checks_calculation_flags(fsuv):
     """
     Checks if the user wants to calculate any restraints.
     
-    Args:
+    Parameters:
         fsuv (module): contains user defined variables (preferences) after
             .read_user_variables().
     """
@@ -436,7 +436,7 @@ def checks_fit_input(series, fsuv):
     """
     Checks whether required fit data and settings are provided correctly.
     
-    Args:
+    Parameters:
         series (FarseerSeries instance):
         
         fsuv (module): contains user defined variables (preferences) after
@@ -475,14 +475,14 @@ Hill Equation will be performed with the following values: {}.".\
 
 def checks_axis_coherency(dim, fsuv):
     """
-    Warns in case the axis the user activates for calculation actually has
-    no data points to create a series.
+    Warns in case the axis the user activates for calculation actually
+    has no data points to create a series.
     
-    Args:
+    Parameters:
         dim (str): the dimension to warn about.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv["general_settings"]["logfile_name"]
@@ -505,9 +505,9 @@ def creates_farseer_dataset(fsuv):
     """
     Creates a Farseer-NMR dataset.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Returns:
         exp (FarseerCube class instance): contains all peaklist data.
@@ -535,11 +535,11 @@ def reads_peaklists(exp, fsuv):
     
     Uses FarseerCube.load_experiments().
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.applyFASTA
@@ -562,7 +562,7 @@ def identify_residues(exp):
     """
     Reads Assignment information using FarseerCube.split_res_info().
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
     """
     exp.split_res_info()
@@ -578,11 +578,11 @@ def correct_shifts(
     
     Uses FarseerCube.correct_shifts_*
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
     
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
         
         resonance_type (str): {'Backbone', 'Sidechains'}
     
@@ -611,9 +611,9 @@ def fill_na(peak_status, merit=0, details='None'):
     A dictionary that configures how the fields of the added rows for 
     missing residues are fill.
     
-    Args:
-        peak_status (str): {'lost', 'unassigned'}, how to fill 'Peak Status' 
-            column.
+    Parameters:
+        peak_status (str): {'lost', 'unassigned'},
+            how to fill 'Peak Status' column.
         
         merit (int/str): how to fill the 'Merit' column.
         
@@ -649,11 +649,11 @@ def expand_lost(exp, resonance_type='Backbone', dim='z'):
     This function is useful when analysing dia/ and paramagnetic/ series
     along the Z axis.
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        dim (str): {'y', 'z'}, defaults to 'z'. The dimension along which 
-            references will be compared.
+        dim (str): {'y', 'z'}, defaults to 'z'.
+            The dimension along which references will be compared.
         
         resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
             'Backbone'.
@@ -676,11 +676,11 @@ def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     Expands a <target> peaklist to the index of a <reference> peaklist.
     Uses FarseerCube.finds_missing().
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        peak_status (str): {'lost', 'unassigned'} the peak status of the new
-            generated entries for missing peaks. Defaults to 'lost'.
+        peak_status (str): {'lost', 'unassigned'}, defaults to 'lost'.
+            Peak status for the new generated entries for missing peaks. 
         
         resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
             'Backbone'.
@@ -710,11 +710,11 @@ def organize_columns(exp, fsuv, resonance_type='Backbone'):
     """
     Uses FarseerSet.organize_cols().
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
         
         resonance_type (str): {'Backbone','Sidechains'}, defaults to 
             'Backbone'.
@@ -741,11 +741,11 @@ def init_fs_cube(exp, fsuv):
     Inits Farseer-NMR Cube.
     The Cube is stored as an attribute of the FarseerCube instance.
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.use_sidechains
@@ -762,9 +762,9 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
     Defines the kwargs dictionary that will be used to generate
     the FarseerSeries object based on the user defined preferences.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
         
         resonance_type (str): {'Backbone', 'Sidechains'}, whether data 
             corresponds to one or another.
@@ -796,20 +796,20 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
 
 def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     """
-    Generates a nested dictionary, <D>, containing all possible series over all the 
-    three Farseer-NMR Cube axis.
+    Generates a nested dictionary, <D>, containing all possible series
+    over all the three Farseer-NMR Cube axis.
     
-    Args:
+    Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
         series_class (FarseerSeries class): The class that will 
             initiate the series, normally fslibs/FarseerSeries.py
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
         
-        resonance_type OPT (stg): {'Backbone', 'Sidechains'} depending on
-            data in <exp>.
+        resonance_type OPT (stg): {'Backbone', 'Sidechains'} depending
+            on data in <exp>.
     
     
     <D> contains a first level key for each Farseer-NMR Cube's axis.
@@ -820,7 +820,7 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     Creates series only for user activated axis.
     
     The first level keys of the experimental series are the "next axis"
-    datapoints, and the second level keys are the "previous axis" datapoints.
+    datapoints, second level keys are the "previous axis" datapoints.
     
     Example:
         for X axis series, keys are:
@@ -920,15 +920,16 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
     Executes the Farseer-NMR Analysis Routines over all the series of
     the activated Farseer-NMR Cube Axes.
     
-    Args:
-        series_dct (dict): a nested dictionary containing the FarseerSeries
-            for every axis of the Farseer-NMR Cube.
+    Parameters:
+        series_dct (dict): a nested dictionary containing the
+            FarseerSeries for every axis of the Farseer-NMR Cube.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
-        resonance_type OPT (str): {'Backbone', 'Sidechains'} whether the data 
-            in <series_dct> corresponds to backbone or sidechain resonances.
+        resonance_type OPT (str): {'Backbone', 'Sidechains'}
+            whether the data in <series_dct> corresponds to backbone or
+            sidechain resonances.
     """
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
@@ -984,13 +985,13 @@ def perform_calcs(farseer_series, fsuv):
     """
     Calculates the NMR restraints according to the user specifications.
     
-    Args:
-        farseer_series (FarseerSeries class): a FarseerSeries class object
-            containing all the experiments along a series previously
-            selected from the Farseer-NMR Cube.
+    Parameters:
+        farseer_series (FarseerSeries class): a FarseerSeries class
+            object containing all the experiments along a series
+            previously selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv["PosF1_settings"]["calcs_PosF1_delta"]
@@ -1059,13 +1060,13 @@ def perform_fits(farseer_series, fsuv):
     """
     Performs fits for 1H, 15N and CSPs data along the X axis series.
     
-    Args:
-        farseer_series (FarseerSeries class): a FarseerSeries class object
-            containing all the experiments along a series previously
-            selected from the Farseer-NMR Cube.
+    Parameters:
+        farseer_series (FarseerSeries class): a FarseerSeries class
+            object containing all the experiments along a series
+            previously selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.perform_resevo_fit
@@ -1106,13 +1107,13 @@ def PRE_analysis(farseer_series, fsuv):
     """
     Optimized algorythm that performs all possible PRE analysis.
     
-    Args:
-        farseer_series (FarseerSeries class): a FarseerSeries class object
-            containing all the experiments along a series previously
-            selected from the Farseer-NMR Cube.
+    Parameters:
+        farseer_series (FarseerSeries class): a FarseerSeries class
+            object containing all the experiments along a series
+            previously selected from the Farseer-NMR Cube.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.apply_PRE_analysis
@@ -1222,7 +1223,7 @@ def exports_series(farseer_series):
     
     Uses FarseerSeries.export_seres_to_tsv()
     
-    Args:
+    Parameters:
         farseer_series (FarseerSeries instance)
     """
     
@@ -1237,12 +1238,12 @@ def exports_chimera_att_files(farseer_series, fsuv):
     
     http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
     
-    Args:
-        farseer_series (FarseerSeries instance): contains all the experiments
-            of a Farseer-NMR Cube extracted series.
+    Parameters:
+        farseer_series (FarseerSeries instance): contains all the
+            experiments of a Farseer-NMR Cube extracted series.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv.restraint_settings
@@ -1312,12 +1313,12 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     Walks through the plotting routines and plots according to user
     preferences.
     
-    Args:
-        farseer_series (FarseerSeries class): contains all the experiments
-            of a Farseer-NMR Cube extracted series.
+    Parameters:
+        farseer_series (FarseerSeries class): contains all the
+            experiments of a Farseer-NMR Cube extracted series.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Depends on:
     fsuv["plotting_flags"]["do_ext_bar"]
@@ -1545,7 +1546,7 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     """
     The set of routines that are run for each comparative series.
     
-    Args:
+    Parameters:
         comp_panel (FarseerSeries instance generated from 
             Comparisons.gen_next_dim or gen_prev_dim): contains all the 
             experiments parsed along an axis and for a specific
@@ -1578,16 +1579,16 @@ def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     """
     Algorythm to perform data comparisons over analysed conditions.
     
-    Args:
-        series_dct (dict): a nested dictionary containing the FarseerSeries
-            for every axis of the Farseer-NMR Cube.
+    Parameters:
+        series_dct (dict): a nested dictionary containing the   
+            FarseerSeries for every axis of the Farseer-NMR Cube.
         
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     
     Returns:
-        comp_dct (dict): a dictionary containing all the comparison objects 
-            created.
+        comp_dct (dict): a dictionary containing all the comparison
+            objects created.
     """
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
@@ -1680,9 +1681,9 @@ def run_farseer(fsuv):
     """
     Runs the whole Farseer-NMR standard algorithm.
     
-    Args:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
+    Parameters:
+        fsuv (module): contains user defined variables (preferences)
+            after .read_user_variables().
     """
     
     general = fsuv["general_settings"]

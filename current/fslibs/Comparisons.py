@@ -13,7 +13,7 @@ class Comparisons:
     
     Different dictionaries are stored for next and previous parsed axes.
     
-    Args:
+    Parameters:
         dimension (str): identifies the main dimension axis of the class
             where X = cond1, Y = cond2, Z = cond3
         
@@ -56,8 +56,9 @@ class Comparisons:
             selfdim='cond',
             other_dim_keys=['condy','condz']):
         """
-        dimension_dict (dict): is a dictionary containing all the series
-            for the main dimension.
+        Parameters:
+            dimension_dict (dict): is a dictionary containing all the
+            series for the main dimension.
         """
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
@@ -97,8 +98,10 @@ class Comparisons:
         """
         Registers the log and prints to the user.
         
-        :logstr: the string to be registered in the log
-        :istitle: is True, formats logstr as a title
+        Parameters:
+            logstr: the string to be registered in the log
+            
+            istitle: is True, formats logstr as a title
         """
         
         if istitle:
@@ -140,11 +143,12 @@ class Comparisons:
         
     def gen_next_dim(self, series_class, comp_kwargs):
         """
-        Generates dictionary with the Series parsed along the next dimension
-        of the <self.dimension>.
+        Generates dictionary with the Series parsed along the next
+        dimension of the <self.dimension>.
         
-        series_class (class): fss.FarseerSeries.
-        comp_kwargs (dict): contains kwargs to initiate FarseerSeries.
+        Parameters:
+            series_class (class): fss.FarseerSeries.
+            comp_kwargs (dict): kwargs to initiate FarseerSeries.
         
         Returns:
             None.
@@ -197,8 +201,9 @@ class Comparisons:
         Generates dictionary with the Series parsed along the previous
         dimension of the <self.dimension>.
         
-        series_class (class): fss.FarseerSeries.
-        comp_kwargs (dict): contains kwargs to initiate FarseerSeries.
+        Parameters:
+            series_class (class): fss.FarseerSeries.
+            comp_kwargs (dict): kwargs to initiate FarseerSeries.
         
         Returns:
             None.

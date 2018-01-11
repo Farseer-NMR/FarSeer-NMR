@@ -15,51 +15,52 @@ class FarseerSeries(pd.Panel):
     A series of NMR experiments.
     
     Inherits a pd.Panel. Each DataFrame is an experiment (peaklist)
-    and progression along panel.items is the evolution of the Series along
-    and experimental variable.
+    and progression along panel.items is the evolution of the series
+    along an experimental variable.
     
     Attributes:
         calc_folder (str): folder name to store calculations.
         
         comparison_folder (str): folder name to store comparisons.
         
-        tables_and_plots_folder (str): subfolder name to store tables and plots 
-            resulting from the calculations.
+        tables_and_plots_folder (str): subfolder name to store tables
+            and plots resulting from the calculations.
         
         chimera_att_folder (str): subfolder name to store UCSF Chimera 
             Attribute files
         
-        export_series_folder (str): subfolder name to store the series peaklists 
-            after all restraints are calculated.
+        export_series_folder (str): subfolder name to store the series
+            peaklists after all restraints are calculated.
         
         calc_path (str): the absolute path to store calculation results.
         
         series_axis (str): identifies the main axis of the series,
             where X = cond1, Y = cond2, Z = cond3
         
-        series_datapoints (list): ordered list with the names of the series
-            data points.
+        series_datapoints (list): ordered list with the names of the
+            series data points.
             
         next_dim (str): the name of the next dimension. For X is Y.
         
         prev_dim (str): the name of the previous dimension. For X is Z.
         
         dim_comparison (str): if the series corresponds to a parsed 
-            comparison, the name of the dimension along which is compared.
+            comparison, the name of the dimension along which is
+            compared.
         
         resonance_type (str): {'Backbone', 'Sidechains'}
         
         res_info (pd.Panel): a copy of the residue information and 
             measurement status.
         
-        restraint_list (list): ORDERED names of the restraints that can be 
-            calculated.
+        restraint_list (list): ORDERED names of the restraints that can
+            be calculated.
         
-        cs_lost (str): {'prev', 'full', 'zero'}, how to represent bars for 
-            lost residues.
+        cs_lost (str): {'prev', 'full', 'zero'}, how to represent bars
+            for lost residues.
             
-        csp_alpha4res (dict): a dictionary containing the alpha values to be 
-            used for each residue in the CSP calculation formula.
+        csp_alpha4res (dict): a dictionary containing the alpha values
+            to be used for each residue in the CSP calculation formula.
         
         fitdf (dict): stored pd.DataFrames with information on fitting.
         fit_performed (bool): defaults False. True after .perform_fit().
@@ -231,8 +232,10 @@ class FarseerSeries(pd.Panel):
         """
         Registers the log string and prints it.
         
-        logstr (str): the string to be registered in the log.
-        istitle (bool): flag to format logstr as a title.
+        Parameters:
+            logstr (str): the string to be registered in the log.
+            
+            istitle (bool): flag to format logstr as a title.
         """
         
         if istitle:
@@ -259,8 +262,10 @@ class FarseerSeries(pd.Panel):
     def exports_log( self, mod='a', path='farseer.log'):
         """Exports log to external file.
         
-        mod (str): python.open() arg mode.
-        logfile_name (str): the external log file name.
+        Parameters:
+            mod (str): python.open() arg mode.
+            
+            logfile_name (str): the external log file name.
         """
         
         with open(path, mod) as logfile:
@@ -286,22 +291,24 @@ class FarseerSeries(pd.Panel):
         
         Permission is hereby granted, free of charge,
         to any person obtaining a copy of this software and associated
-        documentation files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use, copy,
-        modify, merge, publish, distribute, sublicense, and/or sell copies of
-        the Software, and to permit persons to whom the Software is furnished
-        to do so, subject to the following conditions:
+        documentation files (the "Software"), to deal in the Software
+        without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to
+        whom the Software is furnished to do so, subject to the
+        following conditions:
 
         The above copyright notice and this permission notice shall be
         included in all copies or substantial portions of the Software.
 
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
 
         "#FFFFFF" -> [255,255,255]
         """
@@ -318,22 +325,24 @@ class FarseerSeries(pd.Panel):
         
         Permission is hereby granted, free of charge,
         to any person obtaining a copy of this software and associated
-        documentation files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use, copy,
-        modify, merge, publish, distribute, sublicense, and/or sell copies of
-        the Software, and to permit persons to whom the Software is furnished
-        to do so, subject to the following conditions:
+        documentation files (the "Software"), to deal in the Software
+        without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to
+        whom the Software is furnished to do so, subject to the
+        following conditions:
 
         The above copyright notice and this permission notice shall be
         included in all copies or substantial portions of the Software.
 
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
         
         [255,255,255] -> "#FFFFFF"
         """
@@ -354,22 +363,24 @@ class FarseerSeries(pd.Panel):
         
         Permission is hereby granted, free of charge,
         to any person obtaining a copy of this software and associated
-        documentation files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use, copy,
-        modify, merge, publish, distribute, sublicense, and/or sell copies of
-        the Software, and to permit persons to whom the Software is furnished
-        to do so, subject to the following conditions:
+        documentation files (the "Software"), to deal in the Software
+        without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to
+        whom the Software is furnished to do so, subject to the
+        following conditions:
 
         The above copyright notice and this permission notice shall be
         included in all copies or substantial portions of the Software.
 
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
         
         Takes in a list of RGB sub-lists and returns dictionary of
         colors in RGB and hex form for use in a graphing function
@@ -395,22 +406,24 @@ class FarseerSeries(pd.Panel):
         
         Permission is hereby granted, free of charge,
         to any person obtaining a copy of this software and associated
-        documentation files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use, copy,
-        modify, merge, publish, distribute, sublicense, and/or sell copies of
-        the Software, and to permit persons to whom the Software is furnished
-        to do so, subject to the following conditions:
+        documentation files (the "Software"), to deal in the Software
+        without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to
+        whom the Software is furnished to do so, subject to the
+        following conditions:
 
         The above copyright notice and this permission notice shall be
         included in all copies or substantial portions of the Software.
 
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
         
         returns a gradient list of (n) colors between
         two hex colors. start_hex and finish_hex
@@ -439,7 +452,7 @@ class FarseerSeries(pd.Panel):
         using as reference the column from the reference experiment, 
         which is always stored in Item=0.
         
-        Calculation results are stored in a new column for each DataFrame.
+        Calculation results are stored in new columns.
         """
         
         self.loc[:,:,calccol] = \
@@ -468,9 +481,9 @@ class FarseerSeries(pd.Panel):
     
     def calc_ratio(self, calccol, sourcecol):
         """
-        Calculates the ration between two columns along a Series
-        using as reference the column from the reference experiment, 
-        which is always stored in Item=0.
+        Calculates the ratio between two columns along a series of
+        experiments using as reference the column from the reference
+        experiment, which is always stored in Item=0.
         
         Calculation result is stored in a new column of each DataFrame.
         """
@@ -485,8 +498,8 @@ class FarseerSeries(pd.Panel):
         """
         Formula that calculates Chemical Shift Perturbations (CSPs).
         
-        Args:
-            s (pd.Series): s[0], 1-letter residue code; s[1]; chemical shift 
+        Parameters:
+            s (pd.Series): s[0], 1-letter res code; s[1]; chemical shift 
             for nuclei 1, s[2], chemical shift for nuclei 2.
         
         np.sqrt(0.5*(H1**2 + (alpha*N15)**2))
@@ -525,10 +538,10 @@ class FarseerSeries(pd.Panel):
         Theorital PRE files (*.pre) should be stored in a 'para' folder
         at the cond3 hierarchy level.
         
-        Reads information on the tag position which should be stored in the
+        Reads information on the tag position stored in the
         *.pre file as an header comment, for example, '#40'.
         
-        Args:
+        Parameters:
             spectra_path (str): absolute path to the spectra/ folder.
             
             datapoint (str): the name of the data point.
@@ -609,8 +622,7 @@ is not part of the protein sequence ({}-{}).'.\
         Arbesú, M. et al. The Unique Domain Forms a Fuzzy Intramolecular 
         Complex in Src Family Kinases. Structure 25, 630–640.e4 (2017).
         
-        Args:
-        
+        Parameters:
             sourcecol (str): the column name of the intensity data.
             
             targetcol (str): the column name to store delta PRE data.
@@ -655,8 +667,8 @@ with window size {} and stdev {}'.\
         """
         Exports to .csv file the columns along the series.
         
-        Args:
-            restraint_folder (str): the folder name relating to the restraint.
+        Parameters:
+            restraint_folder (str): the folder name.
             
             tablecol (str): the column name to be exported.
             
@@ -759,13 +771,12 @@ with window size {} and stdev {}'.\
         
         One file is exported for each experiment in the Series.
         
-        Args:
-            resformat (str): the formating options for the 'ResNo' column. 
-            This must match the residue selection command in Chimera.
-            See:
-            www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
-            this is defined in the Chimera_ATT_Res_format variable in
-            farseer_user_variables.
+        Parameters:
+            resformat (str): formatting prefix for the 'ResNo' column. 
+                Must match the residue selection command in Chimera.
+                See:
+                www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
+                Defined in the Chimera_ATT_Res_format variable.
             
             colformat (str): formatting code.
         """
@@ -847,7 +858,7 @@ recipient: residues
         """
         Translates the 'Peak Status' col to a dict of colours.
         
-        Args:
+        Parameters:
             items (matplotlib obj): either plot bars, ticks, etc...
         
             series (pd.Series): containing the 'Peak Status' information.
@@ -875,8 +886,8 @@ recipient: residues
         """
         Places a text mark over the bars of a Bar Plot.
         
-        Args:
-            ax (matplotlib subplot axis): subplot where maker is written.
+        Parameters:
+            ax (matplotlib subplot axis): where maker is written.
             
             axbar (matplotlib object): bars of plot.
             
@@ -884,12 +895,12 @@ recipient: residues
             
             d (dict): translates information into marker.
             
-            yy_scale (float): a vertical scale to calibrate marker position
+            yy_scale (float): vertical scale calibrates marker position
             
             fs (int): font size
             
-            orientation (str): {'horizontal', 'vertical'} wheter plotting in a
-                vertical or horizontal barplot.
+            orientation (str): {'horizontal', 'vertical'}
+                wheter plotting in a vertical or horizontal barplot.
         """
         
         def vpos_sign(x, y):
@@ -941,7 +952,7 @@ recipient: residues
         """
         Plots threshold line that identifies relevant perturnations.
         
-        Args:
+        Parameters:
             ax (matplotlib subplot axis): subplot where line is drawn.
             
             series (pd.Series): values to evaluate.
@@ -952,8 +963,8 @@ recipient: residues
             
             alpha (float): transparency.
             
-            orientation (str): {'horizontal', 'vertical'} wheter plotting in a
-                vertical or horizontal barplot.
+            orientation (str): {'horizontal', 'vertical'}
+                wheter plotting in a vertical or horizontal barplot.
             
             zorder (int): the matplotlib zorder kwarg.
         """
@@ -1012,7 +1023,7 @@ recipient: residues
         """
         Plots theoretical PRE.
         
-        Args:
+        Parameters:
             axs (matplotlib subplot axis): where values are plot.
             
             exp (str): the name of the Z axis data point.
@@ -1183,7 +1194,7 @@ recipient: residues
         """
         Plots horizontal bar plots.
         
-        Args:
+        Parameters:
             plot_style (str): {'bar_extender', 'bar_compacted'},
                 template to use.
             
@@ -1520,8 +1531,7 @@ recipient: residues
         """
         Plots vertical bar plots.
         
-        Args:
-            
+        Parameters:
             calccol (str): the name of the column to plot.
             
             axs: matplotlib axis object.
@@ -1758,9 +1768,9 @@ recipient: residues
             cols_page='',
             perform_resevo_fitting=''):
         """
-        Plots the evolution of a restraint along the series of a residue.
+        Plots residue resolved parameter evolution along the series.
         
-        Args:
+        Parameters:
             calccol (str): the name of the column to plot.
             
             axs: matplotlib axis object.
@@ -2011,10 +2021,10 @@ or confirm you have not forgot any peaklist [{}].".\
             cols_page='',
             perform_resevo_fitting=''):
         """
-        Plots the chemical shift evolution normalized to zero (reference) 
-        along the series for the current residue.
+        Plots residue resolved CSPs along the series and normalised to
+        the reference experiment.
         
-        Args:
+        Parameters:
             calccol (str): the name of the column to plot.
             
             axs: matplotlib axis object.
@@ -2284,10 +2294,10 @@ or confirm you have not forgot any peaklist [{}].".\
             titration_x_values='',
             perform_resevo_fitting=''):
         """
-        Plots the chemical shift evolution normalized to zero (reference) 
-        for all the residues in a single plot.
+        Plots the chemical shift evolution normalized the reference
+        experiment for all the residues in a single plot.
         
-        Args:
+        Parameters:
             
             axs (matplotlib subplot axis): the subplot axis array.
         """
@@ -2428,8 +2438,7 @@ or confirm you have not forgot any peaklist [{}].".\
         Arbesú, M. et al. The Unique Domain Forms a Fuzzy Intramolecular 
         Complex in Src Family Kinases. Structure 25, 630–640.e4 (2017).
         
-        Args:
-            
+        Parameters:
             calccol (str): the name of the column to plot.
             
             f: the matplotlib figure object.
@@ -2587,8 +2596,7 @@ or confirm you have not forgot any peaklist [{}].".\
         Arbesú, M. et al. The Unique Domain Forms a Fuzzy Intramolecular 
         Complex in Src Family Kinases. Structure 25, 630–640.e4 (2017).
         
-        Args:
-            
+        Parameters:
             calccol (str): the name of the column to plot.
             
             axs: matplotlib axis object.
@@ -2799,16 +2807,20 @@ or confirm you have not forgot any peaklist [{}].".\
         """
         The main function that calls and builds the different plots.
         
-        Args:
+        Parameters:
             calccol (str): the column to plot.
             
-            plot_type (str): {'exp', 'res', 'single'}. 'exp' if one subplot 
-                for each experiment in series; 'res' if one subplot per 
-                residue, 'single' if a single plot.
+            plot_type (str): {'exp', 'res', 'single'}. 
+                'exp' if one subplot for each experiment in series;
+                'res' if one subplot per residue;
+                'single' if a single plot.
             
-            plot_style (str): one of the different plot styles, see Wiki.
+            plot_style (str): {'bar_extended', 'bar_compacted',
+                'bar_vertical', 'res_evo', 'cs_scatter',
+                'cs_scatter_flower', 'heat_map', 'delta_osci'}
             
-            param_dict (dict): kwargs to be passed to each plotting function.
+            param_dict (dict): kwargs to be passed to each plotting
+                function.
         """
         
         self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
@@ -2955,7 +2967,7 @@ or confirm you have not forgot any peaklist [{}].".\
         """
         Saves plot figure to a file.
         
-        Args:
+        Parameters:
             fig (matplotlib figure object):
             
             plot_name (str): the name of the plot file.
@@ -2964,7 +2976,7 @@ or confirm you have not forgot any peaklist [{}].".\
             
             calccol (str): the data column name.
             
-            fig_file_type (str): the figure file extension (.pdf, .png, ...).
+            fig_file_type (str): file extension.
             
             fig_dpi (int): the dpi resolution.
         """
@@ -2993,7 +3005,7 @@ or confirm you have not forgot any peaklist [{}].".\
         If multiple fits have to be performed, run Faseer-NMR with
         different config files.
         
-        Arguments:
+        Parameters:
             - col: the column containing the data to fit
             - x_values: the x data
             - mindp: minimum number of points to consider residue
