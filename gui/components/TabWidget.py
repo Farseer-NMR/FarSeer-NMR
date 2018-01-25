@@ -32,8 +32,6 @@ class TabWidget(QTabWidget):
 
 
 
-
-
     def add_tabs_to_widget(self):
         self.interface = Interface(self, gui_settings=self.gui_settings, variables=self.variables, footer=False)
         self.settings = Settings(self, gui_settings=self.gui_settings, variables=self.variables, footer=True)

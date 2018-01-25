@@ -35,7 +35,7 @@ def getPeakListFileFormat(filePath):
     if len(filePath.split('.')) < 2:
         print('Invalid File Extension')
         return
-    if filePath.split('.')[1] not in file_extenstions:
+    if filePath.split('.')[-1] not in file_extenstions:
         print('Invalid File Extension')
         return
     for line in fin:
@@ -377,6 +377,7 @@ def parseCcpn(peaklist_file):
               atoms.append(a2)
       peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
                   volume=row[7], height=row[6], fit_method=row[12], merit=row[10], volume_method=row[13], details=row[11])
+      print(peak)
 
       peakList.append(peak)
 
@@ -421,20 +422,15 @@ def read_peaklist(fin, prot_file=None, seq_file=None):
 
   peaklist_file = fixpath(fin)
   file_format = getPeakListFileFormat(peaklist_file)
-  print(fin)
 
   if file_format == 'ANSIG':
       return parseAnsig(peaklist_file)
-  # elif file_format == 'CYANA':
-  #     return parseXeasy(peaklist_file, prot_file, seq_file)
   elif file_format == 'NMRDRAW':
       return parseNmrDraw(peaklist_file)
   elif file_format == 'NMRVIEW':
       return parseNmrView(peaklist_file)
   elif file_format == 'SPARKY':
       return parseSparkyPeakList(peaklist_file)
-  # elif file_format == 'XEASY':
-  #     return parseXeasy(peaklist_file, prot_file, seq_file)
   elif file_format == 'CCPN':
       return parseCcpn(peaklist_file)
 

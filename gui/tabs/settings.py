@@ -397,6 +397,8 @@ class Settings(BaseWidget):
 
         general["spectra_path"] = self.spectrum_path.field.text()
         general["output_path"] = self.output_path.field.text()
+        general["spectrum_input_path"] = self.output_path.field.text()+'/spectra/'
+
         general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
         general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
         general["fig_height"] = self.figure_height.field.value()
@@ -468,7 +470,7 @@ class Settings(BaseWidget):
         self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
 
-        self.parent().parent().parent().save_config(self.variables, path)
+        self.parent().parent().parent().save_config(path)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
