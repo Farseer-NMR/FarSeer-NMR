@@ -12,36 +12,35 @@ from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLabel, \
 from gui.components.Icon import ICON_DIR
 
 
-from gui.tabs.peaklist_selection import Interface
+from gui.tabs.peaklist_selection import PeaklistSelection
 from gui.tabs.paraset import Paraset
 from gui.tabs.settings import Settings
+
+from current.fslibs.Variables import Variables
 
 
 
 class TabWidget(QTabWidget):
-    def __init__(self, gui_settings, variables):
+
+    variables = Variables()._vars
+
+    def __init__(self, gui_settings):
         QTabWidget.__init__(self, parent=None)
 
         self.widgets = []
-
         self.gui_settings = gui_settings
         self.add_tab_logo()
-        self.variables = variables
-        self.config_file = None
         self.add_tabs_to_widget()
 
 
-
     def add_tabs_to_widget(self):
-        self.interface = Interface(self, gui_settings=self.gui_settings, variables=self.variables, footer=False)
-        self.settings = Settings(self, gui_settings=self.gui_settings, variables=self.variables, footer=True)
-        self.paraset = Paraset(self, gui_settings=self.gui_settings, variables=self.variables, footer=True)
+        self.peaklist_selection = PeaklistSelection(self, gui_settings=self.gui_settings, footer=False)
+        self.settings = Settings(self, gui_settings=self.gui_settings, footer=True)
 
-        self.add_tab(self.interface, "PeakList Selection")
+        self.add_tab(self.peaklist_selection, "PeakList Selection")
         self.add_tab(self.settings, "Settings", "Settings")
-        self.add_tab(self.paraset, "ParaSet", "ParaSetWidget")
 
-        self.widgets.extend([self.interface, self.settings, self.paraset])
+        self.widgets.extend([self.peaklist_selection, self.settings])
 
 
     def set_data_sets(self):
@@ -65,12 +64,10 @@ class TabWidget(QTabWidget):
             fname = [path]
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
-                variables = json.load(open(fname[0], 'r'))
-                self.settings.spectrum_path.field.setText('')
-                self.variables = variables
-                self.load_variables(variables)
-                print(self.variables["peaklists"], "peaklists")
-                return variables
+                # variables = json.load(open(fname[0], 'r'))
+                # self.settings.spectrum_path.field.setText('')
+                # self.variables = variables
+                Variables().read(fname[0])
         return
 
     def load_variables(self, variables):
@@ -88,19 +85,20 @@ class TabWidget(QTabWidget):
 
     def save_config(self, path=None):
         if not path:
-            fname = QFileDialog.getSaveFileName(self, 'Save Configuration' '', "*.json")
+            filters = "JSON files (*.json)"
+            selected_filter = "JSON files (*.json)"
+            fname = QFileDialog.getSaveFileName(self, " Save Configuration ", "", filters,
+                                                  selected_filter)
+
         else:
             fname = [path]
+        if not fname[0].endswith('.json'):
+            fname = [fname[0] +".json"]
         if fname[0]:
             with open(fname[0], 'w') as outfile:
-                if fname[0].endswith('.json'):
-                    print(self.interface.sideBar.peakLists)
-                    if not self.variables["peaklists"]:
-                        self.variables["peaklists"] = self.interface.sideBar.peakLists
+                Variables().write(outfile)
 
-                    json.dump(self.variables, outfile, indent=4)
-                    self.config_file = fname[0]
-                print('Configuration saved to %s' % fname[0])
+        print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
         from current.Threading import Threading

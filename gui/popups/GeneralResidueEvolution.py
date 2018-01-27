@@ -1,29 +1,23 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox
+
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.FontComboBox import FontComboBox
-from functools import partial
-from gui.gui_utils import defaults, font_weights
+
+from gui.gui_utils import font_weights
+
+from gui.popups.BasePopup import BasePopup
 
 
-class GeneralResidueEvolution(QDialog):
+class GeneralResidueEvolution(BasePopup):
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(GeneralResidueEvolution, self).__init__(parent)
-        self.setWindowTitle("Residue Evolution Plot")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        self.variables = None
-        #self.default_do_revo_fit_setting = defaults["fitting_settings"]["perform_resevo_fitting"]
-        #self.variable_do_revo_fit_setting = variables["fitting_settings"]["perform_resevo_fitting"]
-        if variables:
-            self.variables = variables["revo_settings"]
-        self.default = defaults["revo_settings"]
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="Residue Evolution Plot",
+                           settings_key=["revo_settings"])
+
         self.do_revo_fit = LabelledCheckbox(self, text="Fit Parameter Evolution")
         self.revo_subtitle_fn = FontComboBox(self, text="Subtitle Font")
         self.revo_subtitle_fs = LabelledSpinBox(self, text="Subtitle Font Size", min=0, step=1)
@@ -83,14 +77,14 @@ class GeneralResidueEvolution(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 12, 0, 1, 2)
 
-        if variables:
-            self.get_values()
+        self.get_values()
+
 
     def get_defaults(self):
         self.do_revo_fit.checkBox.setChecked(self.default["perform_resevo_fitting"])
@@ -121,59 +115,59 @@ class GeneralResidueEvolution(QDialog):
 
 
 
-    def set_values(self, variables):
-        self.variables["perform_resevo_fitting"] = self.do_revo_fit.checkBox.isChecked()
-        self.variables["subtitle_fn"] = str(self.revo_subtitle_fn.fields.currentText())
-        self.variables["subtitle_fs"] = self.revo_subtitle_fs.field.value()
-        self.variables["subtitle_pad"] = self.revo_subtitle_pad.field.value()
-        self.variables["subtitle_weight"] = str(self.revo_subtitle_weight.fields.currentText())
-        self.variables["x_label_fn"] = str(self.revo_x_label_fn.fields.currentText())
-        self.variables["x_label_fs"] = self.revo_x_label_fs.field.value()
-        self.variables["x_label_pad"] = self.revo_x_label_pad.field.value()
-        self.variables["x_label_weight"] = str(self.revo_x_label_weight.fields.currentText())
-        self.variables["y_label_fn"] = str(self.revo_y_label_fn.fields.currentText())
-        self.variables["y_label_fs"] = self.revo_y_label_fs.field.value()
-        self.variables["y_label_pad"] = self.revo_y_label_pad.field.value()
+    def set_values(self):
+        self.local_variables["perform_resevo_fitting"] = self.do_revo_fit.checkBox.isChecked()
+        self.local_variables["subtitle_fn"] = str(self.revo_subtitle_fn.fields.currentText())
+        self.local_variables["subtitle_fs"] = self.revo_subtitle_fs.field.value()
+        self.local_variables["subtitle_pad"] = self.revo_subtitle_pad.field.value()
+        self.local_variables["subtitle_weight"] = str(self.revo_subtitle_weight.fields.currentText())
+        self.local_variables["x_label_fn"] = str(self.revo_x_label_fn.fields.currentText())
+        self.local_variables["x_label_fs"] = self.revo_x_label_fs.field.value()
+        self.local_variables["x_label_pad"] = self.revo_x_label_pad.field.value()
+        self.local_variables["x_label_weight"] = str(self.revo_x_label_weight.fields.currentText())
+        self.local_variables["y_label_fn"] = str(self.revo_y_label_fn.fields.currentText())
+        self.local_variables["y_label_fs"] = self.revo_y_label_fs.field.value()
+        self.local_variables["y_label_pad"] = self.revo_y_label_pad.field.value()
 
-        self.variables["y_label_weight"] = str(self.revo_y_label_weight.fields.currentText())
-        self.variables["x_ticks_fn"] = str(self.revo_x_ticks_fn.fields.currentText())
-        self.variables["x_ticks_fs"] = self.revo_x_ticks_fs.field.value()
-        self.variables["x_ticks_pad"] = self.revo_x_ticks_pad.field.value()
-        self.variables["x_ticks_weight"] = str(self.revo_x_ticks_weight.fields.currentText())
-        self.variables["x_ticks_rot"] = self.revo_x_ticks_rotation.field.value()
-        self.variables["y_ticks_fn"] = str(self.revo_y_ticks_fn.fields.currentText())
-        self.variables["y_ticks_fs"] = self.revo_y_ticks_fs.field.value()
-        self.variables["y_ticks_pad"] = self.revo_y_ticks_pad.field.value()
-        self.variables["y_ticks_weight"] = str(self.revo_y_ticks_weight.fields.currentText())
-        self.variables["y_ticks_rot"] = self.revo_y_ticks_rot.field.value()
-        self.variables["titration_x_values"] = [float(x) for x in self.titration_x_values.field.text().split(',')]
-        variables["revo_settings"] = self.variables
+        self.local_variables["y_label_weight"] = str(self.revo_y_label_weight.fields.currentText())
+        self.local_variables["x_ticks_fn"] = str(self.revo_x_ticks_fn.fields.currentText())
+        self.local_variables["x_ticks_fs"] = self.revo_x_ticks_fs.field.value()
+        self.local_variables["x_ticks_pad"] = self.revo_x_ticks_pad.field.value()
+        self.local_variables["x_ticks_weight"] = str(self.revo_x_ticks_weight.fields.currentText())
+        self.local_variables["x_ticks_rot"] = self.revo_x_ticks_rotation.field.value()
+        self.local_variables["y_ticks_fn"] = str(self.revo_y_ticks_fn.fields.currentText())
+        self.local_variables["y_ticks_fs"] = self.revo_y_ticks_fs.field.value()
+        self.local_variables["y_ticks_pad"] = self.revo_y_ticks_pad.field.value()
+        self.local_variables["y_ticks_weight"] = str(self.revo_y_ticks_weight.fields.currentText())
+        self.local_variables["y_ticks_rot"] = self.revo_y_ticks_rot.field.value()
+        self.local_variables["titration_x_values"] = [float(x) for x in self.titration_x_values.field.text().split(',')]
+        self.variables.update(self.local_variables)
         self.accept()
 
     def get_values(self):
-        self.do_revo_fit.setChecked(self.variables["perform_resevo_fitting"])
-        self.revo_subtitle_fn.select(self.variables["subtitle_fn"])
-        self.revo_subtitle_fs.setValue(self.variables["subtitle_fs"])
-        self.revo_subtitle_pad.setValue(self.variables["subtitle_pad"])
-        self.revo_subtitle_weight.select(self.variables["subtitle_weight"])
-        self.revo_x_label_fn.select(self.variables["x_label_fn"])
-        self.revo_x_label_fs.setValue(self.variables["x_label_fs"])
-        self.revo_x_label_pad.setValue(self.variables["x_label_pad"])
-        self.revo_x_label_weight.select(self.variables["x_label_weight"])
-        self.revo_y_label_fn.select(self.variables["y_label_fn"])
-        self.revo_y_label_fs.setValue(self.variables["y_label_fs"])
-        self.revo_y_label_pad.setValue(self.variables["y_label_pad"])
+        self.do_revo_fit.setChecked(self.local_variables["perform_resevo_fitting"])
+        self.revo_subtitle_fn.select(self.local_variables["subtitle_fn"])
+        self.revo_subtitle_fs.setValue(self.local_variables["subtitle_fs"])
+        self.revo_subtitle_pad.setValue(self.local_variables["subtitle_pad"])
+        self.revo_subtitle_weight.select(self.local_variables["subtitle_weight"])
+        self.revo_x_label_fn.select(self.local_variables["x_label_fn"])
+        self.revo_x_label_fs.setValue(self.local_variables["x_label_fs"])
+        self.revo_x_label_pad.setValue(self.local_variables["x_label_pad"])
+        self.revo_x_label_weight.select(self.local_variables["x_label_weight"])
+        self.revo_y_label_fn.select(self.local_variables["y_label_fn"])
+        self.revo_y_label_fs.setValue(self.local_variables["y_label_fs"])
+        self.revo_y_label_pad.setValue(self.local_variables["y_label_pad"])
 
-        self.revo_y_label_weight.select(self.variables["y_label_weight"])
-        self.revo_x_ticks_fn.select(self.variables["x_ticks_fn"])
-        self.revo_x_ticks_fs.setValue(self.variables["x_ticks_fs"])
-        self.revo_x_ticks_pad.setValue(self.variables["x_ticks_pad"])
-        self.revo_x_ticks_weight.select(self.variables["x_ticks_weight"])
-        self.revo_x_ticks_rotation.setValue(self.variables["x_ticks_rot"])
-        self.revo_y_ticks_fn.select(self.variables["y_ticks_fn"])
-        self.revo_y_ticks_fs.setValue(self.variables["y_ticks_fs"])
-        self.revo_y_ticks_pad.setValue(self.variables["y_ticks_pad"])
-        self.revo_y_ticks_weight.select(self.variables["y_ticks_weight"])
-        self.revo_y_ticks_rot.setValue(self.variables["y_ticks_rot"])
-        self.revo_y_ticks_rot.setValue(self.variables["y_ticks_rot"])
-        self.titration_x_values.field.setText(','.join([str(x) for x in self.variables["titration_x_values"]]))
+        self.revo_y_label_weight.select(self.local_variables["y_label_weight"])
+        self.revo_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
+        self.revo_x_ticks_fs.setValue(self.local_variables["x_ticks_fs"])
+        self.revo_x_ticks_pad.setValue(self.local_variables["x_ticks_pad"])
+        self.revo_x_ticks_weight.select(self.local_variables["x_ticks_weight"])
+        self.revo_x_ticks_rotation.setValue(self.local_variables["x_ticks_rot"])
+        self.revo_y_ticks_fn.select(self.local_variables["y_ticks_fn"])
+        self.revo_y_ticks_fs.setValue(self.local_variables["y_ticks_fs"])
+        self.revo_y_ticks_pad.setValue(self.local_variables["y_ticks_pad"])
+        self.revo_y_ticks_weight.select(self.local_variables["y_ticks_weight"])
+        self.revo_y_ticks_rot.setValue(self.local_variables["y_ticks_rot"])
+        self.revo_y_ticks_rot.setValue(self.local_variables["y_ticks_rot"])
+        self.titration_x_values.field.setText(','.join([str(x) for x in self.local_variables["titration_x_values"]]))

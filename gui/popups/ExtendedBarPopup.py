@@ -1,26 +1,31 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 
-from gui.gui_utils import defaults, font_weights
+from gui.gui_utils import font_weights
 from functools import partial
 
-class ExtendedBarPopup(QDialog):
+from gui.popups.BasePopup import BasePopup
+from functools import partial
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(ExtendedBarPopup, self).__init__(parent)
-        self.setWindowTitle("Extended Bar Plot")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
+from PyQt5.QtWidgets import QDialogButtonBox
 
-        self.variables = None
-        if variables:
-            self.variables = variables["extended_bar_settings"]
-        self.defaults = defaults["extended_bar_settings"]
+from gui.components.FontComboBox import FontComboBox
+from gui.components.LabelledCheckbox import LabelledCheckbox
+from gui.components.LabelledCombobox import LabelledCombobox
+from gui.components.LabelledSpinBox import LabelledSpinBox
+from gui.gui_utils import font_weights
+from gui.popups.BasePopup import BasePopup
+
+
+class ExtendedBarPopup(BasePopup):
+
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="Extended Bar Plot",
+                           settings_key=["extended_bar_settings"])
+
 
         self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
         self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
@@ -40,13 +45,13 @@ class ExtendedBarPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 8, 0)
-        if self.variables:
-            self.get_values()
+
+        self.get_values()
 
     def get_defaults(self):
         self.bar_cols.setValue(self.defaults["cols_page"])
@@ -59,21 +64,21 @@ class ExtendedBarPopup(QDialog):
 
 
     def get_values(self):
-        self.bar_cols.setValue(self.variables["cols_page"])
-        self.bar_rows.setValue(self.variables["rows_page"])
-        self.x_tick_font.select(self.variables["x_ticks_fn"])
-        self.x_tick_font_size.setValue(self.variables["x_ticks_fs"])
-        self.x_tick_rotation.setValue(self.variables["x_ticks_rot"])
-        self.x_tick_font_weight.select(self.variables["x_ticks_weight"])
-        self.x_tick_colour.setChecked(self.variables["x_ticks_color_flag"])
+        self.bar_cols.setValue(self.local_variables["cols_page"])
+        self.bar_rows.setValue(self.local_variables["rows_page"])
+        self.x_tick_font.select(self.local_variables["x_ticks_fn"])
+        self.x_tick_font_size.setValue(self.local_variables["x_ticks_fs"])
+        self.x_tick_rotation.setValue(self.local_variables["x_ticks_rot"])
+        self.x_tick_font_weight.select(self.local_variables["x_ticks_weight"])
+        self.x_tick_colour.setChecked(self.local_variables["x_ticks_color_flag"])
 
-    def set_values(self, variables):
-        self.variables["cols_page"] = self.bar_cols.field.value()
-        self.variables["rows_page"] = self.bar_rows.field.value()
-        self.variables["x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
-        self.variables["x_ticks_fs"] = self.x_tick_font_size.field.value()
-        self.variables["x_ticks_rot"] = self.x_tick_rotation.field.value()
-        self.variables["x_ticks_weight"] = str(self.x_tick_font_weight.fields.currentText())
-        self.variables["x_ticks_color_flag"] = self.x_tick_colour.checkBox.isChecked()
-        variables["extended_bar_settings"] = self.variables
+    def set_values(self):
+        self.local_variables["cols_page"] = self.bar_cols.field.value()
+        self.local_variables["rows_page"] = self.bar_rows.field.value()
+        self.local_variables["x_ticks_fn"] = str(self.x_tick_font.fields.currentText())
+        self.local_variables["x_ticks_fs"] = self.x_tick_font_size.field.value()
+        self.local_variables["x_ticks_rot"] = self.x_tick_rotation.field.value()
+        self.local_variables["x_ticks_weight"] = str(self.x_tick_font_weight.fields.currentText())
+        self.local_variables["x_ticks_color_flag"] = self.x_tick_colour.checkBox.isChecked()
+        self.local_variables.update(self.variables)
         self.accept()

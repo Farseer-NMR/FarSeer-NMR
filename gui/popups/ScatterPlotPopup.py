@@ -1,5 +1,4 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
@@ -7,25 +6,20 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 
-from gui.gui_utils import defaults, colours
-from functools import partial
-
+from gui.gui_utils import colours
 # https://stackoverflow.com/questions/34293875/how-to-remove-punctuation-marks-from-a-string-in-python-3-x-using-translate
 import string
 translator = str.maketrans('', '', string.punctuation+" ")
 
-class ScatterPlotPopup(QDialog):
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(ScatterPlotPopup, self).__init__(parent)
-        self.setWindowTitle("Scatter Plot")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        self.variables = None
-        if variables:
-            self.variables = variables["cs_scatter_settings"]
-        self.default = defaults["cs_scatter_settings"]
+
+from gui.popups.BasePopup import BasePopup
+
+class ScatterPlotPopup(BasePopup):
+
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="Scatter Plot",
+                           settings_key=["cs_scatter_settings"])
 
         self.cs_scatter_cols_page = LabelledSpinBox(self, "Columns Per Page", min=1, step=1)
         self.cs_scatter_rows_page = LabelledSpinBox(self, "Rows Per Page", min=1, step=1)
@@ -61,14 +55,13 @@ class ScatterPlotPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 7, 0, 1, 2)
 
-        if variables:
-            self.get_values()
+        self.get_values()
 
     def get_defaults(self):
         self.cs_scatter_cols_page.setValue(self.default["cols_page"])
@@ -88,41 +81,41 @@ class ScatterPlotPopup(QDialog):
         self.cs_scatter_hide_lost.setChecked(self.default["hide_lost"])
 
 
-    def set_values(self, variables):
-        self.variables["cols_page"] = self.cs_scatter_cols_page.field.value()
-        self.variables["rows_page"] = self.cs_scatter_rows_page.field.value()
-        self.variables["x_label"] = self.cs_scatter_x_label.field.text()
-        self.variables["y_label"] = self.cs_scatter_y_label.field.text()
-        self.variables["mksize"] = self.cs_scatter_mksize.field.value()
-        self.variables["scale"] = self.cs_scatter_scale.field.value()
-        self.variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
-        self.variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
-        self.variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
-        self.variables["markers"] = [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
-        self.variables["mk_color"] = \
+    def set_values(self):
+        self.local_variables["cols_page"] = self.cs_scatter_cols_page.field.value()
+        self.local_variables["rows_page"] = self.cs_scatter_rows_page.field.value()
+        self.local_variables["x_label"] = self.cs_scatter_x_label.field.text()
+        self.local_variables["y_label"] = self.cs_scatter_y_label.field.text()
+        self.local_variables["mksize"] = self.cs_scatter_mksize.field.value()
+        self.local_variables["scale"] = self.cs_scatter_scale.field.value()
+        self.local_variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
+        self.local_variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
+        self.local_variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
+        self.local_variables["markers"] = [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
+        self.local_variables["mk_color"] = \
             [x.translate(translator) \
                 for x in self.cs_scatter_mk_color.field.text().split(',')]
-        self.variables["mk_edgecolors"] = \
+        self.local_variables["mk_edgecolors"] = \
             [x.translate(translator) \
                 for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
-        self.variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
-        self.variables["hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
-        variables["cs_scatter_settings"] = self.variables
+        self.local_variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
+        self.local_variables["hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
+        self.local_variables.update(self.variables)
         self.accept()
 
     def get_values(self):
-        self.cs_scatter_cols_page.setValue(self.variables["cols_page"])
-        self.cs_scatter_rows_page.setValue(self.variables["rows_page"])
-        self.cs_scatter_x_label.field.setText(self.variables["x_label"])
-        self.cs_scatter_y_label.field.setText(self.variables["y_label"])
-        self.cs_scatter_mksize.setValue(self.variables["mksize"])
-        self.cs_scatter_scale.setValue(self.variables["scale"])
-        self.cs_scatter_mk_type.select(self.variables["mk_type"])
+        self.cs_scatter_cols_page.setValue(self.local_variables["cols_page"])
+        self.cs_scatter_rows_page.setValue(self.local_variables["rows_page"])
+        self.cs_scatter_x_label.field.setText(self.local_variables["x_label"])
+        self.cs_scatter_y_label.field.setText(self.local_variables["y_label"])
+        self.cs_scatter_mksize.setValue(self.local_variables["mksize"])
+        self.cs_scatter_scale.setValue(self.local_variables["scale"])
+        self.cs_scatter_mk_type.select(self.local_variables["mk_type"])
 
-        self.cs_scatter_mk_start_color.select(self.variables["mk_start_color"])
-        self.cs_scatter_mk_end_color.select(self.variables["mk_end_color"])
-        self.cs_scatter_markers.field.setText(','.join(self.variables["markers"]))
-        self.cs_scatter_mk_color.field.setText(','.join(self.variables["mk_color"]))
-        self.cs_scatter_mk_edgecolors.field.setText(','.join(self.variables["mk_edgecolors"]))
-        self.cs_scatter_mk_lost_color.select(self.variables["mk_lost_color"])
-        self.cs_scatter_hide_lost.setChecked(self.variables["hide_lost"])
+        self.cs_scatter_mk_start_color.select(self.local_variables["mk_start_color"])
+        self.cs_scatter_mk_end_color.select(self.local_variables["mk_end_color"])
+        self.cs_scatter_markers.field.setText(','.join(self.local_variables["markers"]))
+        self.cs_scatter_mk_color.field.setText(','.join(self.local_variables["mk_color"]))
+        self.cs_scatter_mk_edgecolors.field.setText(','.join(self.local_variables["mk_edgecolors"]))
+        self.cs_scatter_mk_lost_color.select(self.local_variables["mk_lost_color"])
+        self.cs_scatter_hide_lost.setChecked(self.local_variables["hide_lost"])

@@ -6,8 +6,13 @@ width = 600
 
 import math
 
+from current.fslibs.Variables import Variables
+
 class PeakListArea(QWidget):
-    def __init__(self, parent, variables, gui_settings):
+
+    variables = Variables()._vars
+
+    def __init__(self, parent, gui_settings):
 
         QWidget.__init__(self, parent)
         self.scene = QGraphicsScene(self)
@@ -20,7 +25,6 @@ class PeakListArea(QWidget):
         self.layout().addWidget(self.scrollContents)
         self.scrollContents.setMinimumSize(gui_settings['scene_width'], gui_settings['scene_height'])
         self.scrollContents.setAcceptDrops(True)
-        self.variables = variables
         self.setEvents()
         self.updateClicks = 0
 

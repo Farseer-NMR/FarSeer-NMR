@@ -11,20 +11,28 @@ from gui.Footer import Footer
 
 from gui import resources_rc
 
+from current.fslibs.Variables import Variables
 
 class Main(QWidget):
+
+
 
     def __init__(self, parent=None, gui_settings=None, config=None, **kw):
 
         QWidget.__init__(self, parent=parent)
 
-        variables = json.load(
-            open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current', 'default_config.json'), 'r'))
+        default_config = os.path.join(os.path.dirname(os.path.abspath(
+            __file__)), 'current',
+            'default_config.json')
 
-        tabWidget = TabWidget(gui_settings, variables)
+        if config:
+            Variables().read(config)
+        else:
+            Variables().read(default_config)
+
+        tabWidget = TabWidget(gui_settings)
 
         footer = Footer(self, gui_settings=gui_settings)
-
 
         layout = QVBoxLayout(self)
         self.setLayout(layout)
@@ -33,8 +41,9 @@ class Main(QWidget):
         self.layout().addWidget(footer)
 
         self.setObjectName("MainWidget")
-        if config:
-            tabWidget.load_config(config)
+
+
+        print(tabWidget.variables)
 
 
 if __name__ == '__main__':
@@ -58,7 +67,7 @@ if __name__ == '__main__':
 
     from gui import gui_utils
     gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
-
+    print(args)
     ex = Main(gui_settings=gui_settings, config=args.config)
     splash.finish(ex)
     fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'

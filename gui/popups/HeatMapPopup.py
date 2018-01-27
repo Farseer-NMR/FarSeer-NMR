@@ -1,27 +1,18 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
 from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.FontComboBox import FontComboBox
 from gui.components.ColourBox import ColourBox
-from functools import partial
 
-from gui.gui_utils import defaults, font_weights, line_styles
+from gui.gui_utils import font_weights, line_styles
+from gui.popups.BasePopup import BasePopup
 
+class HeatMapPopup(BasePopup):
 
-class HeatMapPopup(QDialog):
-
-    def __init__(self, parent=None, variables=None, **kw):
-        super(HeatMapPopup, self).__init__(parent)
-        self.setWindowTitle("PRE Heat Map")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        self.variables = None
-        if variables:
-            self.variables = variables["heat_map_settings"]
-        self.default = defaults["heat_map_settings"]
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="PRE Heat Map",
+                           settings_key=["heat_map_settings"])
 
         self.heat_map_rows = LabelledSpinBox(self, "Rows Per Page", min=1, step=1)
         self.heat_map_vmin = LabelledDoubleSpinBox(self, "V Min", min=0, step=0.01)
@@ -67,14 +58,13 @@ class HeatMapPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 9, 1, 1, 1)
 
-        if self.variables:
-            self.get_values()
+        self.get_values()
 
     def get_defaults(self):
         self.heat_map_rows.setValue(self.default["rows"])
@@ -96,45 +86,45 @@ class HeatMapPopup(QDialog):
         self.heat_map_tag_ls.select(self.default["tag_line_ls"])
         self.heat_map_tag_lw.setValue(self.default["tag_line_lw"])
 
-    def set_values(self, variables):
-        self.variables["rows"] = self.heat_map_rows.field.value()
-        self.variables["vmin"] = self.heat_map_vmin.field.value()
-        self.variables["vmax"] = self.heat_map_vmax.field.value()
-        self.variables["x_ticks_fs"] = self.heat_map_x_ticks_fs.field.value()
-        self.variables["x_ticks_rot"] = self.heat_map_x_ticks_rot.field.value()
-        self.variables["x_ticks_fn"] = self.heat_map_x_ticks_fn.fields.currentText()
-        self.variables["x_ticks_pad"] = self.heat_map_x_tick_pad.field.value()
-        self.variables["x_ticks_weight"] = self.heat_map_x_tick_weight.fields.currentText()
-        self.variables["y_label_fs"] = self.heat_map_y_label_fs.field.value()
-        self.variables["y_label_pad"] = self.heat_map_y_label_pad.field.value()
-        self.variables["y_label_fn"] = self.heat_map_y_label_fn.fields.currentText()
-        self.variables["y_label_weight"] = self.heat_map_y_label_weight.fields.currentText()
-        self.variables["right_margin"] = self.heat_map_right_margin.field.value()
-        self.variables["bottom_margin"] = self.heat_map_bottom_margin.field.value()
-        self.variables["cbar_font_size"] = self.heat_map_cbar_font_size.field.value()
-        self.variables["tag_line_color"] = self.heat_map_tag_line_color.fields.currentText()
-        self.variables["tag_line_ls"] = self.heat_map_tag_ls.fields.currentText()
-        self.variables["tag_line_lw"] = self.heat_map_tag_lw.field.value()
-        variables["heat_map_settings"] = self.variables
+    def set_values(self):
+        self.local_variables["rows"] = self.heat_map_rows.field.value()
+        self.local_variables["vmin"] = self.heat_map_vmin.field.value()
+        self.local_variables["vmax"] = self.heat_map_vmax.field.value()
+        self.local_variables["x_ticks_fs"] = self.heat_map_x_ticks_fs.field.value()
+        self.local_variables["x_ticks_rot"] = self.heat_map_x_ticks_rot.field.value()
+        self.local_variables["x_ticks_fn"] = self.heat_map_x_ticks_fn.fields.currentText()
+        self.local_variables["x_ticks_pad"] = self.heat_map_x_tick_pad.field.value()
+        self.local_variables["x_ticks_weight"] = self.heat_map_x_tick_weight.fields.currentText()
+        self.local_variables["y_label_fs"] = self.heat_map_y_label_fs.field.value()
+        self.local_variables["y_label_pad"] = self.heat_map_y_label_pad.field.value()
+        self.local_variables["y_label_fn"] = self.heat_map_y_label_fn.fields.currentText()
+        self.local_variables["y_label_weight"] = self.heat_map_y_label_weight.fields.currentText()
+        self.local_variables["right_margin"] = self.heat_map_right_margin.field.value()
+        self.local_variables["bottom_margin"] = self.heat_map_bottom_margin.field.value()
+        self.local_variables["cbar_font_size"] = self.heat_map_cbar_font_size.field.value()
+        self.local_variables["tag_line_color"] = self.heat_map_tag_line_color.fields.currentText()
+        self.local_variables["tag_line_ls"] = self.heat_map_tag_ls.fields.currentText()
+        self.local_variables["tag_line_lw"] = self.heat_map_tag_lw.field.value()
+        self.variables.update(self.local_variables)
         self.accept()
 
     def get_values(self):
-        self.heat_map_rows.setValue(self.variables["rows"])
-        self.heat_map_vmin.setValue(self.variables["vmin"])
-        self.heat_map_vmax.setValue(self.variables["vmax"])
-        self.heat_map_x_ticks_fs.setValue(self.variables["x_ticks_fs"])
-        self.heat_map_x_ticks_rot.setValue(self.variables["x_ticks_rot"])
-        self.heat_map_x_ticks_fn.select(self.variables["x_ticks_fn"])
-        self.heat_map_x_tick_pad.setValue(self.variables["x_ticks_pad"])
-        self.heat_map_x_tick_weight.select(self.variables["x_ticks_weight"])
-        self.heat_map_y_label_fs.setValue(self.variables["y_label_fs"])
-        self.heat_map_y_label_pad.setValue(self.variables["y_label_pad"])
-        self.heat_map_y_label_fn.select(self.variables["y_label_fn"])
-        self.heat_map_y_label_weight.select(self.variables["y_label_weight"])
-        self.heat_map_right_margin.setValue(self.variables["right_margin"])
-        self.heat_map_bottom_margin.setValue(self.variables["bottom_margin"])
-        self.heat_map_cbar_font_size.setValue(self.variables["cbar_font_size"])
-        self.heat_map_tag_line_color.select(self.variables["tag_line_color"])
-        self.heat_map_tag_ls.select(self.variables["tag_line_ls"])
-        self.heat_map_tag_lw.setValue(self.variables["tag_line_lw"])
+        self.heat_map_rows.setValue(self.local_variables["rows"])
+        self.heat_map_vmin.setValue(self.local_variables["vmin"])
+        self.heat_map_vmax.setValue(self.local_variables["vmax"])
+        self.heat_map_x_ticks_fs.setValue(self.local_variables["x_ticks_fs"])
+        self.heat_map_x_ticks_rot.setValue(self.local_variables["x_ticks_rot"])
+        self.heat_map_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
+        self.heat_map_x_tick_pad.setValue(self.local_variables["x_ticks_pad"])
+        self.heat_map_x_tick_weight.select(self.local_variables["x_ticks_weight"])
+        self.heat_map_y_label_fs.setValue(self.local_variables["y_label_fs"])
+        self.heat_map_y_label_pad.setValue(self.local_variables["y_label_pad"])
+        self.heat_map_y_label_fn.select(self.local_variables["y_label_fn"])
+        self.heat_map_y_label_weight.select(self.local_variables["y_label_weight"])
+        self.heat_map_right_margin.setValue(self.local_variables["right_margin"])
+        self.heat_map_bottom_margin.setValue(self.local_variables["bottom_margin"])
+        self.heat_map_cbar_font_size.setValue(self.local_variables["cbar_font_size"])
+        self.heat_map_tag_line_color.select(self.local_variables["tag_line_color"])
+        self.heat_map_tag_ls.select(self.local_variables["tag_line_ls"])
+        self.heat_map_tag_lw.setValue(self.local_variables["tag_line_lw"])
 

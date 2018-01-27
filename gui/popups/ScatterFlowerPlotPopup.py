@@ -1,5 +1,4 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
@@ -8,25 +7,20 @@ from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-from functools import partial
-from gui.gui_utils import font_weights, defaults, colours
+from gui.gui_utils import font_weights, colours
 
 # https://stackoverflow.com/questions/34293875/how-to-remove-punctuation-marks-from-a-string-in-python-3-x-using-translate
 import string
 translator = str.maketrans('', '', string.punctuation+" ")
 
-class ScatterFlowerPlotPopup(QDialog):
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(ScatterFlowerPlotPopup, self).__init__(parent)
-        self.setWindowTitle("Scatter Flower Plot")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        self.variables = None
-        if variables:
-            self.variables = variables["cs_scatter_flower_settings"]
-        self.default = defaults["cs_scatter_flower_settings"]
+from gui.popups.BasePopup import BasePopup
+
+class ScatterFlowerPlotPopup(BasePopup):
+
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="Scatter Flower Plot",
+                           settings_key=["cs_scatter_flower_settings"])
 
         self.cs_scatter_flower_x_label = LabelledLineEdit(self, "X Label")
         self.cs_scatter_flower_y_label = LabelledLineEdit(self, "Y Label")
@@ -90,14 +84,13 @@ class ScatterFlowerPlotPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 8, 1, 1, 2)
 
-        if variables:
-            self.get_values()
+        self.get_values()
 
     def get_defaults(self):
         self.cs_scatter_flower_x_label.field.setText(self.default["x_label"])
@@ -131,76 +124,76 @@ class ScatterFlowerPlotPopup(QDialog):
         self.cs_scatter_flower_y_ticks_rot.setValue(self.default["y_ticks_rot"])
 
 
-    def set_values(self, variables):
-        self.variables["x_label"] = self.cs_scatter_flower_x_label.field.text()
-        self.variables["y_label"] = self.cs_scatter_flower_y_label.field.text()
-        self.variables["mksize"] = self.cs_scatter_flower_mksize.field.value()
-        self.variables["color_grad"] = self.cs_scatter_flower_color_grad.checkBox.isChecked()
-        self.variables["mk_start_color"] = colours[self.cs_scatter_flower_color_start.fields.currentText()]
-        self.variables["mk_end_color"] = colours[self.cs_scatter_flower_color_end.fields.currentText()]
+    def set_values(self):
+        self.local_variables["x_label"] = self.cs_scatter_flower_x_label.field.text()
+        self.local_variables["y_label"] = self.cs_scatter_flower_y_label.field.text()
+        self.local_variables["mksize"] = self.cs_scatter_flower_mksize.field.value()
+        self.local_variables["color_grad"] = self.cs_scatter_flower_color_grad.checkBox.isChecked()
+        self.local_variables["mk_start_color"] = colours[self.cs_scatter_flower_color_start.fields.currentText()]
+        self.local_variables["mk_end_color"] = colours[self.cs_scatter_flower_color_end.fields.currentText()]
 
-        self.variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
-        self.variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()
-        self.variables["x_label_pad"] = self.cs_scatter_flower_x_label_pad.field.value()
-        self.variables["x_label_weight"] = self.cs_scatter_flower_x_label_weight.fields.currentText()
+        self.local_variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
+        self.local_variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()
+        self.local_variables["x_label_pad"] = self.cs_scatter_flower_x_label_pad.field.value()
+        self.local_variables["x_label_weight"] = self.cs_scatter_flower_x_label_weight.fields.currentText()
 
-        self.variables["y_label_fn"] = self.cs_scatter_flower_y_label_fn.fields.currentText()
-        self.variables["y_label_fs"] = self.cs_scatter_flower_y_label_fs.field.value()
-        self.variables["y_label_pad"] = self.cs_scatter_flower_y_label_pad.field.value()
-        self.variables["y_label_weight"] = self.cs_scatter_flower_y_label_weight.fields.currentText()
+        self.local_variables["y_label_fn"] = self.cs_scatter_flower_y_label_fn.fields.currentText()
+        self.local_variables["y_label_fs"] = self.cs_scatter_flower_y_label_fs.field.value()
+        self.local_variables["y_label_pad"] = self.cs_scatter_flower_y_label_pad.field.value()
+        self.local_variables["y_label_weight"] = self.cs_scatter_flower_y_label_weight.fields.currentText()
 
-        self.variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
-        self.variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()
-        self.variables["x_label_pad"] = self.cs_scatter_flower_x_label_pad.field.value()
-        self.variables["x_label_weight"] = self.cs_scatter_flower_x_label_weight.fields.currentText()
+        self.local_variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
+        self.local_variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()
+        self.local_variables["x_label_pad"] = self.cs_scatter_flower_x_label_pad.field.value()
+        self.local_variables["x_label_weight"] = self.cs_scatter_flower_x_label_weight.fields.currentText()
 
-        self.variables["x_ticks_fn"] = self.cs_scatter_flower_x_ticks_fn.fields.currentText()
-        self.variables["x_ticks_fs"] = self.cs_scatter_flower_x_ticks_fs.field.value()
-        self.variables["x_ticks_pad"] = self.cs_scatter_flower_x_ticks_pad.field.value()
-        self.variables["x_ticks_weight"] = self.cs_scatter_flower_x_ticks_weight.fields.currentText()
-        self.variables["x_ticks_rot"] = self.cs_scatter_flower_x_ticks_rot.field.value()
+        self.local_variables["x_ticks_fn"] = self.cs_scatter_flower_x_ticks_fn.fields.currentText()
+        self.local_variables["x_ticks_fs"] = self.cs_scatter_flower_x_ticks_fs.field.value()
+        self.local_variables["x_ticks_pad"] = self.cs_scatter_flower_x_ticks_pad.field.value()
+        self.local_variables["x_ticks_weight"] = self.cs_scatter_flower_x_ticks_weight.fields.currentText()
+        self.local_variables["x_ticks_rot"] = self.cs_scatter_flower_x_ticks_rot.field.value()
 
-        self.variables["y_ticks_fn"] = self.cs_scatter_flower_y_ticks_fn.fields.currentText()
-        self.variables["y_ticks_fs"] = self.cs_scatter_flower_y_ticks_fs.field.value()
-        self.variables["y_ticks_pad"] = self.cs_scatter_flower_y_ticks_pad.field.value()
-        self.variables["y_ticks_weight"] = self.cs_scatter_flower_y_ticks_weight.fields.currentText()
-        self.variables["y_ticks_rot"] = self.cs_scatter_flower_y_ticks_rot.field.value()
-        self.variables["color_list"] = \
+        self.local_variables["y_ticks_fn"] = self.cs_scatter_flower_y_ticks_fn.fields.currentText()
+        self.local_variables["y_ticks_fs"] = self.cs_scatter_flower_y_ticks_fs.field.value()
+        self.local_variables["y_ticks_pad"] = self.cs_scatter_flower_y_ticks_pad.field.value()
+        self.local_variables["y_ticks_weight"] = self.cs_scatter_flower_y_ticks_weight.fields.currentText()
+        self.local_variables["y_ticks_rot"] = self.cs_scatter_flower_y_ticks_rot.field.value()
+        self.local_variables["color_list"] = \
             [x.translate(translator) \
                 for x in self.cs_scatter_flower_color_list.field.text().\
                     split(',')]
         
-        variables["cs_scatter_flower_settings"] = self.variables
+        self.local_variables.update(self.variables)
         self.accept()
 
     def get_values(self):
 
-        self.cs_scatter_flower_x_label.field.setText(self.variables["x_label"])
-        self.cs_scatter_flower_y_label.field.setText(self.variables["y_label"])
-        self.cs_scatter_flower_mksize.setValue(self.variables["mksize"])
-        self.cs_scatter_flower_color_grad.setChecked(self.variables["color_grad"])
-        self.cs_scatter_flower_color_start.select(self.variables["mk_start_color"])
-        self.cs_scatter_flower_color_end.select(self.variables["mk_end_color"])
-        self.cs_scatter_flower_color_list.field.setText(','.join(self.variables["color_list"]))
+        self.cs_scatter_flower_x_label.field.setText(self.local_variables["x_label"])
+        self.cs_scatter_flower_y_label.field.setText(self.local_variables["y_label"])
+        self.cs_scatter_flower_mksize.setValue(self.local_variables["mksize"])
+        self.cs_scatter_flower_color_grad.setChecked(self.local_variables["color_grad"])
+        self.cs_scatter_flower_color_start.select(self.local_variables["mk_start_color"])
+        self.cs_scatter_flower_color_end.select(self.local_variables["mk_end_color"])
+        self.cs_scatter_flower_color_list.field.setText(','.join(self.local_variables["color_list"]))
 
-        self.cs_scatter_flower_x_label_fn.select(self.variables["x_label_fn"])
-        self.cs_scatter_flower_x_label_fs.setValue(self.variables["x_label_fs"])
-        self.cs_scatter_flower_x_label_pad.setValue(self.variables["x_label_pad"])
-        self.cs_scatter_flower_x_label_weight.select(self.variables["x_label_weight"])
+        self.cs_scatter_flower_x_label_fn.select(self.local_variables["x_label_fn"])
+        self.cs_scatter_flower_x_label_fs.setValue(self.local_variables["x_label_fs"])
+        self.cs_scatter_flower_x_label_pad.setValue(self.local_variables["x_label_pad"])
+        self.cs_scatter_flower_x_label_weight.select(self.local_variables["x_label_weight"])
 
-        self.cs_scatter_flower_y_label_fn.select(self.variables["y_label_fn"])
-        self.cs_scatter_flower_y_label_fs.setValue(self.variables["y_label_fs"])
-        self.cs_scatter_flower_y_label_pad.setValue(self.variables["y_label_pad"])
-        self.cs_scatter_flower_y_label_weight.select(self.variables["y_label_weight"])
+        self.cs_scatter_flower_y_label_fn.select(self.local_variables["y_label_fn"])
+        self.cs_scatter_flower_y_label_fs.setValue(self.local_variables["y_label_fs"])
+        self.cs_scatter_flower_y_label_pad.setValue(self.local_variables["y_label_pad"])
+        self.cs_scatter_flower_y_label_weight.select(self.local_variables["y_label_weight"])
 
-        self.cs_scatter_flower_x_ticks_fn.select(self.variables["x_ticks_fn"])
-        self.cs_scatter_flower_x_ticks_fs.setValue(self.variables["x_ticks_fs"])
-        self.cs_scatter_flower_x_ticks_pad.setValue(self.variables["x_ticks_pad"])
-        self.cs_scatter_flower_x_ticks_weight.select(self.variables["x_ticks_weight"])
-        self.cs_scatter_flower_x_ticks_rot.setValue(self.variables["x_ticks_rot"])
+        self.cs_scatter_flower_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
+        self.cs_scatter_flower_x_ticks_fs.setValue(self.local_variables["x_ticks_fs"])
+        self.cs_scatter_flower_x_ticks_pad.setValue(self.local_variables["x_ticks_pad"])
+        self.cs_scatter_flower_x_ticks_weight.select(self.local_variables["x_ticks_weight"])
+        self.cs_scatter_flower_x_ticks_rot.setValue(self.local_variables["x_ticks_rot"])
 
-        self.cs_scatter_flower_y_ticks_fn.select(self.variables["y_ticks_fn"])
-        self.cs_scatter_flower_y_ticks_fs.setValue(self.variables["y_ticks_fs"])
-        self.cs_scatter_flower_y_ticks_pad.setValue(self.variables["y_ticks_pad"])
-        self.cs_scatter_flower_y_ticks_weight.select(self.variables["y_ticks_weight"])
-        self.cs_scatter_flower_y_ticks_rot.setValue(self.variables["y_ticks_rot"])
+        self.cs_scatter_flower_y_ticks_fn.select(self.local_variables["y_ticks_fn"])
+        self.cs_scatter_flower_y_ticks_fs.setValue(self.local_variables["y_ticks_fs"])
+        self.cs_scatter_flower_y_ticks_pad.setValue(self.local_variables["y_ticks_pad"])
+        self.cs_scatter_flower_y_ticks_weight.select(self.local_variables["y_ticks_weight"])
+        self.cs_scatter_flower_y_ticks_rot.setValue(self.local_variables["y_ticks_rot"])

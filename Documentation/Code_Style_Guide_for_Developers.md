@@ -24,7 +24,8 @@ If method call cannot fit one line, break the line after the "." followed by an 
 
 ## Function call
 
-Whenever a function call cannot fit a single line, **all** arguments should be followed by newlines and an extra identation, closing the call should be aligned with args:
+Whenever a function call cannot fit a single line, **all** arguments should
+be followed by newlines and an extra indentation, closing the call should be aligned with args:
 
 Yes:
 ```

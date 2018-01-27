@@ -29,10 +29,13 @@ from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
 from gui.popups.VerticalBar import VerticalBarPopup
 
-class Settings(BaseWidget):
-    def __init__(self, parent=None, gui_settings=None, variables=None, footer=None):
 
-        BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, variables=variables, footer=footer)
+
+class Settings(BaseWidget):
+    
+    def __init__(self, parent=None, gui_settings=None, footer=None):
+
+        BaseWidget.__init__(self, parent=parent, gui_settings=gui_settings, footer=footer)
 
         grid = QGridLayout()
         grid2 = QGridLayout()
@@ -375,8 +378,8 @@ class Settings(BaseWidget):
 
         retval = msg.exec_()
         if retval == QMessageBox.Ok:
-            self.variables = self.parent().parent().parent().load_config()
-            if self.variables:
+            variables = self.parent().parent().parent().load_config()
+            if variables:
                 self.load_variables()
         else:
             return
@@ -397,8 +400,6 @@ class Settings(BaseWidget):
 
         general["spectra_path"] = self.spectrum_path.field.text()
         general["output_path"] = self.output_path.field.text()
-        general["spectrum_input_path"] = self.output_path.field.text()+'/spectra/'
-
         general["has_sidechains"] = self.has_sidechains_checkbox.isChecked()
         general["use_sidechains"] = self.use_sidechains_checkbox.isChecked()
         general["fig_height"] = self.figure_height.field.value()
@@ -470,15 +471,12 @@ class Settings(BaseWidget):
         self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
 
-        self.parent().parent().parent().save_config(path)
+        self.parent().parent().parent().save_config(self.variables, path)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
 
     def load_variables(self, variables=None):
-
-        # if variables:
-        #     self.variables = variables
 
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
@@ -570,10 +568,9 @@ class Settings(BaseWidget):
         self.heat_map_checkbox.setChecked(self.variables["plotting_flags"]["do_heat_map"])
         self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_dpre_osci"])
 
-        # peaklists from loaded config
-        # self.variables[] = self.variables["peaklists"]
+
 
     def show_popup(self, popup, variables):
-        p = popup(self, variables=self.variables)
+        p = popup(self, variables=variables)
         p.exec_()
         p.raise_()

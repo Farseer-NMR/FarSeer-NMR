@@ -3,16 +3,17 @@
 from PyQt5.QtWidgets import QWidget
 
 from gui.components.TabFooter import TabFooter
+from current.fslibs.Variables import Variables
 
 
 
 class BaseWidget(QWidget):
 
-    def __init__(self, parent=None, gui_settings=None, variables=None, footer=True):
+    variables = Variables()._vars
+
+    def __init__(self, parent=None, gui_settings=None, footer=True):
         QWidget.__init__(self, parent=parent)
 
-        if variables:
-            self.variables = variables
         self.gui_settings = gui_settings
 
         if footer:

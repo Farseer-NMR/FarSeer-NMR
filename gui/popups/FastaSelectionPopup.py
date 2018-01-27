@@ -1,57 +1,50 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QLabel, QDialogButtonBox, QFileDialog, QGridLayout, QPushButton, QVBoxLayout, QWidget, QHBoxLayout
-from gui.components.LabelledCheckbox import LabelledCheckbox
-from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
-from gui.components.LabelledSpinBox import LabelledSpinBox
-from gui.components.LabelledLineEdit import LabelledLineEdit
-from gui.components.ColourBox import ColourBox
-
-from gui.popups.UserMarksPopup import UserMarksPopup
-
-from gui.gui_utils import defaults
+from collections import OrderedDict
 from functools import partial
 
-from collections import OrderedDict
+from PyQt5.QtWidgets import QLabel, QDialogButtonBox, QFileDialog, QPushButton, QWidget, QHBoxLayout
 
-class FastaSelectionPopup(QDialog):
+from gui.components.LabelledLineEdit import LabelledLineEdit
+from gui.popups.BasePopup import BasePopup
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(FastaSelectionPopup, self).__init__(parent)
-        self.setWindowTitle("FASTA Selection Popup")
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+class FastaSelectionPopup(BasePopup):
+
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="FASTA Selection Popup",
+                           settings_key=["fasta_files"], layout='vbox')
+
         label = QLabel("Y conditions", self)
         self.layout().addWidget(label)
         self.cond_widget_dict = {}
 
-        if variables:
-            self.fasta_files = OrderedDict(sorted(variables["fasta_files"].items()))
-            self.get_values(variables)
+        self.fasta_files = OrderedDict(self.local_variables.items())
 
         self.buttonBox = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
 
         self.layout().addWidget(self.buttonBox)
 
+        self.get_values()
 
-    def get_values(self, variables):
+
+    def get_values(self):
         if self.fasta_files:
             for cond_name, fasta_path in self.fasta_files.items():
                 self.add_field(cond_name, fasta_path)
-        elif variables["conditions"]["y"]:
-            for cond in variables["conditions"]["y"]:
+        elif self.variables["conditions"]["y"]:
+            for cond in self.variables["conditions"]["y"]:
                 self.add_field(cond, '')
 
 
 
-    def set_values(self, variables):
+    def set_values(self):
         for name, widget in self.cond_widget_dict.items():
             self.fasta_files[name] = widget[0].field.text()
-        variables["fasta_files"] = self.fasta_files
+        self.local_variables = self.fasta_files
+        self.variables.update(self.local_variables)
         self.accept()
 
 

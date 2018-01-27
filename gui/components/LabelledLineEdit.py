@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QLabel, QHBoxLayout
-from PyQt5 import QtCore
+
+from gui.components.ModifiedLineEdit import ModifiedLineEdit
 
 class LabelledLineEdit(QWidget):
 
@@ -24,25 +25,3 @@ class LabelledLineEdit(QWidget):
     def setText(self, text):
         self.field.setText(text)
 
-class ModifiedLineEdit(QLineEdit):
-    textModified = QtCore.pyqtSignal(str, str)
-
-    def __init__(self, parent, contents=None):
-        super(ModifiedLineEdit, self).__init__(contents, parent)
-        self.returnPressed.connect(self.checkText)
-        self._before = contents
-
-    def focusInEvent(self, event):
-        if event.reason() != QtCore.Qt.PopupFocusReason:
-            self._before = self.text()
-        super(ModifiedLineEdit, self).focusInEvent(event)
-
-    def focusOutEvent(self, event):
-        if event.reason() != QtCore.Qt.PopupFocusReason:
-            self.checkText()
-        super(ModifiedLineEdit, self).focusOutEvent(event)
-
-    def checkText(self):
-        if self._before != self.text():
-            self._before = self.text()
-            self.textModified.emit(self._before, self.text())

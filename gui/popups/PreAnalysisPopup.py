@@ -1,27 +1,14 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QGridLayout, QDialogButtonBox
-from gui.components.LabelledCombobox import LabelledCombobox
-from gui.components.LabelledCheckbox import LabelledCheckbox
-from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
+from PyQt5.QtWidgets import QDialogButtonBox
+
 from gui.components.LabelledSpinBox import LabelledSpinBox
-from gui.components.LabelledLineEdit import LabelledLineEdit
-from gui.components.ColourBox import ColourBox
 
-from gui.gui_utils import defaults
-from functools import partial
+from gui.popups.BasePopup import BasePopup
 
-class PreAnalysisPopup(QDialog):
+class PreAnalysisPopup(BasePopup):
 
-    def __init__(self, parent=None, variables=None, **kw):
-        super(PreAnalysisPopup, self).__init__(parent)
-        self.setWindowTitle("PRE Settings")
-        grid = QGridLayout()
-        grid.setAlignment(QtCore.Qt.AlignTop)
-        self.setLayout(grid)
-        self.variables = None
-        if variables:
-            self.variables = variables["pre_settings"]
-        self.default = defaults["pre_settings"]
+    def __init__(self, parent=None, **kw):
+        BasePopup.__init__(self, parent, title="PRE Settings",
+                           settings_key=["pre_settings"])
 
         self.gaussian_stdev = LabelledSpinBox(self, "Gaussian Stdev", min=1, step=1)
         self.gauss_x_size = LabelledSpinBox(self, "Gaussian X Size", min=1, step=1)
@@ -32,26 +19,25 @@ class PreAnalysisPopup(QDialog):
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
 
-        self.buttonBox.accepted.connect(partial(self.set_values, variables))
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 2, 0)
 
-        if variables:
-            self.get_values()
+        self.get_values()
 
     def get_defaults(self):
         self.gauss_x_size.field.setValue(self.default["gauss_x_size"])
         self.gaussian_stdev.field.setValue(self.default["gaussian_stdev"])
 
-    def set_values(self, variables):
-        self.variables["gaussian_stdev"] = self.gaussian_stdev.field.value()
-        self.variables["gauss_x_size"] = self.gauss_x_size.field.value()
-        variables["pre_settings"] = self.variables
+    def set_values(self):
+        self.local_variables["gaussian_stdev"] = self.gaussian_stdev.field.value()
+        self.local_variables["gauss_x_size"] = self.gauss_x_size.field.value()
+        self.local_variables.update(self.variables)
         self.accept()
 
 
     def get_values(self):
-        self.gaussian_stdev.setValue(self.variables["gaussian_stdev"])
-        self.gauss_x_size.setValue(self.variables["gauss_x_size"])
+        self.gaussian_stdev.setValue(self.local_variables["gaussian_stdev"])
+        self.gauss_x_size.setValue(self.local_variables["gauss_x_size"])

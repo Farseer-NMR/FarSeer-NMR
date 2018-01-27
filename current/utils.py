@@ -1,4 +1,7 @@
 # variables necessary for the functions
+
+from functools import reduce
+
 aal3tol1 = {
 "Ala": "A",
 "Arg": "R",
@@ -57,3 +60,7 @@ def exp_set_is_valid(variables):
             if all(variables["conditions"]["y"] in list(variables["experimental_dataset"][z].keys()) for z in variables["conditions"]["z"]):
                 if all(variables["conditions"]["x"] in list(variables["experimental_dataset"][z][y].keys()) for z in variables["conditions"]["y"]):
                     return True
+
+def get_nested_value(dictionary, *keys):
+    return reduce(lambda dct, key: dct.get(key, None) if isinstance(dct,
+                                            dict) else None, *keys, dictionary)
