@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-import scipy.optimize as sciopt
+from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
 
@@ -3018,19 +3018,21 @@ or confirm you have not forgot any peaklist [{}].".\
         
         # checks correct input. As new functions are added, those options
         # should be appended to the list.
-        if fit_function not in ('hill'):
-            self.abort(
-                "Chosen fiting function <{}> not an available option.".\
+        to_fit = locate('current.fslibs.fitting_functions.%s' % fit_function)()
+        print(fit_function, 'herehrehrehre')
+        if to_fit is None:
+            self.abort("Chosen fitting function <{}> not an available option.".\
                     format(fit_function))
         
         # new functions should be appended to the dictionaries
-        fitting_functions = {
-            "hill":fsfit.fitting_hill
-            }
-        not_enough_data_funcs = {
-            "hill":fsfit.hill_results
-            }
+        # fitting_functions = {
+        #     "hill":fsfit.fitting_hill
+        #     }
+        # not_enough_data_funcs = {
+        #     "hill":fsfit.hill_results
+        #     }
         # logging ###
+        not_enough_data = to_fit.not_enough_data
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
         
         if not(os.path.exists(col_path)):
@@ -3040,14 +3042,15 @@ or confirm you have not forgot any peaklist [{}].".\
             self.tables_and_plots_folder,
             col
             )
+        print(logf, 'logf')
         logfout = open(logf, 'w')
-        logfout.write(fsfit.fit_log_head(fit_function, col))
+        logfout.write(to_fit.fit_log_header(col))
         logresults = '{0}/{1}/{1}_fit_results.csv'.format(
             self.tables_and_plots_folder,
             col
             )
         logrout = open(logresults, 'w')
-        logrout.write(fsfit.fit_results_head(fit_function))
+        logrout.write(to_fit.results_header())
         self.log_r('** Performing fitting for {}...'.format(col))
         measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
@@ -3064,22 +3067,22 @@ or confirm you have not forgot any peaklist [{}].".\
             
             if mmask.sum() < mindp:
                 # residue does not have enough data to perform fit
-                logfout.write(fsfit.not_enough_data(res, xdata, ydata))
+                logfout.write(to_fit.not_enough_data(res, xdata, ydata))
                 logrout.write(
-                    not_enough_data_funcs[fit_function](
+                    not_enough_data(
                         res,
                         xdata,
                         ydata,
-                        status='not_enough_data'
+
                         )
                     )
                 self.fit_okay[col_res] = False
                 self.fit_plot_text[col_res] = "not enough data"
                 self.fit_plot_ydata[col_res] = None
                 continue
-            
+            print('xfit', self.xfit)
             a, b, c, d, e = \
-                fitting_functions[fit_function](
+                to_fit.fit_data(
                     xdata,
                     ydata,
                     res,

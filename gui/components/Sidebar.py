@@ -11,7 +11,7 @@ class SideBar(QTreeWidget):
 
     variables = Variables()._vars
 
-    def __init__(self, parent=None, peakLists=None, gui_settings=None):
+    def __init__(self, parent=None, gui_settings=None):
         QTreeWidget.__init__(self, parent)
         self.header().hide()
         self.setDragEnabled(True)
@@ -21,20 +21,20 @@ class SideBar(QTreeWidget):
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
         self.setFixedHeight(gui_settings['sideBar_height'])
-        self.peakLists = peakLists
         self.setSortingEnabled(True)
         print('sidebar', self.variables)
 
         self.update_from_config()
+        # self.peakLists = self.variables['peakLists']
+
 
     def update_from_config(self):
         self.clear()
         used_peaklists = []
         print(self.variables.keys())
-        # self.peakLists = self.variables["peaklists"]
+        self.peakLists = self.variables["peaklists"]
 
         if not all(x for v in self.variables["conditions"].values() for x in v):
-            # self.peakLists = self.variables["peaklists"]
             self.refresh_sidebar()
 
         else:

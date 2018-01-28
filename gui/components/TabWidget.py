@@ -107,7 +107,7 @@ class TabWidget(QTabWidget):
 
         if run_msg == 'Run':
             from current.farseermain import read_user_variables, run_farseer
-            if self.config_file:
+            if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
                 fsuv = read_user_variables(path, config_name)
             else:
