@@ -3,7 +3,6 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 from current.parsing import read_peaklist
-from current.utils import exp_set_is_valid
 
 from current.fslibs.Variables import Variables
 
@@ -22,8 +21,6 @@ class SideBar(QTreeWidget):
         self.setMaximumWidth(320)
         self.setFixedHeight(gui_settings['sideBar_height'])
         self.setSortingEnabled(True)
-        print('sidebar', self.variables)
-
         self.update_from_config()
         # self.peakLists = self.variables['peakLists']
 

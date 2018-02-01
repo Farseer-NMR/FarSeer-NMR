@@ -523,7 +523,7 @@ class FarseerSeries(pd.Panel):
         pos1 (str): the column name of the source data for nuclei 1.
         pos2 (str): the column name for the source data for nuclei 2.
         """
-        
+
         self.loc[:,:,calccol] = \
             self.loc[:,:,['1-letter',pos1,pos2]].\
                 apply(lambda x: self.csp_willi(x), axis=2)

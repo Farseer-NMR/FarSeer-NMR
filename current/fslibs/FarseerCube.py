@@ -1622,7 +1622,7 @@ of the reference experiment [{}][{}][{}]'.\
         
         l = []
         is_bigger = False
-        
+
         for z in self.zzcoords:
             for y in self.yycoords:
                 key = list(self.allfasta[z][y].keys())[0]

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout, QToolButton, QToolBar
+from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout, QToolButton
 from PyQt5 import QtCore, QtGui
 import os
 from gui.components.Icon import Icon, ICON_DIR

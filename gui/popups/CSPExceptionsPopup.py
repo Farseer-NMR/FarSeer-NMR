@@ -35,6 +35,8 @@ class CSPExceptionsPopup(BasePopup):
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 6, 2, 1, 2)
+        import pprint
+        pprint.pprint(self.local_variables)
 
         self.get_values()
 
@@ -50,7 +52,7 @@ class CSPExceptionsPopup(BasePopup):
 
     def get_values(self):
         for key, value in self.value_dict.items():
-            if aal3tol1[key] in self.variables.keys():
+            if aal3tol1[key] in self.local_variables.keys():
                 value.field.setValue(self.local_variables[aal3tol1[key]])
             else:
                 value.field.setValue(self.alpha_value)
@@ -59,6 +61,6 @@ class CSPExceptionsPopup(BasePopup):
     def get_defaults(self):
         for key, value in self.value_dict.items():
             if aal3tol1[key] in self.defaults.keys():
-                value.field.setValue(self.local_variables[aal3tol1[key]])
+                value.field.setValue(self.defaults[aal3tol1[key]])
             else:
                 value.field.setValue(self.alpha_value)
