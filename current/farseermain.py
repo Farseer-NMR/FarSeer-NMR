@@ -94,7 +94,7 @@ def read_user_variables(path, config_name):
 
     fsuv = json.load(open(os.path.join(cwd, config_name), 'r'))
     fsuv["cwd"] = cwd
-    
+
     if not("input_spectra_path" in fsuv["general_settings"]):
         fsuv["general_settings"]["input_spectra_path"] = \
              '{}/spectra'.format(cwd)

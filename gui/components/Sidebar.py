@@ -3,7 +3,6 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 from current.parsing import read_peaklist
-from current.utils import exp_set_is_valid
 
 from current.fslibs.Variables import Variables
 
@@ -23,18 +22,14 @@ class SideBar(QTreeWidget):
         self.setFixedHeight(gui_settings['sideBar_height'])
         self.peakLists = peakLists
         self.setSortingEnabled(True)
-        print('sidebar', self.variables)
-
         self.update_from_config()
 
     def update_from_config(self):
         self.clear()
         used_peaklists = []
         print(self.variables.keys())
-        # self.peakLists = self.variables["peaklists"]
 
         if not all(x for v in self.variables["conditions"].values() for x in v):
-            # self.peakLists = self.variables["peaklists"]
             self.refresh_sidebar()
 
         else:

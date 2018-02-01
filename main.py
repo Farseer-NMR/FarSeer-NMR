@@ -1,5 +1,4 @@
 import sys
-import json
 import os
 
 from PyQt5 import QtCore, QtGui
@@ -13,9 +12,8 @@ from gui import resources_rc
 
 from current.fslibs.Variables import Variables
 
+
 class Main(QWidget):
-
-
 
     def __init__(self, parent=None, gui_settings=None, config=None, **kw):
 
@@ -43,9 +41,6 @@ class Main(QWidget):
         self.setObjectName("MainWidget")
 
 
-        print(tabWidget.variables)
-
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     import argparse
@@ -60,7 +55,6 @@ if __name__ == '__main__':
     splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
     splash.setEnabled(False)
-
     splash.show()
 
     screen_resolution = app.desktop().screenGeometry()

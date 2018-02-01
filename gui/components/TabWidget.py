@@ -1,5 +1,3 @@
-import sys
-import json
 import os
 
 from PyQt5 import QtCore, QtGui
@@ -13,7 +11,6 @@ from gui.components.Icon import ICON_DIR
 
 
 from gui.tabs.peaklist_selection import PeaklistSelection
-from gui.tabs.paraset import Paraset
 from gui.tabs.settings import Settings
 
 from current.fslibs.Variables import Variables
@@ -114,7 +111,7 @@ class TabWidget(QTabWidget):
                 self.settings.save_config(path=os.path.join(output_path, 'user_config.json'))
                 fsuv = read_user_variables(output_path, 'user_config.json')
 
-            process = Threading(function=run_farseer, args=fsuv)
+            Threading(function=run_farseer, args=fsuv)
 
         else:
             msg = QMessageBox()
