@@ -384,8 +384,8 @@ class Settings(BaseWidget):
         else:
             return
 
-    def save_config(self, path=None):
-
+    def save_config(self):
+        print('saving in interface')
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
         cs = self.variables["cs_settings"]
@@ -471,7 +471,7 @@ class Settings(BaseWidget):
         self.variables["plotting_flags"]["do_heat_map"] =  self.heat_map_checkbox.isChecked()
         self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
 
-        self.parent().parent().parent().save_config(path)
+        # self.parent().parent().parent().save_config(path)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
@@ -573,3 +573,5 @@ class Settings(BaseWidget):
         p = popup(self, variables=variables)
         p.exec_()
         p.raise_()
+        import pprint
+        pprint.pprint(variables)

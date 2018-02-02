@@ -43,8 +43,10 @@ class FastaSelectionPopup(BasePopup):
     def set_values(self):
         for name, widget in self.cond_widget_dict.items():
             self.fasta_files[name] = widget[0].field.text()
-        self.local_variables = self.fasta_files
-        self.variables.update(self.local_variables)
+        print(self.fasta_files)
+        self.local_variables.update(self.fasta_files)
+        print(self.local_variables, 'fasta')
+        # self.variables.update(self.local_variables)
         self.accept()
 
 

@@ -46,7 +46,6 @@ class CSPExceptionsPopup(BasePopup):
         for key, value in self.value_dict.items():
             tmp_dict[aal3tol1[key]] = round(value.field.value(), 2)
         self.local_variables.update(tmp_dict)
-        self.variables.update(self.local_variables)
         self.accept()
 
     def get_values(self):

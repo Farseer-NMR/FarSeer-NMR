@@ -377,7 +377,6 @@ def parseCcpn(peaklist_file):
               atoms.append(a2)
       peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
                   volume=row[7], height=row[6], fit_method=row[12], merit=row[10], volume_method=row[13], details=row[11])
-      print(peak)
 
       peakList.append(peak)
 
