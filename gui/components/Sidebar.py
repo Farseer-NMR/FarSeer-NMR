@@ -21,13 +21,17 @@ class SideBar(QTreeWidget):
         self.setMaximumWidth(320)
         self.setFixedHeight(gui_settings['sideBar_height'])
         self.peakLists = self.variables['peaklists']
+
         self.setSortingEnabled(True)
         self.update_from_config()
+        # self.peakLists = self.variables['peakLists']
+
 
     def update_from_config(self):
         self.clear()
         used_peaklists = []
         print(self.variables.keys())
+        self.peakLists = self.variables["peaklists"]
 
         if not all(x for v in self.variables["conditions"].values() for x in v):
             self.refresh_sidebar()

@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-import scipy.optimize as sciopt
+from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
 
@@ -1942,9 +1942,9 @@ or confirm you have not forgot any peaklist [{}].".\
         if self.fit_performed \
                 and self.series_axis == 'cond1'\
                 and self.fit_okay[fit_res_col]:
-            print(res)
-            print(self.xfit)
-            print(self.fit_plot_ydata[fit_res_col])
+            #print(res)
+            #print(self.xfit)
+            #print(self.fit_plot_ydata[fit_res_col])
             # plot fit
             axs[i].plot(
                 self.xfit,
@@ -3009,45 +3009,44 @@ or confirm you have not forgot any peaklist [{}].".\
             - col: the column containing the data to fit
             - x_values: the x data
             - mindp: minimum number of points to consider residue
-                     for fitting.
-            - fit_function: the key that directs to the fiting function
-                            in fsfit module.
+                for fitting.
+            - fit_function: fitting library name according to
+                current.fslibs.fitting_functions.__init__.py
         """
         
         self.fit_performed = True
         
-        # checks correct input. As new functions are added, those options
-        # should be appended to the list.
-        if fit_function not in ('hill'):
-            self.abort(
-                "Chosen fiting function <{}> not an available option.".\
-                    format(fit_function))
+        try:
+            to_fit = locate(
+                'current.fslibs.fitting_functions.{}'.format(fit_function)
+                )()
         
-        # new functions should be appended to the dictionaries
-        fitting_functions = {
-            "hill":fsfit.fitting_hill
-            }
-        not_enough_data_funcs = {
-            "hill":fsfit.hill_results
-            }
+        except TypeError:
+            msg = "Chosen fitting function <{}> not an available option.".\
+                format(fit_function)
+            self.log_r(fsw.gen_wet('ERROR', msg, 23))
+            self.abort()
+        
+        self.log_r("*** Performing fit using function: {}".format(fit_function))
         # logging ###
+        not_enough_data = to_fit.not_enough_data
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
         
         if not(os.path.exists(col_path)):
             os.makedirs(col_path)
         
-        logf = '{0}/{1}/{1}_fit_report.log'.format(
+        logfrep_name = '{0}/{1}/{1}_fit_report.log'.format(
             self.tables_and_plots_folder,
             col
             )
-        logfout = open(logf, 'w')
-        logfout.write(fsfit.fit_log_head(fit_function, col))
-        logresults = '{0}/{1}/{1}_fit_results.csv'.format(
+        logfreport = open(logfrep_name, 'w')
+        logfreport.write(to_fit.fit_log_header(col))
+        logftable_name = '{0}/{1}/{1}_fit_table.csv'.format(
             self.tables_and_plots_folder,
             col
             )
-        logrout = open(logresults, 'w')
-        logrout.write(fsfit.fit_results_head(fit_function))
+        logftable = open(logftable_name, 'w')
+        logftable.write(to_fit.results_header())
         self.log_r('** Performing fitting for {}...'.format(col))
         measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
@@ -3064,35 +3063,29 @@ or confirm you have not forgot any peaklist [{}].".\
             
             if mmask.sum() < mindp:
                 # residue does not have enough data to perform fit
-                logfout.write(fsfit.not_enough_data(res, xdata, ydata))
-                logrout.write(
-                    not_enough_data_funcs[fit_function](
-                        res,
-                        xdata,
-                        ydata,
-                        status='not_enough_data'
-                        )
-                    )
+                logfreport.write(to_fit.not_enough_data(res, xdata, ydata))
                 self.fit_okay[col_res] = False
                 self.fit_plot_text[col_res] = "not enough data"
                 self.fit_plot_ydata[col_res] = None
                 continue
             
             a, b, c, d, e = \
-                fitting_functions[fit_function](
+                to_fit.fit_data(
                     xdata,
                     ydata,
                     res,
                     self.xfit
                     )
-            logfout.write(a)
-            logrout.write(b)
+            logfreport.write(a)
+            logftable.write(b)
             self.fit_plot_text[col_res] = c
             self.fit_okay[col_res] = d
             self.fit_plot_ydata[col_res] = e
         
-        logfout.close()
-        logrout.close()
+        logfreport.close()
+        self.log_r("*** Fit report log file written: {}".format(logfrep_name))
+        logftable.close()
+        self.log_r("*** Fit table log file written: {}".format(logftable_name))
         
         return
     
