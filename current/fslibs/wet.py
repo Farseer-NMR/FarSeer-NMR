@@ -28,6 +28,8 @@ def gen_wet(t, s, n):
 {}
 {}
 {}
+{}
+{}
 
 """.\
         format(
@@ -36,6 +38,11 @@ def gen_wet(t, s, n):
              "\n".join(map(format_msg, textwrap.wrap(s, width=67))),
             line(),
             referwet(n),
+            line(s="please visit"),
+            line(
+                s="github.com/joaomcteixeira/FarSeer-NMR/wiki/WET-List#wet{}".\
+                    format(n)
+                ),
             bottom()
             )
     

@@ -849,9 +849,17 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         # reads size of target peaklist
         target_ind_init_len = target_pkl.shape[0]
         # expands the target peaklist to the new index
-        target_pkl = \
-            target_pkl.set_index('ResNo').\
-                reindex(ind).reset_index().fillna(fillna)
+        try:
+            target_pkl = \
+                target_pkl.set_index('ResNo').\
+                    reindex(ind).reset_index().fillna(fillna)
+        except ValueError:
+            msg = "Farseer-NMR could not reindex this peaklist. There are \
+several input errors that may occur in this case. Read the Documentation for \
+more details."
+            self.log_r(fsw.gen_wet('ERROR', msg, 24))
+            self.abort()
+        
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
         # transfers information of the different columns
