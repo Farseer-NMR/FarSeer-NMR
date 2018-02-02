@@ -39,8 +39,7 @@ class PeakListArea(QWidget):
         return self.parent().parent().parent().sideBar
 
 
-    def update_variables(self, variables):
-        self.variables = variables
+    def update_variables(self):
         self.updateTree()
 
     def show_update_warning(self):
@@ -115,6 +114,8 @@ class PeakListArea(QWidget):
 
 
     def updateTree(self):
+
+        print(self.check_conditions_for_tree)
 
         if not self.check_conditions_for_tree():
             return
