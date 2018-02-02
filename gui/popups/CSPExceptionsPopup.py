@@ -64,3 +64,4 @@ class CSPExceptionsPopup(BasePopup):
                 value.field.setValue(defaults[aal3tol1[key]])
             else:
                 value.field.setValue(self.alpha_value)
+
