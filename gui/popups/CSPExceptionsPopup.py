@@ -18,7 +18,7 @@ class CSPExceptionsPopup(BasePopup):
 
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):
-            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, min=0, max=1, step=0.01)
+            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, min=0.01, max=1, step=0.01)
             if ii < 5:
                 self.layout().addWidget(self.value_dict[res], ii, 0)
             elif 5 <= ii < 10:
@@ -44,8 +44,7 @@ class CSPExceptionsPopup(BasePopup):
     def set_values(self):
         tmp_dict = {}
         for key, value in self.value_dict.items():
-            if value.field.value() > 0:
-                tmp_dict[aal3tol1[key]] = value.field.value()
+            tmp_dict[aal3tol1[key]] = round(value.field.value(), 2)
         self.local_variables.update(tmp_dict)
         self.variables.update(self.local_variables)
         self.accept()
