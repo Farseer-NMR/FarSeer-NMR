@@ -17,8 +17,8 @@ def create_directory_structure(output_path, variables):
         return "No dataset"
     for ii, z_key in enumerate(variables["conditions"]["z"]):
         for jj, y_key in enumerate(variables["conditions"]["y"]):
-            z_name = '_'.join([str(ii), z_key])
-            y_name = '_'.join([str(jj), y_key])
+            z_name = '_'.join(["{:0>2}".format(ii), z_key])
+            y_name = '_'.join(["{:0>2}".format(jj), y_key])
             if not os.path.exists(os.path.join(spectrum_dir, z_name, y_name)):
                 os.makedirs(os.path.join(spectrum_dir, z_name, y_name))
             if variables["fasta_settings"]["applyFASTA"]:
@@ -26,7 +26,7 @@ def create_directory_structure(output_path, variables):
                     fasta_file = variables["fasta_files"][y_key]
                     copy2(fasta_file, os.path.join(spectrum_dir, z_name, y_name))
             for kk, x_key in enumerate(variables["conditions"]["x"]):
-                x_name = '_'.join([str(kk), x_key])
+                x_name = '_'.join(["{:0>2}".format(kk), x_key])
                 fout = open(os.path.join(spectrum_dir, z_name, y_name, "%s.csv" % x_name), 'w')
                 peaklist_path = variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
