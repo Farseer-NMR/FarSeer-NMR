@@ -42,6 +42,8 @@ class SideBar(QTreeWidget):
         self.setMinimumWidth(200)
         self.setMaximumWidth(320)
         self.setFixedHeight(gui_settings['sideBar_height'])
+        self.peakLists = self.variables['peaklists']
+
         self.setSortingEnabled(True)
         self.update_from_config()
         # self.peakLists = self.variables['peakLists']

@@ -87,20 +87,19 @@ class TabWidget(QTabWidget):
                 # self.settings.spectrum_path.field.setText('')
                 # self.variables = variables
                 Variables().read(fname[0])
+                self.load_variables()
         return
 
-    def load_variables(self, variables):
+    def load_variables(self):
 
-        self.settings.load_variables(variables)
-        self.settings.variables = variables
-        self.interface.load_variables(variables)
-        self.interface.sideBar.update_from_config(variables)
+        self.settings.load_variables()
+        self.peaklist_selection.load_variables()
+        self.peaklist_selection.sideBar.update_from_config()
 
     def load_peak_lists(self, path=None):
-        print('load')
         if os.path.exists(path):
-            self.interface.sideBar.load_from_path(path)
-            self.interface.sideBar.update_from_config(self.variables)
+            self.peaklist_selection.sideBar.load_from_path(path)
+            self.peaklist_selection.sideBar.update_from_config()
 
     def save_config(self, path=None):
         if not path:
