@@ -378,9 +378,9 @@ class Settings(BaseWidget):
 
         retval = msg.exec_()
         if retval == QMessageBox.Ok:
-            variables = self.parent().parent().parent().load_config()
-            if variables:
-                self.load_variables()
+            self.variables = self.parent().parent().parent().load_config()
+
+            self.load_variables()
         else:
             return
 
@@ -476,8 +476,7 @@ class Settings(BaseWidget):
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()
 
-    def load_variables(self, variables=None):
-
+    def load_variables(self):
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
         cs = self.variables["cs_settings"]
