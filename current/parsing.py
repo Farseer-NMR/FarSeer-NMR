@@ -29,13 +29,13 @@ res1to3dict = {
 
 file_extenstions = ['peaks', 'xpk', 'out', 'csv']
 
-def getPeakListFileFormat(filePath):
+def get_peaklist_format(file_path):
 
-    fin = open(filePath, 'r')
-    if len(filePath.split('.')) < 2:
+    fin = open(file_path, 'r')
+    if len(file_path.split('.')) < 2:
         print('Invalid File Extension')
         return
-    if filePath.split('.')[-1] not in file_extenstions:
+    if file_path.split('.')[-1] not in file_extenstions:
         print('Invalid File Extension')
         return
     for line in fin:
@@ -43,24 +43,26 @@ def getPeakListFileFormat(filePath):
             continue
 
         if (line.lstrip().startswith("Assignment") and "w1" in line) or line.startswith("<sparky save file>"):
+            fin.close()
             return "SPARKY"
 
         if line.lstrip().startswith("ANSIG") and "crosspeak" in line:
+            fin.close()
             return "ANSIG"
 
-        if line.startswith('#') and "Number of dimensions" in line:
-            return "XEASY"
-
         if line.startswith("DATA") and "X_AXIS" in line:
+            fin.close()
             return "NMRDRAW"
 
         if line.split()[0].isdigit() and line.split()[1].startswith('{'):
+            fin.close()
             return "NMRVIEW"
 
         if line.startswith("Number"):
+            fin.close()
             return "CCPN"
 
-def parseAnsig(peaklist_file):
+def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
        From ANSIG Manual:
        For 2D crosspeaks files the record has the format:
@@ -92,10 +94,6 @@ ANSIG v3.3 export crosspeaks file
 
     # check a 2D peaklist has been parsed in
 
-    first_two_lines = open(peaklist_file, 'rU').readlines()[:2]
-    if first_two_lines[1][11] != '2':
-        print("Peak list is not from a 2D spectrum")
-        return
 
     # Each chemical shift is 13 characters wide and intensity always follows chemical shifts
     intensity_column_number = 13*dimension_count
@@ -103,9 +101,18 @@ ANSIG v3.3 export crosspeaks file
     # assignment field occurs after 13 character intensity field, plus 12 character spectrum name field and seven 6
     # character symmetry and connection fields
     assignment_field_start_index = intensity_column_number+13+12+7*6
-    fin = open(peaklist_file, 'rU')
-    lines = fin.readlines()[2:]
-    for ii, line in enumerate(lines):
+    fin = open(peaklist_file, 'r')
+
+    lines = fin.readlines()
+
+
+    first_two_lines = lines[:2]
+
+    if first_two_lines[1][11] != '2':
+        print("Peak list is not from a 2D spectrum")
+        return
+
+    for ii, line in enumerate(lines[2:]):
 
         if line.strip().startswith('!'):
             continue
@@ -137,10 +144,11 @@ ANSIG v3.3 export crosspeaks file
                    assignments=peak_labels, linewidths=line_widths, atoms=atoms)
 
             peakList.append(peak)
+    fin.close()
     return peakList
 
 
-def parseNmrDraw(peaklist_file):
+def parse_nmrdraw_peaklist(peaklist_file):
     """Parse a 2D peaklist in NmrDraw format
 REMARK
 
@@ -223,7 +231,7 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
     return peakList
 
 
-def parseNmrView(peaklist_file):
+def parse_nmrview_peaklist(peaklist_file):
       peakList = []
       fin = open(peaklist_file, 'rU')
 
@@ -294,7 +302,7 @@ def parseNmrView(peaklist_file):
               boxWidths[i] = float(boxWidth)
               annotations[i] = anno
           peak = Peak(peak_number=peak_number, positions=ppms, volume=volume, height=height,
-                     assignments=annotations, linewidths=lineWidths, atoms=atoms)
+                     assignments=annotations, linewidths=lineWidths, atoms=atoms, details=details)
 
           peakList.append(peak)
 
@@ -303,65 +311,7 @@ def parseNmrView(peaklist_file):
       return peakList
 
 
-def parseProtFile(prot_file, seq_file):
-  seq_dict = get_sequence_dict(seq_file)
-  annotation_dict = {}
-  lines = open(prot_file, 'r').readlines()
-
-  for line in lines:
-      l = line.strip().split()
-      annotation_dict[int(l[0])] = l[-1]+seq_dict[int(l[-1])]+l[-2]
-  return annotation_dict
-
-def get_sequence_dict(seq_file, first_residue=1):
-
-  seq_dict = {}
-  lines = open(seq_file, 'r').readlines()
-
-  for ii, line in enumerate(lines):
-      l = line.strip().split()
-      seq_dict[ii+first_residue] = l[0].title()
-  return seq_dict
-
-
-def parseXeasy(peaklist_file, prot_file, seq_file):
-    peakList = []
-    fin = open(peaklist_file, 'rU')
-
-    numDim = int(fin.readline().strip().split()[-1])
-    lineWidth = None
-    annotation_dict = parseProtFile(prot_file, seq_file)
-    for line in fin:
-      line = line.strip()
-
-      if not line:
-        continue
-
-      atoms = []
-      if line.startswith('#'):
-        atoms.append(line.strip().split()[-1])
-        continue
-      data = line.split()
-
-      if len(data) < 10:
-          continue
-      ppms = [0] * numDim
-      annotations = [None] * numDim
-      volume = float(data[numDim+3])
-      height = None
-
-      for dim in range(numDim):
-        ppms[dim] = float(data[dim+1])
-        if data[dim+9] != '0':
-          annotations[dim] = annotation_dict[int(data[dim+9])]
-
-      peak = Peak(peak_number=data[0], positions=ppms, assignments=annotations, atoms=atoms, linewidths=lineWidth, volume=volume,
-                  height=height)
-      peakList.append(peak)
-
-    fin.close()
-
-def parseCcpn(peaklist_file):
+def parse_ccpn_peaklist(peaklist_file):
   fin = open(peaklist_file, 'rU')
   next(fin)
   peakList = []
@@ -383,7 +333,7 @@ def parseCcpn(peaklist_file):
   fin.close()
   return peakList
 
-def parseSparkyPeakList(peaklist_file):
+def parse_sparky_peaklist(peaklist_file):
   peakList = []
   with open(peaklist_file) as f:
       lines = f.readlines()[1:]
@@ -409,27 +359,20 @@ def parseSparkyPeakList(peaklist_file):
 
   return peakList
 
-def fixpath(path):
-  if path.startswith('/') and  platform.system() == "Windows":
-      path = os.path.normpath(path[1:])
-  else:
-      path = os.path.normpath(os.path.expanduser(path))
-  return path
 
-
-def read_peaklist(fin, prot_file=None, seq_file=None):
+def read_peaklist(fin):
 
   peaklist_file = fixpath(fin)
-  file_format = getPeakListFileFormat(peaklist_file)
+  file_format = get_peaklist_format(peaklist_file)
 
   if file_format == 'ANSIG':
-      return parseAnsig(peaklist_file)
+      return parse_ansig_peaklist(peaklist_file)
   elif file_format == 'NMRDRAW':
-      return parseNmrDraw(peaklist_file)
+      return parse_nmrdraw_peaklist(peaklist_file)
   elif file_format == 'NMRVIEW':
-      return parseNmrView(peaklist_file)
+      return parse_nmrview_peaklist(peaklist_file)
   elif file_format == 'SPARKY':
-      return parseSparkyPeakList(peaklist_file)
+      return parse_sparky_peaklist(peaklist_file)
   elif file_format == 'CCPN':
-      return parseCcpn(peaklist_file)
+      return parse_ccpn_peaklist(peaklist_file)
 

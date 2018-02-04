@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
+from current.utils import aal1tol3, aal3tol1
 
 import current.fslibs.wet as fsw
 
@@ -9,13 +10,13 @@ class FarseerCube:
     """
     The Farseer-NMR Data set.
     
-    Reads all the experimental input peaklists to a hierarchycal nested
+    Reads all the experimental input peaklists to a hierarchical nested
     dictionary where the hierarchy is dictated by the acquisition
     schedule of the different measured variables (temperature,
     ligand ratio, etc...).
     Peaklists should be stored in a spectra/ folder.
     
-    Peaklists in dicitonary are read as pd.DataFrames.
+    Peaklists in dictionary are read as pd.DataFrames.
     
     Formats all the peaklists to the same size.
     
@@ -59,9 +60,7 @@ class FarseerCube:
             written on-the-fly.
         
         p5d (pandas.Panel): a 5-dimension pandas.Panel.
-        
-        aal3tol1, aal1tol3 (dict): translate between 3-letter and
-            1-letter aminoacid codes.
+    
         
         tmp_vars (dict): stored temporary variables for functions.
         
@@ -176,52 +175,7 @@ FASTA starting residue: {}  """.\
             aliases={'major': 'index', 'minor': 'minor_axis'},
             stat_axis=2
             )
-        # translation dictionaries
-        self.aal3tol1 = {
-            "Ala": "A",
-            "Arg": "R",
-            "Asn": "N",
-            "Asp": "D",
-            "Cys": "C",
-            "Glu": "E",
-            "Gln": "Q",
-            "Gly": "G",
-            "His": "H",
-            "Ile": "I",
-            "Leu": "L",
-            "Lys": "K",
-            "Met": "M",
-            "Phe": "F",
-            "Pro": "P",
-            "Ser": "S",
-            "Thr": "T",
-            "Trp": "W",
-            "Tyr": "Y",
-            "Val": "V"
-            }
-        self.aal1tol3 = {
-            "A": "Ala",
-            "R": "Arg",
-            "N": "Asn",
-            "D": "Asp",
-            "C": "Cys",
-            "E": "Glu",
-            "Q": "Gln",
-            "G": "Gly",
-            "H": "His",
-            "I": "Ile",
-            "L": "Leu",
-            "K": "Lys",
-            "M": "Met",
-            "F": "Phe",
-            "P": "Pro",
-            "S": "Ser",
-            "T": "Thr",
-            "W": "Trp",
-            "Y": "Tyr",
-            "V": "Val"
-            }
-    
+       
     def log_r(self, logstr, istitle=False):
         """
         Registers activity to the log string and prints it.
@@ -452,7 +406,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 )
             ]
         dd["1-letter"] = list(FASTA)
-        dd["3-letter"] = [self.aal1tol3[i] for i in FASTA]
+        dd["3-letter"] = [aal1tol3[i] for i in FASTA]
         # Assign F1 is generated here because it will serve in future functions.
         atomtype = \
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
@@ -590,7 +544,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
     
             # Step 2
             resInfo.loc[:,'1-letter'] = \
-                resInfo.loc[:,"3-letter"].map(self.aal3tol1.get)
+                resInfo.loc[:,"3-letter"].map(aal3tol1.get)
             
             # Step 3
             self.allpeaklists[z][y][x] = \

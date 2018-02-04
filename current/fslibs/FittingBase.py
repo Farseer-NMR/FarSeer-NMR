@@ -5,7 +5,7 @@ class FittingBase(metaclass=ABCMeta):
     Fitting base class.
     
     To implement a new fitting formula create a class that inherits
-    FittingBase and define its specific funtions (@abstractmethod),
+    FittingBase and define its specific functions (@abstractmethod),
     see HillEquation as example.
     """
     @abstractmethod

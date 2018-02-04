@@ -1,6 +1,7 @@
 class Peak(object):
 
-    def __init__(self, peak_number, positions, assignments, linewidths, height, volume, atoms, fit_method=None, merit=None,
+    def __init__(self, peak_number, positions, assignments, linewidths, height, volume, atoms,
+                 fit_method=None, merit=None,
                  volume_method=None, details=None):
 
         self.peak_number = peak_number
