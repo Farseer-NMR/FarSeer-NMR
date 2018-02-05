@@ -6,7 +6,6 @@ Authors
 Katya: https://stackoverflow.com/users/1035567/katya
 ekhumoro: https://stackoverflow.com/users/984421/ekhumoro
 Avaris: https://stackoverflow.com/users/843822/avaris
-
 """
 
 from PyQt5.QtWidgets import QLineEdit
