@@ -1,6 +1,6 @@
 import unittest
 
-from current import parsing 
+from core import parsing 
 
 ansig_peaklist = 'test_data/ansig_peaklist.xpk'
 sparky_peaklist = 'test_data/sparky_peaklist.peaks'
