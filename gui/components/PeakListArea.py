@@ -28,7 +28,7 @@ width = 600
 
 import math
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 class PeakListArea(QWidget):
 
