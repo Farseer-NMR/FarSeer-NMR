@@ -26,7 +26,7 @@ import json
 from matplotlib import colors as mcolors
 GUI_DIR = os.path.dirname(__file__)
 
-defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'current', 'default_config.json'), 'r'))
+defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'core', 'default_config.json'), 'r'))
 
 line_styles = ['-', '--', '-.', ':', 'o']
 
