@@ -154,7 +154,6 @@ class OscillationMapPopup(BasePopup):
         self.local_variables["res_highlight_fs"] = self.dpre_osci_rh_fs.field.value()
         self.local_variables["res_highlight_y"] = self.dpre_osci_rh_y.field.value()
         self.local_variables["ymax"] = self.dpre_osci_ymax.field.value()
-        self.variables.update(self.local_variables)
         self.accept()
 
 

@@ -68,7 +68,6 @@ class FastaSelectionPopup(BasePopup):
         print(self.fasta_files)
         self.local_variables.update(self.fasta_files)
         print(self.local_variables, 'fasta')
-        # self.variables.update(self.local_variables)
         self.accept()
 
 

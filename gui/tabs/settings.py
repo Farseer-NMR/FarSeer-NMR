@@ -443,7 +443,7 @@ class Settings(BaseWidget):
         cs["cs_correction_res_ref"] = self.cs_correction_res_ref.field.value()
 
         # CSP Settings
-        csp["csp_res4alpha"] = self.csp_alpha.field.value()
+        csp["csp_res4alpha"] = round(self.csp_alpha.field.value(), 2)
         csp["cs_lost"] = self.csp_lost.fields.currentText()
 
         # FASTA Settings

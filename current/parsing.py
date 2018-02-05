@@ -384,7 +384,7 @@ def parse_sparky_peaklist(peaklist_file):
 
 def read_peaklist(fin):
 
-  peaklist_file = fixpath(fin)
+  peaklist_file = fin
   file_format = get_peaklist_format(peaklist_file)
 
   if file_format == 'ANSIG':

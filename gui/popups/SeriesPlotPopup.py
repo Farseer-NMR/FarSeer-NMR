@@ -239,7 +239,7 @@ class SeriesPlotPopup(BasePopup):
         self.local_variables["tag_cartoon_ls"] = self.tag_cartoon_ls.fields.currentText()
 
 
-        self.local_variables.update(self.variables)
+        # self.local_variables.update(self.variables)
         self.accept()
 
     def get_values(self):

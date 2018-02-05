@@ -96,6 +96,5 @@ class CompactBarPopup(BasePopup):
         self.local_variables["x_ticks_weight"] = str(self.x_tick_weight.fields.currentText())
         self.local_variables["unassigned_shade"] = self.shade_unassigned_checkbox.isChecked()
         self.local_variables["unassigned_shade_alpha"] = self.unassigned_shade_alpha.field.value()
-        self.variables.update(self.local_variables)
 
         self.accept()

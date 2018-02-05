@@ -60,5 +60,4 @@ class VerticalBarPopup(BasePopup):
     def set_values(self):
         self.local_variables["cols_page"] = self.bar_cols.field.value()
         self.local_variables["rows_page"] = self.bar_rows.field.value()
-        self.local_variables.update(self.variables)
         self.accept()
