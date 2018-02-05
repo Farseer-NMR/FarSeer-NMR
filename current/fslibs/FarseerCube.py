@@ -673,6 +673,9 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                     )
             
             self.log_r(logs)
+            
+        # confirms F1 and F2 coherency with nuclei
+        self.checks_posf1_posf2_nuclei(self.allpeaklists)
         
         return
 
@@ -1690,5 +1693,47 @@ You should verify that your start Fasta residue number is correct.".\
         else:
             msg = "> FASTA files starting number is consistent with peaklists"
             self.log_r(msg)
+        
+        return
+
+    def checks_posf1_posf2_nuclei(self, target):
+        """
+        Confirms coherency between Columns label and nuclei type.
+        
+        Demmands that cols "Position F1" and "Assign F1" refer to 1H
+        and "Position F2" and "Assign F2" to 15N.
+        
+        Must be called after self.init_coord_names()
+        
+        Parameters:
+            target: Nested Dictionary of pd.DatFrame containing
+                the peaklist information.
+        """
+        
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            
+            if not(0 < target[z][y][x].loc[:,'Position F1'].mean() < 20):
+                msg = 'Peaklist [{}][{}][{}] "Position F1" values do not \
+correspond to proton chemical shift values.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(target[z][y][x].ix[0,'Assign F1'].endswith('H')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F1" values do not \
+correspond to proton assignment labels.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(80 < target[z][y][x].loc[:,'Position F2'].mean() < 150):
+                msg = 'Peaklist [{}][{}][{}] "Position F2" values do not \
+correspond to nitrogen chemical shift values.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(target[z][y][x].ix[0,'Assign F2'].endswith('N')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F2" values do not \
+correspond to nitrogen assignment labels.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
         
         return
