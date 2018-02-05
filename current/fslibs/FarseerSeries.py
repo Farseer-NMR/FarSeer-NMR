@@ -30,7 +30,6 @@ from math import ceil
 from matplotlib import pyplot as plt
 
 import current.fslibs.wet as fsw
-import current.fslibs.fitting as fsfit
 
 class FarseerSeries(pd.Panel):
     """
