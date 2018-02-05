@@ -163,7 +163,6 @@ class ScatterFlowerPlotPopup(BasePopup):
                 for x in self.cs_scatter_flower_color_list.field.text().\
                     split(',')]
         
-        self.local_variables.update(self.variables)
         self.accept()
 
     def get_values(self):

@@ -9,9 +9,11 @@ class Variables(dict):
         return ob
 
     def read(self, fname):
-        variables = json.load(open(fname, 'r'))
+        fin = open(fname, 'r')
+        variables = json.load(fin)
         self._vars.update(variables)
+        fin.close()
 
     def write(self, fout):
         json.dump(self._vars, fout, indent=4)
-
+        fout.close()

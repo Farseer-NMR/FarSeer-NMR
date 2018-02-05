@@ -80,5 +80,4 @@ class ExtendedBarPopup(BasePopup):
         self.local_variables["x_ticks_rot"] = self.x_tick_rotation.field.value()
         self.local_variables["x_ticks_weight"] = str(self.x_tick_font_weight.fields.currentText())
         self.local_variables["x_ticks_color_flag"] = self.x_tick_colour.checkBox.isChecked()
-        self.local_variables.update(self.variables)
         self.accept()

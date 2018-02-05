@@ -105,7 +105,6 @@ class HeatMapPopup(BasePopup):
         self.local_variables["tag_line_color"] = self.heat_map_tag_line_color.fields.currentText()
         self.local_variables["tag_line_ls"] = self.heat_map_tag_ls.fields.currentText()
         self.local_variables["tag_line_lw"] = self.heat_map_tag_lw.field.value()
-        self.variables.update(self.local_variables)
         self.accept()
 
     def get_values(self):

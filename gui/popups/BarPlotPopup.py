@@ -120,5 +120,4 @@ class BarPlotPopup(BasePopup):
         self.local_variables["mark_prolines_symbol"] = str(self.proline_marker.field.text())
         self.local_variables["mark_user_details_flag"] = self.user_details.checkBox.isChecked()
         self.local_variables["color_user_details_flag"] = self.colour_user_details.checkBox.isChecked()
-        self.variables.update(self.local_variables)
         self.accept()

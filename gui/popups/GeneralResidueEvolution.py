@@ -141,7 +141,7 @@ class GeneralResidueEvolution(BasePopup):
         self.local_variables["y_ticks_weight"] = str(self.revo_y_ticks_weight.fields.currentText())
         self.local_variables["y_ticks_rot"] = self.revo_y_ticks_rot.field.value()
         self.local_variables["titration_x_values"] = [float(x) for x in self.titration_x_values.field.text().split(',')]
-        self.variables.update(self.local_variables)
+        # self.variables.update(self.local_variables)
         self.accept()
 
     def get_values(self):

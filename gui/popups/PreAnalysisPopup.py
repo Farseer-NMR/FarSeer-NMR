@@ -34,7 +34,6 @@ class PreAnalysisPopup(BasePopup):
     def set_values(self):
         self.local_variables["gaussian_stdev"] = self.gaussian_stdev.field.value()
         self.local_variables["gauss_x_size"] = self.gauss_x_size.field.value()
-        self.local_variables.update(self.variables)
         self.accept()
 
 

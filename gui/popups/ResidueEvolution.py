@@ -97,7 +97,6 @@ class ResidueEvolutionPopup(BasePopup):
         self.local_variables["fit_line_color"] = self.res_evo_fit_line_colour.fields.currentText()
         self.local_variables["fit_line_width"] = self.res_evo_fit_line_width.field.value()
         self.local_variables["fit_line_style"] = self.res_evo_fit_line_style.fields.currentText()
-        self.local_variables.update(self.variables)
         self.accept()
 
     def get_values(self):
