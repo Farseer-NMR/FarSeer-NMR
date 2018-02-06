@@ -22,9 +22,9 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QDialog, QGridLayout, QVBoxLayout
 from PyQt5 import QtCore
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 from gui.gui_utils import defaults
-from current.utils import get_nested_value
+from core.utils import get_nested_value
 
 class BasePopup(QDialog):
 

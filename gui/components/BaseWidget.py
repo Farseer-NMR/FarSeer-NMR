@@ -23,7 +23,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget
 
 from gui.components.TabFooter import TabFooter
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 
 

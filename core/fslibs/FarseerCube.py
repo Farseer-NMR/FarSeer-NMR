@@ -24,9 +24,9 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-from current.utils import aal1tol3, aal3tol1
+from core.utils import aal1tol3, aal3tol1
 
-import current.fslibs.wet as fsw
+import core.fslibs.wet as fsw
 
 class FarseerCube:
     """

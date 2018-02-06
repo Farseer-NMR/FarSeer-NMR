@@ -24,9 +24,9 @@ import os
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
-from current.parsing import read_peaklist
+from core.parsing import read_peaklist
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 class SideBar(QTreeWidget):
 

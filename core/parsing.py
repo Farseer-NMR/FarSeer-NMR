@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-from current.fslibs.Peak import Peak
+from core.fslibs.Peak import Peak
 import platform
 import re, os, csv
 

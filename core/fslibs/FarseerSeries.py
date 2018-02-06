@@ -29,7 +29,7 @@ from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
 
-import current.fslibs.wet as fsw
+import core.fslibs.wet as fsw
 
 class FarseerSeries(pd.Panel):
     """
@@ -3032,14 +3032,14 @@ or confirm you have not forgot any peaklist [{}].".\
             - mindp: minimum number of points to consider residue
                 for fitting.
             - fit_function: fitting library name according to
-                current.fslibs.fitting_functions.__init__.py
+                core.fslibs.fitting_functions.__init__.py
         """
         
         self.fit_performed = True
         
         try:
             to_fit = locate(
-                'current.fslibs.fitting_functions.{}'.format(fit_function)
+                'core.fslibs.fitting_functions.{}'.format(fit_function)
                 )()
         
         except TypeError:
