@@ -1,3 +1,25 @@
+"""
+Copyright © 2017-2018 Farseer-NMR
+João M.C. Teixeira and Simon P. Skinner
+
+@ResearchGate https://goo.gl/z8dPJU
+@Twitter https://twitter.com/farseer_nmr
+
+This file is part of Farseer-NMR.
+
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Farseer-NMR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+"""
 import glob
 import os
 import numpy as np
@@ -8,7 +30,6 @@ from math import ceil
 from matplotlib import pyplot as plt
 
 import core.fslibs.wet as fsw
-import core.fslibs.fitting as fsfit
 
 class FarseerSeries(pd.Panel):
     """
@@ -437,7 +458,7 @@ class FarseerSeries(pd.Panel):
         RGB_list = [s]
         # Calcuate a color at each evenly spaced value of t from 1 to n
         for t in range(1, n):
-            # Interpolate RGB vector for color at the core value of t
+            # Interpolate RGB vector for color at the current value of t
             curr_vector = [
                 int(s[j] + (float(t)/(n-1))*(f[j]-s[j]))
                 for j in range(3)
@@ -1777,7 +1798,7 @@ recipient: residues
             
             i (int): the index of the subplot axis.
             
-            row_number (int): the index of the core residue.
+            row_number (int): the index of the current residue.
         """
         
         # Draws subplot title
@@ -2031,7 +2052,7 @@ or confirm you have not forgot any peaklist [{}].".\
             
             i (int): the index of the subplot axis.
             
-            row_number (int): the index of the core residue.
+            row_number (int): the index of the current residue.
         """
         
         def set_tick_labels():

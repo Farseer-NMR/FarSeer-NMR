@@ -279,12 +279,12 @@
         "expand_lost_zz": false,
         "perform_comparisons": false
     },
-    
+
     "fitting_parameters": {
         "mininum_datapoints": 5,
         "fitting_function": "hill"
     },
-    
+
     "general_settings": {
         "chimera_att_select_format": ":",
         "fig_dpi": 300,
@@ -334,7 +334,7 @@
         "plots_height":false,
         "height_scale":[0,100000]
     },
-    
+
     "experimental_dataset": {
 
     },

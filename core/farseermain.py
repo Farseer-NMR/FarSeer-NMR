@@ -1,4 +1,25 @@
 """
+Copyright © 2017-2018 Farseer-NMR
+João M.C. Teixeira and Simon P. Skinner
+
+@ResearchGate https://goo.gl/z8dPJU
+@Twitter https://twitter.com/farseer_nmr
+
+This file is part of Farseer-NMR.
+
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Farseer-NMR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+
 Optimal algorithm to run the Farseer-NMR method.
 
 Usage as main script:
@@ -77,7 +98,7 @@ def read_user_variables(path, config_name):
     # Simon: for sure with the JSON you will make it work differently :-P
     cwd =  os.path.abspath(path)
     
-    # changes core directory to the directory where
+    # changes current directory to the directory where
     # farseer_user_variables is. In this way, output from calculations is
     # stored in that same directory
     os.chdir(cwd)

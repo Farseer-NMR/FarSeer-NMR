@@ -1,3 +1,25 @@
+"""
+Copyright © 2017-2018 Farseer-NMR
+João M.C. Teixeira and Simon P. Skinner
+
+@ResearchGate https://goo.gl/z8dPJU
+@Twitter https://twitter.com/farseer_nmr
+
+This file is part of Farseer-NMR.
+
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Farseer-NMR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+"""
 import os
 import numpy as np
 import pandas as pd
@@ -651,6 +673,9 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                     )
             
             self.log_r(logs)
+            
+        # confirms F1 and F2 coherency with nuclei
+        self.checks_posf1_posf2_nuclei(self.allpeaklists)
         
         return
 
@@ -704,8 +729,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 ref_data['F2_cs'] = dp_F2_cs
             
             # For the reference residue, calculates the difference between the 
-            # chemical shift in the reference and the core spectra. If
-            # core == reference, difference should yield 0.
+            # chemical shift in the reference and the current spectra. If 
+            # current == reference, difference should yield 0.
             F1_cs_diff = float(dp_F1_cs) - float(ref_data['F1_cs'])
             F2_cs_diff = float(dp_F2_cs) - float(ref_data['F2_cs'])
             # copies the chemical shift data to a backup column
@@ -803,9 +828,17 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         # reads size of target peaklist
         target_ind_init_len = target_pkl.shape[0]
         # expands the target peaklist to the new index
-        target_pkl = \
-            target_pkl.set_index('ResNo').\
-                reindex(ind).reset_index().fillna(fillna)
+        try:
+            target_pkl = \
+                target_pkl.set_index('ResNo').\
+                    reindex(ind).reset_index().fillna(fillna)
+        except ValueError:
+            msg = "Farseer-NMR could not reindex this peaklist. There are \
+several input errors that may occur in this case. Read the Documentation for \
+more details."
+            self.log_r(fsw.gen_wet('ERROR', msg, 24))
+            self.abort()
+        
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
         # transfers information of the different columns
@@ -1660,5 +1693,47 @@ You should verify that your start Fasta residue number is correct.".\
         else:
             msg = "> FASTA files starting number is consistent with peaklists"
             self.log_r(msg)
+        
+        return
+
+    def checks_posf1_posf2_nuclei(self, target):
+        """
+        Confirms coherency between Columns label and nuclei type.
+        
+        Demmands that cols "Position F1" and "Assign F1" refer to 1H
+        and "Position F2" and "Assign F2" to 15N.
+        
+        Must be called after self.init_coord_names()
+        
+        Parameters:
+            target: Nested Dictionary of pd.DatFrame containing
+                the peaklist information.
+        """
+        
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            
+            if not(0 < target[z][y][x].loc[:,'Position F1'].mean() < 20):
+                msg = 'Peaklist [{}][{}][{}] "Position F1" values do not \
+correspond to proton chemical shift values.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(target[z][y][x].ix[0,'Assign F1'].endswith('H')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F1" values do not \
+correspond to proton assignment labels.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(80 < target[z][y][x].loc[:,'Position F2'].mean() < 150):
+                msg = 'Peaklist [{}][{}][{}] "Position F2" values do not \
+correspond to nitrogen chemical shift values.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
+            
+            if not(target[z][y][x].ix[0,'Assign F2'].endswith('N')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F2" values do not \
+correspond to nitrogen assignment labels.'.format(z, y, x)
+                self.log_r(fsw.gen_wet("ERROR", msg, 25))
+                self.abort()
         
         return

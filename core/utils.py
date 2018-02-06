@@ -1,7 +1,28 @@
+"""
+Copyright © 2017-2018 Farseer-NMR
+Simon P. Skinner and João M.C. Teixeira
+
+@ResearchGate https://goo.gl/z8dPJU
+@Twitter https://twitter.com/farseer_nmr
+
+This file is part of Farseer-NMR.
+
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Farseer-NMR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+"""
 # variables necessary for the functions
 
 from functools import reduce
-import os
 
 aal3tol1 = {
 "Ala": "A",
@@ -65,8 +86,3 @@ def exp_set_is_valid(variables):
 def get_nested_value(dictionary, *keys):
     return reduce(lambda dct, key: dct.get(key, None) if isinstance(dct,
                                             dict) else None, *keys, dictionary)
-
-def get_default_config_path():
-    current_path = os.path.dirname(__file__)
-    default_path = os.path.join(current_path, 'default_config.json')
-    return default_path
