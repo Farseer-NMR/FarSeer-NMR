@@ -23,23 +23,6 @@ for key in keylist:
         colours.pop(key, None)
 
 
-#colours = OrderedDict([('#ff0000','red'),
-                       #('#8b0000','dark red'),
-                       #('#00ffff', 'cyan'),
-                       #('#ff8000', 'orange'),
-                       #('#0080ff', 'manganese blue'),
-                       #('#ffff00', 'yellow'),
-                       #('#0000ff', 'blue'),
-                       #('#80ff00', 'chartreuse'),
-                       #('#8000ff', 'purple'),
-                       #('#00ff00', 'green'),
-                       #('#ff00ff', 'magenta'),
-                       #('#00ff80', 'spring green'),
-                       #('#ff0080', 'deep pink'),
-                       #('#e7e7e7', 'light grey'),
-                       #('#999999', 'grey'),
-                       #('#000000', 'black')])
-
 
 settings_1280x800 = {'peaklistarea_height': 350,
                  'peaklistarea_width': 920,
