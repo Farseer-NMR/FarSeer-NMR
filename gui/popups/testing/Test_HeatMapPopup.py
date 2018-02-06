@@ -2,28 +2,26 @@ import sys
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtTest import QTest
-from PyQt5.QtCore import Qt
-import os
 
 from gui.popups.HeatMapPopup import HeatMapPopup
+from current.utils import get_default_config_path
 
 app = QApplication(sys.argv)
 
 from current.fslibs.Variables import Variables
 
-class Test_BarPlotPopup(unittest.TestCase):
+class Test_HeatMapPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/home/simon/PycharmProjects/FarSeer-NMR/current' \
-                         '/default_config.json'
 
-        Variables().read(default_config)
-        fin = open(default_config, 'r')
-        self.popup = HeatMapPopup()
+        default_config_path = get_default_config_path()
+        Variables().read(default_config_path)
+        fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["heat_map_settings"]
         fin.close()
+
+        self.popup = HeatMapPopup()
         self.variable_keys = tuple(self.popup.variables["heat_map_settings"].keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 

@@ -4,6 +4,8 @@ import json
 from PyQt5.QtWidgets import QApplication
 
 from gui.popups.VerticalBar import VerticalBarPopup
+from gui.gui_utils import default_path as default_config
+
 
 app = QApplication(sys.argv)
 
@@ -13,9 +15,6 @@ class Test_VerticalBarPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/home/simon/PycharmProjects/FarSeer-NMR/current' \
-                         '/default_config.json'
-
         Variables().read(default_config)
         fin = open(default_config, 'r')
         self.popup = VerticalBarPopup()

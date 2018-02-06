@@ -4,7 +4,7 @@ import json
 from matplotlib import colors as mcolors
 GUI_DIR = os.path.dirname(__file__)
 
-defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'current', 'default_config.json'), 'r'))
+
 
 line_styles = ['-', '--', '-.', ':', 'o']
 
@@ -15,6 +15,8 @@ colours = OrderedDict(sorted(matplt_colours_dict.items(),
                              key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
 
 keylist = list(colours.keys())
+
+hex_to_colour_dict = {value: key for key, value in colours.items()}
 
 for key in keylist:
     if len(key) == 1:
@@ -105,3 +107,9 @@ def deliver_settings(resolution):
         print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
+
+def get_colour(colour):
+    if colour.startswith('#'):
+        return hex_to_colour_dict[colour.upper()]
+    else:
+        return colour

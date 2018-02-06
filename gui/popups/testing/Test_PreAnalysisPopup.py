@@ -2,61 +2,63 @@ import sys
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtTest import QTest
-from PyQt5.QtCore import Qt
-import os
 
-from gui.popups.BarPlotPopup import BarPlotPopup
+from current.utils import get_default_config_path
+
+from gui.popups.PreAnalysisPopup import PreAnalysisPopup
 
 app = QApplication(sys.argv)
 
+
+
 from current.fslibs.Variables import Variables
 
-class Test_BarPlotPopup(unittest.TestCase):
+class Test_PreAnalysisPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json'
 
-        Variables().read(default_config)
-        fin = open(default_config, 'r')
-        self.popup = BarPlotPopup()
-        self.defaults = json.load(fin)["bar_plot_settings"]
+        default_config_path = get_default_config_path()
+        Variables().read(default_config_path)
+        fin = open(default_config_path, 'r')
+        self.defaults = json.load(fin)["pre_settings"]
         fin.close()
+
+
+        self.popup = PreAnalysisPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-        print(self.local_variable_keys)
 
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
-
-        self.assertEqual(self.popup.apply_status.isChecked(), self.defaults["status_color_flag"])
-        self.assertEqual(self.popup.meas_bar_colour.fields.currentText(), self.defaults["measured_color"])
-        self.assertEqual(self.popup.lost_bar_colour.fields.currentText(), self.defaults["lost_color"])
-        self.assertEqual(self.popup.unassigned_bar_colour.fields.currentText(), self.defaults["unassigned_color"])
-        self.assertEqual(self.popup.bar_width.field.value(), self.defaults["bar_width"])
-        self.assertEqual(self.popup.bar_alpha.field.value(), self.defaults["bar_alpha"])
-        self.assertEqual(self.popup.bar_linewidth.field.value(), self.defaults["bar_linewidth"])
-        self.assertEqual(self.popup.bar_threshold.isChecked(), self.defaults["threshold_flag"])
-        self.assertEqual(self.popup.bar_threshold_colour.fields.currentText(), self.defaults["threshold_color"])
-        self.assertEqual(self.popup.bar_threshold_linewidth.field.value(), self.defaults["threshold_linewidth"])
-        self.assertEqual(self.popup.bar_threshold_alpha.field.value(), self.defaults["threshold_alpha"])
-        self.assertEqual(self.popup.user_mark_font_size.field.value(), self.defaults["mark_fontsize"])
-        self.assertEqual(self.popup.markProlines.isChecked(), self.defaults["mark_prolines_flag"])
-        self.assertEqual(self.popup.proline_marker.field.text(), self.defaults["mark_prolines_symbol"])
-        self.assertEqual(self.popup.user_details.isChecked(), self.defaults["mark_user_details_flag"])
-        self.assertEqual(self.popup.colour_user_details.isChecked(), self.defaults["color_user_details_flag"])
-
-    def test_change_variables(self):
-        pass
+        self.assertEqual(self.popup.gauss_x_size.field.value(),
+                         self.defaults["gauss_x_size"])
+        self.assertEqual(self.popup.gaussian_stdev.field.value(),
+                         self.defaults["gaussian_stdev"])
 
 
     def test_set_values(self):
-        self.popup.apply_status.setChecked(False)
+
+        self.popup.gauss_x_size.setValue(5)
+        self.popup.gaussian_stdev.setValue(8)
+
         self.popup.set_values()
-        self.assertEqual(self.popup.local_variables["status_color_flag"], False)
-        self.assertEqual(self.popup.local_variables["status_color_flag"], self.popup.variables["bar_plot_settings"]["status_color_flag"])
+
+        self.assertEqual(self.popup.gauss_x_size.field.value(), 5)
+        self.assertEqual(self.popup.gaussian_stdev.field.value(), 8)
+        self.assertEqual(self.popup.variables["pre_settings"]["gauss_x_size"], 5)
+        self.assertEqual(self.popup.variables["pre_settings"]["gaussian_stdev"], 8)
+
+    def test_values_not_set(self):
+
+        self.popup.gauss_x_size.setValue(5)
+        self.popup.gaussian_stdev.setValue(8)
+
+        self.assertEqual(self.popup.gauss_x_size.field.value(), 5)
+        self.assertEqual(self.popup.gaussian_stdev.field.value(), 8)
+        self.assertNotEqual(self.popup.variables["pre_settings"]["gauss_x_size"], 5)
+        self.assertNotEqual(self.popup.variables["pre_settings"]["gaussian_stdev"], 8)
         self.assertEqual(tuple(self.popup.local_variables.keys()), self.local_variable_keys)
         self.assertEqual(tuple(self.popup.variables.keys()), self.variable_keys)
 

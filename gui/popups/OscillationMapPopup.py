@@ -7,7 +7,7 @@ from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-from gui.gui_utils import font_weights, colours
+from gui.gui_utils import font_weights, get_colour
 
 from gui.popups.BasePopup import BasePopup
 
@@ -77,6 +77,7 @@ class OscillationMapPopup(BasePopup):
 
         self.get_values()
 
+
     def set_ranges(self, field_value):
         ll = field_value.split(',')
         return [[int(x.split('-')[0]), int(x.split('-')[1])] for x in ll]
@@ -92,9 +93,9 @@ class OscillationMapPopup(BasePopup):
         self.dpre_osci_dpre_ms.setValue(self.defaults["dpre_ms"])
         self.dpre_osci_dpre_alpha.setValue(self.defaults["dpre_alpha"])
         self.dpre_osci_smooth_lw.setValue(self.defaults["smooth_lw"])
-        self.dpre_osci_ref_color.select(colours[self.defaults["ref_color"]])
-        self.dpre_osci_color_init.select(self.defaults["color_init"])
-        self.dpre_osci_color_end.select(self.defaults["color_end"])
+        self.dpre_osci_ref_color.select(get_colour(self.defaults["ref_color"]))
+        self.dpre_osci_color_init.select(get_colour(self.defaults["color_init"]))
+        self.dpre_osci_color_end.select(get_colour(self.defaults["color_end"]))
         self.dpre_osci_x_ticks_fs.setValue(self.defaults["x_ticks_fs"])
         self.dpre_osci_x_ticks_fn.select(self.defaults["x_ticks_fn"])
         self.dpre_osci_x_ticks_pad.setValue(self.defaults["x_ticks_pad"])
@@ -117,9 +118,9 @@ class OscillationMapPopup(BasePopup):
         self.local_variables["dpre_ms"] = self.dpre_osci_dpre_ms.field.value()
         self.local_variables["dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
         self.local_variables["smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
-        self.local_variables["ref_color"] = self.dpre_osci_ref_color.fields.currentText()
-        self.local_variables["color_init"] = colours[self.dpre_osci_color_init.fields.currentText()]
-        self.local_variables["color_end"] = colours[self.dpre_osci_color_end.fields.currentText()]
+        self.local_variables["ref_color"] = str(self.dpre_osci_ref_color.fields.currentText())
+        self.local_variables["color_init"] = str(self.dpre_osci_color_init.fields.currentText())
+        self.local_variables["color_end"] = str(self.dpre_osci_color_end.fields.currentText())
         self.local_variables["x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
         self.local_variables["x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
         self.local_variables["x_ticks_pad"] = self.dpre_osci_x_ticks_pad.field.value()

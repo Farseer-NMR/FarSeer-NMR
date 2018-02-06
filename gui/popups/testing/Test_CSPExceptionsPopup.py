@@ -3,6 +3,8 @@ import unittest
 import json
 from PyQt5.QtWidgets import QApplication
 from current.utils import aal3tol1, aal1tol3
+from current.utils import get_default_config_path
+
 
 from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
 
@@ -18,14 +20,14 @@ class Test_CSPExceptionsPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/home/simon/PycharmProjects/FarSeer-NMR/current' \
-                         '/default_config.json'
 
-        Variables().read(default_config)
-        fin = open(default_config, 'r')
-        self.popup = CSPExceptionsPopup()
+        default_config_path = get_default_config_path()
+        Variables().read(default_config_path)
+        fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["csp_settings"]["csp_res_exceptions"]
         fin.close()
+
+        self.popup = CSPExceptionsPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 
@@ -52,8 +54,7 @@ class Test_CSPExceptionsPopup(unittest.TestCase):
 
         for ii, key in enumerate(keys):
             self.assertEqual(self.popup.value_dict[key].field.value(),
-                             test_values[
-                ii])
+                             test_values[ii])
 
         self.popup.set_values()
 

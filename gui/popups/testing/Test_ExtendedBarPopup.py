@@ -4,6 +4,8 @@ import json
 from PyQt5.QtWidgets import QApplication
 
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
+from current.utils import get_default_config_path
+
 
 app = QApplication(sys.argv)
 
@@ -13,17 +15,17 @@ class Test_ExtendedBarPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/home/simon/PycharmProjects/FarSeer-NMR/current' \
-                         '/default_config.json'
 
-        Variables().read(default_config)
-        fin = open(default_config, 'r')
-        self.popup = ExtendedBarPopup()
+        default_config_path = get_default_config_path()
+        Variables().read(default_config_path)
+        fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["extended_bar_settings"]
         fin.close()
+
+
+        self.popup = ExtendedBarPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-        print(self.local_variable_keys)
 
 
     def test_defaults(self):

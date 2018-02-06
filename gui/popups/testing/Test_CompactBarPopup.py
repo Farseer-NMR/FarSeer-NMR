@@ -4,6 +4,7 @@ import json
 from PyQt5.QtWidgets import QApplication
 
 from gui.popups.CompactBarPopup import CompactBarPopup
+from current.utils import get_default_config_path
 
 app = QApplication(sys.argv)
 
@@ -13,16 +14,16 @@ class Test_CompactBarPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json'
 
-        Variables().read(default_config)
-        fin = open(default_config, 'r')
-        self.popup = CompactBarPopup()
+        default_config_path = get_default_config_path()
+        Variables().read(default_config_path)
+        fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["compact_bar_settings"]
         fin.close()
+
+        self.popup = CompactBarPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -119,7 +120,7 @@ class Test_CompactBarPopup(unittest.TestCase):
 
         self.popup.bar_cols.setValue(0)
         self.popup.bar_rows.setValue(0)
-        self.popup.x_tick_font_size.setValue(0)
+        self.popup.x_tick_font_size.setValue(1)
         self.popup.x_tick_rotation.setValue(361)
         self.assertEqual(self.popup.bar_cols.field.value(), 1)
         self.assertEqual(self.popup.bar_rows.field.value(), 1)
