@@ -16,7 +16,7 @@ class Test_BarPlotPopup(unittest.TestCase):
 
     def setUp(self):
         ''' Create the popup'''
-        default_config = '/Users/fbssps/PycharmProjects/FarSeer-NMR/core/default_config.json'
+        default_config = '/Users/fbssps/PycharmProjects/FarSeer-NMR/current/default_config.json'
 
         Variables().read(default_config)
         fin = open(default_config, 'r')
