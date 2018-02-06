@@ -23,6 +23,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 # variables necessary for the functions
 
 from functools import reduce
+import os
 
 aal3tol1 = {
 "Ala": "A",
@@ -86,3 +87,9 @@ def exp_set_is_valid(variables):
 def get_nested_value(dictionary, *keys):
     return reduce(lambda dct, key: dct.get(key, None) if isinstance(dct,
                                             dict) else None, *keys, dictionary)
+
+
+def get_default_config_path():
+    core_path = os.path.dirname(__file__)
+    default_path = os.path.join(core_path, 'default_config.json')
+    return default_path
