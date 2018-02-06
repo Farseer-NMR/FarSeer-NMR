@@ -129,8 +129,8 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.local_variables["y_label"] = self.cs_scatter_flower_y_label.field.text()
         self.local_variables["mksize"] = self.cs_scatter_flower_mksize.field.value()
         self.local_variables["color_grad"] = self.cs_scatter_flower_color_grad.checkBox.isChecked()
-        self.local_variables["mk_start_color"] = colours[self.cs_scatter_flower_color_start.fields.currentText()]
-        self.local_variables["mk_end_color"] = colours[self.cs_scatter_flower_color_end.fields.currentText()]
+        self.local_variables["mk_start_color"] = self.cs_scatter_flower_color_start.fields.currentText()
+        self.local_variables["mk_end_color"] = self.cs_scatter_flower_color_end.fields.currentText()
 
         self.local_variables["x_label_fn"] = self.cs_scatter_flower_x_label_fn.fields.currentText()
         self.local_variables["x_label_fs"] = self.cs_scatter_flower_x_label_fs.field.value()

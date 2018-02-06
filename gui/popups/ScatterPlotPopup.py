@@ -89,8 +89,8 @@ class ScatterPlotPopup(BasePopup):
         self.local_variables["mksize"] = self.cs_scatter_mksize.field.value()
         self.local_variables["scale"] = self.cs_scatter_scale.field.value()
         self.local_variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
-        self.local_variables["mk_start_color"] = colours[self.cs_scatter_mk_start_color.fields.currentText()]
-        self.local_variables["mk_end_color"] = colours[self.cs_scatter_mk_end_color.fields.currentText()]
+        self.local_variables["mk_start_color"] = self.cs_scatter_mk_start_color.fields.currentText()
+        self.local_variables["mk_end_color"] = self.cs_scatter_mk_end_color.fields.currentText()
         self.local_variables["markers"] = [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
         self.local_variables["mk_color"] = \
             [x.translate(translator) \
