@@ -38,6 +38,8 @@ colours = OrderedDict(sorted(matplt_colours_dict.items(),
 
 keylist = list(colours.keys())
 
+hex_to_colour_dict = {value: key for key, value in colours.items()}
+
 for key in keylist:
     if len(key) == 1:
         colours.pop(key, None)
@@ -127,3 +129,9 @@ def deliver_settings(resolution):
         print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
+
+def get_colour(colour):
+    if colour.startswith('#'):
+       return hex_to_colour_dict[colour.upper()]
+    else:
+        return colour

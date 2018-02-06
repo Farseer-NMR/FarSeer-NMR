@@ -24,7 +24,6 @@ from PyQt5.QtWidgets import QDialogButtonBox, QPushButton, QWidget, QGridLayout
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from functools import partial
-from gui.gui_utils import defaults
 
 from gui.popups.BasePopup import BasePopup
 
@@ -166,7 +165,7 @@ class UserMarksPopup(BasePopup):
             self.marker_rows += 1
 
 
-    def setValues(self):
+    def set_values(self):
         self.variables["bar_plot_settings"]["user_marks_dict"] = \
             {pair[0].field.text():pair[1].field.text() for pair in self.pairs}
         self.variables["bar_plot_settings"]["user_bar_colors_dict"] = \
