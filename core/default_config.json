@@ -99,8 +99,8 @@
         "dpre_alpha": 0.5,
         "smooth_lw": 1,
         "ref_color": "black",
-        "color_init": "#ff00ff",
-        "color_end": "#0000ff",
+        "color_init": "fuchsia",
+        "color_end": "blue",
         "x_ticks_fn": "Arial",
         "x_ticks_fs": 5,
         "x_ticks_pad": 0.5,
@@ -163,7 +163,7 @@
         "x_label": "ligand ratio",
         "line_style": "-",
         "line_width": 1,
-        "line_color": "r",
+        "line_color": "red",
         "marker_style": "o",
         "marker_color": "darkred",
         "marker_size": 3,
@@ -194,8 +194,8 @@
         "mksize": 20,
         "scale": 0.01,
         "mk_type": "color",
-        "mk_start_color": "#cdcdcd",
-        "mk_end_color": "#000000",
+        "mk_start_color": "dimgrey",
+        "mk_end_color": "black",
         "mk_color": [
             "none"
         ],
@@ -210,8 +210,8 @@
         "y_label": "15N (ppm)",
         "mksize": 8,
         "color_grad": true,
-        "mk_start_color": "#e7e7e7",
-        "mk_end_color": "#000000",
+        "mk_start_color": "whitesmoke",
+        "mk_end_color": "black",
         "color_list": [],
         "x_label_fn": "Arial",
         "x_label_fs": 10,
@@ -279,12 +279,12 @@
         "expand_lost_zz": false,
         "perform_comparisons": false
     },
-    
+
     "fitting_parameters": {
         "mininum_datapoints": 5,
         "fitting_function": "hill"
     },
-    
+
     "general_settings": {
         "chimera_att_select_format": ":",
         "fig_dpi": 300,
@@ -334,7 +334,7 @@
         "plots_height":false,
         "height_scale":[0,100000]
     },
-    
+
     "experimental_dataset": {
 
     },
