@@ -1,10 +1,32 @@
+"""
+Copyright © 2017-2018 Farseer-NMR
+Simon P. Skinner and João M.C. Teixeira
+
+@ResearchGate https://goo.gl/z8dPJU
+@Twitter https://twitter.com/farseer_nmr
+
+This file is part of Farseer-NMR.
+
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Farseer-NMR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+"""
 from collections import OrderedDict
 import os
 import json
 from matplotlib import colors as mcolors
 GUI_DIR = os.path.dirname(__file__)
 
-
+defaults = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'core', 'default_config.json'), 'r'))
 
 line_styles = ['-', '--', '-.', ':', 'o']
 
@@ -16,12 +38,27 @@ colours = OrderedDict(sorted(matplt_colours_dict.items(),
 
 keylist = list(colours.keys())
 
-hex_to_colour_dict = {value: key for key, value in colours.items()}
-
 for key in keylist:
     if len(key) == 1:
         colours.pop(key, None)
 
+
+#colours = OrderedDict([('#ff0000','red'),
+                       #('#8b0000','dark red'),
+                       #('#00ffff', 'cyan'),
+                       #('#ff8000', 'orange'),
+                       #('#0080ff', 'manganese blue'),
+                       #('#ffff00', 'yellow'),
+                       #('#0000ff', 'blue'),
+                       #('#80ff00', 'chartreuse'),
+                       #('#8000ff', 'purple'),
+                       #('#00ff00', 'green'),
+                       #('#ff00ff', 'magenta'),
+                       #('#00ff80', 'spring green'),
+                       #('#ff0080', 'deep pink'),
+                       #('#e7e7e7', 'light grey'),
+                       #('#999999', 'grey'),
+                       #('#000000', 'black')])
 
 
 settings_1280x800 = {'peaklistarea_height': 350,
@@ -90,9 +127,3 @@ def deliver_settings(resolution):
         print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
-
-def get_colour(colour):
-    if colour.startswith('#'):
-        return hex_to_colour_dict[colour.upper()]
-    else:
-        return colour
