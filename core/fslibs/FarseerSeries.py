@@ -7,8 +7,8 @@ from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
 
-import current.fslibs.wet as fsw
-import current.fslibs.fitting as fsfit
+import core.fslibs.wet as fsw
+import core.fslibs.fitting as fsfit
 
 class FarseerSeries(pd.Panel):
     """
@@ -437,7 +437,7 @@ class FarseerSeries(pd.Panel):
         RGB_list = [s]
         # Calcuate a color at each evenly spaced value of t from 1 to n
         for t in range(1, n):
-            # Interpolate RGB vector for color at the current value of t
+            # Interpolate RGB vector for color at the core value of t
             curr_vector = [
                 int(s[j] + (float(t)/(n-1))*(f[j]-s[j]))
                 for j in range(3)
@@ -1777,7 +1777,7 @@ recipient: residues
             
             i (int): the index of the subplot axis.
             
-            row_number (int): the index of the current residue.
+            row_number (int): the index of the core residue.
         """
         
         # Draws subplot title
@@ -2031,7 +2031,7 @@ or confirm you have not forgot any peaklist [{}].".\
             
             i (int): the index of the subplot axis.
             
-            row_number (int): the index of the current residue.
+            row_number (int): the index of the core residue.
         """
         
         def set_tick_labels():
@@ -3011,14 +3011,14 @@ or confirm you have not forgot any peaklist [{}].".\
             - mindp: minimum number of points to consider residue
                 for fitting.
             - fit_function: fitting library name according to
-                current.fslibs.fitting_functions.__init__.py
+                core.fslibs.fitting_functions.__init__.py
         """
         
         self.fit_performed = True
         
         try:
             to_fit = locate(
-                'current.fslibs.fitting_functions.{}'.format(fit_function)
+                'core.fslibs.fitting_functions.{}'.format(fit_function)
                 )()
         
         except TypeError:

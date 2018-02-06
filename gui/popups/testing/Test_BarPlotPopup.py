@@ -4,11 +4,11 @@ import json
 from PyQt5.QtWidgets import QApplication
 
 from gui.popups.BarPlotPopup import BarPlotPopup
-from current.utils import get_default_config_path
+from core.utils import get_default_config_path
 
 app = QApplication(sys.argv)
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 class Test_BarPlotPopup(unittest.TestCase):
 

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QGridLayout, QVBoxLayout
 from PyQt5 import QtCore
-from current.fslibs.Variables import Variables
-from current.utils import get_nested_value, get_default_config_path
+from core.fslibs.Variables import Variables
+from core.utils import get_nested_value, get_default_config_path
 import json
 
 defaults = json.load(open(get_default_config_path(), 'r'))

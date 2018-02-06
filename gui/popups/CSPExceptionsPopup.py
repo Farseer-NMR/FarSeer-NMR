@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QDialogButtonBox
 
-from current.utils import aal3tol1
+from core.utils import aal3tol1
 
 from gui.popups.BasePopup import BasePopup
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox

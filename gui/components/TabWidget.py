@@ -2,7 +2,7 @@ import os
 
 from PyQt5 import QtCore, QtGui
 
-from current.setup_farseer_calculation import create_directory_structure
+from core.setup_farseer_calculation import create_directory_structure
 
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLabel, \
      QMessageBox, QTabWidget, QWidget
@@ -13,7 +13,7 @@ from gui.components.Icon import ICON_DIR
 from gui.tabs.peaklist_selection import PeaklistSelection
 from gui.tabs.settings import Settings
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 
 
@@ -100,12 +100,12 @@ class TabWidget(QTabWidget):
         print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
-        from current.Threading import Threading
+        from core.Threading import Threading
         output_path = self.interface.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables)
 
         if run_msg == 'Run':
-            from current.farseermain import read_user_variables, run_farseer
+            from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
                 fsuv = read_user_variables(path, config_name)

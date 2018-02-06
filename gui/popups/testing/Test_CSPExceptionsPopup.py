@@ -2,15 +2,15 @@ import sys
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
-from current.utils import aal3tol1, aal1tol3
-from current.utils import get_default_config_path
+from core.utils import aal3tol1, aal1tol3
+from core.utils import get_default_config_path
 
 
 from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
 
 app = QApplication(sys.argv)
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 test_values = [0.06, 0.36, 0.48, 0.4, 0.32, 0.96, 0.51, 0.84, 0.72, 0.63,
                0.64, 0.02, 0.98, 0.97, 0.45, 0.92, 0.44, 0.31, 0.27, 0.42]

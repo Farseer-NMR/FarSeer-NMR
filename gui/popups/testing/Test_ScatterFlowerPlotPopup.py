@@ -2,13 +2,13 @@ import sys
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
-from current.utils import get_default_config_path
+from core.utils import get_default_config_path
 
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
 
 app = QApplication(sys.argv)
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 class Test_ScatterFlowerPlotPopup(unittest.TestCase):
 

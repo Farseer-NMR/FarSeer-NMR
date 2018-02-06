@@ -1,4 +1,4 @@
-from current.fslibs.Peak import Peak
+from core.fslibs.Peak import Peak
 import platform
 import re, os, csv
 

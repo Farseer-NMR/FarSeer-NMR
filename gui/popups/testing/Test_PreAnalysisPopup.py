@@ -3,7 +3,7 @@ import unittest
 import json
 from PyQt5.QtWidgets import QApplication
 
-from current.utils import get_default_config_path
+from core.utils import get_default_config_path
 
 from gui.popups.PreAnalysisPopup import PreAnalysisPopup
 
@@ -11,7 +11,7 @@ app = QApplication(sys.argv)
 
 
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 class Test_PreAnalysisPopup(unittest.TestCase):
 

@@ -10,7 +10,7 @@ from gui.Footer import Footer
 
 from gui import resources_rc
 
-from current.fslibs.Variables import Variables
+from core.fslibs.Variables import Variables
 
 
 class Main(QWidget):
@@ -20,7 +20,7 @@ class Main(QWidget):
         QWidget.__init__(self, parent=parent)
 
         default_config = os.path.join(os.path.dirname(os.path.abspath(
-            __file__)), 'current',
+            __file__)), 'core',
             'default_config.json')
 
         if config:

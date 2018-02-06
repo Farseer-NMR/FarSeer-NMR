@@ -2,9 +2,9 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-from current.utils import aal1tol3, aal3tol1
+from core.utils import aal1tol3, aal3tol1
 
-import current.fslibs.wet as fsw
+import core.fslibs.wet as fsw
 
 class FarseerCube:
     """
@@ -704,8 +704,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 ref_data['F2_cs'] = dp_F2_cs
             
             # For the reference residue, calculates the difference between the 
-            # chemical shift in the reference and the current spectra. If 
-            # current == reference, difference should yield 0.
+            # chemical shift in the reference and the core spectra. If
+            # core == reference, difference should yield 0.
             F1_cs_diff = float(dp_F1_cs) - float(ref_data['F1_cs'])
             F2_cs_diff = float(dp_F2_cs) - float(ref_data['F2_cs'])
             # copies the chemical shift data to a backup column

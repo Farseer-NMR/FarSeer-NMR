@@ -53,10 +53,10 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
-import current.fslibs.FarseerCube as fcube
-import current.fslibs.FarseerSeries as fss
-import current.fslibs.Comparisons as fsc
-import current.fslibs.wet as fsw
+import core.fslibs.FarseerCube as fcube
+import core.fslibs.FarseerSeries as fss
+import core.fslibs.Comparisons as fsc
+import core.fslibs.wet as fsw
 
 
 def read_user_variables(path, config_name):
@@ -77,7 +77,7 @@ def read_user_variables(path, config_name):
     # Simon: for sure with the JSON you will make it work differently :-P
     cwd =  os.path.abspath(path)
     
-    # changes current directory to the directory where
+    # changes core directory to the directory where
     # farseer_user_variables is. In this way, output from calculations is
     # stored in that same directory
     os.chdir(cwd)

@@ -2,7 +2,7 @@ import csv
 import os
 from shutil import copy2
 
-from current.parsing import read_peaklist
+from core.parsing import read_peaklist
 
 
 def create_directory_structure(output_path, variables):

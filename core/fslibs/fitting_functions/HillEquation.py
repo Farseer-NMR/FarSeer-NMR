@@ -1,5 +1,5 @@
 import numpy as np
-from current.fslibs.FittingBase import FittingBase
+from core.fslibs.FittingBase import FittingBase
 import scipy.optimize as sciopt
 
 
