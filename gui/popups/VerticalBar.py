@@ -28,21 +28,41 @@ from gui.popups.BasePopup import BasePopup
 class VerticalBarPopup(BasePopup):
 
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, title="Vertical Bar Plot", settings_key="vert_bar_settings")
+        BasePopup.__init__(
+                           self,
+                           parent,
+                           title="Vertical Bar Plot",
+                           settings_key="vert_bar_settings"
+                           )
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", minimum=1, step=1)
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", minimum=1, step=1)
+        self.bar_cols = LabelledSpinBox(
+                                        self,
+                                        text="Columns Per Page",
+                                        minimum=1,
+                                        step=1
+                                        )
+        self.bar_rows = LabelledSpinBox(
+                                        self,
+                                        text="Rows Per Page",
+                                        minimum=1,
+                                        step=1
+                                        )
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)
         self.layout().addWidget(self.bar_rows, 1, 0)
 
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
+        self.buttonBox = QDialogButtonBox(
+                                          QDialogButtonBox.Ok |
+                                          QDialogButtonBox.Cancel |
+                                          QDialogButtonBox.RestoreDefaults
+                                          )
 
         self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
+            clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 2, 0, 1, 1)
 

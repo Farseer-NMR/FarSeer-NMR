@@ -39,10 +39,14 @@ class UserMarksPopup(BasePopup):
         self.buttonWidget = QWidget(self)
         self.mainWidget.setLayout(layout1)
         self.buttonWidget.setLayout(layout2)
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
+        self.buttonBox = QDialogButtonBox(
+                                          QDialogButtonBox.Ok |
+                                          QDialogButtonBox.Cancel |
+                                          QDialogButtonBox.RestoreDefaults)
         self.buttonBox.accepted.connect(self.setValues)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.set_defaults)
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
+            clicked.connect(self.set_defaults)
         self.buttonWidget.layout().addWidget(self.buttonBox)
         self.layout().addWidget(self.mainWidget, 0, 0)
         self.layout().addWidget(self.buttonWidget, 1, 0)
@@ -56,14 +60,16 @@ class UserMarksPopup(BasePopup):
             addButton = QPushButton("Add", self)
             removeButton = QPushButton("Remove", self)
             addButton.clicked.connect(self.add_row_to_popup)
-            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            removeButton.clicked.\
+                connect(partial(self.remove_row_to_popup, self.marker_rows))
             self.pairs.append([key, value, colour, addButton, removeButton])
 
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
             self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
+            self.mainWidget.layout().\
+                addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
 
 
@@ -74,7 +80,8 @@ class UserMarksPopup(BasePopup):
         addButton = QPushButton("Add", self)
         addButton.clicked.connect(self.add_row_to_popup)
         removeButton = QPushButton("Remove", self)
-        removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+        removeButton.clicked.\
+            connect(partial(self.remove_row_to_popup, self.marker_rows))
         self.pairs.append([key, value, colour, addButton, removeButton])
         self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
         self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
@@ -114,18 +121,21 @@ class UserMarksPopup(BasePopup):
         self.pairs = []
         self.marker_rows = 0
 
-        for key1, value1 in self.variables["bar_plot_settings"]["user_marks_dict"].items():
+        for key1, value1 in \
+                self.variables["bar_plot_settings"]["user_marks_dict"].items():
 
             key = LabelledLineEdit(self, text='key')
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
             value.field.setText(value1)
             colour = ColourBox(self, text='colour')
-            colour.select(self.variables["bar_plot_settings"]["user_bar_colors_dict"][key1])
+            colour.select(self.variables
+                          ["bar_plot_settings"]["user_bar_colors_dict"][key1])
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
             removeButton = QPushButton("Remove", self)
-            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            removeButton.clicked.\
+                connect(partial(self.remove_row_to_popup, self.marker_rows))
             # addButton.setFixedWidth(50)
             # removeButton.setFixedWidth(50)
             self.pairs.append([key, value, colour, addButton, removeButton])
@@ -133,7 +143,8 @@ class UserMarksPopup(BasePopup):
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
             self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
+            self.mainWidget.layout().\
+                addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
 
 
@@ -144,24 +155,28 @@ class UserMarksPopup(BasePopup):
         self.marker_rows = 0
         self.pairs = []
 
-        for key1, value1 in defaults["bar_plot_settings"]["user_marks_dict"].items():
+        for key1, value1 in \
+                self.defaults["bar_plot_settings"]["user_marks_dict"].items():
 
             key = LabelledLineEdit(self, text='key')
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
             colour = ColourBox(self, text='colour')
-            colour.select(defaults["bar_plot_settings"]["user_bar_colors_dict"][key1])
+            colour.select(self.defaults
+                          ["bar_plot_settings"]["user_bar_colors_dict"][key1])
             value.field.setText(value1)
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
             removeButton = QPushButton("Remove", self)
-            removeButton.clicked.connect(partial(self.remove_row_to_popup, self.marker_rows))
+            removeButton.clicked.\
+                connect(partial(self.remove_row_to_popup, self.marker_rows))
             self.pairs.append([key, value, colour, addButton, removeButton])
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
             self.mainWidget.layout().addWidget(colour, self.marker_rows, 2)
             self.mainWidget.layout().addWidget(addButton, self.marker_rows, 3)
-            self.mainWidget.layout().addWidget(removeButton, self.marker_rows, 4)
+            self.mainWidget.layout().\
+                addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
 
 
