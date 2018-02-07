@@ -279,7 +279,7 @@ def log_time_stamp(
     
     return
 
-def logs(s, logfile_name, mod='a'):
+def logs(s, logfile_name, mod='a', printit=True):
     """
     Prints <s> and writes it to log file.
     
@@ -291,7 +291,8 @@ def logs(s, logfile_name, mod='a'):
         mod (str): python.open() arg mode.
     """
     
-    print(s)
+    if printit:
+        print(s)
     
     with open(logfile_name, mod) as logfile:
         logfile.write(s)
@@ -299,18 +300,40 @@ def logs(s, logfile_name, mod='a'):
     return
 
 def log_init(fsuv):
-    """Operations perform when initializing the log file."""
-    log_time_stamp(fsuv["general_settings"]["logfile_name"], mod='w')
+    """Operations performed when initializing the log file."""
+    
+    fout = fsuv["general_settings"]["logfile_name"]
+    log_time_stamp(fout, mod='w')
     logs(
         "*** Run Calculation folder: {}\n".\
             format(fsuv["general_settings"]["output_path"]),
-        fsuv["general_settings"]["logfile_name"]
+        fout
         )
     logs(
         "*** Config file: {}\n".\
             format(fsuv["general_settings"]["config_path"]),
-        fsuv["general_settings"]["logfile_name"]
+        fout
         )
+    
+    return
+
+def log_end(fsuv):
+    """Operations performed when finalizing the log file."""
+    
+    fout = fsuv["general_settings"]["logfile_name"]
+    logs(fsw.end_good(), fout)
+    log_time_stamp(fout, state='ENDED')
+    print("*** Used JSON config file will be copied to the end of MD log file")
+    logs("*** USED CONFIG FILE ***\n", fout, printit=False)
+    fsuv_tmp = fsuv.copy()
+    
+    for key in fsuv.keys():
+        if isinstance(fsuv_tmp[key], pd.DataFrame):
+            fsuv_tmp.pop(key, None)
+    
+    with open(fsuv["general_settings"]["logfile_name"], 'a') as f:
+        json.dump(fsuv_tmp, f, indent=4)
+    
     return
 
 def initial_checks(fsuv):
@@ -1821,8 +1844,7 @@ def run_farseer(fsuv):
                 resonance_type='Sidechains'
                 )
     
-    logs(fsw.end_good(), fsuv["general_settings"]["logfile_name"])
-    log_time_stamp(fsuv["general_settings"]["logfile_name"], state='ENDED')
+    log_end(fsuv)
     
     return
 
