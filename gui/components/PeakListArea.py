@@ -320,7 +320,6 @@ class PeakListLabel(QGraphicsTextItem):
     def _raise_context_menu(self, event):
         contextMenu = QMenu()
         contextMenu.addAction('Delete', self.remove_item)
-        print(event, 'event')
         contextMenu.exec_(event.screenPos())
 
     def remove_item(self):
@@ -347,9 +346,9 @@ class PeakListLabel(QGraphicsTextItem):
             self.setHtml('<div style="color: %s; font-size: 10pt;">%s</div>'
                          % ('#FAFAF7', mimeData.text()))
             self.peak_list = mimeData.text()
-        self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = \
+            self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = \
             self.peak_list
-        event.accept()
-        # else:
-        #     self.peak_list = mimeData.text()
-        #     event.ignore()
+            event.accept()
+        else:
+            self.sideBar().addItem(event.mimeData.text())
+            event.ignore()
