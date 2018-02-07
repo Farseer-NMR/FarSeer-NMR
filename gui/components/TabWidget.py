@@ -38,7 +38,6 @@ from gui.tabs.settings import Settings
 from core.fslibs.Variables import Variables
 
 
-
 class TabWidget(QTabWidget):
 
     variables = Variables()._vars
@@ -51,16 +50,15 @@ class TabWidget(QTabWidget):
         self.add_tab_logo()
         self.add_tabs_to_widget()
 
-
     def add_tabs_to_widget(self):
-        self.peaklist_selection = PeaklistSelection(self, gui_settings=self.gui_settings, footer=False)
-        self.interface = Settings(self, gui_settings=self.gui_settings, footer=True)
-
+        self.peaklist_selection = \
+            PeaklistSelection(self, gui_settings=self.gui_settings,
+                              footer=False)
+        self.interface = Settings(self, gui_settings=self.gui_settings,
+                                  footer=True)
         self.add_tab(self.peaklist_selection, "PeakList Selection")
         self.add_tab(self.interface, "Settings", "Settings")
-
         self.widgets.extend([self.peaklist_selection, self.interface])
-
 
     def set_data_sets(self):
         for widget in self.widgets:
@@ -75,17 +73,14 @@ class TabWidget(QTabWidget):
         if object_name:
             tab.setObjectName(object_name)
 
-
     def load_config(self, path=None):
         if not path:
-            fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+            fname = QFileDialog.getOpenFileName(None, 'Load Configuration',
+                                                os.getcwd())
         else:
             fname = [path]
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
-                # variables = json.load(open(fname[0], 'r'))
-                # self.interface.spectrum_path.field.setText('')
-                # self.variables = variables
                 Variables().read(fname[0])
                 self.load_variables()
         return
@@ -94,30 +89,28 @@ class TabWidget(QTabWidget):
 
         self.interface.load_variables()
         self.peaklist_selection.load_variables()
-        self.peaklist_selection.sideBar.update_from_config()
+        self.peaklist_selection.side_bar.update_from_config()
 
     def load_peak_lists(self, path=None):
         if os.path.exists(path):
-            self.peaklist_selection.sideBar.load_from_path(path)
-            self.peaklist_selection.sideBar.update_from_config()
+            self.peaklist_selection.side_bar.load_from_path(path)
+            self.peaklist_selection.side_bar.update_from_config()
 
     def save_config(self, path=None):
         self.interface.save_config()
         if not path:
             filters = "JSON files (*.json)"
             selected_filter = "JSON files (*.json)"
-            fname = QFileDialog.getSaveFileName(self, " Save Configuration ", "", filters,
-                                                  selected_filter)
-
+            fname = QFileDialog.getSaveFileName(self, "Save Configuration",
+                                                "", filters, selected_filter)
         else:
             fname = [path]
         if not fname[0].endswith('.json'):
-            fname = [fname[0] +".json"]
+            fname = [fname[0] + ".json"]
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 Variables().write(outfile)
                 self.config_file = outfile
-
 
         print('Configuration saved to %s' % fname[0])
 
@@ -132,7 +125,8 @@ class TabWidget(QTabWidget):
                 path, config_name = os.path.split(self.config_file)
                 fsuv = read_user_variables(path, config_name)
             else:
-                self.save_config(path=os.path.join(output_path, 'user_config.json'))
+                self.save_config(path=os.path.join(output_path,
+                                                   'user_config.json'))
                 fsuv = read_user_variables(output_path, 'user_config.json')
 
             Threading(function=run_farseer, args=fsuv)
@@ -144,22 +138,24 @@ class TabWidget(QTabWidget):
             if run_msg == "Path Exists":
                 msg.setText("Output Path Exists")
                 msg.setInformativeText(
-                    "Spectrum folder already exists in Calculation Output Path. Calculation cannot be launched.")
+                    "Spectrum folder already exists in Calculation Output "
+                    "Path. Calculation cannot be launched.")
             elif run_msg == "No dataset":
                 msg.setText("No dataset")
                 msg.setInformativeText(
-                    "No Experimental dataset has been created. Please populate Experimental Dataset Tree.")
+                    "No Experimental dataset has been created. "
+                    "Please populate Experimental Dataset Tree.")
             msg.exec_()
 
     def add_tab_logo(self):
 
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
-        self.tablogo.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        self.tablogo.setAlignment(QtCore.Qt.AlignHCenter |
+                                  QtCore.Qt.AlignVCenter)
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
         self.tablogo.setPixmap(pixmap)
         self.tablogo.setContentsMargins(9, 0, 0, 6)
         self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
-        self.setFixedSize(QtCore.QSize(self.gui_settings['app_width'], self.gui_settings['app_height']))
-
-
+        self.setFixedSize(QtCore.QSize(self.gui_settings['app_width'],
+                                       self.gui_settings['app_height']))

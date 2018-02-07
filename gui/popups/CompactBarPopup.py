@@ -37,14 +37,14 @@ class CompactBarPopup(BasePopup):
         BasePopup.__init__(self, parent, "compact_bar_settings", "Compact Bar "
                                                                  "Plot")
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
+        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", minimum=1, step=1)
+        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", minimum=1, step=1)
         self.x_tick_font = FontComboBox(self, "X Tick Font")
-        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size", min=0, step=1)
-        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation", min=0, max=360, step=1)
+        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size", minimum=0, step=1)
+        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation", minimum=0, maximum=360, step=1)
         self.x_tick_weight = LabelledCombobox(self, "X Tick Font Weight", items=font_weights)
         self.shade_unassigned_checkbox = LabelledCheckbox(self, "Shade Unassigned?")
-        self.unassigned_shade_alpha = LabelledDoubleSpinBox(self, "Unassigned Shade Transparency", min=0, max=1, step=0.1)
+        self.unassigned_shade_alpha = LabelledDoubleSpinBox(self, "Unassigned Shade Transparency", minimum=0, maximum=1, step=0.1)
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)

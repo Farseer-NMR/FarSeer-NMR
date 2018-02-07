@@ -28,6 +28,7 @@ from core.parsing import read_peaklist
 
 from core.fslibs.Variables import Variables
 
+
 class SideBar(QTreeWidget):
 
     variables = Variables()._vars
@@ -43,16 +44,12 @@ class SideBar(QTreeWidget):
         self.setMaximumWidth(320)
         self.setFixedHeight(gui_settings['sideBar_height'])
         self.peakLists = self.variables['peaklists']
-
         self.setSortingEnabled(True)
         self.update_from_config()
-        # self.peakLists = self.variables['peakLists']
-
 
     def update_from_config(self):
         self.clear()
         used_peaklists = []
-        print(self.variables.keys())
         self.peakLists = self.variables["peaklists"]
 
         if not all(
@@ -69,8 +66,7 @@ class SideBar(QTreeWidget):
             unused_peaklists = [x for x, pl in self.variables[
                 "peaklists"].items() if x not in used_peaklists]
             for peaklist in unused_peaklists:
-                self.addItem(peaklist)
-
+                self.add_item(peaklist)
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -90,8 +86,6 @@ class SideBar(QTreeWidget):
             for filePath in filePaths:
                self.load_from_path(filePath)
 
-
-
     def load_from_path(self, filePath):
         name = None
         if os.path.isdir(filePath):
@@ -107,46 +101,43 @@ class SideBar(QTreeWidget):
         if name:
             return name, path
 
-
-
     def refresh_sidebar(self):
         self.clear()
         for peaklist in self.peakLists.keys():
-            self.addItem(peaklist)
+            self.add_item(peaklist)
 
-    def load_peaklist(self, filePath):
+    def load_peaklist(self, file_path):
 
-        if os.path.isdir(filePath):
+        if os.path.isdir(file_path):
             return
 
-        name = filePath.split('/')[-1].split('.')[0]
+        name = file_path.split('/')[-1].split('.')[0]
 
-        if not name in self.peakLists.keys():
-            peaklist = read_peaklist(filePath)
+        if name not in self.peakLists.keys():
+            peaklist = read_peaklist(file_path)
             if peaklist:
                 pl_name = name
 
-
-                item = self.addItem(pl_name)
+                item = self.add_item(pl_name)
                 self.peakLists[item.text(0)] = peaklist
-                self.peakLists[pl_name] = filePath
+                self.peakLists[pl_name] = file_path
 
-                return pl_name, filePath
+                return pl_name, file_path
             else:
-                print("Invalid peak list file: %s" % filePath)
+                print("Invalid peak list file: %s" % file_path)
                 return None, None
         else:
             print('Peaklist with name %s already exists.' % name)
             return None, None
 
-    def addItem(self, name):
+    def add_item(self, name):
         newItem = QTreeWidgetItem(self)
-        newItem.setFlags(newItem.flags() & ~(QtCore.Qt.ItemIsDropEnabled))
+        newItem.setFlags(newItem.flags() & ~QtCore.Qt.ItemIsDropEnabled)
         newItem.setText(0, name)
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)
         return newItem
 
-    def removeItem(self, item_name):
+    def _raise_context_menu(self, item_name):
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchRecursive, 0)
         if result:

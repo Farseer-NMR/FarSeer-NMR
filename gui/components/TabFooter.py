@@ -22,6 +22,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QGroupBox, QHBoxLayout, QPushButton
 
+
 class TabFooter(QGroupBox):
 
     def __init__(self, parent):
@@ -38,4 +39,3 @@ class TabFooter(QGroupBox):
         self.layout().addWidget(self.run_farseer_button)
 
         self.setFixedHeight(75)
-

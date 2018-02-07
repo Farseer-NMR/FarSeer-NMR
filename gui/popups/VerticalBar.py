@@ -30,8 +30,8 @@ class VerticalBarPopup(BasePopup):
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="Vertical Bar Plot", settings_key="vert_bar_settings")
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
+        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", minimum=1, step=1)
+        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", minimum=1, step=1)
 
 
         self.layout().addWidget(self.bar_cols, 0, 0)
