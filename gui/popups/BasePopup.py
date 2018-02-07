@@ -28,11 +28,13 @@ import json
 
 defaults = json.load(open(get_default_config_path(), 'r'))
 
+
 class BasePopup(QDialog):
 
     variables = Variables()._vars
 
-    def __init__(self, parent, settings_key=None, title=None, layout='grid', **kw):
+    def __init__(self, parent, settings_key=None, title=None,
+                 layout='grid', **kw):
         QDialog.__init__(self, parent)
 
         self.setWindowTitle(title)
@@ -52,8 +54,7 @@ class BasePopup(QDialog):
                 self.local_variables = get_nested_value(self.variables,
                                                         settings_key)
                 self.defaults = get_nested_value(defaults,
-                                                        settings_key)
-
+                                                 settings_key)
 
     def launch(self):
         self.exec_()

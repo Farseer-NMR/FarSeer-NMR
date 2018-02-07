@@ -42,7 +42,6 @@ class PeaklistSelection(BaseWidget):
         self.initUI()
         self.widget2.setObjectName("InterfaceTop")
 
-
     def load_variables(self):
 
         self.update_condition_boxes(3, 'x',
@@ -57,7 +56,8 @@ class PeaklistSelection(BaseWidget):
         self.peak_list_area.update_variables()
 
     def initUI(self):
-        self.peak_list_area = PeakListArea(self, gui_settings=self.gui_settings)
+        self.peak_list_area = PeakListArea(self,
+                                           gui_settings=self.gui_settings)
         grid = QGridLayout()
         grid2 = QGridLayout()
         grid.setAlignment(QtCore.Qt.AlignTop)
@@ -175,6 +175,3 @@ class PeaklistSelection(BaseWidget):
                 text_box.setText(str(valuesDict[dim][x]))
 
             layout.addWidget(text_box, row, x + 3, 1, 1)
-
-
-
