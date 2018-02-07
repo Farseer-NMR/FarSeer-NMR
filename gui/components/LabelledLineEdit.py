@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import QWidget, QLineEdit, QLabel, QHBoxLayout
 
 from gui.components.ModifiedLineEdit import ModifiedLineEdit
 
+
 class LabelledLineEdit(QWidget):
 
     def __init__(self, parent, text, callback=None):
@@ -46,4 +47,3 @@ class LabelledLineEdit(QWidget):
 
     def setText(self, text):
         self.field.setText(text)
-

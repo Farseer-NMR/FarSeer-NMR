@@ -32,8 +32,8 @@ class PreAnalysisPopup(BasePopup):
         BasePopup.__init__(self, parent, title="PRE Settings",
                            settings_key=["pre_settings"])
 
-        self.gaussian_stdev = LabelledSpinBox(self, "Gaussian Stdev", min=1, step=1)
-        self.gauss_x_size = LabelledSpinBox(self, "Gaussian X Size", min=1, step=1)
+        self.gaussian_stdev = LabelledSpinBox(self, "Gaussian Stdev", minimum=1, step=1)
+        self.gauss_x_size = LabelledSpinBox(self, "Gaussian X Size", minimum=1, step=1)
 
         self.layout().addWidget(self.gauss_x_size, 0, 0)
         self.layout().addWidget(self.gaussian_stdev, 1, 0)

@@ -22,9 +22,11 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QWidget, QSpinBox, QLabel, QHBoxLayout
 
+
 class LabelledSpinBox(QWidget):
 
-    def __init__(self, parent, text, callback=None, min=None, max=None, step=None):
+    def __init__(self, parent, text, callback=None,
+                 minimum=None, maximum=None, step=None):
 
         QWidget.__init__(self, parent)
 
@@ -32,22 +34,19 @@ class LabelledSpinBox(QWidget):
         self.setLayout(layout)
         label = QLabel(text)
         self.field = QSpinBox()
-        #self.field.setMaximum(10000)
-        #self.field.setMinimum(-10000)
 
         self.layout().addWidget(label)
         self.layout().addWidget(self.field)
 
-        if min:
-            self.field.setMinimum(min)
-        if max:
-            self.field.setMaximum(max)
+        if minimum:
+            self.field.setMinimum(minimum)
+        if maximum:
+            self.field.setMaximum(maximum)
         if step:
             self.field.setSingleStep(step)
 
         if callback:
             self.set_callback(callback)
-
 
     def setValue(self, value):
         if value:

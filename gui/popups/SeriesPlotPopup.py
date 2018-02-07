@@ -44,8 +44,8 @@ class SeriesPlotPopup(BasePopup):
         self.series_subtitle_groupbox.setTitle("Subtitle Settings")
 
         self.series_subtitle_fn = FontComboBox(self, "Subtitle Font")
-        self.series_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size", min=0, step=1)
-        self.series_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding", min=-100, max=100, step=0.1)
+        self.series_subtitle_fs = LabelledSpinBox(self, "Subtitle Font Size", minimum=0, step=1)
+        self.series_subtitle_pad = LabelledDoubleSpinBox(self, "Subtitle Padding", minimum=-100, maximum=100, step=0.1)
         self.series_subtitle_weight = LabelledCombobox(self, text="Subtitle Font Weight", items=font_weights)
 
         self.series_x_label_groupbox = QGroupBox()
@@ -54,8 +54,8 @@ class SeriesPlotPopup(BasePopup):
         self.series_x_label_groupbox.setTitle("X Label Settings")
 
         self.series_x_label_fn = FontComboBox(self, "X Font Label")
-        self.series_x_label_fs = LabelledSpinBox(self, "X Label Font Size", min=0, step=1)
-        self.series_x_label_pad = LabelledDoubleSpinBox(self, "X Label Padding", min=-100, max=100, step=0.1)
+        self.series_x_label_fs = LabelledSpinBox(self, "X Label Font Size", minimum=0, step=1)
+        self.series_x_label_pad = LabelledDoubleSpinBox(self, "X Label Padding", minimum=-100, maximum=100, step=0.1)
         self.series_x_label_weight = LabelledCombobox(self, text="X Label Font Weight", items=font_weights)
 
         self.series_y_label_groupbox = QGroupBox()
@@ -69,25 +69,25 @@ class SeriesPlotPopup(BasePopup):
         self.series_y_tick_groupbox.setTitle("Tick Settings")
 
         self.series_y_label_fn = FontComboBox(self, "Y Label Font")
-        self.series_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", min=0, step=1)
-        self.series_y_label_pad = LabelledDoubleSpinBox(self, "Y Label Padding", min=-100, max=100, step=0.1)
+        self.series_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", minimum=0, step=1)
+        self.series_y_label_pad = LabelledDoubleSpinBox(self, "Y Label Padding", minimum=-100, maximum=100, step=0.1)
         self.series_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
 
-        self.series_x_ticks_pad = LabelledDoubleSpinBox(self, "X Tick Padding", min=-100, max=100, step=0.1)
-        self.series_x_ticks_len = LabelledDoubleSpinBox(self, "X Tick Length", min=0, max=100, step=0.1)
+        self.series_x_ticks_pad = LabelledDoubleSpinBox(self, "X Tick Padding", minimum=-100, maximum=100, step=0.1)
+        self.series_x_ticks_len = LabelledDoubleSpinBox(self, "X Tick Length", minimum=0, maximum=100, step=0.1)
 
         self.series_y_ticks_fn = FontComboBox(self, "Y Tick Font")
-        self.series_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size", min=0, step=1)
-        self.series_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation", min=0, max=360, step=1)
-        self.series_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding", min=-100, max=100, step=0.1)
+        self.series_y_ticks_fs = LabelledSpinBox(self, "Y Tick Font Size", minimum=0, step=1)
+        self.series_y_ticks_rot = LabelledSpinBox(self, "Y Tick Rotation", minimum=0, maximum=360, step=1)
+        self.series_y_ticks_pad = LabelledDoubleSpinBox(self, "Y Tick Padding", minimum=-100, maximum=100, step=0.1)
         self.series_y_ticks_weight = LabelledCombobox(self, text="Y Tick Font Weight", items=font_weights)
-        self.series_y_ticks_len = LabelledDoubleSpinBox(self, "Y Tick Length", min=0, max=100, step=0.1)
+        self.series_y_ticks_len = LabelledDoubleSpinBox(self, "Y Tick Length", minimum=0, maximum=100, step=0.1)
         self.series_y_grid_flag = LabelledCheckbox(self, "Show Y Grid")
         self.series_y_grid_color = ColourBox(self, "Y Grid Colour")
         self.series_y_grid_linestyle = LabelledCombobox(self, text="Y Grid Line Style", items=['-', '--', '-.', ':'])
         self.series_y_grid_linewidth = LabelledDoubleSpinBox(self, "Y Grid Line Width")
-        self.series_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Transparency", min=0, max=1, step=0.1)
-        self.series_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing", min=-100, max=100, step=0.1)
+        self.series_y_grid_alpha = LabelledDoubleSpinBox(self, "Y Grid Transparency", minimum=0, maximum=1, step=0.1)
+        self.series_vspace = LabelledDoubleSpinBox(self, "Plot Vertical Spacing", minimum=-100, maximum=100, step=0.1)
 
         self.theo_pre_groupbox = QGroupBox()
         self.theo_pre_groupbox_layout = QVBoxLayout()
@@ -95,9 +95,9 @@ class SeriesPlotPopup(BasePopup):
         self.theo_pre_groupbox.setTitle("Dedicated PRE Settings")
 
         self.theo_pre_color = ColourBox(self, "Theoretical PRE Line Colour")
-        self.theo_pre_lw = LabelledDoubleSpinBox(self, "Theoretical PRE Line Width", min=0, step=0.1)
+        self.theo_pre_lw = LabelledDoubleSpinBox(self, "Theoretical PRE Line Width", minimum=0, step=0.1)
         self.tag_cartoon_color = ColourBox(self, "Tag Pin Colour")
-        self.tag_cartoon_lw = LabelledDoubleSpinBox(self, "Tag Pin Line Width", min=0, step=0.1)
+        self.tag_cartoon_lw = LabelledDoubleSpinBox(self, "Tag Pin Line Width", minimum=0, step=0.1)
         self.tag_cartoon_ls = LabelledCombobox(self, "Tag Pin Line Style", items=line_styles)
 
         self.theo_pre_groupbox.layout().addWidget(self.theo_pre_color)

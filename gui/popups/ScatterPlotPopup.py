@@ -43,12 +43,12 @@ class ScatterPlotPopup(BasePopup):
         BasePopup.__init__(self, parent, title="Scatter Plot",
                            settings_key=["cs_scatter_settings"])
 
-        self.cs_scatter_cols_page = LabelledSpinBox(self, "Columns Per Page", min=1, step=1)
-        self.cs_scatter_rows_page = LabelledSpinBox(self, "Rows Per Page", min=1, step=1)
+        self.cs_scatter_cols_page = LabelledSpinBox(self, "Columns Per Page", minimum=1, step=1)
+        self.cs_scatter_rows_page = LabelledSpinBox(self, "Rows Per Page", minimum=1, step=1)
         self.cs_scatter_x_label = LabelledLineEdit(self, "X Label")
         self.cs_scatter_y_label = LabelledLineEdit(self, "Y Label")
-        self.cs_scatter_mksize = LabelledSpinBox(self, "Mark Size", min=0, step=1)
-        self.cs_scatter_scale = LabelledDoubleSpinBox(self, "Scale", min=0, step=0.01)
+        self.cs_scatter_mksize = LabelledSpinBox(self, "Mark Size", minimum=0, step=1)
+        self.cs_scatter_scale = LabelledDoubleSpinBox(self, "Scale", minimum=0, step=0.01)
         self.cs_scatter_mk_type = LabelledCombobox(self, text="Mark Type", items=['color', 'shape'])
         self.cs_scatter_mk_start_color = ColourBox(self, text="Mark Start Colour")
         self.cs_scatter_mk_end_color = ColourBox(self, text="Mark End Colour")

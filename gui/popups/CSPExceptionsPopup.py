@@ -40,7 +40,7 @@ class CSPExceptionsPopup(BasePopup):
 
         self.value_dict = {}
         for ii, res in enumerate(sorted(aal3tol1.keys())):
-            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, min=0.01, max=1, step=0.01)
+            self.value_dict[res] = LabelledDoubleSpinBox(self, text=res, minimum=0.01, maximum=1, step=0.01)
             if ii < 5:
                 self.layout().addWidget(self.value_dict[res], ii, 0)
             elif 5 <= ii < 10:

@@ -35,6 +35,3 @@ class ColourBox(LabelledCombobox):
             pix = QPixmap(QtCore.QSize(20, 20))
             pix.fill(QColor(item[1]))
             self.fields.addItem(QIcon(pix), item[0])
-
-
-

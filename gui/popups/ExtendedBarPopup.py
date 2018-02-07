@@ -49,11 +49,11 @@ class ExtendedBarPopup(BasePopup):
                            settings_key=["extended_bar_settings"])
 
 
-        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", min=1, step=1)
-        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", min=1, step=1)
+        self.bar_cols = LabelledSpinBox(self, text="Columns Per Page", minimum=1, step=1)
+        self.bar_rows = LabelledSpinBox(self, text="Rows Per Page", minimum=1, step=1)
         self.x_tick_font = FontComboBox(self, "X Tick Font")
-        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size", min=0, step=1)
-        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation", min=0, max=90, step=1)
+        self.x_tick_font_size = LabelledSpinBox(self, "X Tick Font Size", minimum=0, step=1)
+        self.x_tick_rotation = LabelledSpinBox(self, "X Tick Rotation", minimum=0, maximum=90, step=1)
         self.x_tick_font_weight = LabelledCombobox(self, "X Tick Font Weight", items=font_weights)
         self.x_tick_colour = LabelledCheckbox(self, "Colour X Ticks?")
 

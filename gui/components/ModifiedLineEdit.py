@@ -11,6 +11,7 @@ Avaris: https://stackoverflow.com/users/843822/avaris
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5 import QtCore
 
+
 class ModifiedLineEdit(QLineEdit):
 
     textModified = QtCore.pyqtSignal(str, str)

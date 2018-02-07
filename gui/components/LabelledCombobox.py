@@ -23,6 +23,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget, QComboBox, QLabel, QHBoxLayout
 from PyQt5 import QtCore
 
+
 class LabelledCombobox(QWidget):
 
     def __init__(self, parent, text=None, items=None, callback=None):
@@ -47,8 +48,6 @@ class LabelledCombobox(QWidget):
         index = self.fields.findText(text, QtCore.Qt.MatchFixedString)
         if index >= 0:
             self.fields.setCurrentIndex(index)
-
-
 
     def set_callback(self, callback):
         self.fields.currentTextChanged.connect(callback)
