@@ -110,7 +110,7 @@ class TabWidget(QTabWidget):
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 Variables().write(outfile)
-                self.config_file = outfile
+                self.config_file = os.path.abspath(fname[0])
 
         print('Configuration saved to %s' % fname[0])
 
