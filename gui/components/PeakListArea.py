@@ -140,7 +140,7 @@ class PeakListArea(QWidget):
 
     def update_tree(self):
 
-        print(self.check_conditions_for_tree)
+        print(self.check_conditions_for_tree())
 
         if not self.check_conditions_for_tree():
             return
@@ -314,10 +314,12 @@ class PeakListLabel(QGraphicsTextItem):
         if event.button() == QtCore.Qt.RightButton:
             if self.peak_list:
                 self._raise_context_menu(event)
+            else:
+                print('no_peaklist')
 
     def _raise_context_menu(self, event):
         contextMenu = QMenu()
-        contextMenu.addAction('Delete', self._raise_context_menu)
+        contextMenu.addAction('Delete', self.remove_item)
         contextMenu.exec_(event.screenPos())
 
     def remove_item(self):
@@ -345,7 +347,8 @@ class PeakListLabel(QGraphicsTextItem):
                          % ('#FAFAF7', mimeData.text()))
             self.peak_list = mimeData.text()
             self.peak_list_dict[self.z_cond][self.y_cond][self.x_cond] = \
-                self.peak_list
+            self.peak_list
             event.accept()
         else:
+            self.sideBar().addItem(event.mimeData.text())
             event.ignore()

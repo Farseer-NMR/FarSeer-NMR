@@ -2,18 +2,19 @@ import sys
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
+
+from core.fslibs.Variables import Variables
 from core.utils import get_default_config_path
 
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_ResidueEvolutionPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
         fin = open(default_config_path, 'r')
@@ -23,7 +24,6 @@ class Test_ResidueEvolutionPopup(unittest.TestCase):
         self.popup = ResidueEvolutionPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -66,7 +66,6 @@ class Test_ResidueEvolutionPopup(unittest.TestCase):
         self.assertEqual(
             self.popup.res_evo_fit_line_style.fields.currentText(),
             self.defaults["fit_line_style"])
-
 
     def test_set_values(self):
         self.popup.res_evo_cols.setValue(8)
@@ -165,9 +164,10 @@ class Test_ResidueEvolutionPopup(unittest.TestCase):
             self.popup.res_evo_fit_line_style.fields.currentText(),
             self.popup.variables["res_evo_settings"]["fit_line_style"])
 
-        self.assertEqual(tuple(self.popup.local_variables.keys()), self.local_variable_keys)
-        self.assertEqual(tuple(self.popup.variables.keys()), self.variable_keys)
-
+        self.assertEqual(tuple(self.popup.local_variables.keys()),
+                         self.local_variable_keys)
+        self.assertEqual(tuple(self.popup.variables.keys()),
+                         self.variable_keys)
 
     def test_values_not_set(self):
 
@@ -267,6 +267,7 @@ class Test_ResidueEvolutionPopup(unittest.TestCase):
         self.assertNotEqual(
             self.popup.res_evo_fit_line_style.fields.currentText(),
             self.popup.variables["res_evo_settings"]["fit_line_style"])
+
 
 if __name__ == "__main__":
     unittest.main()

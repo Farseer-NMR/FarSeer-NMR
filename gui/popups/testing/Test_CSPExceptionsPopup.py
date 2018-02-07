@@ -7,19 +7,18 @@ from core.utils import get_default_config_path
 
 
 from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
-
-from core.fslibs.Variables import Variables
 
 test_values = [0.06, 0.36, 0.48, 0.4, 0.32, 0.96, 0.51, 0.84, 0.72, 0.63,
                0.64, 0.02, 0.98, 0.97, 0.45, 0.92, 0.44, 0.31, 0.27, 0.42]
 
 
-class Test_CSPExceptionsPopup(unittest.TestCase):
+class Test_CspExceptionsPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -31,7 +30,6 @@ class Test_CSPExceptionsPopup(unittest.TestCase):
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 
-
     def test_defaults(self):
         """Test popup reads and sets default variables"""
         for res, val in self.popup.value_dict.items():
@@ -42,10 +40,6 @@ class Test_CSPExceptionsPopup(unittest.TestCase):
                 self.assertEqual(val.field.value(), 0.2)
 
         self.assertIn("Gly", self.popup.value_dict.keys())
-
-    def test_change_variables(self):
-        pass
-
 
     def test_set_values(self):
         keys = list(self.popup.value_dict.keys())
@@ -79,8 +73,6 @@ class Test_CSPExceptionsPopup(unittest.TestCase):
                                  "csp_res_exceptions"].keys():
                 self.assertNotEqual(self.popup.variables["csp_settings"][
                                  "csp_res_exceptions"][key], test_values[ii])
-
-
 
 
 if __name__ == "__main__":

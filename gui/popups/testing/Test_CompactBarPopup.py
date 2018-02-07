@@ -5,15 +5,15 @@ from PyQt5.QtWidgets import QApplication
 
 from gui.popups.CompactBarPopup import CompactBarPopup
 from core.utils import get_default_config_path
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_CompactBarPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -117,7 +117,6 @@ class Test_CompactBarPopup(unittest.TestCase):
 
     def test_spinboxes(self):
 
-
         self.popup.bar_cols.setValue(0)
         self.popup.bar_rows.setValue(0)
         self.popup.x_tick_font_size.setValue(1)
@@ -126,7 +125,6 @@ class Test_CompactBarPopup(unittest.TestCase):
         self.assertEqual(self.popup.bar_rows.field.value(), 1)
         self.assertEqual(self.popup.x_tick_font_size.field.value(), 1)
         self.assertEqual(self.popup.x_tick_rotation.field.value(), 360)
-
 
 
 if __name__ == "__main__":

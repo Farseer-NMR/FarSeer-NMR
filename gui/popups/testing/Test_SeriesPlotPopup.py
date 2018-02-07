@@ -5,16 +5,15 @@ from PyQt5.QtWidgets import QApplication
 from core.utils import get_default_config_path
 
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
-
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_SeriesPlotPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -26,7 +25,6 @@ class Test_SeriesPlotPopup(unittest.TestCase):
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 
-
     def test_defaults(self):
         """Test popup reads and sets default variables"""
 
@@ -34,8 +32,8 @@ class Test_SeriesPlotPopup(unittest.TestCase):
                          self.defaults["subtitle_fn"])
         self.assertEqual(self.popup.series_subtitle_fs.field.value(),
                          self.defaults["subtitle_fs"])
-        self.assertEqual(self.popup.series_subtitle_weight.fields.currentText(),
-                         self.defaults["subtitle_weight"])
+        self.assertEqual(self.popup.series_subtitle_weight.fields
+                         .currentText(), self.defaults["subtitle_weight"])
         self.assertEqual(self.popup.series_subtitle_pad.field.value(),
                          self.defaults["subtitle_pad"])
         self.assertEqual(self.popup.series_x_label_fn.fields.currentText(),
@@ -75,8 +73,8 @@ class Test_SeriesPlotPopup(unittest.TestCase):
                          self.defaults["y_grid_flag"])
         self.assertEqual(self.popup.series_y_grid_color.fields.currentText(),
                          self.defaults["y_grid_color"])
-        self.assertEqual(self.popup.series_y_grid_linestyle.fields.currentText(),
-                         self.defaults["y_grid_linestyle"])
+        self.assertEqual(self.popup.series_y_grid_linestyle.fields.
+                         currentText(), self.defaults["y_grid_linestyle"])
         self.assertEqual(self.popup.series_y_grid_linewidth.field.value(),
                          self.defaults["y_grid_linewidth"])
         self.assertEqual(self.popup.series_y_grid_alpha.field.value(),
@@ -267,9 +265,10 @@ class Test_SeriesPlotPopup(unittest.TestCase):
                          self.popup.variables["series_plot_settings"][
                              "tag_cartoon_ls"])
 
-        self.assertEqual(tuple(self.popup.local_variables.keys()), self.local_variable_keys)
-        self.assertEqual(tuple(self.popup.variables.keys()), self.variable_keys)
-
+        self.assertEqual(tuple(self.popup.local_variables.keys()),
+                         self.local_variable_keys)
+        self.assertEqual(tuple(self.popup.variables.keys()),
+                         self.variable_keys)
 
     def test_values_not_set(self):
         self.popup.series_subtitle_fn.select("Verdana")
@@ -349,7 +348,6 @@ class Test_SeriesPlotPopup(unittest.TestCase):
                          "bisque")
         self.assertEqual(self.popup.tag_cartoon_lw.field.value(), 0.8)
         self.assertEqual(self.popup.tag_cartoon_ls.fields.currentText(), "-")
-
 
         self.assertNotEqual(self.popup.series_subtitle_fn.fields.currentText(),
                             self.popup.variables["series_plot_settings"][

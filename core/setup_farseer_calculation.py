@@ -46,11 +46,14 @@ def create_directory_structure(output_path, variables):
             if variables["fasta_settings"]["applyFASTA"]:
                 if variables["fasta_files"][y_key]:
                     fasta_file = variables["fasta_files"][y_key]
-                    copy2(fasta_file, os.path.join(spectrum_dir, z_name, y_name))
+                    copy2(fasta_file, os.path.join(spectrum_dir,
+                                                   z_name, y_name))
             for kk, x_key in enumerate(variables["conditions"]["x"]):
                 x_name = '_'.join(["{:0>2}".format(kk), x_key])
-                fout = open(os.path.join(spectrum_dir, z_name, y_name, "%s.csv" % x_name), 'w')
-                peaklist_path = variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
+                fout = open(os.path.join(spectrum_dir, z_name, y_name,
+                                         "%s.csv" % x_name), 'w')
+                peaklist_path = variables["peaklists"][exp_dataset[z_key]
+                                                       [y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
                 write_peaklist_file(fout, peaklist)
                 fout.close()
@@ -81,6 +84,7 @@ def write_peaklist_file(fin, peak_list):
             peak.fit_method,
             peak.volume_method
         ])
+
 
 def list_all_files_in_path(path):
     result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(path)
