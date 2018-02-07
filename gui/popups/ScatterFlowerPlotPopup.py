@@ -42,7 +42,7 @@ class ScatterFlowerPlotPopup(BasePopup):
 
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="Scatter Flower Plot",
-                           settings_key=["settings"])
+                           settings_key=["cs_scatter_flower_settings"])
 
         self.x_label = LabelledLineEdit(self, "X Label")
         self.y_label = LabelledLineEdit(self, "Y Label")

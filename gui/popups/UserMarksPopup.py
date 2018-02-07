@@ -27,6 +27,7 @@ from functools import partial
 
 from gui.popups.BasePopup import BasePopup
 
+
 class UserMarksPopup(BasePopup):
 
     def __init__(self, parent=None, **kw):
@@ -52,7 +53,7 @@ class UserMarksPopup(BasePopup):
         self.layout().addWidget(self.buttonWidget, 1, 0)
         self.pairs = []
         if self.variables:
-            self.setValuesFromConfig()
+            self.set_values_from_config()
         else:
             key = LabelledLineEdit(self, text='key')
             value = LabelledLineEdit(self, text='value')
@@ -71,7 +72,6 @@ class UserMarksPopup(BasePopup):
             self.mainWidget.layout().\
                 addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
-
 
     def add_row_to_popup(self):
         key = LabelledLineEdit(self, text='key')
@@ -115,7 +115,7 @@ class UserMarksPopup(BasePopup):
         if pop:
             self.pairs.pop(index)
 
-    def setValuesFromConfig(self):
+    def set_values_from_config(self):
         for i in range(self.marker_rows):
             self.remove_row_to_popup(i, pop=False)
         self.pairs = []
@@ -136,8 +136,6 @@ class UserMarksPopup(BasePopup):
             removeButton = QPushButton("Remove", self)
             removeButton.clicked.\
                 connect(partial(self.remove_row_to_popup, self.marker_rows))
-            # addButton.setFixedWidth(50)
-            # removeButton.setFixedWidth(50)
             self.pairs.append([key, value, colour, addButton, removeButton])
             self.mainWidget.layout().addWidget(key, self.marker_rows, 0)
             self.mainWidget.layout().addWidget(value, self.marker_rows, 1)
@@ -146,7 +144,6 @@ class UserMarksPopup(BasePopup):
             self.mainWidget.layout().\
                 addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
-
 
     def set_defaults(self):
         for i in range(self.marker_rows):
@@ -179,10 +176,9 @@ class UserMarksPopup(BasePopup):
                 addWidget(removeButton, self.marker_rows, 4)
             self.marker_rows += 1
 
-
     def set_values(self):
         self.variables["bar_plot_settings"]["user_marks_dict"] = \
-            {pair[0].field.text():pair[1].field.text() for pair in self.pairs}
+            {pair[0].field.text(): pair[1].field.text() for pair in self.pairs}
         self.variables["bar_plot_settings"]["user_bar_colors_dict"] = \
             {pair[0].field.text(): pair[2].fields.currentText()
              for pair in self.pairs}

@@ -25,6 +25,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 
 from gui.popups.BasePopup import BasePopup
 
+
 class VerticalBarPopup(BasePopup):
 
     def __init__(self, parent=None, **kw):
@@ -48,10 +49,8 @@ class VerticalBarPopup(BasePopup):
                                         step=1
                                         )
 
-
         self.layout().addWidget(self.bar_cols, 0, 0)
         self.layout().addWidget(self.bar_rows, 1, 0)
-
 
         self.buttonBox = QDialogButtonBox(
                                           QDialogButtonBox.Ok |
@@ -71,7 +70,6 @@ class VerticalBarPopup(BasePopup):
     def get_defaults(self):
         self.bar_cols.setValue(self.defaults["cols_page"])
         self.bar_rows.setValue(self.defaults["rows_page"])
-
 
     def get_values(self):
         self.bar_cols.setValue(self.local_variables["cols_page"])
