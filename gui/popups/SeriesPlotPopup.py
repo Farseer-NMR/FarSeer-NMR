@@ -226,7 +226,7 @@ class SeriesPlotPopup(BasePopup):
 
         self.local_variables["y_ticks_weight"] = str(self.series_y_ticks_weight.fields.currentText())
         self.local_variables["y_ticks_len"] = self.series_y_ticks_len.field.value()
-        self.local_variables["y_grid_flag"] = self.series_y_grid_flag.checkBox.isChecked()
+        self.local_variables["y_grid_flag"] = self.series_y_grid_flag.isChecked()
         self.local_variables["y_grid_color"] = str(self.series_y_grid_color.fields.currentText())
         self.local_variables["y_grid_linestyle"] = str(self.series_y_grid_linestyle.fields.currentText())
         self.local_variables["y_grid_linewidth"] = self.series_y_grid_linewidth.field.value()

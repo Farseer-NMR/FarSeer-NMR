@@ -30,31 +30,107 @@ from gui.components.ColourBox import ColourBox
 from gui.gui_utils import font_weights, line_styles
 from gui.popups.BasePopup import BasePopup
 
+
 class HeatMapPopup(BasePopup):
 
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="PRE Heat Map",
                            settings_key=["heat_map_settings"])
 
-        self.heat_map_rows = LabelledSpinBox(self, "Rows Per Page", minimum=1, step=1)
-        self.heat_map_vmin = LabelledDoubleSpinBox(self, "V Min", minimum=0, step=0.01)
-        self.heat_map_vmax = LabelledDoubleSpinBox(self, "V Max", maximum=1, minimum=0, step=0.01)
+        self.heat_map_rows = LabelledSpinBox(
+                                             self,
+                                             "Rows Per Page",
+                                             minimum=1,
+                                             step=1
+                                             )
+        self.heat_map_vmin = LabelledDoubleSpinBox(
+                                                   self,
+                                                   "V Min",
+                                                   minimum=0,
+                                                   step=0.01
+                                                   )
+        self.heat_map_vmax = LabelledDoubleSpinBox(
+                                                   self,
+                                                   "V Max",
+                                                   maximum=1,
+                                                   minimum=0,
+                                                   step=0.01
+                                                   )
         self.heat_map_x_ticks_fn = FontComboBox(self, "X Tick Font")
-        self.heat_map_x_ticks_fs = LabelledDoubleSpinBox(self, "X Tick Font Size", minimum=0, step=1)
-        self.heat_map_x_tick_pad = LabelledDoubleSpinBox(self, "X Tick Padding", minimum=-100, step=0.1)
-        self.heat_map_x_tick_weight = LabelledCombobox(self, text="X Tick Font Weight", items=font_weights)
-        self.heat_map_x_ticks_rot = LabelledSpinBox(self, "X Tick Rotation", maximum=360, minimum=0, step=1)
+        self.heat_map_x_ticks_fs = LabelledDoubleSpinBox(
+                                                         self,
+                                                         "X Tick Font Size",
+                                                         minimum=0,
+                                                         step=1
+                                                         )
+        self.heat_map_x_tick_pad = LabelledDoubleSpinBox(
+                                                         self,
+                                                         "X Tick Padding",
+                                                         minimum=-100,
+                                                         step=0.1
+                                                         )
+        self.heat_map_x_tick_weight = LabelledCombobox(
+                                                   self,
+                                                   text="X Tick Font Weight",
+                                                   items=font_weights
+                                                       )
+        self.heat_map_x_ticks_rot = LabelledSpinBox(
+                                                    self,
+                                                    "X Tick Rotation",
+                                                    maximum=360,
+                                                    minimum=0,
+                                                    step=1
+                                                    )
         self.heat_map_y_label_fn = FontComboBox(self, "Y Label Font")
-        self.heat_map_y_label_fs = LabelledSpinBox(self, "Y Label Font Size", minimum=0, step=1)
-        self.heat_map_y_label_pad = LabelledDoubleSpinBox(self, "Y Label Padding", minimum=-100, step=0.1)
-        self.heat_map_y_label_weight = LabelledCombobox(self, text="Y Label Font Weight", items=font_weights)
-        self.heat_map_right_margin = LabelledDoubleSpinBox(self, "Right Margin", minimum=0, maximum=1, step=0.01)
-        self.heat_map_bottom_margin = LabelledDoubleSpinBox(self, "Bottom Margin", minimum=0, maximum=1, step=0.01)
-        self.heat_map_cbar_font_size = LabelledSpinBox(self, "Colour Bar Font Size", minimum=0, step=1)
-        self.heat_map_tag_line_color = ColourBox(self, "Tag Line Colour")
-        self.heat_map_tag_ls = LabelledCombobox(self, "Tag Line Style", items=line_styles)
-        self.heat_map_tag_lw = LabelledDoubleSpinBox(self, "Tag Line Width", minimum=0, step=0.1)
+        self.heat_map_y_label_fs = LabelledSpinBox(
+                                                   self,
+                                                   "Y Label Font Size",
+                                                   minimum=0,
+                                                   step=1
+                                                   )
+        self.heat_map_y_label_pad = LabelledDoubleSpinBox(
+                                                          self,
+                                                          "Y Label Padding",
+                                                          minimum=-100,
+                                                          step=0.1
+                                                          )
+        self.heat_map_y_label_weight = LabelledCombobox(
+                                                    self,
+                                                    text="Y Label Font Weight",
+                                                    items=font_weights
+                                                        )
+        self.heat_map_right_margin = LabelledDoubleSpinBox(
+                                                           self,
+                                                           "Right Margin",
+                                                           minimum=0,
+                                                           maximum=1,
+                                                           step=0.01
+                                                           )
 
+        self.heat_map_bottom_margin = LabelledDoubleSpinBox(
+                                                            self,
+                                                            "Bottom Margin",
+                                                            minimum=0,
+                                                            maximum=1,
+                                                            step=0.01
+                                                            )
+        self.heat_map_cbar_font_size = LabelledSpinBox(
+                                                       self,
+                                                       "Colour Bar Font Size",
+                                                       minimum=0,
+                                                       step=1
+                                                       )
+        self.heat_map_tag_line_color = ColourBox(self,
+                                                 "Tag Line Colour")
+        self.heat_map_tag_ls = LabelledCombobox(self,
+                                                "Tag Line Style",
+                                                items=line_styles
+                                                )
+        self.heat_map_tag_lw = LabelledDoubleSpinBox(self,
+                                                     "Tag Line Width",
+                                                     minimum=0,
+                                                     step=0.1
+                                                     )
 
         self.layout().addWidget(self.heat_map_rows, 0, 0)
         self.layout().addWidget(self.heat_map_vmin, 1, 0)
@@ -76,13 +152,16 @@ class HeatMapPopup(BasePopup):
         self.layout().addWidget(self.heat_map_y_label_pad, 7, 1)
         self.layout().addWidget(self.heat_map_y_label_weight, 8, 1)
 
-
-
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.RestoreDefaults)
+        self.buttonBox = QDialogButtonBox(
+                                          QDialogButtonBox.Ok |
+                                          QDialogButtonBox.Cancel |
+                                          QDialogButtonBox.RestoreDefaults
+                                          )
 
         self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
+            clicked.connect(self.get_defaults)
 
         self.layout().addWidget(self.buttonBox, 9, 1, 1, 1)
 
@@ -112,21 +191,36 @@ class HeatMapPopup(BasePopup):
         self.local_variables["rows"] = self.heat_map_rows.field.value()
         self.local_variables["vmin"] = self.heat_map_vmin.field.value()
         self.local_variables["vmax"] = self.heat_map_vmax.field.value()
-        self.local_variables["x_ticks_fs"] = self.heat_map_x_ticks_fs.field.value()
-        self.local_variables["x_ticks_rot"] = self.heat_map_x_ticks_rot.field.value()
-        self.local_variables["x_ticks_fn"] = self.heat_map_x_ticks_fn.fields.currentText()
-        self.local_variables["x_ticks_pad"] = self.heat_map_x_tick_pad.field.value()
-        self.local_variables["x_ticks_weight"] = self.heat_map_x_tick_weight.fields.currentText()
-        self.local_variables["y_label_fs"] = self.heat_map_y_label_fs.field.value()
-        self.local_variables["y_label_pad"] = self.heat_map_y_label_pad.field.value()
-        self.local_variables["y_label_fn"] = self.heat_map_y_label_fn.fields.currentText()
-        self.local_variables["y_label_weight"] = self.heat_map_y_label_weight.fields.currentText()
-        self.local_variables["right_margin"] = self.heat_map_right_margin.field.value()
-        self.local_variables["bottom_margin"] = self.heat_map_bottom_margin.field.value()
-        self.local_variables["cbar_font_size"] = self.heat_map_cbar_font_size.field.value()
-        self.local_variables["tag_line_color"] = self.heat_map_tag_line_color.fields.currentText()
-        self.local_variables["tag_line_ls"] = self.heat_map_tag_ls.fields.currentText()
-        self.local_variables["tag_line_lw"] = self.heat_map_tag_lw.field.value()
+        self.local_variables["x_ticks_fs"] = \
+            self.heat_map_x_ticks_fs.field.value()
+        self.local_variables["x_ticks_rot"] = \
+            self.heat_map_x_ticks_rot.field.value()
+        self.local_variables["x_ticks_fn"] = \
+            self.heat_map_x_ticks_fn.fields.currentText()
+        self.local_variables["x_ticks_pad"] = \
+            self.heat_map_x_tick_pad.field.value()
+        self.local_variables["x_ticks_weight"] = \
+            self.heat_map_x_tick_weight.fields.currentText()
+        self.local_variables["y_label_fs"] = \
+            self.heat_map_y_label_fs.field.value()
+        self.local_variables["y_label_pad"] = \
+            self.heat_map_y_label_pad.field.value()
+        self.local_variables["y_label_fn"] = \
+            self.heat_map_y_label_fn.fields.currentText()
+        self.local_variables["y_label_weight"] = \
+            self.heat_map_y_label_weight.fields.currentText()
+        self.local_variables["right_margin"] = \
+            self.heat_map_right_margin.field.value()
+        self.local_variables["bottom_margin"] = \
+            self.heat_map_bottom_margin.field.value()
+        self.local_variables["cbar_font_size"] = \
+            self.heat_map_cbar_font_size.field.value()
+        self.local_variables["tag_line_color"] = \
+            self.heat_map_tag_line_color.fields.currentText()
+        self.local_variables["tag_line_ls"] = \
+            self.heat_map_tag_ls.fields.currentText()
+        self.local_variables["tag_line_lw"] = \
+            self.heat_map_tag_lw.field.value()
         self.accept()
 
     def get_values(self):
@@ -137,15 +231,23 @@ class HeatMapPopup(BasePopup):
         self.heat_map_x_ticks_rot.setValue(self.local_variables["x_ticks_rot"])
         self.heat_map_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
         self.heat_map_x_tick_pad.setValue(self.local_variables["x_ticks_pad"])
-        self.heat_map_x_tick_weight.select(self.local_variables["x_ticks_weight"])
-        self.heat_map_y_label_fs.setValue(self.local_variables["y_label_fs"])
-        self.heat_map_y_label_pad.setValue(self.local_variables["y_label_pad"])
-        self.heat_map_y_label_fn.select(self.local_variables["y_label_fn"])
-        self.heat_map_y_label_weight.select(self.local_variables["y_label_weight"])
-        self.heat_map_right_margin.setValue(self.local_variables["right_margin"])
-        self.heat_map_bottom_margin.setValue(self.local_variables["bottom_margin"])
-        self.heat_map_cbar_font_size.setValue(self.local_variables["cbar_font_size"])
-        self.heat_map_tag_line_color.select(self.local_variables["tag_line_color"])
+        self.heat_map_x_tick_weight.select(
+            self.local_variables["x_ticks_weight"])
+        self.heat_map_y_label_fs.setValue(
+            self.local_variables["y_label_fs"])
+        self.heat_map_y_label_pad.setValue(
+            self.local_variables["y_label_pad"])
+        self.heat_map_y_label_fn.select(
+            self.local_variables["y_label_fn"])
+        self.heat_map_y_label_weight.select(
+            self.local_variables["y_label_weight"])
+        self.heat_map_right_margin.setValue(
+            self.local_variables["right_margin"])
+        self.heat_map_bottom_margin.setValue(
+            self.local_variables["bottom_margin"])
+        self.heat_map_cbar_font_size.setValue(
+            self.local_variables["cbar_font_size"])
+        self.heat_map_tag_line_color.select(
+            self.local_variables["tag_line_color"])
         self.heat_map_tag_ls.select(self.local_variables["tag_line_ls"])
         self.heat_map_tag_lw.setValue(self.local_variables["tag_line_lw"])
-

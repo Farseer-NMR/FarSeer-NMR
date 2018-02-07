@@ -38,8 +38,11 @@ class BaseWidget(QWidget):
         if footer:
             self.tab_footer = TabFooter(self)
             self.tab_footer.load_config_button.clicked.connect(
-                parent.load_config)
+                parent.load_config
+            )
             self.tab_footer.save_config_button.clicked.connect(
-                parent.save_config)
+                parent.save_config
+            )
             self.tab_footer.run_farseer_button.clicked.connect(
-                parent.run_farseer_calculation)
+                parent.run_farseer_calculation
+            )

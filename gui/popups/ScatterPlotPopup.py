@@ -121,7 +121,7 @@ class ScatterPlotPopup(BasePopup):
             [x.translate(translator) \
                 for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
         self.local_variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
-        self.local_variables["hide_lost"] = self.cs_scatter_hide_lost.checkBox.isChecked()
+        self.local_variables["hide_lost"] = self.cs_scatter_hide_lost.isChecked()
         self.accept()
 
     def get_values(self):

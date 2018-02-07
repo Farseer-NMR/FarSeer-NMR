@@ -39,22 +39,30 @@ class BarPlotPopup(BasePopup):
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
         self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
         self.lost_bar_colour = ColourBox(self, text="Lost Bar Colour")
-        self.unassigned_bar_colour = ColourBox(self,
-                                               text="Unassigned Bar Colour")
-        self.bar_width = LabelledDoubleSpinBox(self,
+        self.unassigned_bar_colour = ColourBox(
+                                               self,
+                                               text="Unassigned Bar Colour"
+                                               )
+        self.bar_width = LabelledDoubleSpinBox(
+                                               self,
                                                text="Bar Width",
                                                minimum=0,
                                                maximum=1,
-                                               step=0.1)
-        self.bar_alpha = LabelledDoubleSpinBox(self,
+                                               step=0.1
+                                               )
+        self.bar_alpha = LabelledDoubleSpinBox(
+                                               self,
                                                text="Bar Transparency",
                                                minimum=0,
                                                maximum=1,
-                                               step=0.1)
-        self.bar_linewidth = LabelledDoubleSpinBox(self,
+                                               step=0.1
+                                               )
+        self.bar_linewidth = LabelledDoubleSpinBox(
+                                                   self,
                                                    text="Bar Line Width",
                                                    minimum=0,
-                                                   step=0.1)
+                                                   step=0.1
+                                                  )
         self.bar_threshold = LabelledCheckbox(self, "Apply Stdev Threshold")
         self.bar_threshold_colour = ColourBox(self, "Stdev Threshold Colour")
         self.bar_threshold_alpha = LabelledDoubleSpinBox(
@@ -163,7 +171,7 @@ class BarPlotPopup(BasePopup):
     def set_values(self):
 
         self.local_variables["status_color_flag"] = \
-            self.apply_status.checkBox.isChecked()
+            self.apply_status.isChecked()
         self.local_variables["measured_color"] = \
             str(self.meas_bar_colour.fields.currentText())
         self.local_variables["lost_color"] = \
@@ -177,7 +185,7 @@ class BarPlotPopup(BasePopup):
         self.local_variables["bar_linewidth"] = \
             self.bar_linewidth.field.value()
         self.local_variables["threshold_flag"] = \
-            self.bar_threshold.checkBox.isChecked()
+            self.bar_threshold.isChecked()
         self.local_variables["threshold_color"] = \
             str(self.bar_threshold_colour.fields.currentText())
         self.local_variables["threshold_linewidth"] = \
@@ -187,11 +195,11 @@ class BarPlotPopup(BasePopup):
         self.local_variables["mark_fontsize"] = \
             self.user_mark_font_size.field.value()
         self.local_variables["mark_prolines_flag"] = \
-            self.markProlines.checkBox.isChecked()
+            self.markProlines.isChecked()
         self.local_variables["mark_prolines_symbol"] = \
             str(self.proline_marker.field.text())
         self.local_variables["mark_user_details_flag"] = \
-            self.user_details.checkBox.isChecked()
+            self.user_details.isChecked()
         self.local_variables["color_user_details_flag"] = \
-            self.colour_user_details.checkBox.isChecked()
+            self.colour_user_details.isChecked()
         self.accept()

@@ -23,7 +23,8 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 from collections import OrderedDict
 from functools import partial
 
-from PyQt5.QtWidgets import QLabel, QDialogButtonBox, QFileDialog, QPushButton, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import (QDialogButtonBox, QFileDialog, QHBoxLayout,
+                             QLabel, QPushButton, QWidget)
 
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.popups.BasePopup import BasePopup
@@ -51,9 +52,6 @@ class FastaSelectionPopup(BasePopup):
 
         self.get_values()
 
-        print(self.cond_widget_dict)
-
-
     def get_values(self):
         if self.fasta_files:
             for cond_name, fasta_path in self.fasta_files.items():
@@ -62,15 +60,11 @@ class FastaSelectionPopup(BasePopup):
             for cond in self.variables["conditions"]["y"]:
                 self.add_field(cond, '')
 
-
-
     def set_values(self):
         for name, widget in self.cond_widget_dict.items():
             self.fasta_files[name] = widget[0].field.text()
         self.local_variables.update(self.fasta_files)
         self.accept()
-
-
 
     def add_field(self, cond_name, fasta_path):
 
@@ -93,6 +87,11 @@ class FastaSelectionPopup(BasePopup):
         return
 
     def raise_file_dialog(self, file_field):
-        fasta_file = QFileDialog.getOpenFileName(self, "Select FASTA File", "", "*.fasta")
+        fasta_file = QFileDialog.getOpenFileName(
+                                                 self,
+                                                 "Select FASTA File",
+                                                 "",
+                                                 "*.fasta"
+                                                )
         if fasta_file:
             file_field.field.setText(fasta_file[0])

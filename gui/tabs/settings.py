@@ -156,26 +156,32 @@ class Settings(BaseWidget):
         self.perform_comparisons_checkbox = LabelledCheckbox(
             self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
-        self.fasta_start = LabelledSpinBox(self,
+        self.fasta_start = LabelledSpinBox(
+                                           self,
                                            "Fasta start",
                                            maximum=10000,
-                                           step=1)
+                                           step=1
+                                           )
 
         self.expand_lost_yy = LabelledCheckbox(self,
                                                "Analyse Lost Y Residues?")
         self.expand_lost_zz = LabelledCheckbox(self,
                                                "Analyse Lost Z Residues?")
 
-        self.figure_width = LabelledDoubleSpinBox(self,
+        self.figure_width = LabelledDoubleSpinBox(
+                                                  self,
                                                   "Figure Width",
                                                   minimum=0.1,
                                                   maximum=100,
-                                                  step=0.1)
-        self.figure_height = LabelledDoubleSpinBox(self,
+                                                  step=0.1
+                                                  )
+        self.figure_height = LabelledDoubleSpinBox(
+                                                   self,
                                                    "Figure Height",
                                                    minimum=0.1,
                                                    maximum=100,
-                                                   step=0.1)
+                                                   step=0.1
+                                                  )
         self.figure_dpi = LabelledSpinBox(self,
                                           "Figure DPI",
                                           minimum=0,
@@ -290,25 +296,36 @@ class Settings(BaseWidget):
         self.plot_height_calccol = LabelledLineEdit(self, text="")
         self.plot_volume_calccol = LabelledLineEdit(self, text="")
 
-        self.plot_F1_y_scale = LabelledDoubleSpinBox(self,
+        self.plot_F1_y_scale = LabelledDoubleSpinBox(
+                                                     self,
                                                      text="",
                                                      minimum=0,
-                                                     step=0.1)
-        self.plot_F2_y_scale = LabelledDoubleSpinBox(self, text="",
+                                                     step=0.1
+                                                    )
+        self.plot_F2_y_scale = LabelledDoubleSpinBox(
+                                                     self,
+                                                     text="",
                                                      minimum=0,
-                                                     step=0.1)
-        self.plot_CSP_y_scale = LabelledDoubleSpinBox(self,
+                                                     step=0.1
+                                                    )
+        self.plot_CSP_y_scale = LabelledDoubleSpinBox(
+                                                      self,
                                                       text="",
                                                       minimum=0,
-                                                      step=0.1)
-        self.plot_height_y_scale = LabelledDoubleSpinBox(self,
+                                                      step=0.1
+                                                     )
+        self.plot_height_y_scale = LabelledDoubleSpinBox(
+                                                         self,
                                                          text="",
                                                          minimum=0,
-                                                         step=.1)
-        self.plot_volume_y_scale = LabelledDoubleSpinBox(self,
+                                                         step=0.1
+                                                        )
+        self.plot_volume_y_scale = LabelledDoubleSpinBox(
+                                                         self,
                                                          text="",
                                                          minimum=0,
-                                                         step=.1)
+                                                         step=0.1
+                                                        )
 
         restraint_label = QLabel("Restraint Name")
         axis_label = QLabel("Y Axis Label")
