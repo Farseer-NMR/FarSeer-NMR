@@ -1823,6 +1823,9 @@ def run_farseer(fsuv):
     
     logs(fsw.end_good(), fsuv["general_settings"]["logfile_name"])
     log_time_stamp(fsuv["general_settings"]["logfile_name"], state='ENDED')
+    logs("*** USED CONFIG FILE***", fsuv["general_settings"]["logfile_name"])
+    with open(fsuv["general_settings"]["logfile_name"], 'a') as f:
+        json.dump(fsuv, f)
     
     return
 
