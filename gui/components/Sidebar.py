@@ -82,14 +82,14 @@ class SideBar(QTreeWidget):
 
         if event.mimeData().hasUrls():
             event.accept()
-            filePaths = [url.path() for url in event.mimeData().urls()]
-            for filePath in filePaths:
-               self.load_from_path(filePath)
+            file_paths = [url.path() for url in event.mimeData().urls()]
+            for file_path in file_paths:
+                self.load_from_path(file_path)
 
-    def load_from_path(self, filePath):
+    def load_from_path(self, file_path):
         name = None
-        if os.path.isdir(filePath):
-            for root, dirs, filenames in os.walk(filePath):
+        if os.path.isdir(file_path):
+            for root, dirs, filenames in os.walk(file_path):
                 for filename in filenames:
                     try:
                         path = os.path.join(root, filename)
@@ -97,7 +97,7 @@ class SideBar(QTreeWidget):
                     except IOError:
                         pass
         else:
-            name, path = self.load_peaklist(filePath)
+            name, path = self.load_peaklist(file_path)
         if name:
             return name, path
 
