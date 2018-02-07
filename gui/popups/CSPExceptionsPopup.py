@@ -84,9 +84,8 @@ class CSPExceptionsPopup(BasePopup):
                 value.field.setValue(self.alpha_value)
 
     def get_defaults(self):
-        defaults = self.defaults["csp_settings"]["csp_res_exceptions"]
         for key, value in self.value_dict.items():
-            if aal3tol1[key] in defaults.keys():
-                value.field.setValue(defaults[aal3tol1[key]])
+            if aal3tol1[key] in self.defaults.keys():
+                value.field.setValue(self.defaults[aal3tol1[key]])
             else:
                 value.field.setValue(self.alpha_value)
