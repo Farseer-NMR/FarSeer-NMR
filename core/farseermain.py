@@ -80,46 +80,35 @@ import core.fslibs.Comparisons as fsc
 import core.fslibs.wet as fsw
 
 
-def read_user_variables(path, config_name):
+def read_user_variables(runfolder_path, configjson_path):
     """
-    Reads user defined preferences from file and prepares the module of 
-    variables necessary for Farseermain.
+    Sets calculation folder to the folder where spectra/ is.
+    Reads user definitions from config.json file to a dictionary.
+    
+    Changes RUN directory to run_path.
     
     Parameters:
-        path (str): path to farseer_user_variables.py.
+        runfolder_path (str): Calculation run folder. Parent path of
+            spectra/ folder.
+        configjson_path (str) path to config.json file.
     
     Returns:
-        fsuv (module): contains the user preferences.
+        fsuv (dictionary): contains the user preferences.
     """
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-    # IMPORTING FARSEER USER VARIABLES FROM CALCULATION DIR
-    # I placed this here as a draft to make it work for now.
-    # Simon: for sure with the JSON you will make it work differently :-P
-    cwd =  os.path.abspath(path)
-    
+    # Sets Run folder
+    run_cwd =  os.path.abspath(runfolder_path)
     # changes current directory to the directory where
     # farseer_user_variables is. In this way, output from calculations is
-    # stored in that same directory
-    os.chdir(cwd)
-    #
-    # spec = \
-    #     importlib.util.spec_from_file_location(\
-    #                         "farseer_user_variables",
-    #                         "{}/farseer_user_variables.py".format(cwd))
-    # #
-    # fsuv = importlib.util.module_from_spec(spec)
-    # spec.loader.exec_module(fsuv)
-
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    fsuv = json.load(open(os.path.join(cwd, config_name), 'r'))
-    fsuv["cwd"] = cwd
-
-    if not("input_spectra_path" in fsuv["general_settings"]):
-        fsuv["general_settings"]["input_spectra_path"] = \
-             '{}/spectra'.format(cwd)
-    
+    # stored in that same directory of spectra/
+    os.chdir(run_cwd)
+    # loads json config file
+    json_cwd = os.path.abspath(configjson_path)
+    fsuv = json.load(open(json_cwd, 'r'))
+    fsuv["general_settings"]["input_spectra_path"] = \
+        '{}/spectra'.format(run_cwd)
+    fsuv["general_settings"]["config_path"] = json_cwd
+    fsuv["general_settings"]["output_path"] = run_cwd
     fsuv = config_user_variables(fsuv)
     
     return fsuv
@@ -285,9 +274,7 @@ def log_time_stamp(
     
     return
 
-def logs(
-        s, logfile_name,
-        mod='a'):
+def logs(s, logfile_name, mod='a'):
     """
     Prints <s> and writes it to log file.
     
@@ -1715,6 +1702,14 @@ def run_farseer(fsuv):
     use_sidechains = general["use_sidechains"]
     # Initiates the log
     log_time_stamp(general["logfile_name"], mod='w')
+    logs(
+        "*** Run Calculation folder: {}\n".format(general["output_path"]),
+        general["logfile_name"]
+        )
+    logs(
+        "*** Config file: {}\n".format(general["config_path"]),
+        general["logfile_name"]
+        )
     # performs initial checks
     initial_checks(fsuv)
     # Initiates Farseer
