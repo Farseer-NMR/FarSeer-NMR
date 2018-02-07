@@ -79,7 +79,6 @@ import core.fslibs.FarseerSeries as fss
 import core.fslibs.Comparisons as fsc
 import core.fslibs.wet as fsw
 
-
 def read_user_variables(runfolder_path, configjson_path):
     """
     Sets calculation folder to the folder where spectra/ is.
@@ -96,19 +95,23 @@ def read_user_variables(runfolder_path, configjson_path):
         fsuv (dictionary): contains the user preferences.
     """
     # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-    # Sets Run folder
+    # Reads Run calculation folder absolut path
     run_cwd =  os.path.abspath(runfolder_path)
-    # changes current directory to the directory where
-    # farseer_user_variables is. In this way, output from calculations is
-    # stored in that same directory of spectra/
-    os.chdir(run_cwd)
-    # loads json config file
+    # Reads json config absolut path
     json_cwd = os.path.abspath(configjson_path)
+    # loads and reads json config file
     fsuv = json.load(open(json_cwd, 'r'))
+    # changes current directory to the run directory which is that where
+    # spectra/ folder is.
+    os.chdir(run_cwd)
+    # stores path to spectra/ folder
     fsuv["general_settings"]["input_spectra_path"] = \
         '{}/spectra'.format(run_cwd)
+    # stores path to json config file
     fsuv["general_settings"]["config_path"] = json_cwd
+    # stores path to run calculation folder
     fsuv["general_settings"]["output_path"] = run_cwd
+    # configs user variables necessary for Farseer-NMR
     fsuv = config_user_variables(fsuv)
     
     return fsuv
@@ -139,9 +142,11 @@ def config_user_variables(fsuv):
     plots_volume = fsuv["Volume_ratio_settings"]
 
     # does the user want to perform any analysis on the Farseer-NMR cube?
-    fsuv["any_axis"] = any([fitting["do_cond1"],
-                            fitting["do_cond2"],
-                            fitting["do_cond3"]])
+    fsuv["any_axis"] = any([
+        fitting["do_cond1"],
+        fitting["do_cond2"],
+        fitting["do_cond3"]
+        ])
     
     # sorted values to be used as x coordinates in the fitting routine
     # fsuv.txv = sorted(fsuv.titration_x_values)
@@ -291,6 +296,21 @@ def logs(s, logfile_name, mod='a'):
     with open(logfile_name, mod) as logfile:
         logfile.write(s)
     
+    return
+
+def log_init(fsuv):
+    """Operations perform when initializing the log file."""
+    log_time_stamp(fsuv["general_settings"]["logfile_name"], mod='w')
+    logs(
+        "*** Run Calculation folder: {}\n".\
+            format(fsuv["general_settings"]["output_path"]),
+        fsuv["general_settings"]["logfile_name"]
+        )
+    logs(
+        "*** Config file: {}\n".\
+            format(fsuv["general_settings"]["config_path"]),
+        fsuv["general_settings"]["logfile_name"]
+        )
     return
 
 def initial_checks(fsuv):
@@ -1701,15 +1721,7 @@ def run_farseer(fsuv):
     fasta = fsuv["fasta_settings"]
     use_sidechains = general["use_sidechains"]
     # Initiates the log
-    log_time_stamp(general["logfile_name"], mod='w')
-    logs(
-        "*** Run Calculation folder: {}\n".format(general["output_path"]),
-        general["logfile_name"]
-        )
-    logs(
-        "*** Config file: {}\n".format(general["config_path"]),
-        general["logfile_name"]
-        )
+    log_init(fsuv)
     # performs initial checks
     initial_checks(fsuv)
     # Initiates Farseer
