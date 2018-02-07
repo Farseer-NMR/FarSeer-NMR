@@ -5,15 +5,15 @@ from PyQt5.QtWidgets import QApplication
 
 from gui.popups.FastaSelectionPopup import FastaSelectionPopup
 from core.utils import get_default_config_path
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_BarPlotPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -25,12 +25,10 @@ class Test_BarPlotPopup(unittest.TestCase):
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 
-
     def test_defaults(self):
         """Test popup reads and sets default variables"""
 
         self.assertEqual(list(self.popup.cond_widget_dict.keys()), [])
-
 
     def test_set_values(self):
         self.popup.add_field('mut1', '/test/path/1')
@@ -44,11 +42,11 @@ class Test_BarPlotPopup(unittest.TestCase):
         self.assertIn("mut3", self.popup.cond_widget_dict.keys())
 
         self.assertEqual(self.popup.cond_widget_dict["mut1"][0].field.text(),
-                          '/test/path/1')
+                         '/test/path/1')
         self.assertEqual(self.popup.cond_widget_dict["mut2"][0].field.text(),
-                          '/test/path/2')
+                         '/test/path/2')
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
-                          '/test/path/3')
+                         '/test/path/3')
 
         self.assertEqual(self.popup.variables["fasta_files"]["mut1"],
                          '/test/path/1')
@@ -67,11 +65,11 @@ class Test_BarPlotPopup(unittest.TestCase):
         self.assertIn("mut3", self.popup.cond_widget_dict.keys())
 
         self.assertEqual(self.popup.cond_widget_dict["mut1"][0].field.text(),
-                          '/test/path/1')
+                         '/test/path/1')
         self.assertEqual(self.popup.cond_widget_dict["mut2"][0].field.text(),
-                          '/test/path/2')
+                         '/test/path/2')
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
-                          '/test/path/3')
+                         '/test/path/3')
 
         self.assertNotIn("mut1", self.popup.variables["fasta_files"].keys())
         self.assertNotIn("mut2", self.popup.variables["fasta_files"].keys())

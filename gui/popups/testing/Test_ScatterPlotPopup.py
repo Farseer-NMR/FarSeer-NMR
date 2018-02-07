@@ -5,15 +5,15 @@ from PyQt5.QtWidgets import QApplication
 from core.utils import get_default_config_path
 
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_ScatterPlotPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -24,7 +24,6 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.popup = ScatterPlotPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -101,8 +100,6 @@ class Test_ScatterPlotPopup(unittest.TestCase):
             self.popup.cs_scatter_mk_lost_color.fields.currentText(), "orange")
         self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(), True)
 
-
-
         self.assertEqual(self.popup.cs_scatter_cols_page.field.value(),
                          self.popup.variables["cs_scatter_settings"][
                              "cols_page"])
@@ -143,8 +140,10 @@ class Test_ScatterPlotPopup(unittest.TestCase):
                          self.popup.variables["cs_scatter_settings"][
                              "hide_lost"])
 
-        self.assertEqual(tuple(self.popup.local_variables.keys()), self.local_variable_keys)
-        self.assertEqual(tuple(self.popup.variables.keys()), self.variable_keys)
+        self.assertEqual(tuple(self.popup.local_variables.keys()),
+                         self.local_variable_keys)
+        self.assertEqual(tuple(self.popup.variables.keys()),
+                         self.variable_keys)
 
     def test_values_not_set(self):
         self.popup.cs_scatter_cols_page.setValue(6)
@@ -184,8 +183,6 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.assertEqual(
             self.popup.cs_scatter_mk_lost_color.fields.currentText(), "orange")
         self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(), True)
-
-
 
         self.assertNotEqual(self.popup.cs_scatter_cols_page.field.value(),
                             self.popup.variables["cs_scatter_settings"][

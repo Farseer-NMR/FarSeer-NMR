@@ -20,36 +20,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import re
+import csv
+
+from core.utils import aal1tol3
 from core.fslibs.Peak import Peak
-import platform
-import re, os, csv
 
 
-res1to3dict = {
+file_extensions = ['peaks', 'xpk', 'out', 'csv']
 
-     'A': 'Ala',
-     'C': 'Cys',
-     'D': 'Asp',
-     'E': 'Glu',
-     'F': 'Phe',
-     'G': 'Gly',
-     'H': 'His',
-     'I': 'Ile',
-     'K': 'Lys',
-     'L': 'Leu',
-     'M': 'Met',
-     'N': 'Asn',
-     'P': 'Pro',
-     'Q': 'Gln',
-     'R': 'Arg',
-     'S': 'Ser',
-     'T': 'Thr',
-     'V': 'Val',
-     'W': 'Trp',
-     'Y': 'Tyr'
-}
-
-file_extenstions = ['peaks', 'xpk', 'out', 'csv']
 
 def get_peaklist_format(file_path):
 
@@ -57,14 +36,15 @@ def get_peaklist_format(file_path):
     if len(file_path.split('.')) < 2:
         print('Invalid File Extension')
         return
-    if file_path.split('.')[-1] not in file_extenstions:
+    if file_path.split('.')[-1] not in file_extensions:
         print('Invalid File Extension')
         return
     for line in fin:
         if not line.strip():
             continue
 
-        if (line.lstrip().startswith("Assignment") and "w1" in line) or line.startswith("<sparky save file>"):
+        if (line.lstrip().startswith("Assignment") and "w1" in line) or \
+                line.startswith("<sparky save file>"):
             fin.close()
             return "SPARKY"
 
@@ -83,6 +63,7 @@ def get_peaklist_format(file_path):
         if line.startswith("Number"):
             fin.close()
             return "CCPN"
+
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
@@ -114,19 +95,17 @@ ANSIG v3.3 export crosspeaks file
     # FarSeer-NMR only supports peaklists so dimension_count must equal 2
     dimension_count = 2
 
-    # check a 2D peaklist has been parsed in
-
-
-    # Each chemical shift is 13 characters wide and intensity always follows chemical shifts
+    # Each chemical shift is 13 characters wide and intensity
+    # always follows chemical shifts
     intensity_column_number = 13*dimension_count
 
-    # assignment field occurs after 13 character intensity field, plus 12 character spectrum name field and seven 6
+    # assignment field occurs after 13 character intensity
+    # field, plus 12 character spectrum name field and seven 6
     # character symmetry and connection fields
     assignment_field_start_index = intensity_column_number+13+12+7*6
     fin = open(peaklist_file, 'r')
 
     lines = fin.readlines()
-
 
     first_two_lines = lines[:2]
 
@@ -141,7 +120,8 @@ ANSIG v3.3 export crosspeaks file
         if line.strip().startswith('ANSIG'):
             continue
 
-        height = float(line[intensity_column_number:intensity_column_number+13].strip() or '0')
+        height = float(line[intensity_column_number:
+                       intensity_column_number+13].strip() or '0')
         volume = height
         peak_positions = [0] * dimension_count
         peak_labels = [None] * dimension_count
@@ -150,20 +130,31 @@ ANSIG v3.3 export crosspeaks file
 
         for dimension in range(dimension_count):
 
-          shifts_field = dimension*13
-          sequence_code_field = assignment_field_start_index + (dimension*4)
-          residue_name_field = assignment_field_start_index + (dimension_count*4) + (dimension*4)
-          atom_name_field = assignment_field_start_index + (dimension_count*8) + (dimension*4)
+            shifts_field = dimension*13
+            sequence_code_field = assignment_field_start_index + (dimension*4)
+            residue_name_field = assignment_field_start_index\
+                + (dimension_count*4) + (dimension*4)
+            atom_name_field = assignment_field_start_index\
+                + (dimension_count*8) + (dimension*4)
 
-          peak_positions[dimension] = float(line[shifts_field:shifts_field+13])
-          residue_number = line[sequence_code_field:sequence_code_field+4].strip() or '?'
-          residue_name = line[residue_name_field:residue_name_field+4].strip() or '?'
-          atom = line[atom_name_field:atom_name_field+4].strip() or '?'
-          atoms[dimension] = atom[0]
-          peak_labels[dimension] = '%s%s%s' % (residue_number, residue_name, atom[0])
-        if not '?' in peak_labels:
-            peak = Peak(peak_number=ii+1, positions=peak_positions, volume=volume, height=height,
-                   assignments=peak_labels, linewidths=line_widths, atoms=atoms)
+            peak_positions[dimension] = \
+                float(line[shifts_field:shifts_field+13])
+            residue_number = line[sequence_code_field:sequence_code_field+4].\
+                strip() or '?'
+            residue_name = line[residue_name_field:residue_name_field+4].\
+                strip() or '?'
+            atom = line[atom_name_field:atom_name_field+4].strip() or '?'
+            atoms[dimension] = atom[0]
+            peak_labels[dimension] = '%s%s%s' % (residue_number,
+                                                 residue_name, atom[0])
+        if '?' not in peak_labels:
+            peak = Peak(peak_number=ii+1,
+                        positions=peak_positions,
+                        volume=volume,
+                        height=height,
+                        assignments=peak_labels,
+                        linewidths=line_widths,
+                        atoms=atoms)
 
             peakList.append(peak)
     fin.close()
@@ -193,60 +184,68 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
     Line starting VARS or variables contains contents of each column.
     """
 
-
     peakList = []
     isotopes = []
     fin = open(peaklist_file, 'r')
     dimension_count = 0
 
-    # create a dictionary to store key:value pairs of column_label: column_index
+    # create a dictionary to store key:value pairs of
+    # column_label: column_index
     field_dictionary = {}
 
     for line in fin:
-      line = line.strip()
-      # ignore blank lines and lines starting with REMARK
-      if not line:
-        continue
+        line = line.strip()
+        # ignore blank lines and lines starting with REMARK
+        if not line:
+            continue
 
-      if line.startswith('REMARK'):
-        continue
+        if line.startswith('REMARK'):
+            continue
 
-      data = line.split()
-      # 
-      if line.startswith('DATA'):
-        dimension_count += 1
-        isotopes.append(data[2])
-        continue
+        data = line.split()
 
-      if line.startswith('VARS') or line.startswith('variables'):
-        # populate field_dictionary with key:value pairs of column_label: column_index
-        for i, key in enumerate(data[1:]):
-            field_dictionary[key] = i
+        if line.startswith('DATA'):
+            dimension_count += 1
+            isotopes.append(data[2])
+            continue
 
-        continue
+        if line.startswith('VARS') or line.startswith('variables'):
+            # populate field_dictionary with key:value pairs
+            # of column_label: column_index
+            for i, key in enumerate(data[1:]):
+                field_dictionary[key] = i
 
-      elif not field_dictionary:
-        continue
+            continue
 
-      elif not line[0].isdigit():
-        continue
+        elif not field_dictionary:
+            continue
 
-      ppms = [0] * dimension_count
-      lineWidths = [None] * dimension_count
-      dimension_labels = (('X_PPM','XW'), ('Y_PPM','YW'), ('Z_PPM','ZW'))
+        elif not line[0].isdigit():
+            continue
 
-      height = float(data[field_dictionary['HEIGHT']])
-      volume = float(data[field_dictionary['VOL']])
-      annotations = data[field_dictionary['ASS']].split(';')
-      atoms = [anno.split('.')[1] for anno in annotations if anno]
-      for dimension in range(dimension_count):
-        ppmKey, linewidthKey = dimension_labels[dimension]
-        ppms[dimension] = float(data[field_dictionary[ppmKey]])
-        lineWidths[dimension] = float(data[field_dictionary[linewidthKey]])
+        ppms = [0] * dimension_count
+        linewidths = [None] * dimension_count
+        dimension_labels = (('X_PPM', 'XW'), ('Y_PPM', 'YW'), ('Z_PPM', 'ZW'))
 
-      peak = Peak(peak_number=data[0], assignments=annotations, atoms=atoms, height=height, volume=volume, positions=ppms,
-                  linewidths=lineWidths)
-      peakList.append(peak)
+        height = float(data[field_dictionary['HEIGHT']])
+        volume = float(data[field_dictionary['VOL']])
+        annotations = data[field_dictionary['ASS']].split(';')
+        atoms = [annotation.split('.')[1] for annotation in annotations
+                 if annotation]
+
+        for dimension in range(dimension_count):
+            ppmKey, linewidthKey = dimension_labels[dimension]
+            ppms[dimension] = float(data[field_dictionary[ppmKey]])
+            linewidths[dimension] = float(data[field_dictionary[linewidthKey]])
+
+        peak = Peak(peak_number=data[0],
+                    assignments=annotations,
+                    atoms=atoms,
+                    height=height,
+                    volume=volume,
+                    positions=ppms,
+                    linewidths=linewidths)
+        peakList.append(peak)
 
     fin.close()
 
@@ -254,147 +253,167 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
 
 
 def parse_nmrview_peaklist(peaklist_file):
-      peakList = []
-      fin = open(peaklist_file, 'rU')
+    peakList = []
+    fin = open(peaklist_file, 'r')
 
-      null = fin.readline()
-      dimNames = fin.readline().strip().split()
-      numDim = len(dimNames)
-      name = fin.readline()
-      line = fin.readline()
-      line = line.replace('{', '')
-      line = line.replace('}', '')
+    null = fin.readline()
+    dimNames = fin.readline().strip().split()
+    dimension_count = len(dimNames)
+    name = fin.readline()
+    line = fin.readline()
+    line = line.replace('{', '')
+    line = line.replace('}', '')
 
-      line = fin.readline()
-      line = line.replace('{', '')
-      line = line.replace('}', '')
-      headings = fin.readline().strip().split()
-      dimHeadings = [x.split('.') for x in headings if '.' in x]
-      dimHeadings = [x for x in dimHeadings if x[0] in dimNames]
-      numFields = int(len(dimHeadings) / numDim)
+    line = fin.readline()
+    line = line.replace('{', '')
+    line = line.replace('}', '')
+    headings = fin.readline().strip().split()
+    dimension_headings = [x.split('.') for x in headings if '.' in x]
+    dimension_headings = [x for x in dimension_headings if x[0] in dimNames]
+    field_count = int(len(dimension_headings) / dimension_count)
 
-      for line in fin:
-          fields = line.strip().split()
-          checked = []
+    for line in fin:
+        fields = line.strip().split()
+        verified = []
 
-          while fields:
-              val = fields.pop()
+        while fields:
+            val = fields.pop()
 
-              if val[-1] == '}':
-                  while val[0] != '{':
-                      val = fields.pop() + val
+            if val[-1] == '}':
+                while val[0] != '{':
+                    val = fields.pop() + val
 
-              checked.append(val)
+                verified.append(val)
 
-          checked.reverse()
+            verified.reverse()
 
-          j = 1 + numDim * numFields
-          volume, height, status, comment = checked[j:j+4]
+            j = 1 + dimension_count * field_count
+            volume, height, status, comment = verified[j:j+4]
 
-          if status == '-1':
-            continue
+            if status == '-1':
+                continue
 
-          peak_number = int(checked[0])
-          volume = float(volume)
-          height = float(height)
-          details = comment[1:-1].strip()
-          ppms = [0] * numDim
-          annotations = [None] * numDim
-          lineWidths = [None] * numDim
-          boxWidths = [None] * numDim
-          atoms = [None] * numDim
+            peak_number = int(verified[0])
+            volume = float(volume)
+            height = float(height)
+            details = comment[1:-1].strip()
+            ppms = [0] * dimension_count
+            annotations = [None] * dimension_count
+            linewidths = [None] * dimension_count
+            boxwidths = [None] * dimension_count
+            atoms = [None] * dimension_count
 
+            if details == '?':
+                details = None
 
-          if details == '?':
-              details = None
+            for i in range(dimension_count):
+                j = 1 + i*field_count
+                dimension_data = verified[j:j+field_count]
+                annotation, ppm, linewidth, boxwidth, shape = \
+                    dimension_data[:5]
 
-          for i in range(numDim):
-              j = 1 + i*numFields
-              dimData = checked[j:j+numFields]
-              anno, ppm, lineWidth, boxWidth, shape = dimData[:5]
+                annotation = annotation[1:-1]
 
-              anno = anno[1:-1]
+                if annotation == '?':
+                    annotation = None
+                if annotation:
+                    atoms[i] = annotation.split('.')[1]
+                ppms[i] = float(ppm)
+                linewidths[i] = float(linewidth)
+                boxwidths[i] = float(boxwidth)
+                annotations[i] = annotation
+            peak = Peak(peak_number=peak_number,
+                        positions=ppms,
+                        volume=volume,
+                        height=height,
+                        assignments=annotations,
+                        linewidths=linewidths,
+                        atoms=atoms,
+                        details=details)
 
-              if anno =='?':
-                  anno = None
-              if anno:
-                  atoms[i] = anno.split('.')[1]
-              ppms[i] = float(ppm)
-              lineWidths[i] = float(lineWidth)
-              boxWidths[i] = float(boxWidth)
-              annotations[i] = anno
-          peak = Peak(peak_number=peak_number, positions=ppms, volume=volume, height=height,
-                     assignments=annotations, linewidths=lineWidths, atoms=atoms, details=details)
+            peakList.append(peak)
 
-          peakList.append(peak)
+        fin.close()
 
-      fin.close()
-
-      return peakList
+        return peakList
 
 
 def parse_ccpn_peaklist(peaklist_file):
-  fin = open(peaklist_file, 'rU')
-  next(fin)
-  peakList = []
-  reader = csv.reader(fin)
-  for row in reader:
-      atoms = []
-      for v in res1to3dict.values():
-          if v in row[4]:
-              a1 = row[4].strip().split(v)[-1]
-              atoms.append(a1)
-          if v in row[5]:
-              a2 = row[5].strip().split(v)[-1]
-              atoms.append(a2)
-      peak = Peak(peak_number=row[1], positions=[row[2], row[3]], assignments=[row[4], row[5]], atoms=atoms, linewidths=[row[8], row[9]],
-                  volume=row[7], height=row[6], fit_method=row[12], merit=row[10], volume_method=row[13], details=row[11])
+    fin = open(peaklist_file, 'r')
+    next(fin)
+    peakList = []
+    reader = csv.reader(fin)
+    for row in reader:
+        atoms = []
+        for v in aal1tol3.values():
+            if v in row[4]:
+                a1 = row[4].strip().split(v)[-1]
+                atoms.append(a1)
+            if v in row[5]:
+                a2 = row[5].strip().split(v)[-1]
+                atoms.append(a2)
+        peak = Peak(peak_number=row[1],
+                    positions=[row[2], row[3]],
+                    assignments=[row[4], row[5]],
+                    atoms=atoms,
+                    linewidths=[row[8], row[9]],
+                    volume=row[7],
+                    height=row[6],
+                    fit_method=row[12], merit=row[10],
+                    volume_method=row[13],
+                    details=row[11])
 
-      peakList.append(peak)
+        peakList.append(peak)
 
-  fin.close()
-  return peakList
+    fin.close()
+    return peakList
+
 
 def parse_sparky_peaklist(peaklist_file):
-  peakList = []
-  with open(peaklist_file) as f:
-      lines = f.readlines()[1:]
-      f.close()
-      for ii, line in enumerate(lines):
-          l = line.strip().split()
-          if len(l) < 4:
-              continue
-          if '?' in l[0]:
-              continue
-          assignment = re.sub(r"([A-Z])([0-9]+)([A-Z])","\\1 \\2 \\3",l[0]).split()
-          resname = assignment[0]
-          resnumber = assignment[1]
-          atoms = [assignment[2].split('-')[0], assignment[-1]]
-          annotations = [resnumber+res1to3dict[resname]+x[0] for x in atoms]
-          lineWidths = [None] * 2
-          ppms = [l[1], l[2]]
-          height = l[3]
-          volume = l[4]
-          peak = Peak(peak_number=ii+1, positions=ppms, assignments=annotations, atoms=atoms, linewidths=lineWidths,
-                      volume=volume, height=height)
-          peakList.append(peak)
+    peakList = []
+    with open(peaklist_file) as f:
+        lines = f.readlines()[1:]
+        f.close()
+    for ii, line in enumerate(lines):
+        line_list = line.strip().split()
+        if len(line_list) < 4:
+            continue
+        if '?' in line_list[0]:
+            continue
+        assignment = re.sub(r"([A-Z])([0-9]+)([A-Z])", "\\1 \\2 \\3",
+                            line_list[0]).split()
+        resname = assignment[0]
+        resnumber = assignment[1]
+        atoms = [assignment[2].split('-')[0], assignment[-1]]
+        annotations = [resnumber+aal1tol3[resname]+x[0] for x in atoms]
+        linewidths = [None] * 2
+        ppms = [line_list[1], line_list[2]]
+        height = line_list[3]
+        volume = line_list[4]
+        peak = Peak(peak_number=ii+1,
+                    positions=ppms,
+                    assignments=annotations,
+                    atoms=atoms,
+                    linewidths=linewidths,
+                    volume=volume,
+                    height=height)
+        peakList.append(peak)
 
-  return peakList
+    return peakList
 
 
 def read_peaklist(fin):
 
-  peaklist_file = fin
-  file_format = get_peaklist_format(peaklist_file)
+    peaklist_file = fin
+    file_format = get_peaklist_format(peaklist_file)
 
-  if file_format == 'ANSIG':
-      return parse_ansig_peaklist(peaklist_file)
-  elif file_format == 'NMRDRAW':
-      return parse_nmrdraw_peaklist(peaklist_file)
-  elif file_format == 'NMRVIEW':
-      return parse_nmrview_peaklist(peaklist_file)
-  elif file_format == 'SPARKY':
-      return parse_sparky_peaklist(peaklist_file)
-  elif file_format == 'CCPN':
-      return parse_ccpn_peaklist(peaklist_file)
-
+    if file_format == 'ANSIG':
+        return parse_ansig_peaklist(peaklist_file)
+    elif file_format == 'NMRDRAW':
+        return parse_nmrdraw_peaklist(peaklist_file)
+    elif file_format == 'NMRVIEW':
+        return parse_nmrview_peaklist(peaklist_file)
+    elif file_format == 'SPARKY':
+        return parse_sparky_peaklist(peaklist_file)
+    elif file_format == 'CCPN':
+        return parse_ccpn_peaklist(peaklist_file)

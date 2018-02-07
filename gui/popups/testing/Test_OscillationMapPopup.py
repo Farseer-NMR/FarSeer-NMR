@@ -7,22 +7,21 @@ from gui.popups.OscillationMapPopup import OscillationMapPopup
 
 from gui.gui_utils import get_colour
 from core.utils import get_default_config_path
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_OscillationMapPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
         fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["dpre_osci_settings"]
         fin.close()
-
 
         self.popup = OscillationMapPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
@@ -78,7 +77,7 @@ class Test_OscillationMapPopup(unittest.TestCase):
                          self.defaults["res_highlight_y"])
         self.assertEqual(self.popup.dpre_osci_ymax.field.value(),
                          self.defaults["ymax"])
-        #
+
     def test_set_values(self):
         self.popup.dpre_osci_rows.setValue(5)
         self.popup.dpre_osci_width.setValue(4)
@@ -112,44 +111,54 @@ class Test_OscillationMapPopup(unittest.TestCase):
                          self.popup.variables["dpre_osci_settings"]["width"])
         self.assertEqual(self.popup.dpre_osci_y_label.field.text(), "PRE")
         self.assertEqual(self.popup.dpre_osci_y_label.field.text(),
-                         self.popup.variables["dpre_osci_settings"]["y_label"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["y_label"])
         self.assertEqual(self.popup.dpre_osci_y_label_fs.field.value(), 8)
         self.assertEqual(self.popup.dpre_osci_y_label_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["y_label_fs"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["y_label_fs"])
         self.assertEqual(self.popup.dpre_osci_dpre_ms.field.value(), 5)
         self.assertEqual(self.popup.dpre_osci_dpre_ms.field.value(),
                          self.popup.variables["dpre_osci_settings"]["dpre_ms"])
         self.assertEqual(self.popup.dpre_osci_dpre_alpha.field.value(), 0.3)
         self.assertEqual(self.popup.dpre_osci_dpre_alpha.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["dpre_alpha"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["dpre_alpha"])
         self.assertEqual(self.popup.dpre_osci_smooth_lw.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["smooth_lw"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["smooth_lw"])
         self.assertEqual(self.popup.dpre_osci_smooth_lw.field.value(), 2)
         self.assertEqual(self.popup.dpre_osci_ref_color.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]["ref_color"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["ref_color"])
         self.assertEqual(self.popup.dpre_osci_ref_color.fields.currentText(
 
         ), "white")
         self.assertEqual(self.popup.dpre_osci_color_init.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]["color_init"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["color_init"])
         self.assertEqual(
             self.popup.dpre_osci_color_init.fields.currentText(), "blue")
         self.assertEqual(self.popup.dpre_osci_color_end.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]["color_end"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["color_end"])
         self.assertEqual(self.popup.dpre_osci_color_end.fields.currentText(
 
         ), "red")
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(), 18)
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["x_ticks_fs"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["x_ticks_fs"])
         self.assertEqual(
             self.popup.dpre_osci_x_ticks_fn.fields.currentText(), "Courier "
                                                                   "New")
         self.assertEqual(self.popup.dpre_osci_x_ticks_fn.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]["x_ticks_fn"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["x_ticks_fn"])
         self.assertEqual(self.popup.dpre_osci_x_ticks_pad.field.value(), 0.8)
         self.assertEqual(self.popup.dpre_osci_x_ticks_pad.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["x_ticks_pad"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["x_ticks_pad"])
         self.assertEqual(
             self.popup.dpre_osci_x_ticks_weight.fields.currentText(), "bold")
         self.assertEqual(
@@ -158,28 +167,35 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.assertEqual(
             self.popup.dpre_osci_grid_color.fields.currentText(), "red")
         self.assertEqual(self.popup.dpre_osci_grid_color.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]["grid_color"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["grid_color"])
         self.assertEqual(self.popup.dpre_osci_shade.isChecked(), True)
         self.assertEqual(self.popup.dpre_osci_shade.isChecked(),
                          self.popup.variables["dpre_osci_settings"]["shade"])
         self.assertEqual(self.popup.dpre_osci_regions.field.text(),
                          "0-10, 18-45")
-        self.assertEqual(self.popup.set_ranges(self.popup.dpre_osci_regions.field.text()),
-                         self.popup.variables["dpre_osci_settings"]["shade_regions"])
+        self.assertEqual(self.popup.set_ranges(
+                         self.popup.dpre_osci_regions.field.text()),
+                         self.popup.variables["dpre_osci_settings"]
+                         ["shade_regions"])
         self.assertEqual(self.popup.dpre_osci_res_highlight.isChecked(), True)
         self.assertEqual(self.popup.dpre_osci_res_highlight.isChecked(),
-                         self.popup.variables["dpre_osci_settings"]["res_highlight"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["res_highlight"])
         self.assertEqual(
             self.popup.dpre_osci_res_highlight_list.field.text(), "3,4,5")
         self.assertEqual(self.popup.dpre_osci_res_highlight_list.field.text(),
                          ','.join(list(
-                             map(str, self.popup.variables["dpre_osci_settings"]["res_hl_list"]))))
+                             map(str, self.popup.variables
+                                 ["dpre_osci_settings"]["res_hl_list"]))))
         self.assertEqual(self.popup.dpre_osci_rh_fs.field.value(), 8)
         self.assertEqual(self.popup.dpre_osci_rh_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["res_highlight_fs"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["res_highlight_fs"])
         self.assertEqual(self.popup.dpre_osci_rh_y.field.value(), 0.7)
         self.assertEqual(self.popup.dpre_osci_rh_y.field.value(),
-                         self.popup.variables["dpre_osci_settings"]["res_highlight_y"])
+                         self.popup.variables["dpre_osci_settings"]
+                         ["res_highlight_y"])
         self.assertEqual(self.popup.dpre_osci_ymax.field.value(), 0.9)
         self.assertEqual(self.popup.dpre_osci_ymax.field.value(),
                          self.popup.variables["dpre_osci_settings"]["ymax"])
@@ -213,35 +229,34 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.popup.dpre_osci_rh_y.setValue(0.7)
         self.popup.dpre_osci_ymax.setValue(0.9)
 
-
         self.assertEqual(self.popup.dpre_osci_rows.field.value(), 5)
         self.assertNotEqual(self.popup.dpre_osci_rows.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "rows"])
         self.assertEqual(self.popup.dpre_osci_width.field.value(), 4)
         self.assertNotEqual(self.popup.dpre_osci_width.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "width"])
         self.assertEqual(self.popup.dpre_osci_y_label.field.text(), "PRE")
         self.assertNotEqual(self.popup.dpre_osci_y_label.field.text(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "y_label"])
         self.assertEqual(self.popup.dpre_osci_y_label_fs.field.value(), 8)
         self.assertNotEqual(self.popup.dpre_osci_y_label_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "y_label_fs"])
         self.assertEqual(self.popup.dpre_osci_dpre_ms.field.value(), 5)
         self.assertNotEqual(self.popup.dpre_osci_dpre_ms.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "dpre_ms"])
         self.assertEqual(self.popup.dpre_osci_dpre_alpha.field.value(),
                          0.3)
         self.assertNotEqual(self.popup.dpre_osci_dpre_alpha.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "dpre_alpha"])
         self.assertEqual(self.popup.dpre_osci_smooth_lw.field.value(), 2)
         self.assertNotEqual(self.popup.dpre_osci_smooth_lw.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "smooth_lw"])
         self.assertNotEqual(
             self.popup.dpre_osci_ref_color.fields.currentText(),
@@ -262,7 +277,7 @@ class Test_OscillationMapPopup(unittest.TestCase):
         ), "red")
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(), 18)
         self.assertNotEqual(self.popup.dpre_osci_x_ticks_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "x_ticks_fs"])
         self.assertEqual(
             self.popup.dpre_osci_x_ticks_fn.fields.currentText(),
@@ -274,7 +289,7 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.assertEqual(self.popup.dpre_osci_x_ticks_pad.field.value(),
                          0.8)
         self.assertNotEqual(self.popup.dpre_osci_x_ticks_pad.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "x_ticks_pad"])
         self.assertEqual(
             self.popup.dpre_osci_x_ticks_weight.fields.currentText(),
@@ -289,7 +304,7 @@ class Test_OscillationMapPopup(unittest.TestCase):
             self.popup.variables["dpre_osci_settings"]["grid_color"])
         self.assertEqual(self.popup.dpre_osci_shade.isChecked(), True)
         self.assertNotEqual(self.popup.dpre_osci_shade.isChecked(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "shade"])
         self.assertEqual(self.popup.dpre_osci_regions.field.text(),
                          "0-10, 18-45")
@@ -300,7 +315,7 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.assertEqual(self.popup.dpre_osci_res_highlight.isChecked(),
                          True)
         self.assertNotEqual(self.popup.dpre_osci_res_highlight.isChecked(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "res_highlight"])
         self.assertEqual(
             self.popup.dpre_osci_res_highlight_list.field.text(), "3,4,5")
@@ -311,21 +326,22 @@ class Test_OscillationMapPopup(unittest.TestCase):
                     "res_hl_list"]))))
         self.assertEqual(self.popup.dpre_osci_rh_fs.field.value(), 8)
         self.assertNotEqual(self.popup.dpre_osci_rh_fs.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "res_highlight_fs"])
         self.assertEqual(self.popup.dpre_osci_rh_y.field.value(), 0.7)
         self.assertNotEqual(self.popup.dpre_osci_rh_y.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "res_highlight_y"])
         self.assertEqual(self.popup.dpre_osci_ymax.field.value(), 0.9)
         self.assertNotEqual(self.popup.dpre_osci_ymax.field.value(),
-                         self.popup.variables["dpre_osci_settings"][
+                            self.popup.variables["dpre_osci_settings"][
                              "ymax"])
 
         self.assertEqual(tuple(self.popup.local_variables.keys()),
                          self.local_variable_keys)
         self.assertEqual(tuple(self.popup.variables.keys()),
                          self.variable_keys)
+
 
 if __name__ == "__main__":
     unittest.main()

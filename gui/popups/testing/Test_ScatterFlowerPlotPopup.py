@@ -5,15 +5,15 @@ from PyQt5.QtWidgets import QApplication
 from core.utils import get_default_config_path
 
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_ScatterFlowerPlotPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -24,7 +24,6 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
         self.popup = ScatterFlowerPlotPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -131,7 +130,6 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
         self.popup.y_ticks_pad.setValue(15)
         self.popup.y_ticks_weight.select("bold")
         self.popup.y_ticks_rot.setValue(60)
-
 
         self.popup.set_values()
 
@@ -284,8 +282,10 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
         self.assertEqual(
             self.popup.y_ticks_rot.field.value(),
             self.popup.variables["cs_scatter_flower_settings"]["y_ticks_rot"])
-        self.assertEqual(tuple(self.popup.local_variables.keys()), self.local_variable_keys)
-        self.assertEqual(tuple(self.popup.variables.keys()), self.variable_keys)
+        self.assertEqual(tuple(self.popup.local_variables.keys()),
+                         self.local_variable_keys)
+        self.assertEqual(tuple(self.popup.variables.keys()),
+                         self.variable_keys)
 
     def test_values_not_set(self):
         self.popup.x_label.setText("X Label")

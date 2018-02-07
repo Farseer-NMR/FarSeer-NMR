@@ -5,16 +5,15 @@ from PyQt5.QtWidgets import QApplication
 
 from gui.popups.ExtendedBarPopup import ExtendedBarPopup
 from core.utils import get_default_config_path
-
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_ExtendedBarPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """Create the popup"""
 
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
@@ -22,11 +21,9 @@ class Test_ExtendedBarPopup(unittest.TestCase):
         self.defaults = json.load(fin)["extended_bar_settings"]
         fin.close()
 
-
         self.popup = ExtendedBarPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -35,17 +32,16 @@ class Test_ExtendedBarPopup(unittest.TestCase):
             "cols_page"])
         self.assertEqual(self.popup.bar_rows.field.value(), self.defaults[
             "rows_page"])
-        self.assertEqual(self.popup.x_tick_font.fields.currentText(), 
+        self.assertEqual(self.popup.x_tick_font.fields.currentText(),
                          self.defaults["x_ticks_fn"])
-        self.assertEqual(self.popup.x_tick_font_size.field.value(), 
+        self.assertEqual(self.popup.x_tick_font_size.field.value(),
                          self.defaults["x_ticks_fs"])
-        self.assertEqual(self.popup.x_tick_rotation.field.value(), 
+        self.assertEqual(self.popup.x_tick_rotation.field.value(),
                          self.defaults["x_ticks_rot"])
         self.assertEqual(self.popup.x_tick_font_weight.fields.currentText(),
                          self.defaults["x_ticks_weight"])
-        self.assertEqual(self.popup.x_tick_colour.isChecked(), 
+        self.assertEqual(self.popup.x_tick_colour.isChecked(),
                          self.defaults["x_ticks_color_flag"])
-        
 
     def test_set_values(self):
         self.popup.bar_cols.setValue(4)
@@ -55,7 +51,7 @@ class Test_ExtendedBarPopup(unittest.TestCase):
         self.popup.x_tick_rotation.setValue(75)
         self.popup.x_tick_font_weight.select('bold')
         self.popup.x_tick_colour.setChecked(False)
-        
+
         self.popup.set_values()
 
         self.assertEqual(self.popup.bar_cols.field.value(), 4)
@@ -100,7 +96,7 @@ class Test_ExtendedBarPopup(unittest.TestCase):
 
         self.assertEqual(self.popup.bar_cols.field.value(), 4)
         self.assertNotEqual(self.popup.variables["extended_bar_settings"]
-                         ["cols_page"], 4)
+                            ["cols_page"], 4)
         self.assertEqual(self.popup.bar_rows.field.value(), 15)
         self.assertNotEqual(self.popup.variables["extended_bar_settings"][
                              "rows_page"], 15)

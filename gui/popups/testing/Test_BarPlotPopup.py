@@ -5,26 +5,24 @@ from PyQt5.QtWidgets import QApplication
 
 from gui.popups.BarPlotPopup import BarPlotPopup
 from core.utils import get_default_config_path
+from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
 
-from core.fslibs.Variables import Variables
 
 class Test_BarPlotPopup(unittest.TestCase):
 
     def setUp(self):
-        ''' Create the popup'''
+        """ Create the popup"""
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
         fin = open(default_config_path, 'r')
         self.defaults = json.load(fin)["bar_plot_settings"]
         fin.close()
 
-
         self.popup = BarPlotPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
-
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
@@ -61,10 +59,6 @@ class Test_BarPlotPopup(unittest.TestCase):
                          self.defaults["mark_user_details_flag"])
         self.assertEqual(self.popup.colour_user_details.isChecked(),
                          self.defaults["color_user_details_flag"])
-
-    def test_change_variables(self):
-        pass
-
 
     def test_set_values(self):
         self.popup.apply_status.setChecked(False)
@@ -142,7 +136,6 @@ class Test_BarPlotPopup(unittest.TestCase):
                          self.local_variable_keys)
         self.assertEqual(tuple(self.popup.variables.keys()),
                          self.variable_keys)
-
 
     def test_values_not_set(self):
         self.popup.apply_status.setChecked(True)
