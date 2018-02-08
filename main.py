@@ -75,7 +75,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
-    splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
+    splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint
+                          | QtCore.Qt.FramelessWindowHint)
     splash.setEnabled(False)
     splash.show()
 
@@ -83,11 +84,11 @@ if __name__ == '__main__':
 
     from gui import gui_utils
     gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
-    print(args)
+
     ex = Main(gui_settings=gui_settings, config=args.config)
     splash.finish(ex)
-    fin = 'gui/SinkinSans/SinkinSans-400Regular.otf'
-    font_id = QtGui.QFontDatabase.addApplicationFont(fin)
+    font_file = 'gui/SinkinSans/SinkinSans-400Regular.otf'
+    font_id = QtGui.QFontDatabase.addApplicationFont(font_file)
 
     app.setStyleSheet(stylesheet)
 

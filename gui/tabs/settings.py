@@ -493,7 +493,6 @@ class Settings(BaseWidget):
             return
 
     def save_config(self):
-        print('saving in interface')
         general = self.variables["general_settings"]
         fitting = self.variables["fitting_settings"]
         cs = self.variables["cs_settings"]
@@ -595,7 +594,6 @@ class Settings(BaseWidget):
         self.variables["plotting_flags"]["do_dpre_osci"] = \
             self.dpre_checkbox.isChecked()
 
-        # self.parent().parent().parent().save_config(path)
 
     def run_farseer_calculation(self):
         self.parent().parent().parent().run_farseer_calculation()

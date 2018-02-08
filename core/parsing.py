@@ -257,8 +257,8 @@ def parse_nmrview_peaklist(peaklist_file):
     fin = open(peaklist_file, 'r')
 
     null = fin.readline()
-    dimNames = fin.readline().strip().split()
-    dimension_count = len(dimNames)
+    dimension_names = fin.readline().strip().split()
+    dimension_count = len(dimension_names)
     name = fin.readline()
     line = fin.readline()
     line = line.replace('{', '')
@@ -269,7 +269,8 @@ def parse_nmrview_peaklist(peaklist_file):
     line = line.replace('}', '')
     headings = fin.readline().strip().split()
     dimension_headings = [x.split('.') for x in headings if '.' in x]
-    dimension_headings = [x for x in dimension_headings if x[0] in dimNames]
+    dimension_headings = [x for x in dimension_headings if x[0]
+                          in dimension_names]
     field_count = int(len(dimension_headings) / dimension_count)
 
     for line in fin:
@@ -277,51 +278,50 @@ def parse_nmrview_peaklist(peaklist_file):
         verified = []
 
         while fields:
-            val = fields.pop()
+            value = fields.pop()
 
-            if val[-1] == '}':
-                while val[0] != '{':
-                    val = fields.pop() + val
+            if value[-1] == '}':
+                while value[0] != '{':
+                    value = fields.pop() + value
 
-                verified.append(val)
+                verified.append(value)
 
-            verified.reverse()
+        verified.reverse()
+        j = 1 + dimension_count * field_count
+        volume, height, status, comment = verified[j:j+4]
 
-            j = 1 + dimension_count * field_count
-            volume, height, status, comment = verified[j:j+4]
+        if status == '-1':
+            continue
 
-            if status == '-1':
-                continue
+        peak_number = int(verified[0])
+        volume = float(volume)
+        height = float(height)
+        details = comment[1:-1].strip()
+        ppms = [0] * dimension_count
+        annotations = [None] * dimension_count
+        linewidths = [None] * dimension_count
+        boxwidths = [None] * dimension_count
+        atoms = [None] * dimension_count
 
-            peak_number = int(verified[0])
-            volume = float(volume)
-            height = float(height)
-            details = comment[1:-1].strip()
-            ppms = [0] * dimension_count
-            annotations = [None] * dimension_count
-            linewidths = [None] * dimension_count
-            boxwidths = [None] * dimension_count
-            atoms = [None] * dimension_count
+        if details == '?':
+            details = None
 
-            if details == '?':
-                details = None
+        for i in range(dimension_count):
+            j = 1 + i*field_count
+            dimension_data = verified[j:j+field_count]
+            annotation, ppm, linewidth, boxwidth, shape = \
+                dimension_data[:5]
 
-            for i in range(dimension_count):
-                j = 1 + i*field_count
-                dimension_data = verified[j:j+field_count]
-                annotation, ppm, linewidth, boxwidth, shape = \
-                    dimension_data[:5]
+            annotation = annotation[1:-1]
 
-                annotation = annotation[1:-1]
-
-                if annotation == '?':
-                    annotation = None
-                if annotation:
-                    atoms[i] = annotation.split('.')[1]
-                ppms[i] = float(ppm)
-                linewidths[i] = float(linewidth)
-                boxwidths[i] = float(boxwidth)
-                annotations[i] = annotation
+            if annotation == '?':
+                annotation = None
+            if annotation:
+                atoms[i] = annotation.split('.')[1]
+            ppms[i] = float(ppm)
+            linewidths[i] = float(linewidth)
+            boxwidths[i] = float(boxwidth)
+            annotations[i] = annotation
             peak = Peak(peak_number=peak_number,
                         positions=ppms,
                         volume=volume,
