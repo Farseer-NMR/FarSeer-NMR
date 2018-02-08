@@ -3,7 +3,7 @@
 A fully community driven and ever growing suite to analyse **peaklist files** extracted from multivariable series of biomolecular NMR experiments. Up to three different experimental variables can be combined and analysed together.  
 With Farseer-NMR, you can automatically calculate structural parameters from peaklist datasets, which are then comprehensively and conveniently represented in publication-ready plots.
 
-Conveniently save and load you configuration files and re-run your operations with one-click!
+Conveniently save and load your configuration files and re-run your operations with one-click!
 
 Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
 
@@ -35,7 +35,7 @@ python main.py
 python core/farseemain.py <path to calculation folder> <path to conf.json file>
 ```
 
-where ```calculation folder``` is the folder containing the hierarchical spectra/ folder. The GUI will create the spectra/ folder for you automatically, whereas to run Farseer via the terminal you have to create it yourself.
+where ```calculation folder``` is the folder containing the hierarchical spectra/ folder. The GUI will create the spectra/ folder for you automatically, whereas to run Farseer-NMR via the terminal you have to create it yourself.
 
 ### Changing the config file
 
