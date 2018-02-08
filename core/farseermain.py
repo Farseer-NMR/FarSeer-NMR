@@ -444,20 +444,11 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     
     # exports tables
     if not(plot_bool.any()):
-        for restraint in fsuv["restraint_settings"].index:
-            if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
-                farseer_series.write_table(
-                    restraint,
-                    restraint,
-                    resonance_type=resonance_type
-                    )
-        
         msg = \
 "All potting flags are turned off. No plots will be drawn. \
 Confirm in the Settings menu if this is the desired configuration. \
-I won't leave you with empty hands though, all calculated restraints \
-have been exported in nicely formated tables ;-)"
-        
+I won't leave you with empty hands though, all calculated restraints, \
+NMR observables and user notes will be exported in nicely formatted tables ;-)"
         farseer_series.log_r(fsw.gen_wet('NOTE', msg, 3))
         return False
     
