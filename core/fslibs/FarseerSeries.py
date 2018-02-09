@@ -312,7 +312,7 @@ class FarseerSeries(pd.Panel):
 # 
 # file original path: {}
 #
-# creating date: {}
+# creation date: {}
 #
 """.\
             format(
@@ -2900,10 +2900,9 @@ or confirm you have not forgot any peaklist [{}].".\
             )
         axs = axs.ravel()
         plt.tight_layout(
-            rect=[0.01,0.01,0.995,0.995],
+            rect=[0.01,0.01,0.995,0.87],
             h_pad=fig_height/rows_per_page
             )
-        
         # Plots yy axis title
         # http://www.futurile.net/2016/03/01/text-handling-in-matplotlib/
         if plot_style in ['bar_extended', 'bar_compacted']:
@@ -3043,6 +3042,8 @@ or confirm you have not forgot any peaklist [{}].".\
             plot_name,
             fig_file_type
             )
+        header = self.create_header(file_path=file_path)
+        fig.text(0.04, 0.88, header, fontsize=6)
         fig.savefig(file_path, dpi=fig_dpi)
         self.log_r('**Plot Saved** {}'.format(file_path))
         
