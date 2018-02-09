@@ -43,21 +43,21 @@ Alternatively, you can always change the calculation settings manually by editin
 
 ## Documentation
 
-We have a [Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) where you can find a whole hand of helpful files. Also, there's an online [Wiki](https://github.com/joaomcteixeira/FarSeer-NMR/wiki) page with additional links and info regard Farseer-NMR Documentation. These pages are dynamic upgraded according to the project/community needs.
+We have a [Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files. There is also an online [Wiki](https://github.com/joaomcteixeira/FarSeer-NMR/wiki) page with additional links and infomation regarding the Farseer-NMR Documentation. These pages are dynamic updated according to the needs of the project/community.
 
 ## Participate in the Farseer-NMR community
 
-You can help us to improve in several ways and be part of our community! :-)  
+There are several ways that you can help us improve Farseer-NMR and be part of its community! :-)  
 
 ### Reporting a bug
 
-If you find bugs or unfunctional features during your runs, report them in the [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues). We have prepared a set of labels that help to identify the issues accordingly. Also, you can use Issues to suggest new features.
+If you find bugs, mis-functional or non-functional features during your calculation runs, please report them by using the [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues). We have prepared a set of labels that help you to specify the nature of the issues. You can use the tab [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues) to suggest new features that you would like us to implement or that you would like help implementing.
 
 ### Become a collaborator
 
-Help us implementing new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork this project to your own GitHub account, do the implementation and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guid](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent.
+Help us implement new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork this project to your own GitHub account, write the functionalities and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guide](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent. We kindly request that contributors to the project adhere to this style guide.
 
-In case you don't have coding expericience, please let us know and we will be happy join forces with you to bring about the functionalities!
+Even if you're not an experienced programmer, please get contact with us and we will be happy join forces with you to introduce your functionalities!
 
 ### Mailing list
 
@@ -65,7 +65,7 @@ Post on our [mailing list](https://groups.google.com/forum/#!forum/farseer-nmr) 
 
 ## Social Network
 
-Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data) and on [Twitter]!
+Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data) and on [Twitter](https://twitter.com/farseer_nmr)!
 
 ## License
 
