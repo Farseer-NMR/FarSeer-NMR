@@ -752,8 +752,6 @@ with window size {} and stdev {}'.\
         
         file_path = '{}/{}.csv'.format(tablefolder, tablecol)
         fileout = open(file_path, 'w')
-        
-        # if self.series_axis.startswith('cond'):
         header = \
             "# Table for '{}' resonances.\n".format(self.resonance_type)
         header += self.create_header(
@@ -762,38 +760,6 @@ with window size {} and stdev {}'.\
             file_path=file_path
             )
         header += "# {} data\n#\n".format(tablecol)
-# The results for variable '{1}'
-# ranging datapoints '{2}', where:
-# conditions '{3}' and '{4}' are kept constants.
-# {5} data.
-# """.\
-                # format(
-                    # self.resonance_type,
-                    # self.series_axis,
-                    # list(self.series_datapoints),
-                    # self.prev_dim,
-                    # self.next_dim,
-                    # tablecol
-                    # )
-        
-        # elif self.series_axis.startswith('C'):
-            # header = \
-# """# Table for '{0}' resonances.
-# # The comparison '{1}': for the results obtained for titrations 'cond{7}'
-# # across variable '{2}' which ranges datapoints '{3}', where:
-# # conditions '{4}' and '{5}' are kept constants.
-# # {6} data.
-# """.\
-                # format(
-                    # self.resonance_type,
-                    # self.series_axis,
-                    # self.dim_comparison,
-                    # list(self.series_datapoints),
-                    # self.prev_dim,
-                    # self.next_dim,
-                    # tablecol,
-                    # self.series_axis[-1]
-                    # )
         fileout.write(header)
         
         if is_float:
@@ -856,6 +822,7 @@ with window size {} and stdev {}'.\
             
             file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
             fileout = open(file_name, 'w')
+            header = self.create_header(file_path=file_name)
             attheader = \
 """#
 #
@@ -876,7 +843,7 @@ recipient: residues
                             replace(' ', '').replace('\n', ','),
                     calccol.lower()
                     )
-            fileout.write(attheader)
+            fileout.write(header+attheader)
             formatting[calccol] = colform
             to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
                 to_string(
