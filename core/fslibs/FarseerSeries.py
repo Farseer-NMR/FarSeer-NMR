@@ -151,7 +151,7 @@ class FarseerSeries(pd.Panel):
             series_dps=['foo'],
             next_dim='bar',
             prev_dim='zoo',
-            dim_comparison='not_applied',
+            dim_comparison='',
             resonance_type='Backbone',
             csp_alpha4res=0.14,
             csp_res_exceptions={'G':0.2},
@@ -305,21 +305,30 @@ class FarseerSeries(pd.Panel):
     
     def create_header(self, extra_info="", file_path=""):
         """Creates description header for files and plots."""
+        
+        # discriminates between main calculation or comparison.
+        if self.dim_comparison:
+            axis = "{}/{}".format(self.series_axis, self.dim_comparison)
+        else:
+            axis = self.series_axis
+        
         header_1 = \
 """# Results analysed along {}
 # Farseer Cube corresponding coordinate data points: {} and {}
 # {}
 # 
-# file original path: {}
+# Run folder: {}
+# File path: {}
 #
 # creation date: {}
 #
 """.\
             format(
-                self.series_axis,
+                axis,
                 self.prev_dim,
                 self.next_dim,
                 extra_info,
+                os.getcwd(),
                 file_path,
                 datetime.datetime.now().strftime("%c")
                 )
@@ -2854,7 +2863,8 @@ or confirm you have not forgot any peaklist [{}].".\
             fig_height=11.69,
             fig_width=8.69,
             fig_file_type='pdf',
-            fig_dpi=300):
+            fig_dpi=300,
+            header_fontsize=5):
         """
         The main function that calls and builds the different plots.
         
@@ -2890,7 +2900,7 @@ or confirm you have not forgot any peaklist [{}].".\
         else:
             raise ValueError('Not a valid Farseer plot type')
         
-        numrows = ceil(num_subplots/cols_per_page)
+        numrows = ceil(num_subplots/cols_per_page) + 1 
         real_fig_height = (fig_height / rows_per_page) * numrows
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
         fig, axs = plt.subplots(
@@ -2900,7 +2910,7 @@ or confirm you have not forgot any peaklist [{}].".\
             )
         axs = axs.ravel()
         plt.tight_layout(
-            rect=[0.01,0.01,0.995,0.87],
+            rect=[0.01,0.01,0.995,0.995],
             h_pad=fig_height/rows_per_page
             )
         # Plots yy axis title
@@ -2920,7 +2930,7 @@ or confirm you have not forgot any peaklist [{}].".\
                 fig.subplots_adjust(hspace=hspace)
             
             else:
-                self.clean_subplots(axs, len(self), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'bar_vertical':
             for i, experiment in enumerate(self):
@@ -2935,7 +2945,7 @@ or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, len(self), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'res_evo':
             for i, row_number in enumerate(self.major_axis):
@@ -2950,11 +2960,14 @@ or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, len(self.major_axis), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter':
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(axs, i, row_number, **param_dict)
+            
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter_flower':
             self.plot_cs_scatter_flower(axs, **param_dict)
@@ -2994,11 +3007,16 @@ or confirm you have not forgot any peaklist [{}].".\
                     **param_dict
                     )
             
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
+            
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
+            header_fontsize = 3.5
         
         self.write_plot(
             fig,
+            header_fontsize,
             plot_style,
             folder,
             calccol,
@@ -3010,7 +3028,7 @@ or confirm you have not forgot any peaklist [{}].".\
         return
     
     def write_plot(
-            self, fig,
+            self, fig, header_fontsize,
             plot_name, folder,
             calccol, fig_file_type, 
             fig_dpi):
@@ -3043,7 +3061,7 @@ or confirm you have not forgot any peaklist [{}].".\
             fig_file_type
             )
         header = self.create_header(file_path=file_path)
-        fig.text(0.04, 0.88, header, fontsize=6)
+        fig.text(0.01, 0.01, header, fontsize=header_fontsize)
         fig.savefig(file_path, dpi=fig_dpi)
         self.log_r('**Plot Saved** {}'.format(file_path))
         
