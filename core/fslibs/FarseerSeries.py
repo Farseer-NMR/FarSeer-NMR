@@ -303,7 +303,11 @@ class FarseerSeries(pd.Panel):
         
         return
     
-    def create_header(self, extra_info="", file_path=""):
+    def create_header(
+        self,
+        parameter_type='param',
+        extra_info="",
+        file_path=""):
         """Creates description header for files and plots."""
         
         # discriminates between main calculation or comparison.
@@ -313,7 +317,7 @@ class FarseerSeries(pd.Panel):
             axis = self.series_axis
         
         header_1 = \
-"""# Results analysed along {}
+"""# Parameters/observables along {}
 # Fixed Farseer Cube coordinates: {} and {}
 # {}
 # 
