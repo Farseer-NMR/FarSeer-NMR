@@ -28,6 +28,7 @@ import itertools as it
 from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
+import datetime 
 
 import core.fslibs.wet as fsw
 
@@ -301,6 +302,29 @@ class FarseerSeries(pd.Panel):
         fsw.abort()
         
         return
+    
+    def create_header(self, extra_info="", file_path=""):
+        """Creates description header for files and plots."""
+        header_1 = \
+"""# Results analysed along {}
+# Farseer Cube corresponding coordinate data points: {} and {}
+# {}
+# 
+# file original path: {}
+#
+# creating date: {}
+#
+""".\
+            format(
+                self.series_axis,
+                self.prev_dim,
+                self.next_dim,
+                extra_info,
+                file_path,
+                datetime.datetime.now().strftime("%c")
+                )
+        
+        return header_1
     
     def hex_to_RGB(self, hexx):
         """
@@ -862,6 +886,12 @@ recipient: residues
         for item in self.items:
             file_path = '{}/{}.csv'.format(self.export_series_folder, item)
             fileout = open(file_path, 'w')
+            ###
+            header = self.create_header(
+                extra_info="Peaklist from datapoint: {}".format(item),
+                file_path=file_path
+                )
+            fileout.write(header)
             fileout.write(
                 self.loc[item].to_csv(
                     sep=',',
