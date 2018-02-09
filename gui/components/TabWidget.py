@@ -9,7 +9,7 @@ This file is part of Farseer-NMR.
 
 Farseer-NMR is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free Software Foundation, either version 3 of the License, or¶
 (at your option) any later version.
 
 Farseer-NMR is distributed in the hope that it will be useful,
@@ -18,7 +18,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.¡
 """
 import os
 
@@ -39,7 +39,28 @@ from core.fslibs.Variables import Variables
 
 
 class TabWidget(QTabWidget):
+    """
+    The container for all tab widgets in the Farseer-NMR GUI.
 
+    To add a new tab to the tab widget, the QWidget class of the needs to be
+    imported into this file. The instantiation of the class and the addition
+    of the QWidget to the TabWidger need to be coded in the add_tabs_to_widget
+    method.
+
+    Parameters:
+        gui_settings (dict): a dictionary carrying the settings required to
+            correctly render the graphics based on screen resolution.
+
+    Methods:
+        .add_tabs_to_widget()
+        .set_data_sets()
+        .add_tab(QWidget, str, str)
+        .load_config(str)
+        .load_variables()
+        .load_peak_lists(str)
+        .save_config(str)
+        .run_farseer_calculation
+    """
     variables = Variables()._vars
 
     def __init__(self, gui_settings):
@@ -47,10 +68,13 @@ class TabWidget(QTabWidget):
 
         self.widgets = []
         self.gui_settings = gui_settings
-        self.add_tab_logo()
+        self._add_tab_logo()
         self.add_tabs_to_widget()
 
     def add_tabs_to_widget(self):
+        """
+        Create instances of all widget classes and add them to the TabWidget
+        """
         self.peaklist_selection = \
             PeaklistSelection(self, gui_settings=self.gui_settings,
                               footer=False)
@@ -61,11 +85,15 @@ class TabWidget(QTabWidget):
         self.widgets.extend([self.peaklist_selection, self.interface])
 
     def set_data_sets(self):
+        """Set data in the tabs if they have data_sets as an attribute"""
         for widget in self.widgets:
             if hasattr(widget, 'set_data_sets'):
                 widget.set_data_sets()
 
     def add_tab(self, widget, name, object_name=None):
+        """Re-implemented of the addTab method to ensure proper compatibility
+        with the stylesheet and architecture.
+        """
         tab = QWidget()
         tab.setLayout(QGridLayout())
         tab.layout().addWidget(widget)
@@ -74,6 +102,10 @@ class TabWidget(QTabWidget):
             tab.setObjectName(object_name)
 
     def load_config(self, path=None):
+        """
+        Connection from Tab footer to TabWidget for loading Farseer-NMR
+        configuration files.
+        """
         if not path:
             fname = QFileDialog.getOpenFileName(None, 'Load Configuration',
                                                 os.getcwd())
@@ -86,17 +118,21 @@ class TabWidget(QTabWidget):
         return
 
     def load_variables(self):
-
+        """Load variables into self.variables instance."""
         self.interface.load_variables()
         self.peaklist_selection.load_variables()
         self.peaklist_selection.side_bar.update_from_config()
 
     def load_peak_lists(self, path=None):
+        """Load peaklists into sidebar. Called from self.load_variables."""
         if os.path.exists(path):
             self.peaklist_selection.side_bar.load_from_path(path)
-            self.peaklist_selection.side_bar.update_from_config()
 
     def save_config(self, path=None):
+        """
+        Connection from Tab footer to TabWidget for saving Farseer-NMR
+        configuration files.
+        """
         self.interface.save_config()
         if not path:
             filters = "JSON files (*.json)"
@@ -115,6 +151,11 @@ class TabWidget(QTabWidget):
         print('Configuration saved to %s' % fname[0])
 
     def run_farseer_calculation(self):
+        """
+        Executes Farseer-NMR calculation in its own thread.
+        Saves configuration if not already saved.
+        Performs necessary checks for execution.
+        """
         from core.Threading import Threading
         output_path = self.interface.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables)
@@ -147,8 +188,8 @@ class TabWidget(QTabWidget):
                     "Please populate Experimental Dataset Tree.")
             msg.exec_()
 
-    def add_tab_logo(self):
-
+    def _add_tab_logo(self):
+        """Add logo to tab header."""
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
         self.tablogo.setAlignment(QtCore.Qt.AlignHCenter |

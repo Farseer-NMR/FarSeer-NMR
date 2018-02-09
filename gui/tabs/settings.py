@@ -712,6 +712,4 @@ class Settings(BaseWidget):
             self.variables["plotting_flags"]["do_dpre_osci"])
 
     def show_popup(self, popup):
-        p = popup(self)
-        p.exec_()
-        p.raise_()
+        popup(self).launch()

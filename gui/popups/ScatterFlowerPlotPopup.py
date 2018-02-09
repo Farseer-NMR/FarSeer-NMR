@@ -39,7 +39,18 @@ translator = str.maketrans('', '', string.punctuation+" ")
 
 
 class ScatterFlowerPlotPopup(BasePopup):
+    """
+    A popup for setting Scatter Flower Plot specific settings in the
+    Farseer-NMR configuration.
 
+    Parameters:
+        parent(QWidget): parent widget for popup.
+
+    Methods:
+        .get_defaults()
+        .get_values()
+        .set_values()
+    """
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="Scatter Flower Plot",
                            settings_key=["cs_scatter_flower_settings"])

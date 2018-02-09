@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 Farseer-NMR is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+GNU General Public License for more details.¡
 
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
@@ -30,7 +30,30 @@ from core.fslibs.Variables import Variables
 
 
 class SideBar(QTreeWidget):
+    """
+    A QTreeWidget that enables drag-and-drop loading and parsing of peaklists.
 
+    Peaklist files are dropped onto the sidebar, their format is detected and
+    they are loaded into Farseer-NMR identified by the file name. The labels in
+    the sidebar point to in memory representations of the peaklists, which are
+    parsed out when a calculation is executed.
+
+
+    Parameters:
+        parent (QWidget):
+        gui_settings (dict): a dictionary carrying the settings required to
+            correctly render the graphics based on screen resolution.
+
+    Methods:
+        .update_from_config()
+        .dragEnterEvent(QMouseEvent)
+        .dropEvent(QMouseEvent)
+        .load_from_path(str)
+        .refresh_sidebar()
+        .load_peaklist(str)
+        .add_item(str)
+        ._raise_context_menu(str)
+        """
     variables = Variables()._vars
 
     def __init__(self, parent=None, gui_settings=None):
@@ -48,6 +71,7 @@ class SideBar(QTreeWidget):
         self.update_from_config()
 
     def update_from_config(self):
+        """Update sidebar contents based on configuration file."""
         self.clear()
         used_peaklists = []
         self.peakLists = self.variables["peaklists"]
@@ -69,6 +93,7 @@ class SideBar(QTreeWidget):
                 self.add_item(peaklist)
 
     def dragEnterEvent(self, event):
+        """Re-implemenation for drag-and-drop behaviour."""
         event.accept()
         if not event.mimeData().hasUrls():
 
@@ -79,7 +104,7 @@ class SideBar(QTreeWidget):
             event.mimeData().setText(text)
 
     def dropEvent(self, event):
-
+        """Re-implemenation for drag-and-drop behaviour."""
         if event.mimeData().hasUrls():
             event.accept()
             file_paths = [url.path() for url in event.mimeData().urls()]
@@ -87,6 +112,7 @@ class SideBar(QTreeWidget):
                 self.load_from_path(file_path)
 
     def load_from_path(self, file_path):
+        """load a peaklists from a directory path."""
         name = None
         if os.path.isdir(file_path):
             for root, dirs, filenames in os.walk(file_path):
@@ -102,12 +128,13 @@ class SideBar(QTreeWidget):
             return name, path
 
     def refresh_sidebar(self):
+        """ clear the sidebar and refresh the peaklist names."""
         self.clear()
         for peaklist in self.peakLists.keys():
             self.add_item(peaklist)
 
     def load_peaklist(self, file_path):
-
+        """load individual peaklist from a file path."""
         if os.path.isdir(file_path):
             return
 
@@ -131,6 +158,7 @@ class SideBar(QTreeWidget):
             return None, None
 
     def add_item(self, name):
+        """Add a peaklist pointer to the side bar as a QTreeWidgetItem."""
         newItem = QTreeWidgetItem(self)
         newItem.setFlags(newItem.flags() & ~QtCore.Qt.ItemIsDropEnabled)
         newItem.setText(0, name)
@@ -138,6 +166,7 @@ class SideBar(QTreeWidget):
         return newItem
 
     def _raise_context_menu(self, item_name):
+        """raise a context menu to enabled deletion of objects."""
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchRecursive, 0)
         if result:

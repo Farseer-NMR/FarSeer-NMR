@@ -201,11 +201,19 @@ def get_font_from_file(fname):
 
 
 class FontComboBox(LabelledCombobox):
+    """
+    A convenience subclass of Labelled Combobox, which is populated with
+    the fonts available in matplotlib. To prevent incompatibility between OS
+    font availabilities, the common fonts are listed above and used to populate
+    the combobox.
+    """
 
     def __init__(self, parent, text=None):
         LabelledCombobox.__init__(self, parent, text, fonts)
 
     def select(self, item):
+        """Re-implementation of the LabelledCombobox select fonts from list
+        faithfully."""
         index = list(self.texts).index(item)
         if index:
             self.fields.setCurrentIndex(index)

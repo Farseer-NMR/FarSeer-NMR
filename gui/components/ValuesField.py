@@ -24,7 +24,19 @@ from PyQt5.QtWidgets import QLineEdit, QSizePolicy
 
 
 class ValueField(QLineEdit):
+    """
+    QLineEdit that enables settings different conditions in the upper
+    section of the PeaklistSelectionArea.
 
+    Parameters:
+        parent(QWidget): parent widget
+        index(int): index of the condition in the conditions list
+        dim(str): x, y, or z. determines dimension in Farseer-NMR Cube.
+        valuesDict(dict): dictionary containing values for conditions.
+
+    Methods:
+        .updateValuesDict()
+    """
     def __init__(self, parent, index, dim, valuesDict):
         QLineEdit.__init__(self, parent)
         self.index = index

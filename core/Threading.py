@@ -21,7 +21,6 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import threading
-import time
 
 """Taken from http://sebastiandahlgren.se/2014/06/27/running-a-method-as-a-background-thread-in-python/"""
 class Threading(object):
