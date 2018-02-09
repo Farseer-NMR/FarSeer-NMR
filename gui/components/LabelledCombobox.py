@@ -25,7 +25,23 @@ from PyQt5 import QtCore
 
 
 class LabelledCombobox(QWidget):
+    """
+    A combination of a QLabel and a QCombobox in a single QWidget.
+    Principal methods of QCombobox are re-implemented to make behaviour more
+    native to a standard QCombobox.
 
+    Parameters:
+        parent (QWidget): specifies the parent widget containing the QLabel
+            and the QCombobox.
+        text (str): text to be presented in the QLabel field.
+        callback (func): a function to be called when the QCombobox
+            currentTextChanged signal is emitted.
+
+    Methods:
+        .select(str)
+        .set_callback(function)
+        .addItem(str)
+        """
     def __init__(self, parent, text=None, items=None, callback=None):
 
         QWidget.__init__(self, parent)
@@ -52,7 +68,7 @@ class LabelledCombobox(QWidget):
     def set_callback(self, callback):
         self.fields.currentTextChanged.connect(callback)
 
-    def addItem(self, text,):
+    def addItem(self, text):
 
         self.fields.addItem(text)
         self.texts.append(text)

@@ -26,8 +26,10 @@ import os
 
 ICON_DIR = os.path.dirname(__file__)
 
-
 class Icon(QtGui.QIcon):
+    """A convenience subclass of QIcon to make specification of images from the
+    icons directory easy."""
+
 
     def __init__(self, image=None):
 

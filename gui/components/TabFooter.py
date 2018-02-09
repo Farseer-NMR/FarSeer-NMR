@@ -23,8 +23,12 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QGroupBox, QHBoxLayout, QPushButton
 
 
-class TabFooter(QGroupBox):
 
+class TabFooter(QGroupBox):
+    """
+    A QGroupBox that contains the load, save and run buttons for the
+    Farseer-NMR GUI.
+    """
     def __init__(self, parent):
         QGroupBox.__init__(self, parent)
 

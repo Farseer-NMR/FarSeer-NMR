@@ -24,7 +24,27 @@ from PyQt5.QtWidgets import QWidget, QSpinBox, QLabel, QHBoxLayout
 
 
 class LabelledSpinBox(QWidget):
+    """
+    A combination of a QLabel and a QDoubleSpinBox in a single QWidget.
+    Principal methods of QDoubleSpinBox are re-implemented to make behaviour
+    more native to a standard QDoubleSpinBox.
 
+    Parameters:
+        parent (QWidget): specifies the parent widget containing the QLabel
+            and the QSpinBox.
+        text (str): text to be presented in the QLabel field.
+        callback (func): a function to be called when the QSpinBox
+            valueChanged() signal is emitted.
+        maximum (float): maximum value the QSpinBox can take.
+        minimum (float): minimum value the QSpinBox can take.
+        step (float): determines how the value is incremented by scrolling
+            or by clicking the up/down buttons.
+
+
+    Methods:
+        .setValue(float)
+        .set_callback(function)
+        """
     def __init__(self, parent, text, callback=None,
                  minimum=None, maximum=None, step=None):
 

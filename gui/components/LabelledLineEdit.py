@@ -26,7 +26,20 @@ from gui.components.ModifiedLineEdit import ModifiedLineEdit
 
 
 class LabelledLineEdit(QWidget):
+    """
+    A combination of a QLabel and a ModifiedLineWidget in a single QWidget.
+    Principal methods of QDoubleSpinBox are re-implemented to make behaviour
+    more native to a standard QDoubleSpinBox.
 
+    Parameters:
+        parent (QWidget): specifies the parent widget containing the QLabel
+            and the ModifiedLineWidget.
+        text (str): text to be presented in the QLabel field.
+
+    Methods:
+        .setText (str)
+        .set_callback (function)
+        """
     def __init__(self, parent, text, callback=None):
 
         QWidget.__init__(self, parent)

@@ -25,9 +25,12 @@ from gui.gui_utils import colours
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5 import QtCore
 
-
 class ColourBox(LabelledCombobox):
-
+    """
+    A convenience subclass of Labelled Combobox, which is populated with all
+    the colours available in Matplotlib. Each colour is listed with a pixmap
+    which shows an on-screen representation of the colour.
+    """
     def __init__(self, parent, text=None):
 
         LabelledCombobox.__init__(self, parent, text)

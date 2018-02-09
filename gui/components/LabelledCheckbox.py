@@ -25,6 +25,24 @@ from PyQt5 import QtCore
 
 
 class LabelledCheckbox(QWidget):
+    """
+    A combination of a QLabel and a Checkbox in a single QWidget.
+    Principal methods of QCheckbox are re-implemented to make behaviour more
+    native to a standard QCheckbox.
+
+    Parameters:
+        parent (QWidget): specifies the parent widget containing the QLabel
+            and the QCheckbox.
+        text (str): text to be presented in the QLabel field.
+        callback (func): a function to be called when the checkbox isChecked()
+            signal is emitted.
+
+    Methods:
+        .setEnabled(bool)
+        .setChecked(bool)
+        .isChecked()
+    """
+
 
     def __init__(self, parent, text, callback=None, **kw):
         QWidget.__init__(self, parent)
@@ -49,11 +67,11 @@ class LabelledCheckbox(QWidget):
     def isChecked(self):
         return self.checkBox.isChecked()
 
-    def setEnabled(self, bool):
-        self.checkBox.setEnabled(bool)
+    def setEnabled(self, boolean):
+        self.checkBox.setEnabled(boolean)
 
-    def setChecked(self, value):
-        if value is not None:
-            self.checkBox.setChecked(value)
+    def setChecked(self, boolean):
+        if boolean is True:
+            self.checkBox.setChecked(True)
         else:
             self.checkBox.setChecked(False)

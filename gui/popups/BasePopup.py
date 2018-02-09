@@ -28,8 +28,20 @@ import json
 
 defaults = json.load(open(get_default_config_path(), 'r'))
 
-
 class BasePopup(QDialog):
+    """
+    Base QDialog for all Farseer-NMR popups.
+
+    Parameters:
+        parent(QWidget): parent QWidget
+        settings_keys(str or list): specifies the keys to access popup specific
+            settings in variables.
+        title(str): name of the popup.
+
+    Methods:
+        .launch()
+
+    """
 
     variables = Variables()._vars
 

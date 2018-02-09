@@ -32,7 +32,18 @@ from gui.popups.BasePopup import BasePopup
 
 
 class HeatMapPopup(BasePopup):
+    """
+    A popup for setting Heat Plot specific settings in the Farseer-NMR
+    configuration.
 
+    Parameters:
+        parent(QWidget): parent widget for popup.
+
+    Methods:
+        .get_defaults()
+        .get_values()
+        .set_values()
+    """
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="PRE Heat Map",
                            settings_key=["heat_map_settings"])

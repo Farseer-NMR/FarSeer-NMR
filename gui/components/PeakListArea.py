@@ -33,6 +33,30 @@ width = 600
 
 
 class PeakListArea(QWidget):
+    """
+    A widget containing a QGraphicsScene for rendering the drag and drop
+    creation of the Farseer-NMR cube.
+
+    When a peaklist is dropped on a PeakListLabel instance, the variables
+    instance is updated and its position in the Farseer-NMR cube is specified.
+
+    Parameters:
+        parent (QWidget): specifies the parent widget containing the QLabel
+            and the QSpinBox.
+        gui_settings (dict): a dictionary carrying the settings required to
+            correctly render the graphics based on screen resolution.
+
+    Methods:
+        .setEvents()
+        .side_bar()
+        .update_variables()
+        .show_update_warning()
+        .show_duplicate_key_warning()
+        .update_experimental_dataset(values_dict)
+        .check_conditions_for_tree()
+        .update_tree()
+        .add_connecting_line()
+    """
 
     variables = Variables()._vars
 
@@ -139,8 +163,6 @@ class PeakListArea(QWidget):
         return True
 
     def update_tree(self):
-
-        print(self.check_conditions_for_tree())
 
         if not self.check_conditions_for_tree():
             return
@@ -281,7 +303,18 @@ class PeakListArea(QWidget):
 
 
 class ConditionLabel(QGraphicsTextItem):
+    """""
+    A re-implementation of a QGraphicsTextItem to enable specification of text
+    and positioning of the widget on instantiation.
 
+    When a peaklist is dropped on a PeakListLabel instance, the variables
+    instance is updated and its position in the Farseer-NMR cube is specified.
+
+    Parameters:
+        text (str): text displayed in the QGraphicsTextItem.
+        pos (sequence): x and y values specifying the absolute position of the
+            QGraphicsTextItem
+    """
     def __init__(self, text, pos=None):
 
         QGraphicsTextItem.__init__(self)
@@ -291,7 +324,34 @@ class ConditionLabel(QGraphicsTextItem):
 
 
 class PeakListLabel(QGraphicsTextItem):
+    """
+    A re-implementation of a QGraphicsTextItem to enable drag and drop creation
+    of the Farseer-Cube.
 
+    The drag-and-drop behaviour has been implemented to ensure than when a
+    peaklist is dragged from the side_bar onto a PeakListLabel, all the
+    necessary book keeping is performed and the correct specification of the
+    peaklist's conditions is recorded in the variables object. A peaklist can
+    be deleted from the tree using the right mouse menu.
+
+    Parameters:
+    text (str): text displayed in the QGraphicsTextItem.
+        pos (sequence): x and y values specifying the absolute position of the
+           QGraphicsTextItem
+        x_cond (str): condition specifying the x-axis of the Farseer-NMR cube
+        y_cond (str): condition specifying the y-axis of the Farseer-NMR cube
+        z_cond (str): condition specifying the z-axis of the Farseer-NMR cube
+        peak_list (str): peak_list label
+
+    Methods:
+        .mousePressEvent(QMouseEvent)
+        ._raise_context_menu(QMouseEvent)
+        .remove_item()
+        .dragEnterEvent(QMouseEvent)
+        .dragMoveEvent(QMouseEvent)
+        .dropEvent(QMouseEvent)
+
+    """
     def __init__(self, parent, text, scene, pos=None,
                  x_cond=None, y_cond=None, z_cond=None, peak_list=None):
 

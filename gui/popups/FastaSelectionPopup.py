@@ -31,7 +31,20 @@ from gui.popups.BasePopup import BasePopup
 
 
 class FastaSelectionPopup(BasePopup):
+    """
+    A popup for setting Fasta file path settings in the Farseer-NMR
+    configuration.
 
+    Parameters:
+        parent(QWidget): parent widget for popup.
+
+    Methods:
+        .get_defaults()
+        .get_values()
+        .set_values()
+        .add_field(str, str)
+        .raise_file_dialog(QLineEdit)
+    """
     def __init__(self, parent=None, **kw):
         BasePopup.__init__(self, parent, title="FASTA Selection Popup",
                            settings_key=["fasta_files"], layout='vbox')
