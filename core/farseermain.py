@@ -271,7 +271,7 @@ def log_time_stamp(
         '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
             format(
                 79*'*',
-                datetime.datetime.now().strftime("%Y/%m/%d - %H:%M:%S"),
+                datetime.datetime.now().strftime("%c"),
                 state
                 )
     

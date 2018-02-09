@@ -28,6 +28,7 @@ import itertools as it
 from pydoc import locate
 from math import ceil
 from matplotlib import pyplot as plt
+import datetime 
 
 import core.fslibs.wet as fsw
 
@@ -150,7 +151,7 @@ class FarseerSeries(pd.Panel):
             series_dps=['foo'],
             next_dim='bar',
             prev_dim='zoo',
-            dim_comparison='not_applied',
+            dim_comparison='',
             resonance_type='Backbone',
             csp_alpha4res=0.14,
             csp_res_exceptions={'G':0.2},
@@ -301,6 +302,41 @@ class FarseerSeries(pd.Panel):
         fsw.abort()
         
         return
+    
+    def create_header(
+        self,
+        parameter_type='param',
+        extra_info="",
+        file_path=""):
+        """Creates description header for files and plots."""
+        
+        # discriminates between main calculation or comparison.
+        if self.dim_comparison:
+            axis = "{}/{}".format(self.series_axis, self.dim_comparison)
+        else:
+            axis = self.series_axis
+        
+        header_1 = \
+"""# Parameters/observables along {}
+# Fixed Farseer Cube coordinates: {} and {}
+# {}
+# 
+# Run folder: {}
+# File path: {}
+# creation date: {}
+#
+""".\
+            format(
+                axis,
+                self.prev_dim,
+                self.next_dim,
+                extra_info,
+                os.getcwd(),
+                file_path,
+                datetime.datetime.now().strftime("%c")
+                )
+        
+        return header_1
     
     def hex_to_RGB(self, hexx):
         """
@@ -720,42 +756,14 @@ with window size {} and stdev {}'.\
         
         file_path = '{}/{}.csv'.format(tablefolder, tablecol)
         fileout = open(file_path, 'w')
-        
-        if self.series_axis.startswith('cond'):
-            header = \
-"""# Table for '{0}' resonances.
-# The results for variable '{1}'
-# ranging datapoints '{2}', where:
-# conditions '{3}' and '{4}' are kept constants.
-# {5} data.
-""".\
-                format(
-                    self.resonance_type,
-                    self.series_axis,
-                    list(self.series_datapoints),
-                    self.prev_dim,
-                    self.next_dim,
-                    tablecol
-                    )
-        
-        elif self.series_axis.startswith('C'):
-            header = \
-"""# Table for '{0}' resonances.
-# The comparison '{1}': for the results obtained for titrations 'cond{7}'
-# across variable '{2}' which ranges datapoints '{3}', where:
-# conditions '{4}' and '{5}' are kept constants.
-# {6} data.
-""".\
-                format(
-                    self.resonance_type,
-                    self.series_axis,
-                    self.dim_comparison,
-                    list(self.series_datapoints),
-                    self.prev_dim,
-                    self.next_dim,
-                    tablecol,
-                    self.series_axis[-1]
-                    )
+        header = \
+            "# Table for '{}' resonances.\n".format(self.resonance_type)
+        header += self.create_header(
+            extra_info="Datapoints in series: {}".\
+                format(list(self.series_datapoints)),
+            file_path=file_path
+            )
+        header += "# {} data\n#\n".format(tablecol)
         fileout.write(header)
         
         if is_float:
@@ -818,6 +826,7 @@ with window size {} and stdev {}'.\
             
             file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
             fileout = open(file_name, 'w')
+            header = self.create_header(file_path=file_name)
             attheader = \
 """#
 #
@@ -838,7 +847,7 @@ recipient: residues
                             replace(' ', '').replace('\n', ','),
                     calccol.lower()
                     )
-            fileout.write(attheader)
+            fileout.write(header+attheader)
             formatting[calccol] = colform
             to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
                 to_string(
@@ -862,6 +871,12 @@ recipient: residues
         for item in self.items:
             file_path = '{}/{}.csv'.format(self.export_series_folder, item)
             fileout = open(file_path, 'w')
+            ###
+            header = self.create_header(
+                extra_info="Peaklist from datapoint: {}".format(item),
+                file_path=file_path
+                )
+            fileout.write(header)
             fileout.write(
                 self.loc[item].to_csv(
                     sep=',',
@@ -2824,7 +2839,8 @@ or confirm you have not forgot any peaklist [{}].".\
             fig_height=11.69,
             fig_width=8.69,
             fig_file_type='pdf',
-            fig_dpi=300):
+            fig_dpi=300,
+            header_fontsize=5):
         """
         The main function that calls and builds the different plots.
         
@@ -2860,7 +2876,7 @@ or confirm you have not forgot any peaklist [{}].".\
         else:
             raise ValueError('Not a valid Farseer plot type')
         
-        numrows = ceil(num_subplots/cols_per_page)
+        numrows = ceil(num_subplots/cols_per_page) + 1 
         real_fig_height = (fig_height / rows_per_page) * numrows
         # http://stackoverflow.com/questions/17210646/python-subplot-within-a-loop-first-panel-appears-in-wrong-position
         fig, axs = plt.subplots(
@@ -2873,7 +2889,6 @@ or confirm you have not forgot any peaklist [{}].".\
             rect=[0.01,0.01,0.995,0.995],
             h_pad=fig_height/rows_per_page
             )
-        
         # Plots yy axis title
         # http://www.futurile.net/2016/03/01/text-handling-in-matplotlib/
         if plot_style in ['bar_extended', 'bar_compacted']:
@@ -2891,7 +2906,7 @@ or confirm you have not forgot any peaklist [{}].".\
                 fig.subplots_adjust(hspace=hspace)
             
             else:
-                self.clean_subplots(axs, len(self), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'bar_vertical':
             for i, experiment in enumerate(self):
@@ -2906,7 +2921,7 @@ or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, len(self), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'res_evo':
             for i, row_number in enumerate(self.major_axis):
@@ -2921,11 +2936,14 @@ or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, len(self.major_axis), len(axs))
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter':
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(axs, i, row_number, **param_dict)
+            
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter_flower':
             self.plot_cs_scatter_flower(axs, **param_dict)
@@ -2965,11 +2983,16 @@ or confirm you have not forgot any peaklist [{}].".\
                     **param_dict
                     )
             
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
+            
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
+            header_fontsize = 3.5
         
         self.write_plot(
             fig,
+            header_fontsize,
             plot_style,
             folder,
             calccol,
@@ -2981,7 +3004,7 @@ or confirm you have not forgot any peaklist [{}].".\
         return
     
     def write_plot(
-            self, fig,
+            self, fig, header_fontsize,
             plot_name, folder,
             calccol, fig_file_type, 
             fig_dpi):
@@ -3013,6 +3036,8 @@ or confirm you have not forgot any peaklist [{}].".\
             plot_name,
             fig_file_type
             )
+        header = self.create_header(file_path=file_path)
+        fig.text(0.01, 0.01, header, fontsize=header_fontsize)
         fig.savefig(file_path, dpi=fig_dpi)
         self.log_r('**Plot Saved** {}'.format(file_path))
         
