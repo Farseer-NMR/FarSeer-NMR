@@ -314,12 +314,11 @@ class FarseerSeries(pd.Panel):
         
         header_1 = \
 """# Results analysed along {}
-# Farseer Cube corresponding coordinate data points: {} and {}
+# Fixed Farseer Cube coordinates: {} and {}
 # {}
 # 
 # Run folder: {}
 # File path: {}
-#
 # creation date: {}
 #
 """.\
@@ -754,41 +753,47 @@ with window size {} and stdev {}'.\
         file_path = '{}/{}.csv'.format(tablefolder, tablecol)
         fileout = open(file_path, 'w')
         
-        if self.series_axis.startswith('cond'):
-            header = \
-"""# Table for '{0}' resonances.
+        # if self.series_axis.startswith('cond'):
+        header = \
+            "# Table for '{}' resonances.\n".format(self.resonance_type)
+        header += self.create_header(
+            extra_info="Datapoints in series: {}".\
+                format(list(self.series_datapoints)),
+            file_path=file_path
+            )
+        header += "# {} data\n#\n".format(tablecol)
 # The results for variable '{1}'
 # ranging datapoints '{2}', where:
 # conditions '{3}' and '{4}' are kept constants.
 # {5} data.
-""".\
-                format(
-                    self.resonance_type,
-                    self.series_axis,
-                    list(self.series_datapoints),
-                    self.prev_dim,
-                    self.next_dim,
-                    tablecol
-                    )
+# """.\
+                # format(
+                    # self.resonance_type,
+                    # self.series_axis,
+                    # list(self.series_datapoints),
+                    # self.prev_dim,
+                    # self.next_dim,
+                    # tablecol
+                    # )
         
-        elif self.series_axis.startswith('C'):
-            header = \
-"""# Table for '{0}' resonances.
-# The comparison '{1}': for the results obtained for titrations 'cond{7}'
-# across variable '{2}' which ranges datapoints '{3}', where:
-# conditions '{4}' and '{5}' are kept constants.
-# {6} data.
-""".\
-                format(
-                    self.resonance_type,
-                    self.series_axis,
-                    self.dim_comparison,
-                    list(self.series_datapoints),
-                    self.prev_dim,
-                    self.next_dim,
-                    tablecol,
-                    self.series_axis[-1]
-                    )
+        # elif self.series_axis.startswith('C'):
+            # header = \
+# """# Table for '{0}' resonances.
+# # The comparison '{1}': for the results obtained for titrations 'cond{7}'
+# # across variable '{2}' which ranges datapoints '{3}', where:
+# # conditions '{4}' and '{5}' are kept constants.
+# # {6} data.
+# """.\
+                # format(
+                    # self.resonance_type,
+                    # self.series_axis,
+                    # self.dim_comparison,
+                    # list(self.series_datapoints),
+                    # self.prev_dim,
+                    # self.next_dim,
+                    # tablecol,
+                    # self.series_axis[-1]
+                    # )
         fileout.write(header)
         
         if is_float:
