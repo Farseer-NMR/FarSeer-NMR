@@ -140,13 +140,3 @@ def deliver_settings(resolution):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
 
-
-# def get_colour(colour):
-
-    # if colour.startswith('#'):
-        # if colour.upper() in hex_to_colour_dict:
-            # return hex_to_colour_dict[colour.upper()]
-        # else:
-            # return colour.upper()
-    # else:
-        # return colour
