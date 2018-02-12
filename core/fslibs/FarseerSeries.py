@@ -57,7 +57,7 @@ class FarseerSeries(pd.Panel):
         calc_path (str): the absolute path to store calculation results.
         
         series_axis (str): identifies the main axis of the series,
-            where X = cond1, Y = cond2, Z = cond3
+            where X = along_x, Y = along_y, Z = along_z
         
         series_datapoints (list): ordered list with the names of the
             series data points.
@@ -593,7 +593,7 @@ class FarseerSeries(pd.Panel):
         Loads theoretical PRE values to represent in bar plots.
         
         Theorital PRE files (*.pre) should be stored in a 'para' folder
-        at the cond3 hierarchy level.
+        at the along_z hierarchy level.
         
         Reads information on the tag position stored in the
         *.pre file as an header comment, for example, '#40'.
@@ -1080,7 +1080,7 @@ recipient: residues
             tag_lw (float): tag tick line width.
         """
         
-        if (self.series_axis == 'cond3' and exp == 'para') \
+        if (self.series_axis == 'along_z' and exp == 'para') \
                 or (self.series_axis == 'C3' \
                     and ( self.next_dim == 'para' or self.prev_dim == 'para')):
             # plot theoretical PRE
@@ -1832,14 +1832,14 @@ recipient: residues
         # if the user wants to represent the condition in the x axis
         # for the first dimension
         if set_x_values \
-                and (self.series_axis == 'cond1' \
-                    or self.dim_comparison == 'cond1'):
+                and (self.series_axis == 'along_x' \
+                    or self.dim_comparison == 'along_x'):
             if len(titration_x_values) != len(self.items):
                 msg = \
 "The number of coordinate values defined for fitting/data respresentation, \
-<fitting_x_values> variable [{}], do not match the number of <cond1> \
-data points,i.e. input peaklists. Please correct <fitting_x_values> variable \
-or confirm you have not forgot any peaklist [{}].".\
+<fitting_x_values> variable [{}], do not match the number of \
+data points <along_x>, i.e. input peaklists. Please correct <fitting_x_values> \
+variable or confirm you have not forgot any peaklist [{}].".\
                     format(titration_x_values, self.items)
                 self.log_r(fsw.gen_wet('ERROR', msg, 5))
                 self.abort()
@@ -1848,8 +1848,8 @@ or confirm you have not forgot any peaklist [{}].".\
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
-        elif (self.series_axis in ['cond2', 'cond3']) \
-                or (self.dim_comparison in ['cond2', 'cond3']):
+        elif (self.series_axis in ['along_y', 'along_z']) \
+                or (self.dim_comparison in ['along_y', 'along_z']):
             x = np.arange(0, len(y))
             xmax = len(y)-1
             axs[i].set_xticks(x)
@@ -1857,7 +1857,7 @@ or confirm you have not forgot any peaklist [{}].".\
             x_ticks_rot=45
         
         # just give a range for the x axis
-        # in case representing the cond1 without titration_x_values
+        # in case representing the along_x without titration_x_values
         else:
             x = np.arange(0, len(y))
             axs[i].set_xticks(x)
@@ -1869,8 +1869,8 @@ or confirm you have not forgot any peaklist [{}].".\
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
         if set_x_values \
-                and (self.series_axis == 'cond1' \
-                    or self.dim_comparison == 'cond1'):
+                and (self.series_axis == 'along_x' \
+                    or self.dim_comparison == 'along_x'):
             axs[i].locator_params(axis='x', tight=True, nbins=x_ticks_nbins)
             
             def eval_tick(x):
@@ -1976,7 +1976,7 @@ or confirm you have not forgot any peaklist [{}].".\
         fit_res_col = "{}_{}".format(calccol, res)
         
         if self.fit_performed \
-                and self.series_axis == 'cond1'\
+                and self.series_axis == 'along_x'\
                 and self.fit_okay[fit_res_col]:
             #print(res)
             #print(self.xfit)
@@ -1999,7 +1999,7 @@ or confirm you have not forgot any peaklist [{}].".\
                 fontsize=4
                 )
         
-        elif self.fit_performed and self.series_axis == 'cond1' \
+        elif self.fit_performed and self.series_axis == 'along_x' \
                 and not(self.fit_okay[fit_res_col]):
             axs[i].text(
                 xmax*0.05,
@@ -3045,7 +3045,7 @@ or confirm you have not forgot any peaklist [{}].".\
     
     def perform_fit(self, col, x_values, mindp, fit_function):
         """
-        General workflow for fitting data along cond1
+        General workflow for fitting data along X axis.
         
         Note, only one fit can be performed at a time.
         If multiple fits have to be performed, run Faseer-NMR with

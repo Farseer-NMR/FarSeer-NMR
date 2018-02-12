@@ -143,9 +143,9 @@ def config_user_variables(fsuv):
 
     # does the user want to perform any analysis on the Farseer-NMR cube?
     fsuv["any_axis"] = any([
-        fitting["do_cond1"],
-        fitting["do_cond2"],
-        fitting["do_cond3"]
+        fitting["do_along_x"],
+        fitting["do_along_y"],
+        fitting["do_along_z"]
         ])
     
     # sorted values to be used as x coordinates in the fitting routine
@@ -208,7 +208,7 @@ def config_user_variables(fsuv):
     
     # flags which fsuv.apply_PRE_analysis deppends on
     fsuv["PRE_analysis_flags"] = \
-        fitting["do_cond3"] \
+        fitting["do_along_z"] \
         and (plots_height["calcs_Height_ratio"] \
             or plots_volume["calcs_Volume_ratio"]) \
         and fitting["perform_comparisons"]
@@ -374,12 +374,12 @@ def checks_PRE_analysis_flags(fsuv):
     if not(fsuv["PRE_analysis_flags"]):
         msg = \
 "PRE Analysis is set to <{}> and depends on the following variables: \
-do_cond3 :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
+do_along_z :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
 perform_comparisons :: <{}>. \
 All these variables should be set to True for PRE Analysis to be executed.".\
             format(
                 fsuv["pre_settings"]["apply_PRE_analysis"],
-                fsuv["fitting_settings"]["do_cond3"],
+                fsuv["fitting_settings"]["do_along_z"],
                 fsuv["Height_ratio_settings"]["calcs_Height_ratio"] \
                     or fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
                 fsuv["fitting_settings"]["perform_comparisons"]
@@ -498,8 +498,8 @@ Please revisit your input'
     elif len(x_values) != len(series.items):
         msg = \
 "The number of coordinate values defined for fitting/data respresentation, \
-<fitting_x_values> variable [{}], do not match the number of <cond1> data \
-points,i.e. input peaklists. Please correct <fitting_x_values> variable or \
+<fitting_x_values> variable [{}], do not match the number of data points \
+along_x ,i.e. input peaklists. Please correct <fitting_x_values> variable or \
 confirm you have not forgot any peaklist [{}].".\
             format(x_values, series.items)
         series.log_r(fsw.gen_wet('ERROR', msg, 5))
@@ -882,9 +882,9 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                 Y2
     
     Depends on:
-    fsuv.do_cond1
-    fsuv.do_cond2
-    fsuv.do_cond3
+    fsuv.do_along_x
+    fsuv.do_along_y
+    fsuv.do_along_z
     """
     
     if not(resonance_type in ['Backbone', 'Sidechains']):
@@ -902,9 +902,9 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
     zz = False
     
     # creates set of series for the first condition (1D)
-    if exp.hasxx and fsuv["fitting_settings"]["do_cond1"]:
+    if exp.hasxx and fsuv["fitting_settings"]["do_along_x"]:
         xx = True
-        series_dct['cond1'] = \
+        series_dct['along_x'] = \
             exp.export_series_dict_over_axis(
                 series_class,
                 along_axis='x',
@@ -913,13 +913,13 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                     series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
-    elif not(exp.hasxx) and fsuv["fitting_settings"]["do_cond1"]:
+    elif not(exp.hasxx) and fsuv["fitting_settings"]["do_along_x"]:
         checks_axis_coherency('x', fsuv)
     
     # creates set of series for the second condition (2D)
-    if exp.hasyy and fsuv["fitting_settings"]["do_cond2"]:
+    if exp.hasyy and fsuv["fitting_settings"]["do_along_y"]:
         yy = True
-        series_dct['cond2'] = \
+        series_dct['along_y'] = \
             exp.export_series_dict_over_axis(
                 series_class,
                 along_axis='y',
@@ -928,13 +928,13 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                     series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
-    elif not(exp.hasyy) and fsuv["fitting_settings"]["do_cond2"]:
+    elif not(exp.hasyy) and fsuv["fitting_settings"]["do_along_y"]:
         checks_axis_coherency('y', fsuv)
 
     # creates set of series for the third condition (3D)  
-    if exp.haszz and fsuv["fitting_settings"]["do_cond3"]:
+    if exp.haszz and fsuv["fitting_settings"]["do_along_z"]:
         zz = True
-        series_dct['cond3'] = \
+        series_dct['along_z'] = \
             exp.export_series_dict_over_axis(
                 series_class,
                 along_axis='z',
@@ -943,7 +943,7 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
                     series_kwargs(fsuv, resonance_type=resonance_type)
                 )
     
-    elif not(exp.haszz) and fsuv["fitting_settings"]["do_cond3"]:
+    elif not(exp.haszz) and fsuv["fitting_settings"]["do_along_z"]:
         checks_axis_coherency('z', fsuv)
     
     if not(any([xx, yy, zz])):
@@ -999,7 +999,7 @@ def eval_series(series_dct, fsuv, resonance_type='Backbone'):
                 perform_calcs(series_dct[cond][dim2_pt][dim1_pt], fsuv)
                 # PERFORMS FITS
                 perform_fits(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                # Analysis of PRE data - only in cond3
+                # Analysis of PRE data - only in along_z
                 PRE_analysis(series_dct[cond][dim2_pt][dim1_pt], fsuv)
                 # EXPORTS FULLY PARSED PEAKLISTS
                 exports_series(series_dct[cond][dim2_pt][dim1_pt])
@@ -1119,7 +1119,7 @@ def perform_fits(farseer_series, fsuv):
     # fits are allowed only for X axis series
     if not(
             fsuv["revo_settings"]["perform_resevo_fitting"] \
-                and farseer_series.series_axis == 'cond1'
+                and farseer_series.series_axis == 'along_x'
             ):
         return
     
@@ -1175,14 +1175,14 @@ def PRE_analysis(farseer_series, fsuv):
     if not(fsuv["pre_settings"]["apply_PRE_analysis"]):
         return
     
-    iscond3 = farseer_series.series_axis == 'cond3'
+    isalong_z = farseer_series.series_axis == 'along_z'
     isc3 = farseer_series.series_axis == 'C3'
     isprev_para = farseer_series.prev_dim == 'para'
     isnext_para = farseer_series.next_dim == 'para'
     do_heatmap = fsuv['plotting_flags']['do_heat_map']
     
-    # if analysing cond3: performs calculations.
-    if iscond3:
+    # if analysing along_z: performs calculations.
+    if isalong_z:
         farseer_series.load_theoretical_PRE(
             fsuv["general_settings"]["input_spectra_path"],
             farseer_series.prev_dim
@@ -1202,8 +1202,8 @@ def PRE_analysis(farseer_series, fsuv):
                     )
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
-    # for cond3 and for comparison C3.
-    if (iscond3 or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
+    # for along_z and for comparison C3.
+    if (isalong_z or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
         for sourcecol, targetcol in zip(
                 list(fsuv["restraint_settings"].index[3:])*2,
                 ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
@@ -1644,17 +1644,17 @@ def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     # ORDERED relation between dimension names
     # self: [next, prev]
     series_dim_keys = {
-        'cond1':['cond2','cond3'],
-        'cond2':['cond3','cond1'],
-        'cond3':['cond1','cond2']
+        'along_x':['along_y','along_z'],
+        'along_y':['along_z','along_x'],
+        'along_z':['along_x','along_y']
         }
     # stores all the comparison variables.
     comp_dct = {}
     
     # creates a Comparison object for each dimension that was evaluated
-    # previously with fsuv.do_cond1, fsuv.do_cond2, fsuv.do_cond3
+    # previously with fsuv.do_along_x, fsuv.do_along_y, fsuv.do_along_z
     for dimension in sorted(series_dct.keys()):
-        # sends, cond1, cond2 and cond3.
+        # sends, along_x, along_y and along_z.
         # creates comparison
         c = fsc.Comparisons(
             series_dct[dimension].copy(),
