@@ -142,7 +142,7 @@ def deliver_settings(resolution):
 
 # get_colour is used in Test scripts
 # variables are loaded into config using ColourBox.get_colour()
-def get_colour(self, colour):
+def get_colour(colour):
     """
     Defines how to read a colour.
     """
