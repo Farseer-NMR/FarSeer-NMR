@@ -55,7 +55,7 @@ class UserMarksPopup(BasePopup):
                                           QDialogButtonBox.Ok |
                                           QDialogButtonBox.Cancel |
                                           QDialogButtonBox.RestoreDefaults)
-        self.buttonBox.accepted.connect(self.setValues)
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
             clicked.connect(self.set_defaults)
