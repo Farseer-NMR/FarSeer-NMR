@@ -37,7 +37,13 @@ matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 colours = OrderedDict(sorted(
     matplt_colours_dict.items(),
     key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
-    
+
+keylist = list(colours.keys())
+for key in keylist:
+    if len(key) == 1:
+        colours.pop(key, None)
+hex_to_colour_dict = {value: key for key, value in colours.items()}
+
 single_char_color = {
     "k":"#000000",
     "w":"#FFFFFF",
@@ -51,13 +57,6 @@ single_char_color = {
 
 colours.update(single_char_color)
 
-keylist = list(colours.keys())
-
-hex_to_colour_dict = {value: key for key, value in colours.items()}
-
-for key in keylist:
-    if len(key) == 1:
-        colours.pop(key, None)
 
 settings_1280x800 = {
     'peaklistarea_height': 350,

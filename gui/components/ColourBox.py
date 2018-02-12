@@ -47,7 +47,12 @@ class ColourBox(LabelledCombobox):
             if colour.upper() in hex_to_colour_dict:
                 self.select(hex_to_colour_dict[colour.upper()])
             else:
+                colours[colour.upper()] = colour.upper()
+                pix = QPixmap(QtCore.QSize(20, 20))
+                pix.fill(QColor(colour.upper()))
+                self.fields.addItem(QIcon(pix), colour.upper())
                 self.select(colour.upper())
+                
         else:
             self.select(colour)
     
