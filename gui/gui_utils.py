@@ -140,3 +140,21 @@ def deliver_settings(resolution):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
 
+# get_colour is used in Test scripts
+# variables are loaded into config using ColourBox.get_colour()
+def get_colour(self, colour):
+    """
+    Defines how to read a colour.
+    """
+    if colour.startswith('#'):
+        if colour.upper() in hex_to_colour_dict:
+            return hex_to_colour_dict[colour.upper()]
+        else:
+            colours[colour.upper()] = colour.upper()
+            return colour.upper()
+        
+    elif colour in colours:
+        return colour
+    
+    else:
+        return "black"
