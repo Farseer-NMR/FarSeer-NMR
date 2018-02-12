@@ -52,7 +52,10 @@ class ColourBox(LabelledCombobox):
                 pix.fill(QColor(colour.upper()))
                 self.fields.addItem(QIcon(pix), colour.upper())
                 self.select(colour.upper())
-                
-        else:
+            
+        elif colour in colours:
             self.select(colour)
+        
+        else:
+            self.select("black")
     
