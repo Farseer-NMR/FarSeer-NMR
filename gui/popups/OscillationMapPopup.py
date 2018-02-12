@@ -219,7 +219,7 @@ class OscillationMapPopup(BasePopup):
         self.local_variables["smooth_lw"] = \
             self.dpre_osci_smooth_lw.field.value()
         self.local_variables["ref_color"] = \
-            colours[self.dpre_osci_ref_color.fields.currentText()]
+            self.dpre_osci_ref_color.fields.currentText()
         self.local_variables["color_init"] = \
             colours[self.dpre_osci_color_init.fields.currentText()]
         self.local_variables["color_end"] = \

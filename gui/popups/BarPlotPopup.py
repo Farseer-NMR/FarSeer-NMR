@@ -126,14 +126,14 @@ class BarPlotPopup(BasePopup):
 
     def get_defaults(self):
         self.apply_status.setChecked(self.defaults["status_color_flag"])
-        self.meas_bar_colour.select(self.defaults["measured_color"])
-        self.lost_bar_colour.select(self.defaults["lost_color"])
-        self.unassigned_bar_colour.select(self.defaults["unassigned_color"])
+        self.meas_bar_colour.get_colour(self.defaults["measured_color"])
+        self.lost_bar_colour.get_colour(self.defaults["lost_color"])
+        self.unassigned_bar_colour.get_colour(self.defaults["unassigned_color"])
         self.bar_width.setValue(self.defaults["bar_width"])
         self.bar_alpha.setValue(self.defaults["bar_alpha"])
         self.bar_linewidth.setValue(self.defaults["bar_linewidth"])
         self.bar_threshold.setChecked(self.defaults["threshold_flag"])
-        self.bar_threshold_colour.select(self.defaults["threshold_color"])
+        self.bar_threshold_colour.get_colour(self.defaults["threshold_color"])
         self.bar_threshold_linewidth.setValue(
             self.defaults["threshold_linewidth"])
         self.bar_threshold_alpha.setValue(self.defaults["threshold_alpha"])
@@ -149,11 +149,11 @@ class BarPlotPopup(BasePopup):
 
         self.apply_status.setChecked(
             self.local_variables["status_color_flag"])
-        self.meas_bar_colour.select(
+        self.meas_bar_colour.get_colour(
             self.local_variables["measured_color"])
-        self.lost_bar_colour.select(
+        self.lost_bar_colour.get_colour(
             self.local_variables["lost_color"])
-        self.unassigned_bar_colour.select(
+        self.unassigned_bar_colour.get_colour(
             self.local_variables["unassigned_color"])
         self.bar_width.setValue(
             self.local_variables["bar_width"])
@@ -163,7 +163,7 @@ class BarPlotPopup(BasePopup):
             self.local_variables["bar_linewidth"])
         self.bar_threshold.setChecked(
             self.local_variables["threshold_flag"])
-        self.bar_threshold_colour.select(
+        self.bar_threshold_colour.get_colour(
             self.local_variables["threshold_color"])
         self.bar_threshold_alpha.setValue(
             self.local_variables["threshold_alpha"])
@@ -185,9 +185,9 @@ class BarPlotPopup(BasePopup):
         self.local_variables["status_color_flag"] = \
             self.apply_status.isChecked()
         self.local_variables["measured_color"] = \
-            str(self.meas_bar_colour.fields.currentText())
+            self.meas_bar_colour.fields.currentText()
         self.local_variables["lost_color"] = \
-            str(self.lost_bar_colour.fields.currentText())
+            self.lost_bar_colour.fields.currentText()
         self.local_variables["unassigned_color"] = \
             self.unassigned_bar_colour.fields.currentText()
         self.local_variables["bar_width"] = \
@@ -199,7 +199,7 @@ class BarPlotPopup(BasePopup):
         self.local_variables["threshold_flag"] = \
             self.bar_threshold.isChecked()
         self.local_variables["threshold_color"] = \
-            str(self.bar_threshold_colour.fields.currentText())
+            self.bar_threshold_colour.fields.currentText()
         self.local_variables["threshold_linewidth"] = \
             self.bar_threshold_linewidth.field.value()
         self.local_variables["threshold_alpha"] = \
