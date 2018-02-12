@@ -98,7 +98,7 @@
         "dpre_ms": 2,
         "dpre_alpha": 0.5,
         "smooth_lw": 1,
-        "ref_color": "#000000",
+        "ref_color": "black",
         "color_init": "#000080",
         "color_end": "#FFD700",
         "x_ticks_fn": "Arial",
