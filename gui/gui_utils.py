@@ -37,6 +37,19 @@ matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 colours = OrderedDict(sorted(
     matplt_colours_dict.items(),
     key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
+    
+single_char_color = {
+    "k":"#000000",
+    "w":"#FFFFFF",
+    "r":"#FF0000",
+    "y":"#FFFF00",
+    "g":"#008000",
+    "c":"#00FFFF",
+    "b":"#0000FF",
+    "m":"#FF00FF"
+    }
+
+colours.update(single_char_color)
 
 keylist = list(colours.keys())
 
@@ -129,9 +142,12 @@ def deliver_settings(resolution):
         return settings_720p, stylesheet
 
 
-def get_colour(colour):
+# def get_colour(colour):
 
-    if colour.startswith('#'):
-        return hex_to_colour_dict[colour.upper()]
-    else:
-        return colour
+    # if colour.startswith('#'):
+        # if colour.upper() in hex_to_colour_dict:
+            # return hex_to_colour_dict[colour.upper()]
+        # else:
+            # return colour.upper()
+    # else:
+        # return colour

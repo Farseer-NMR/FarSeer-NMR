@@ -30,7 +30,7 @@ from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 from gui.popups.BasePopup import BasePopup
 
-from gui.gui_utils import font_weights
+from gui.gui_utils import font_weights, colours
 
 import string
 
@@ -198,9 +198,8 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.mksize.setValue(self.defaults["mksize"])
         self.color_grad.setChecked(
             self.defaults["color_grad"])
-        self.color_start.select(
-            self.defaults["mk_start_color"])
-        self.color_end.select(self.defaults["mk_end_color"])
+        self.color_start.get_colour(self.defaults["mk_start_color"])
+        self.color_end.get_colour(self.defaults["mk_end_color"])
         self.color_list.field.setText(
             ','.join(self.defaults["color_list"]))
 
@@ -242,9 +241,9 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.local_variables["mksize"] = self.mksize.field.value()
         self.local_variables["color_grad"] = self.color_grad.isChecked()
         self.local_variables["mk_start_color"] = \
-            self.color_start.fields.currentText()
+            colours[self.color_start.fields.currentText()]
         self.local_variables["mk_end_color"] = \
-            self.color_end.fields.currentText()
+            colours[self.color_end.fields.currentText()]
 
         self.local_variables["x_label_fn"] = \
             self.x_label_fn.fields.currentText()
@@ -292,8 +291,8 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.y_label.field.setText(self.local_variables["y_label"])
         self.mksize.setValue(self.local_variables["mksize"])
         self.color_grad.setChecked(self.local_variables["color_grad"])
-        self.color_start.select(self.local_variables["mk_start_color"])
-        self.color_end.select(self.local_variables["mk_end_color"])
+        self.color_start.get_colour(self.local_variables["mk_start_color"])
+        self.color_end.get_colour(self.local_variables["mk_end_color"])
         self.color_list.field.setText(','.
                                       join(self.local_variables["color_list"]))
 
