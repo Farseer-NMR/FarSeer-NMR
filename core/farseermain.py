@@ -564,7 +564,8 @@ def creates_farseer_dataset(fsuv):
     exp = fcube.FarseerCube(
         fsuv["general_settings"]["input_spectra_path"],
         has_sidechains=fsuv["general_settings"]["has_sidechains"],
-        FASTAstart=fsuv["fasta_settings"]["FASTAstart"]
+        FASTAstart=fsuv["fasta_settings"]["FASTAstart"],
+        applyFASTA=fsuv["fasta_settings"]["applyFASTA"]
         )
     exp.log_export_onthefly = True
     exp.log_export_name = fsuv["general_settings"]["logfile_name"]
