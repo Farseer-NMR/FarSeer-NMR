@@ -147,7 +147,7 @@ class FarseerSeries(pd.Panel):
     
     def create_attributes(
             self,
-            series_axis='cond',
+            series_axis='along',
             series_dps=['foo'],
             next_dim='bar',
             prev_dim='zoo',
@@ -200,7 +200,7 @@ class FarseerSeries(pd.Panel):
         
         # defines the path to store the calculations
         # if stores the result of a calculation
-        if series_axis.startswith('cond'):
+        if series_axis.startswith('along'):
             self.calc_path = '{}/{}/{}/{}/{}'.format(
                 self.resonance_type,
                 self.calc_folder,
@@ -317,13 +317,13 @@ class FarseerSeries(pd.Panel):
             axis = self.series_axis
         
         header_1 = \
-"""# Parameters/observables along {}
-# Fixed Farseer Cube coordinates: {} and {}
+"""# Parameters/observables analysed "{}"
+# Fixed Farseer Cube coordinates: "{}" and "{}"
 # {}
 # 
-# Run folder: {}
-# File path: {}
-# creation date: {}
+# Farseer-NMR Run folder: {}
+# Original file path: {}
+# Creation date: {}
 #
 """.\
             format(
