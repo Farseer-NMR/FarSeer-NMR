@@ -243,7 +243,7 @@ class Settings(BaseWidget):
         cs_norm_groupbox.layout().addWidget(self.cs_correction_res_ref)
 
         lost_analysis_groupbox = QGroupBox()
-        lost_analysis_groupbox.setTitle("Cross axes search for lost residues")
+        lost_analysis_groupbox.setTitle("Search lost residues across axes")
         lost_analysis_groupbox_layout = QVBoxLayout()
         lost_analysis_groupbox.setLayout(lost_analysis_groupbox_layout)
         lost_analysis_groupbox.layout().addWidget(self.expand_lost_yy)
