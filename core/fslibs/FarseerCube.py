@@ -1355,6 +1355,8 @@ more details."
                 df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
                 dfdict[item] = df
             
+            self.compare_peaklists_length(dp1, dp2, series_type, dfdict)
+            
             series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
             series_dct[dp2][dp1] = \
                 self.gen_series(
@@ -1751,5 +1753,36 @@ correspond to nitrogen chemical shift values.'.format(z, y, x)
 correspond to nitrogen assignment labels.'.format(z, y, x)
                 self.log_r(fsw.gen_wet("ERROR", msg, 25))
                 self.abort()
+        
+        return
+
+    def compare_peaklists_length(self, dp1, dp2, axis, df_dict):
+        """
+        Verifies if all peaklists in a series have the same number of 
+        residues before a FarseerSeries object is created.
+        
+        Parameters:
+            - dp1 (str): datapoint name on the next dimension.
+            
+            - dp2 (str): datapoint name on the previous dimension.
+            
+            - axis (str): the axis long which the series will be generated.
+            
+            - df_dict (dict:pd.DataFrame): A dictionary containing
+                pd.DataFrames corresponding to peaklists.
+        """
+        
+        pkl_lengths = []
+        
+        for key, peaklist in df_dict.items():
+            pkl_lengths.append(peaklist.shape[0])
+        
+        if not(len(set(pkl_lengths))) == 1:
+            msg = "Peaklists proposed for series [{}][{}] along {} axis have \
+different lengths.".\
+                format(dp2, dp1, axis[-1].upper())
+            
+            self.log_r(fsw.gen_wet("ERROR", msg, 28))
+            self.abort()
         
         return
