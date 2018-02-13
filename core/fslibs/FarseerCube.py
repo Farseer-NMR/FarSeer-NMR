@@ -369,6 +369,13 @@ the possible options.'
                         format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
+                
+                if filetype == '.fasta' and resonance_type == 'Backbone':
+                    self.check_fasta(
+                        target[parts[1]][parts[2]][lessparts],
+                        parts[2],
+                        p
+                        )
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -456,7 +463,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             )
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         self.log_r(logs)
-        self.check_fasta(df, FASTApath)
+        #self.check_fasta(df, FASTApath)
         
         return df
     
@@ -1574,7 +1581,7 @@ Correct the reference residue in the Settings Menu.'.\
         
         return
 
-    def check_fasta(self, df, fasta_path):
+    def check_fasta(self, df, yy, fasta_path):
         """
         Checks if loaded FASTA file has more residues than the reference
         experiment.
@@ -1586,16 +1593,18 @@ Correct the reference residue in the Settings Menu.'.\
             df (pd.DataFrame): contains the FASTA loaded data in
                 DataFrame format as prepared by .read_FASTA().
             
+            yy (str): the current YY data point name.
+            
             fasta_path (srt): the .fasta file path.
         """
         
         if df.shape[0] \
-                < self.allpeaklists[self.zzref][self.yyref][self.xxref].\
+                < self.allpeaklists[self.zzref][yy][self.xxref].\
                     shape[0]:
             msg = \
 'The .fasta file in {} has less residue entries than the protein sequence \
 of the reference experiment [{}][{}][{}]'.\
-                format(fasta_path, self.zzref, self.yyref, self.xxref)
+                format(fasta_path, self.zzref, yy, self.xxref)
             self.log_r(fsw.gen_wet('ERROR', msg, 18))
             self.abort()
         
