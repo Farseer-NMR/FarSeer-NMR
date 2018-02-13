@@ -321,7 +321,7 @@ class FarseerSeries(pd.Panel):
 # Fixed Farseer Cube coordinates: "{}" and "{}"
 # {}
 # 
-# Farseer-NMR Run folder: {}
+# Calculation Output Folder: {}
 # Original file path: {}
 # Creation date: {}
 #
