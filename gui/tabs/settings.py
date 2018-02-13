@@ -164,9 +164,9 @@ class Settings(BaseWidget):
                                            )
 
         self.expand_lost_yy = LabelledCheckbox(self,
-                                               "Analyse Lost Y Residues?")
+                                               "Search lost residues along Y axis?")
         self.expand_lost_zz = LabelledCheckbox(self,
-                                               "Analyse Lost Z Residues?")
+                                               "Search lost residues along Z axis?")
 
         self.figure_width = LabelledDoubleSpinBox(
                                                   self,
@@ -243,6 +243,7 @@ class Settings(BaseWidget):
         cs_norm_groupbox.layout().addWidget(self.cs_correction_res_ref)
 
         lost_analysis_groupbox = QGroupBox()
+        lost_analysis_groupbox.setTitle("Cross axes search for lost residues")
         lost_analysis_groupbox_layout = QVBoxLayout()
         lost_analysis_groupbox.setLayout(lost_analysis_groupbox_layout)
         lost_analysis_groupbox.layout().addWidget(self.expand_lost_yy)
