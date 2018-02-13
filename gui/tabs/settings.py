@@ -209,9 +209,9 @@ class Settings(BaseWidget):
         fasta_groupbox.layout().addWidget(self.fasta_start, 0, 1)
         fasta_groupbox.layout().addWidget(self.fasta_button, 1, 0, 1, 2)
 
-        self.x_checkbox = LabelledCheckbox(self, "x")
-        self.y_checkbox = LabelledCheckbox(self, "y")
-        self.z_checkbox = LabelledCheckbox(self, "z")
+        self.x_checkbox = LabelledCheckbox(self, "Along X Axis")
+        self.y_checkbox = LabelledCheckbox(self, "Along Y Axis")
+        self.z_checkbox = LabelledCheckbox(self, "Along Z Axis")
 
         series_groupbox = QGroupBox()
         series_groupbox.setTitle("Experimental Series Analysis")
