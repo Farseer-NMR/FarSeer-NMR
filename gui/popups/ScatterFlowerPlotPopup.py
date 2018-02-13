@@ -202,7 +202,6 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.color_end.get_colour(self.defaults["mk_end_color"])
         self.color_list.field.setText(
             ','.join(self.defaults["color_list"]))
-
         self.x_label_fn.select(self.defaults["x_label_fn"])
         self.x_label_fs.setValue(self.defaults["x_label_fs"])
         self.x_label_pad.setValue(
