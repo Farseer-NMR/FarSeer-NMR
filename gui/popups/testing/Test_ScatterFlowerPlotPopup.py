@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from core.utils import get_default_config_path
 
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
+from gui.gui_utils import colours, get_colour
 from core.fslibs.Variables import Variables
 
 app = QApplication(sys.argv)
@@ -27,7 +28,6 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
 
     def test_defaults(self):
         """Test popup reads and sets default variables"""
-
         self.assertEqual(self.popup.x_label.field.text(),
                          self.defaults["x_label"])
         self.assertEqual(self.popup.y_label.field.text(),
@@ -37,10 +37,10 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.color_grad.isChecked(),
                          self.defaults["color_grad"])
         self.assertEqual(
-            self.popup.color_start.fields.currentText(),
+            colours.get(self.popup.color_start.fields.currentText()),
             self.defaults["mk_start_color"])
         self.assertEqual(
-            self.popup.color_end.fields.currentText(),
+            colours.get(self.popup.color_end.fields.currentText()),
             self.defaults["mk_end_color"])
         self.assertEqual(self.popup.color_list.field.text(),
                          ','.join(self.defaults["color_list"]))
@@ -142,7 +142,7 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
                          False)
         self.assertEqual(
             self.popup.color_start.fields.currentText(),
-            "silver")
+            get_colour("silver"))
         self.assertEqual(
             self.popup.color_end.fields.currentText(),
             "brown")
@@ -210,11 +210,11 @@ class Test_ScatterFlowerPlotPopup(unittest.TestCase):
                          self.popup.variables["cs_scatter_flower_settings"][
                              "color_grad"])
         self.assertEqual(
-            self.popup.color_start.fields.currentText(),
+            colours.get(self.popup.color_start.fields.currentText()),
             self.popup.variables["cs_scatter_flower_settings"][
                 "mk_start_color"])
         self.assertEqual(
-            self.popup.color_end.fields.currentText(),
+            colours.get(self.popup.color_end.fields.currentText()),
             self.popup.variables["cs_scatter_flower_settings"]["mk_end_color"])
         self.assertEqual(self.popup.color_list.field.text(),
                          ','.join(self.popup.variables[

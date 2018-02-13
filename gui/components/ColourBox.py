@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from gui.components.LabelledCombobox import LabelledCombobox
-from gui.gui_utils import colours
+from gui.gui_utils import colours, hex_to_colour_dict
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5 import QtCore
 
@@ -38,3 +38,24 @@ class ColourBox(LabelledCombobox):
             pix = QPixmap(QtCore.QSize(20, 20))
             pix.fill(QColor(item[1]))
             self.fields.addItem(QIcon(pix), item[0])
+        
+    def get_colour(self, colour):
+        """
+        Defines how to read a colour.
+        """
+        if colour.startswith('#'):
+            if colour.upper() in hex_to_colour_dict:
+                self.select(hex_to_colour_dict[colour.upper()])
+            else:
+                colours[colour.upper()] = colour.upper()
+                pix = QPixmap(QtCore.QSize(20, 20))
+                pix.fill(QColor(colour.upper()))
+                self.fields.addItem(QIcon(pix), colour.upper())
+                self.select(colour.upper())
+            
+        elif colour in colours:
+            self.select(colour)
+        
+        else:
+            self.select("black")
+    

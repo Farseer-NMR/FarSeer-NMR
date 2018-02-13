@@ -140,46 +140,34 @@ class ScatterPlotPopup(BasePopup):
         self.cs_scatter_mksize.setValue(self.defaults["mksize"])
         self.cs_scatter_scale.setValue(self.defaults["scale"])
         self.cs_scatter_mk_type.select(self.defaults["mk_type"])
-
-        self.cs_scatter_mk_start_color.select(self.defaults["mk_start_color"])
-        self.cs_scatter_mk_end_color.select(self.defaults["mk_end_color"])
-        self.cs_scatter_markers.field.\
-            setText(','.join(self.defaults["markers"]))
-        self.cs_scatter_mk_color.field.\
-            setText(','.join(self.defaults["mk_color"]))
-        self.cs_scatter_mk_edgecolors.field.\
-            setText(','.join(self.defaults["mk_edgecolors"]))
-        self.cs_scatter_mk_lost_color.select(self.defaults["mk_lost_color"])
+        self.cs_scatter_mk_start_color.get_colour(self.defaults["mk_start_color"])
+        self.cs_scatter_mk_end_color.get_colour(self.defaults["mk_end_color"])
+        self.cs_scatter_markers.field.setText(','.join(self.defaults["markers"]))
+        self.cs_scatter_mk_color.field.setText(','.join(self.defaults["mk_color"]))
+        self.cs_scatter_mk_edgecolors.field.setText(','.join(self.defaults["mk_edgecolors"]))
+        self.cs_scatter_mk_lost_color.get_colour(self.defaults["mk_lost_color"])
         self.cs_scatter_hide_lost.setChecked(self.defaults["hide_lost"])
 
     def set_values(self):
-        self.local_variables["cols_page"] = \
-            self.cs_scatter_cols_page.field.value()
-        self.local_variables["rows_page"] = \
-            self.cs_scatter_rows_page.field.value()
+        self.local_variables["cols_page"] = self.cs_scatter_cols_page.field.value()
+        self.local_variables["rows_page"] = self.cs_scatter_rows_page.field.value()
         self.local_variables["x_label"] = self.cs_scatter_x_label.field.text()
         self.local_variables["y_label"] = self.cs_scatter_y_label.field.text()
         self.local_variables["mksize"] = self.cs_scatter_mksize.field.value()
         self.local_variables["scale"] = self.cs_scatter_scale.field.value()
-        self.local_variables["mk_type"] = \
-            self.cs_scatter_mk_type.fields.currentText()
+        self.local_variables["mk_type"] = self.cs_scatter_mk_type.fields.currentText()
         self.local_variables["mk_start_color"] = \
-            self.cs_scatter_mk_start_color.fields.currentText()
+            colours[self.cs_scatter_mk_start_color.fields.currentText()]
         self.local_variables["mk_end_color"] = \
-            self.cs_scatter_mk_end_color.fields.currentText()
+            colours[self.cs_scatter_mk_end_color.fields.currentText()]
         self.local_variables["markers"] = \
-            [x.strip().strip("'") for x in
-             self.cs_scatter_markers.field.text().split(',')]
+            [x.strip().strip("'") for x in self.cs_scatter_markers.field.text().split(',')]
         self.local_variables["mk_color"] = \
-            [x.translate(translator)
-                for x in self.cs_scatter_mk_color.field.text().split(',')]
+            [x.translate(translator) for x in self.cs_scatter_mk_color.field.text().split(',')]
         self.local_variables["mk_edgecolors"] = \
-            [x.translate(translator)
-                for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
-        self.local_variables["mk_lost_color"] = \
-            self.cs_scatter_mk_lost_color.fields.currentText()
-        self.local_variables["hide_lost"] = \
-            self.cs_scatter_hide_lost.isChecked()
+            [x.translate(translator) for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
+        self.local_variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
+        self.local_variables["hide_lost"] = self.cs_scatter_hide_lost.isChecked()
         self.accept()
 
     def get_values(self):
@@ -190,23 +178,10 @@ class ScatterPlotPopup(BasePopup):
         self.cs_scatter_mksize.setValue(self.local_variables["mksize"])
         self.cs_scatter_scale.setValue(self.local_variables["scale"])
         self.cs_scatter_mk_type.select(self.local_variables["mk_type"])
-
-        self.cs_scatter_mk_start_color.select(
-            self.local_variables["mk_start_color"]
-        )
-        self.cs_scatter_mk_end_color.select(
-            self.local_variables["mk_end_color"]
-        )
-        self.cs_scatter_markers.field.setText(','.join(
-            self.local_variables["markers"])
-        )
-        self.cs_scatter_mk_color.field.setText(
-            ','.join(self.local_variables["mk_color"])
-        )
-        self.cs_scatter_mk_edgecolors.field.setText(
-            ','.join(self.local_variables["mk_edgecolors"])
-        )
-        self.cs_scatter_mk_lost_color.select(
-            self.local_variables["mk_lost_color"]
-        )
+        self.cs_scatter_mk_start_color.get_colour(self.local_variables["mk_start_color"])
+        self.cs_scatter_mk_end_color.get_colour(self.local_variables["mk_end_color"])
+        self.cs_scatter_markers.field.setText(','.join(self.local_variables["markers"]))
+        self.cs_scatter_mk_color.field.setText(','.join(self.local_variables["mk_color"]))
+        self.cs_scatter_mk_edgecolors.field.setText(','.join(self.local_variables["mk_edgecolors"]))
+        self.cs_scatter_mk_lost_color.get_colour(self.local_variables["mk_lost_color"])
         self.cs_scatter_hide_lost.setChecked(self.local_variables["hide_lost"])

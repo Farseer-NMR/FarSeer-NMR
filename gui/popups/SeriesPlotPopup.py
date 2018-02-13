@@ -345,15 +345,15 @@ class SeriesPlotPopup(BasePopup):
         self.series_y_ticks_weight.select(self.defaults["y_ticks_weight"])
         self.series_y_ticks_len.setValue(self.defaults["y_ticks_len"])
         self.series_y_grid_flag.setChecked(self.defaults["y_grid_flag"])
-        self.series_y_grid_color.select(self.defaults["y_grid_color"])
+        self.series_y_grid_color.get_colour(self.defaults["y_grid_color"])
         self.series_y_grid_linestyle.select(self.defaults["y_grid_linestyle"])
         self.series_y_grid_linewidth.setValue(
             self.defaults["y_grid_linewidth"])
         self.series_y_grid_alpha.setValue(self.defaults["y_grid_alpha"])
 
-        self.theo_pre_color.select(self.defaults["theo_pre_color"])
+        self.theo_pre_color.get_colour(self.defaults["theo_pre_color"])
         self.theo_pre_lw.setValue(self.defaults["theo_pre_lw"])
-        self.tag_cartoon_color.select(self.defaults["tag_cartoon_color"])
+        self.tag_cartoon_color.get_colour(self.defaults["tag_cartoon_color"])
         self.tag_cartoon_lw.setValue(self.defaults["tag_cartoon_lw"])
         self.tag_cartoon_ls.select(self.defaults["tag_cartoon_ls"])
 
@@ -450,16 +450,16 @@ class SeriesPlotPopup(BasePopup):
             self.local_variables["y_ticks_weight"])
         self.series_y_ticks_len.setValue(self.local_variables["y_ticks_len"])
         self.series_y_grid_flag.setChecked(self.local_variables["y_grid_flag"])
-        self.series_y_grid_color.select(self.local_variables["y_grid_color"])
+        self.series_y_grid_color.get_colour(self.local_variables["y_grid_color"])
         self.series_y_grid_linestyle.select(
             self.local_variables["y_grid_linestyle"])
         self.series_y_grid_linewidth.setValue(
             self.local_variables["y_grid_linewidth"])
         self.series_y_grid_alpha.setValue(self.local_variables["y_grid_alpha"])
 
-        self.theo_pre_color.select(self.local_variables["theo_pre_color"])
+        self.theo_pre_color.get_colour(self.local_variables["theo_pre_color"])
         self.theo_pre_lw.setValue(self.local_variables["theo_pre_lw"])
-        self.tag_cartoon_color.select(
+        self.tag_cartoon_color.get_colour(
             self.local_variables["tag_cartoon_color"])
         self.tag_cartoon_lw.setValue(self.local_variables["tag_cartoon_lw"])
         self.tag_cartoon_ls.select(self.local_variables["tag_cartoon_ls"])

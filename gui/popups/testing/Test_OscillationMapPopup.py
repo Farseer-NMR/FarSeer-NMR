@@ -86,9 +86,9 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.popup.dpre_osci_dpre_ms.setValue(5)
         self.popup.dpre_osci_dpre_alpha.setValue(0.3)
         self.popup.dpre_osci_smooth_lw.setValue(2)
-        self.popup.dpre_osci_ref_color.select("white")
-        self.popup.dpre_osci_color_init.select("blue")
-        self.popup.dpre_osci_color_end.select("red")
+        self.popup.dpre_osci_ref_color.get_colour("black")
+        self.popup.dpre_osci_color_init.get_colour("#000080")
+        self.popup.dpre_osci_color_end.get_colour("#FFD700")
         self.popup.dpre_osci_x_ticks_fs.setValue(18)
         self.popup.dpre_osci_x_ticks_fn.select("Courier New")
         self.popup.dpre_osci_x_ticks_pad.setValue(0.8)
@@ -133,18 +133,18 @@ class Test_OscillationMapPopup(unittest.TestCase):
                          ["ref_color"])
         self.assertEqual(self.popup.dpre_osci_ref_color.fields.currentText(
 
-        ), "white")
+        ), get_colour("black"))
         self.assertEqual(self.popup.dpre_osci_color_init.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]
-                         ["color_init"])
+                         get_colour(self.popup.variables["dpre_osci_settings"]
+                         ["color_init"]))
         self.assertEqual(
-            self.popup.dpre_osci_color_init.fields.currentText(), "blue")
+            self.popup.dpre_osci_color_init.fields.currentText(), get_colour("#000080"))
         self.assertEqual(self.popup.dpre_osci_color_end.fields.currentText(),
-                         self.popup.variables["dpre_osci_settings"]
-                         ["color_end"])
+                         get_colour(self.popup.variables["dpre_osci_settings"]
+                         ["color_end"]))
         self.assertEqual(self.popup.dpre_osci_color_end.fields.currentText(
 
-        ), "red")
+        ), get_colour("#FFD700"))
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(), 18)
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(),
                          self.popup.variables["dpre_osci_settings"]
@@ -214,8 +214,8 @@ class Test_OscillationMapPopup(unittest.TestCase):
         self.popup.dpre_osci_dpre_alpha.setValue(0.3)
         self.popup.dpre_osci_smooth_lw.setValue(2)
         self.popup.dpre_osci_ref_color.select("white")
-        self.popup.dpre_osci_color_init.select("blue")
-        self.popup.dpre_osci_color_end.select("red")
+        self.popup.dpre_osci_color_init.select("#000080")
+        self.popup.dpre_osci_color_end.select("#FFD700")
         self.popup.dpre_osci_x_ticks_fs.setValue(18)
         self.popup.dpre_osci_x_ticks_fn.select("Courier New")
         self.popup.dpre_osci_x_ticks_pad.setValue(0.8)
@@ -263,18 +263,18 @@ class Test_OscillationMapPopup(unittest.TestCase):
             self.popup.variables["dpre_osci_settings"]["ref_color"])
         self.assertEqual(self.popup.dpre_osci_ref_color.fields.currentText(
 
-        ), "white")
+        ), get_colour("white"))
         self.assertNotEqual(
             self.popup.dpre_osci_color_init.fields.currentText(),
             self.popup.variables["dpre_osci_settings"]["color_init"])
         self.assertEqual(
-            self.popup.dpre_osci_color_init.fields.currentText(), "blue")
+            self.popup.dpre_osci_color_init.fields.currentText(), get_colour("#000080"))
         self.assertNotEqual(
             self.popup.dpre_osci_color_end.fields.currentText(),
             self.popup.variables["dpre_osci_settings"]["color_end"])
         self.assertEqual(self.popup.dpre_osci_color_end.fields.currentText(
 
-        ), "red")
+        ), get_colour("#FFD700"))
         self.assertEqual(self.popup.dpre_osci_x_ticks_fs.field.value(), 18)
         self.assertNotEqual(self.popup.dpre_osci_x_ticks_fs.field.value(),
                             self.popup.variables["dpre_osci_settings"][

@@ -55,7 +55,7 @@ class UserMarksPopup(BasePopup):
                                           QDialogButtonBox.Ok |
                                           QDialogButtonBox.Cancel |
                                           QDialogButtonBox.RestoreDefaults)
-        self.buttonBox.accepted.connect(self.setValues)
+        self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
             clicked.connect(self.set_defaults)
@@ -140,7 +140,7 @@ class UserMarksPopup(BasePopup):
             value = LabelledLineEdit(self, text='value')
             value.field.setText(value1)
             colour = ColourBox(self, text='colour')
-            colour.select(self.variables
+            colour.get_colour(self.variables
                           ["bar_plot_settings"]["user_bar_colors_dict"][key1])
             addButton = QPushButton("Add", self)
             addButton.clicked.connect(self.add_row_to_popup)
@@ -170,7 +170,7 @@ class UserMarksPopup(BasePopup):
             key.field.setText(key1)
             value = LabelledLineEdit(self, text='value')
             colour = ColourBox(self, text='colour')
-            colour.select(self.defaults
+            colour.get_colour(self.defaults
                           ["bar_plot_settings"]["user_bar_colors_dict"][key1])
             value.field.setText(value1)
             addButton = QPushButton("Add", self)

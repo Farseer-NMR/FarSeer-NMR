@@ -174,15 +174,15 @@ class ResidueEvolutionPopup(BasePopup):
         self.res_evo_x_label.field.setText(self.defaults["x_label"])
         self.res_evo_plot_line_style.select(self.defaults["line_style"])
         self.res_evo_plot_line_width.setValue(self.defaults["line_width"])
-        self.res_evo_line_color.select(self.defaults["line_color"])
-        self.res_evo_marker_color.select(self.defaults["marker_color"])
+        self.res_evo_line_color.get_colour(self.defaults["line_color"])
+        self.res_evo_marker_color.get_colour(self.defaults["marker_color"])
         self.res_evo_plot_marker_style.select(self.defaults["marker_style"])
         self.res_evo_plot_marker_size.setValue(self.defaults["marker_size"])
         self.res_evo_plot_fill_between.setChecked(
             self.defaults["fill_between"])
-        self.res_evo_plot_fill_colour.select(self.defaults["fill_color"])
+        self.res_evo_plot_fill_colour.get_colour(self.defaults["fill_color"])
         self.res_evo_fill_alpha.setValue(self.defaults["fill_alpha"])
-        self.res_evo_fit_line_colour.select(self.defaults["fit_line_color"])
+        self.res_evo_fit_line_colour.get_colour(self.defaults["fit_line_color"])
         self.res_evo_fit_line_width.setValue(self.defaults["fit_line_width"])
         self.res_evo_fit_line_style.select(self.defaults["fit_line_style"])
 
@@ -231,21 +231,21 @@ class ResidueEvolutionPopup(BasePopup):
         self.res_evo_plot_line_style.select(self.local_variables["line_style"])
         self.res_evo_plot_line_width.setValue(
             self.local_variables["line_width"])
-        self.res_evo_line_color.select(self.local_variables["line_color"])
+        self.res_evo_line_color.get_colour(self.local_variables["line_color"])
         self.res_evo_plot_marker_style.select(
             self.local_variables["marker_style"])
         self.res_evo_plot_marker_size.setValue(
             self.local_variables["marker_size"])
         self.res_evo_plot_fill_between.setChecked(
             self.local_variables["fill_between"])
-        self.res_evo_plot_fill_colour.select(
+        self.res_evo_plot_fill_colour.get_colour(
             self.local_variables["fill_color"])
         self.res_evo_fill_alpha.setValue(
             self.local_variables["fill_alpha"])
-        self.res_evo_fit_line_colour.select(
+        self.res_evo_fit_line_colour.get_colour(
             self.local_variables["fit_line_color"])
         self.res_evo_fit_line_width.setValue(
             self.local_variables["fit_line_width"])
         self.res_evo_fit_line_style.select(
             self.local_variables["fit_line_style"])
-        self.res_evo_marker_color.select(self.local_variables["marker_color"])
+        self.res_evo_marker_color.get_colour(self.local_variables["marker_color"])

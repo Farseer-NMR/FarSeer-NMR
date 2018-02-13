@@ -194,7 +194,7 @@ class HeatMapPopup(BasePopup):
         self.heat_map_right_margin.setValue(self.defaults["right_margin"])
         self.heat_map_bottom_margin.setValue(self.defaults["bottom_margin"])
         self.heat_map_cbar_font_size.setValue(self.defaults["cbar_font_size"])
-        self.heat_map_tag_line_color.select(self.defaults["tag_line_color"])
+        self.heat_map_tag_line_color.get_colour(self.defaults["tag_line_color"])
         self.heat_map_tag_ls.select(self.defaults["tag_line_ls"])
         self.heat_map_tag_lw.setValue(self.defaults["tag_line_lw"])
 
@@ -258,7 +258,7 @@ class HeatMapPopup(BasePopup):
             self.local_variables["bottom_margin"])
         self.heat_map_cbar_font_size.setValue(
             self.local_variables["cbar_font_size"])
-        self.heat_map_tag_line_color.select(
+        self.heat_map_tag_line_color.get_colour(
             self.local_variables["tag_line_color"])
         self.heat_map_tag_ls.select(self.local_variables["tag_line_ls"])
         self.heat_map_tag_lw.setValue(self.local_variables["tag_line_lw"])

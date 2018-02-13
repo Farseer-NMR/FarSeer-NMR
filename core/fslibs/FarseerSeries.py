@@ -340,7 +340,7 @@ class FarseerSeries(pd.Panel):
     
     def hex_to_RGB(self, hexx):
         """
-        This function was taken verbatim from:
+        This function was taken from:
         Copyright 2017 Ben Southgate
         https://github.com/bsouthga/blog
         
@@ -369,6 +369,11 @@ class FarseerSeries(pd.Panel):
 
         "#FFFFFF" -> [255,255,255]
         """
+        # if clause not part of the original function, added for the Farseer-NMR Project.
+        if not(hexx.startswith("#") and len(hexx) == 7):
+            msg = "The input colour is not in HEX format."
+            self.log_r(fsw.gen_wet("ERROR", msg, 27))
+            self.abort()
         # Pass 16 to the integer function for change of base
         return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
 

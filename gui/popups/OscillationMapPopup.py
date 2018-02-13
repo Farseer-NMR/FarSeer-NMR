@@ -29,7 +29,7 @@ from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
 
-from gui.gui_utils import font_weights, get_colour
+from gui.gui_utils import font_weights, colours
 
 from gui.popups.BasePopup import BasePopup
 
@@ -188,10 +188,9 @@ class OscillationMapPopup(BasePopup):
         self.dpre_osci_dpre_ms.setValue(self.defaults["dpre_ms"])
         self.dpre_osci_dpre_alpha.setValue(self.defaults["dpre_alpha"])
         self.dpre_osci_smooth_lw.setValue(self.defaults["smooth_lw"])
-        self.dpre_osci_ref_color.select(get_colour(self.defaults["ref_color"]))
-        self.dpre_osci_color_init.select(get_colour(
-            self.defaults["color_init"]))
-        self.dpre_osci_color_end.select(get_colour(self.defaults["color_end"]))
+        self.dpre_osci_ref_color.get_colour(self.defaults["ref_color"])
+        self.dpre_osci_color_init.get_colour(self.defaults["color_init"])
+        self.dpre_osci_color_end.get_colour(self.defaults["color_end"])
         self.dpre_osci_x_ticks_fs.setValue(self.defaults["x_ticks_fs"])
         self.dpre_osci_x_ticks_fn.select(self.defaults["x_ticks_fn"])
         self.dpre_osci_x_ticks_pad.setValue(self.defaults["x_ticks_pad"])
@@ -220,11 +219,11 @@ class OscillationMapPopup(BasePopup):
         self.local_variables["smooth_lw"] = \
             self.dpre_osci_smooth_lw.field.value()
         self.local_variables["ref_color"] = \
-            str(self.dpre_osci_ref_color.fields.currentText())
+            self.dpre_osci_ref_color.fields.currentText()
         self.local_variables["color_init"] = \
-            str(self.dpre_osci_color_init.fields.currentText())
+            colours[self.dpre_osci_color_init.fields.currentText()]
         self.local_variables["color_end"] = \
-            str(self.dpre_osci_color_end.fields.currentText())
+            colours[self.dpre_osci_color_end.fields.currentText()]
         self.local_variables["x_ticks_fs"] = \
             self.dpre_osci_x_ticks_fs.field.value()
         self.local_variables["x_ticks_fn"] = \
@@ -258,9 +257,9 @@ class OscillationMapPopup(BasePopup):
         self.dpre_osci_dpre_ms.setValue(self.local_variables["dpre_ms"])
         self.dpre_osci_dpre_alpha.setValue(self.local_variables["dpre_alpha"])
         self.dpre_osci_smooth_lw.setValue(self.local_variables["smooth_lw"])
-        self.dpre_osci_ref_color.select(self.local_variables["ref_color"])
-        self.dpre_osci_color_init.select(self.local_variables["color_init"])
-        self.dpre_osci_color_end.select(self.local_variables["color_end"])
+        self.dpre_osci_ref_color.get_colour(self.local_variables["ref_color"])
+        self.dpre_osci_color_init.get_colour(self.local_variables["color_init"])
+        self.dpre_osci_color_end.get_colour(self.local_variables["color_end"])
         self.dpre_osci_x_ticks_fs.setValue(self.local_variables["x_ticks_fs"])
         self.dpre_osci_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
         self.dpre_osci_x_ticks_pad.setValue(
