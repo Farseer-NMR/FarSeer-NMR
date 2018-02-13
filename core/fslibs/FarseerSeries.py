@@ -144,6 +144,7 @@ class FarseerSeries(pd.Panel):
     tables_and_plots_folder = 'TablesAndPlots'
     chimera_att_folder = 'ChimeraAttributeFiles'
     export_series_folder = 'FullPeaklists'
+    axis_list = ['x','y','z']
     
     def create_attributes(
             self,
@@ -303,22 +304,43 @@ class FarseerSeries(pd.Panel):
         
         return
     
-    def create_header(
-        self,
-        parameter_type='param',
-        extra_info="",
-        file_path=""):
-        """Creates description header for files and plots."""
+    def create_header(self, extra_info="", file_path=""):
+        """
+        Creates description header for files and plots using "#" as
+        comment character.
+        
+        Differentiates between calculations and comparisons.
+        
+        Parameters:
+            - extra_info (str): additional info that may be relevant for
+                the process that calls create_header.
+            - file_path (srt): the path where the target file will be
+                saved.
+            
+        Returns:
+            - header_1 (str) containing the header.
+        """
         
         # discriminates between main calculation or comparison.
         if self.dim_comparison:
-            axis = "{}/{}".format(self.series_axis, self.dim_comparison)
+            self_axis_index = self.axis_list.index(self.dim_comparison[-1])
+            hh_string = '# Parameters/observables analysed along "{}" axis \
+and stacked (compared) along "{}" axis'.format(
+                self.series_axis[-1].upper(),
+                self.dim_comparison[-1].upper()
+                )
+        
         else:
-            axis = self.series_axis
+            self_axis_index = self.axis_list.index(self.series_axis[-1])
+            hh_string = '# Parameters/observables analysed along "{}" axis'.\
+                format(self.series_axis[-1].upper())
+        
         
         header_1 = \
-"""# Parameters/observables analysed "{}"
-# Fixed Farseer Cube coordinates: "{}" and "{}"
+"""{}
+# keeping fixed the following data points on the other Farseer-NMR Cube coordinates:
+# - along {} axis: "{}" 
+# - along {} axis: "{}"
 # {}
 # 
 # Calculation Output Folder: {}
@@ -326,15 +348,17 @@ class FarseerSeries(pd.Panel):
 # Creation date: {}
 #
 """.\
-            format(
-                axis,
-                self.prev_dim,
-                self.next_dim,
-                extra_info,
-                os.getcwd(),
-                file_path,
-                datetime.datetime.now().strftime("%c")
-                )
+                format(
+                    hh_string,
+                    self.axis_list[self_axis_index-1],
+                    self.prev_dim,
+                    self.axis_list[self_axis_index-2],
+                    self.next_dim,
+                    extra_info,
+                    os.getcwd(),
+                    file_path,
+                    datetime.datetime.now().strftime("%c")
+                    )
         
         return header_1
     
