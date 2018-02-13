@@ -156,6 +156,7 @@ class FarseerCube:
         # loads user input information into the instance
         self.has_sidechains = has_sidechains
         self.FASTAstart = FASTAstart
+        self.applyFASTA = applyFASTA
         # lists that contain axes datapoint names
         self.zzcoords = None
         self.yycoords = None
@@ -1607,6 +1608,9 @@ of the reference experiment [{}][{}][{}]'.\
         on the y dimension.
         """
         
+        if not(self.applyFASTA):
+            return
+        
         l = []
         is_bigger = False
 
@@ -1640,6 +1644,9 @@ Please correct your .fasta files.'
         
         Raises WET#22 otherwise.
         """
+        
+        if not(self.applyFASTA):
+            return
         
         if not(self.zzcoords and self.allfasta):
             msg = \
