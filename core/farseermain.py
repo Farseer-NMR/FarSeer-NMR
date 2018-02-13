@@ -1614,7 +1614,9 @@ def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     PRE_analysis(comp_panel, fsuv)
     exports_chimera_att_files(comp_panel, fsuv)
     # plots data
-    plots_data(comp_panel, fsuv, resonance_type='Backbone')
+    plots_data(comp_panel, fsuv, resonance_type=resonance_type)
+    # writes parameters to tables
+    exports_all_parameters(comp_panel, fsuv, resonance_type=resonance_type)
     
     return
 
