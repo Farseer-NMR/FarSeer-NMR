@@ -3,7 +3,7 @@ import unittest
 import json
 from PyQt5.QtWidgets import QApplication
 from core.utils import get_default_config_path
-
+from gui.gui_utils import colours
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from core.fslibs.Variables import Variables
 
@@ -43,10 +43,10 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.cs_scatter_mk_type.fields.currentText(),
                          self.defaults["mk_type"])
         self.assertEqual(
-            self.popup.cs_scatter_mk_start_color.fields.currentText(),
+            colours.get(self.popup.cs_scatter_mk_start_color.fields.currentText()),
             self.defaults["mk_start_color"])
         self.assertEqual(
-            self.popup.cs_scatter_mk_end_color.fields.currentText(),
+            colours.get(self.popup.cs_scatter_mk_end_color.fields.currentText()),
             self.defaults["mk_end_color"])
         self.assertEqual(self.popup.cs_scatter_markers.field.text(),
                          ','.join(self.defaults["markers"]))
@@ -121,10 +121,10 @@ class Test_ScatterPlotPopup(unittest.TestCase):
                              "mk_type"])
 
         self.assertEqual(
-            self.popup.cs_scatter_mk_start_color.fields.currentText(),
+            colours.get(self.popup.cs_scatter_mk_start_color.fields.currentText()),
             self.popup.variables["cs_scatter_settings"]["mk_start_color"])
         self.assertEqual(
-            self.popup.cs_scatter_mk_end_color.fields.currentText(),
+            colours.get(self.popup.cs_scatter_mk_end_color.fields.currentText()),
             self.popup.variables["cs_scatter_settings"]["mk_end_color"])
         self.assertEqual(self.popup.cs_scatter_markers.field.text(), ','.join(
             self.popup.variables["cs_scatter_settings"]["markers"]))

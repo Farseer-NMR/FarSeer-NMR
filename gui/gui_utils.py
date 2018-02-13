@@ -39,12 +39,24 @@ colours = OrderedDict(sorted(
     key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
 
 keylist = list(colours.keys())
-
-hex_to_colour_dict = {value: key for key, value in colours.items()}
-
 for key in keylist:
     if len(key) == 1:
         colours.pop(key, None)
+hex_to_colour_dict = {value: key for key, value in colours.items()}
+
+single_char_color = {
+    "k":"#000000",
+    "w":"#FFFFFF",
+    "r":"#FF0000",
+    "y":"#FFFF00",
+    "g":"#008000",
+    "c":"#00FFFF",
+    "b":"#0000FF",
+    "m":"#FF00FF"
+    }
+
+colours.update(single_char_color)
+
 
 settings_1280x800 = {
     'peaklistarea_height': 350,
@@ -128,10 +140,21 @@ def deliver_settings(resolution):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
 
-
+# get_colour is used in Test scripts
+# variables are loaded into config using ColourBox.get_colour()
 def get_colour(colour):
-
+    """
+    Defines how to read a colour.
+    """
     if colour.startswith('#'):
-        return hex_to_colour_dict[colour.upper()]
-    else:
+        if colour.upper() in hex_to_colour_dict:
+            return hex_to_colour_dict[colour.upper()]
+        else:
+            colours[colour.upper()] = colour.upper()
+            return colour.upper()
+        
+    elif colour in colours:
         return colour
+    
+    else:
+        return "black"
