@@ -2377,6 +2377,9 @@ or confirm you have not forgot any peaklist [{}].".\
                 zorder=10
                 )
         
+        # Axis range
+        axs[0].set_xlim(x_min, x_max)
+        axs[0].set_ylim(y_min, y_max)
         # Configure Axis Ticks
         axs[0].xaxis.tick_bottom()
         axs[0].tick_params(
@@ -2392,6 +2395,9 @@ or confirm you have not forgot any peaklist [{}].".\
             length=y_ticks_len,
             direction='out'
             )
+        # remember in NMR spectra the ppm scale is 'inverted' :-)
+        axs[0].invert_xaxis()
+        axs[0].invert_yaxis()
         ## Configure axes labels
         axs[0].set_xlabel(
             x_label,
@@ -2425,11 +2431,6 @@ or confirm you have not forgot any peaklist [{}].".\
             linestyles='dotted',
             linewidth=0.25
             )
-        axs[0].set_xlim(x_min, x_max)
-        axs[0].set_ylim(y_min, y_max)
-        # remember in NMR spectra the ppm scale is 'inverted' :-)
-        axs[0].invert_xaxis()
-        axs[0].invert_yaxis()
         axs[0].locator_params(axis='both', tight=True, nbins=10)
         axs[0].set_xticklabels(
             axs[0].get_xticks(),
