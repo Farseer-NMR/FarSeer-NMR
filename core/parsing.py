@@ -206,7 +206,6 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
 
         if line.startswith('DATA'):
             dimension_count += 1
-            isotopes.append(data[2])
             continue
 
         if line.startswith('VARS') or line.startswith('variables'):
@@ -214,16 +213,17 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
             # of column_label: column_index
             for i, key in enumerate(data[1:]):
                 field_dictionary[key] = i
-
             continue
 
+        # if field dictionary is empty
         elif not field_dictionary:
             continue
 
+        # if field doesn't begin with an integer
         elif not line[0].isdigit():
             continue
 
-        ppms = [0] * dimension_count
+        positions = [0] * dimension_count
         linewidths = [None] * dimension_count
         dimension_labels = (('X_PPM', 'XW'), ('Y_PPM', 'YW'), ('Z_PPM', 'ZW'))
 
@@ -234,16 +234,17 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
                  if annotation]
 
         for dimension in range(dimension_count):
-            ppmKey, linewidthKey = dimension_labels[dimension]
-            ppms[dimension] = float(data[field_dictionary[ppmKey]])
-            linewidths[dimension] = float(data[field_dictionary[linewidthKey]])
+            ppm_heading, linewidth_heading = dimension_labels[dimension]
+            positions[dimension] = float(data[field_dictionary[ppm_heading]])
+            linewidths[dimension] = \
+                float(data[field_dictionary[linewidth_heading]])
 
         peak = Peak(peak_number=data[0],
                     assignments=annotations,
                     atoms=atoms,
                     height=height,
                     volume=volume,
-                    positions=ppms,
+                    positions=positions,
                     linewidths=linewidths)
         peakList.append(peak)
 
@@ -253,89 +254,81 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
 
 
 def parse_nmrview_peaklist(peaklist_file):
+    """Parse a 2D peaklist in NmrDraw format
+label dataset sw sf
+1H 15N
+None
+{9578.54 } {1944.77 }
+{599.7728 } { 60.7814 }
+ 1H.L  1H.P  1H.W  1H.B  1H.E  1H.J  1H.U  15N.L  15N.P  15N.W  15N.B  15N.E  15N.J  15N.U  vol  int  stat  comment  flag0
+7  {480.HN}   8.772   0.050   0.050   ?   0.000   {?}   {480.N}   130.768   0.050   0.050   ?   0.000   {?}  827229.31250 100862.75000 1 {?} 0
+8  {}   0.000   0.000   0.000   ?   0.000   {?}   {}   0.000   0.000   0.000   ?   0.000   {?}  0.00000 0.00000 -1 {?} 0
+9  {640.HN}   8.657   0.050   0.050   ?   0.000   {?}   {640.N}   130.164   0.050   0.050   ?   0.000   {?}  493697.26562 57617.50000 1 {?} 0
+10  {}   0.000   0.000   0.000   ?   0.000   {?}   {}   0.000   0.000   0.000   ?   0.000   {?}  0.00000 0.00000 -1 {?} 0
+11  {739.HN}   8.846   0.050   0.050   ?   0.000   {?}   {739.N}   129.894   0.050   0.050   ?   0.000   {?}  677300.62500 81214.85938 1 {?} 0
+12  {}   0.000   0.000   0.000   ?   0.000   {?}   {}   0.000   0.000   0.000   ?   0.000   {?}  0.00000 0.00000 -1 {?} 0
+    """
     peakList = []
     fin = open(peaklist_file, 'r')
-
-    null = fin.readline()
-    dimension_names = fin.readline().strip().split()
+    lines = fin.readlines()
+    dimension_names = lines[1].strip().split()
     dimension_count = len(dimension_names)
-    name = fin.readline()
-    line = fin.readline()
-    line = line.replace('{', '')
-    line = line.replace('}', '')
-
-    line = fin.readline()
-    line = line.replace('{', '')
-    line = line.replace('}', '')
-    headings = fin.readline().strip().split()
+    headings = lines[5].strip().split()
     dimension_headings = [x.split('.') for x in headings if '.' in x]
     dimension_headings = [x for x in dimension_headings if x[0]
                           in dimension_names]
     field_count = int(len(dimension_headings) / dimension_count)
 
-    for line in fin:
+    for line in lines[6:]:
         fields = line.strip().split()
-        verified = []
+        volume, height, status, comment = fields[-5:-1]
 
-        while fields:
-            value = fields.pop()
-
-            if value[-1] == '}':
-                while value[0] != '{':
-                    value = fields.pop() + value
-
-                verified.append(value)
-
-        verified.reverse()
-        j = 1 + dimension_count * field_count
-        volume, height, status, comment = verified[j:j+4]
-
-        if status == '-1':
+        if line[1] == '{}' or status == '-1':
             continue
-
-        peak_number = int(verified[0])
+        peak_data = fields[:-5]
+        peak_number = int(peak_data[0])
         volume = float(volume)
         height = float(height)
         details = comment[1:-1].strip()
-        ppms = [0] * dimension_count
-        annotations = [None] * dimension_count
+        positions = [None] * dimension_count
+        labels = [None] * dimension_count
         linewidths = [None] * dimension_count
-        boxwidths = [None] * dimension_count
         atoms = [None] * dimension_count
 
         if details == '?':
             details = None
 
         for i in range(dimension_count):
-            j = 1 + i*field_count
-            dimension_data = verified[j:j+field_count]
-            annotation, ppm, linewidth, boxwidth, shape = \
-                dimension_data[:5]
+            field_start = 1 + i*field_count
+            field_end = field_start+1*field_count
+            dimension_data = peak_data[field_start:field_end]
+            label, position, linewidth = dimension_data[:3]
 
-            annotation = annotation[1:-1]
+            label = label[1:-1]
 
-            if annotation == '?':
-                annotation = None
-            if annotation:
-                atoms[i] = annotation.split('.')[1]
-            ppms[i] = float(ppm)
+            if label == '?':
+                label = None
+            if label:
+                atoms[i] = label.split('.')[1]
+            positions[i] = float(position)
             linewidths[i] = float(linewidth)
-            boxwidths[i] = float(boxwidth)
-            annotations[i] = annotation
-            peak = Peak(peak_number=peak_number,
-                        positions=ppms,
-                        volume=volume,
-                        height=height,
-                        assignments=annotations,
-                        linewidths=linewidths,
-                        atoms=atoms,
-                        details=details)
+            labels[i] = label
 
-            peakList.append(peak)
 
-        fin.close()
+        peak = Peak(peak_number=peak_number,
+                    positions=positions,
+                    volume=volume,
+                    height=height,
+                    assignments=labels,
+                    linewidths=linewidths,
+                    atoms=atoms,
+                    details=details)
 
-        return peakList
+        peakList.append(peak)
+
+    fin.close()
+
+    return peakList
 
 
 def parse_ccpn_peaklist(peaklist_file):

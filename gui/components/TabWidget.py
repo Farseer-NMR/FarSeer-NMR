@@ -44,7 +44,7 @@ class TabWidget(QTabWidget):
 
     To add a new tab to the tab widget, the QWidget class of the needs to be
     imported into this file. The instantiation of the class and the addition
-    of the QWidget to the TabWidger need to be coded in the add_tabs_to_widget
+    of the QWidget to the TabWidget need to be coded in the add_tabs_to_widget
     method.
 
     Parameters:
