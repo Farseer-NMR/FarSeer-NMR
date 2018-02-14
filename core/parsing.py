@@ -37,7 +37,7 @@ def get_peaklist_format(file_path):
         print('Invalid File Extension')
         return
     if file_path.split('.')[-1] not in file_extensions:
-        print('Invalid File Extension')
+        print('Invalid File Extension. Suffix not in accepted format.')
         return
     for line in fin:
         if not line.strip():
@@ -154,7 +154,8 @@ ANSIG v3.3 export crosspeaks file
                         height=height,
                         assignments=peak_labels,
                         linewidths=line_widths,
-                        atoms=atoms)
+                        atoms=atoms,
+                        format="ansig")
 
             peakList.append(peak)
     fin.close()
@@ -238,15 +239,16 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
             positions[dimension] = float(data[field_dictionary[ppm_heading]])
             linewidths[dimension] = \
                 float(data[field_dictionary[linewidth_heading]])
-
-        peak = Peak(peak_number=data[0],
-                    assignments=annotations,
-                    atoms=atoms,
-                    height=height,
-                    volume=volume,
-                    positions=positions,
-                    linewidths=linewidths)
-        peakList.append(peak)
+        if '' not in annotations:
+            peak = Peak(peak_number=data[0],
+                        assignments=annotations,
+                        atoms=atoms,
+                        height=height,
+                        volume=volume,
+                        positions=positions,
+                        linewidths=linewidths,
+                        format="nmrdraw")
+            peakList.append(peak)
 
     fin.close()
 
@@ -322,7 +324,8 @@ None
                     assignments=labels,
                     linewidths=linewidths,
                     atoms=atoms,
-                    details=details)
+                    details=details,
+                    format="nmrview")
 
         peakList.append(peak)
 
@@ -354,7 +357,8 @@ def parse_ccpn_peaklist(peaklist_file):
                     height=row[6],
                     fit_method=row[12], merit=row[10],
                     volume_method=row[13],
-                    details=row[11])
+                    details=row[11],
+                    format='ccpn')
 
         peakList.append(peak)
 
@@ -389,7 +393,8 @@ def parse_sparky_peaklist(peaklist_file):
                     atoms=atoms,
                     linewidths=linewidths,
                     volume=volume,
-                    height=height)
+                    height=height,
+                    format="sparky")
         peakList.append(peak)
 
     return peakList

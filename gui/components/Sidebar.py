@@ -22,7 +22,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
+from PyQt5.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
 
 from core.parsing import read_peaklist
 
@@ -144,6 +144,20 @@ class SideBar(QTreeWidget):
             peaklist = read_peaklist(file_path)
             if peaklist:
                 pl_name = name
+                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                    print(peaklist[0].format)
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Warning)
+                    msg.setText("NmrView/NmrDraw Peaklist")
+                    msg.setInformativeText("This peaklist doesn't contain"
+                                           "residue types. Please ensure an "
+                                           "approriate FASTA file is present "
+                                           "in the correct y condition")
+                    msg.setWindowTitle("Duplicate conditions")
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.exec_()
+                    self.variables['fasta_settings']['applyFASTA'] = True
+
 
                 item = self.add_item(pl_name)
                 self.peakLists[item.text(0)] = peaklist

@@ -115,6 +115,7 @@ class TabWidget(QTabWidget):
             if fname[0].split('.')[1] == 'json':
                 Variables().read(fname[0])
                 self.load_variables()
+                self.config_file = fname[0]
         return
 
     def load_variables(self):
@@ -186,6 +187,11 @@ class TabWidget(QTabWidget):
                 msg.setInformativeText(
                     "No Experimental dataset has been created. "
                     "Please populate Experimental Dataset Tree.")
+            elif run_msg == "Invalid Fasta":
+                msg.setText("Invalid dataset")
+                msg.setInformativeText(
+                    "This calculation requires FASTA files to be speicified "
+                    "for each y condition.")
             msg.exec_()
 
     def _add_tab_logo(self):

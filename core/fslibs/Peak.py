@@ -22,9 +22,19 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 class Peak(object):
 
-    def __init__(self, peak_number, positions, assignments, linewidths, height, volume, atoms,
-                 fit_method=None, merit=None,
-                 volume_method=None, details=None):
+    def __init__(self,
+                 peak_number,
+                 positions,
+                 assignments,
+                 linewidths,
+                 height,
+                 volume,
+                 atoms,
+                 format,
+                 fit_method=None,
+                 merit=None,
+                 volume_method=None,
+                 details=None):
 
         self.peak_number = peak_number
         self.positions = positions
@@ -37,5 +47,6 @@ class Peak(object):
         self.merit = merit
         self.volume_method = volume_method
         self.details = details
+        self.format = format
         
 

@@ -25,6 +25,7 @@ import os
 from shutil import copy2
 
 from core.parsing import read_peaklist
+from core.utils import aal1tol3
 
 
 def create_directory_structure(output_path, variables):
@@ -44,9 +45,12 @@ def create_directory_structure(output_path, variables):
             if not os.path.exists(os.path.join(spectrum_dir, z_name, y_name)):
                 os.makedirs(os.path.join(spectrum_dir, z_name, y_name))
             if variables["fasta_settings"]["applyFASTA"]:
-                if variables["fasta_files"][y_key]:
-                    fasta_file = variables["fasta_files"][y_key]
-                    copy2(fasta_file, os.path.join(spectrum_dir,
+                fasta_file = variables["fasta_files"].get(y_key)
+                if not fasta_file:
+                    print('fasta file not specified for %s' % y_key)
+                    return "Invalid Fasta"
+                fasta_file = variables["fasta_files"][y_key]
+                copy2(fasta_file, os.path.join(spectrum_dir,
                                                    z_name, y_name))
             for kk, x_key in enumerate(variables["conditions"]["x"]):
                 x_name = '_'.join(["{:0>2}".format(kk), x_key])
@@ -55,7 +59,16 @@ def create_directory_structure(output_path, variables):
                 peaklist_path = variables["peaklists"][exp_dataset[z_key]
                                                        [y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
-                write_peaklist_file(fout, peaklist)
+                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                    fasta_file = variables['fasta_files'][y_key]
+                    if not fasta_file:
+                        print('fasta file not specified for %s' % y_key)
+                        return "Invalid Fasta"
+                    fasta_start = variables['fasta_settings']['FASTAstart']
+                    write_peaklist_file(fout,
+                                        add_residue_information(peaklist,
+                                                                fasta_file,
+                                                                fasta_start))
                 fout.close()
     return "Run"
 
@@ -90,3 +103,30 @@ def list_all_files_in_path(path):
     result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(path)
               for f in filenames]
     return result
+
+def add_residue_information(peak_list, fasta_file, fasta_start):
+
+    print('fasta_start: %s fasta_file: %s' % (str(fasta_start), fasta_file))
+
+    cleaned_peaklist = []
+
+    fasta = ''.join([line.replace('\n', '') for line in
+                     open(fasta_file, 'r').readlines()[1:]])
+    fasta_dict = {ii + fasta_start: aal1tol3.get(residue) for ii, residue in
+                  enumerate(fasta)}
+    import pprint
+    pprint.pprint(fasta_dict)
+    for peak in peak_list:
+        if all(ass is None for ass in peak.assignments) and not '' in peak.assignments:
+            continue
+        resno = peak.assignments[0].split('.')[0]
+
+        res_type = fasta_dict.get(int(resno))
+        if not res_type:
+            print('Residue number %s is invalid' % str(resno))
+            continue
+        assignment = [''.join([resno, res_type, 'H']),
+                      ''.join([resno, res_type, 'N'])]
+        peak.assignments = assignment
+        cleaned_peaklist.append(peak)
+    return cleaned_peaklist
