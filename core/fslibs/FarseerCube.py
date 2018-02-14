@@ -500,9 +500,9 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         logs = \
 """
-* Farseer Cube X axis variables (cond1): {}
-* Farseer Cube Y axis variables (cond2): {}
-* Farseer Cube Z axis variables (cond3): {}
+* Farseer Cube X axis variables (along_x): {}
+* Farseer Cube Y axis variables (along_y): {}
+* Farseer Cube Z axis variables (along_z): {}
 """.\
             format(self.xxcoords, self.yycoords, self.zzcoords)
         self.log_r(logs)
@@ -1295,21 +1295,21 @@ more details."
         
         # transposes the Farseer-NMR cube according to the desired axis
         if along_axis=='x':
-            series_type='cond1'
+            series_type='along_x'
             owndim_pts=self.xxcoords
             next_axis = self.yycoords
             next_axis_2 = self.zzcoords
         
         elif along_axis=='y':
             self.compare_fastas()
-            series_type='cond2'
+            series_type='along_y'
             fscube = fscube.transpose(2,0,1,3,4, copy=True)
             owndim_pts=self.yycoords
             next_axis = self.zzcoords
             next_axis_2 = self.xxcoords
         
         elif along_axis=='z':
-            series_type='cond3'
+            series_type='along_z'
             fscube = fscube.transpose(1,2,0,3,4, copy=True)
             owndim_pts=self.zzcoords
             next_axis = self.xxcoords

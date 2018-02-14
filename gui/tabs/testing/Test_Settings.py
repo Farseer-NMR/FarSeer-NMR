@@ -93,11 +93,11 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.perform_comparisons_checkbox.isChecked(),
                          fitting["perform_comparisons"])
         self.assertEqual(self.widget.x_checkbox.isChecked(),
-                         fitting["do_cond1"])
+                         fitting["do_along_x"])
         self.assertEqual(self.widget.y_checkbox.isChecked(),
-                         fitting["do_cond2"])
+                         fitting["do_along_y"])
         self.assertEqual(self.widget.z_checkbox.isChecked(),
-                         fitting["do_cond3"])
+                         fitting["do_along_z"])
 
         self.assertEqual(self.widget.cs_correction.isChecked(),
                          cs["perform_cs_correction"])
@@ -335,9 +335,9 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(fitting["expand_lost_yy"], True)
         self.assertEqual(fitting["expand_lost_zz"], True)
         self.assertEqual(fitting["perform_comparisons"], True)
-        self.assertEqual(fitting["do_cond1"], False)
-        self.assertEqual(fitting["do_cond2"], True)
-        self.assertEqual(fitting["do_cond3"], True)
+        self.assertEqual(fitting["do_along_x"], False)
+        self.assertEqual(fitting["do_along_y"], True)
+        self.assertEqual(fitting["do_along_z"], True)
 
         self.assertEqual(cs["perform_cs_correction"], True)
         self.assertEqual(cs["cs_correction_res_ref"], 15)
@@ -556,9 +556,9 @@ class Test_Case(unittest.TestCase):
         self.assertNotEqual(fitting["expand_lost_yy"], True)
         self.assertNotEqual(fitting["expand_lost_zz"], True)
         self.assertNotEqual(fitting["perform_comparisons"], True)
-        self.assertNotEqual(fitting["do_cond1"], False)
-        self.assertNotEqual(fitting["do_cond2"], True)
-        self.assertNotEqual(fitting["do_cond3"], True)
+        self.assertNotEqual(fitting["do_along_x"], False)
+        self.assertNotEqual(fitting["do_along_y"], True)
+        self.assertNotEqual(fitting["do_along_z"], True)
 
         self.assertNotEqual(cs["perform_cs_correction"], True)
         self.assertNotEqual(cs["cs_correction_res_ref"], 15)

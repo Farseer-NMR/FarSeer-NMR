@@ -164,9 +164,9 @@ class Settings(BaseWidget):
                                            )
 
         self.expand_lost_yy = LabelledCheckbox(self,
-                                               "Analyse Lost Y Residues?")
+                                               "Search lost residues along Y axis?")
         self.expand_lost_zz = LabelledCheckbox(self,
-                                               "Analyse Lost Z Residues?")
+                                               "Search lost residues along Z axis?")
 
         self.figure_width = LabelledDoubleSpinBox(
                                                   self,
@@ -209,9 +209,9 @@ class Settings(BaseWidget):
         fasta_groupbox.layout().addWidget(self.fasta_start, 0, 1)
         fasta_groupbox.layout().addWidget(self.fasta_button, 1, 0, 1, 2)
 
-        self.x_checkbox = LabelledCheckbox(self, "x")
-        self.y_checkbox = LabelledCheckbox(self, "y")
-        self.z_checkbox = LabelledCheckbox(self, "z")
+        self.x_checkbox = LabelledCheckbox(self, "Along X Axis")
+        self.y_checkbox = LabelledCheckbox(self, "Along Y Axis")
+        self.z_checkbox = LabelledCheckbox(self, "Along Z Axis")
 
         series_groupbox = QGroupBox()
         series_groupbox.setTitle("Experimental Series Analysis")
@@ -243,6 +243,7 @@ class Settings(BaseWidget):
         cs_norm_groupbox.layout().addWidget(self.cs_correction_res_ref)
 
         lost_analysis_groupbox = QGroupBox()
+        lost_analysis_groupbox.setTitle("Search lost residues across axes")
         lost_analysis_groupbox_layout = QVBoxLayout()
         lost_analysis_groupbox.setLayout(lost_analysis_groupbox_layout)
         lost_analysis_groupbox.layout().addWidget(self.expand_lost_yy)
@@ -519,9 +520,9 @@ class Settings(BaseWidget):
         fitting["expand_lost_zz"] = self.expand_lost_zz.isChecked()
         fitting["perform_comparisons"] = \
             self.perform_comparisons_checkbox.isChecked()
-        fitting["do_cond1"] = self.x_checkbox.isChecked()
-        fitting["do_cond2"] = self.y_checkbox.isChecked()
-        fitting["do_cond3"] = self.z_checkbox.isChecked()
+        fitting["do_along_x"] = self.x_checkbox.isChecked()
+        fitting["do_along_y"] = self.y_checkbox.isChecked()
+        fitting["do_along_z"] = self.z_checkbox.isChecked()
 
         # CS Settings
         cs["perform_cs_correction"] = self.cs_correction.isChecked()
@@ -631,9 +632,9 @@ class Settings(BaseWidget):
         self.expand_lost_zz.setChecked(fitting["expand_lost_zz"])
         self.perform_comparisons_checkbox.setChecked(
             fitting["perform_comparisons"])
-        self.x_checkbox.setChecked(fitting["do_cond1"])
-        self.y_checkbox.setChecked(fitting["do_cond2"])
-        self.z_checkbox.setChecked(fitting["do_cond3"])
+        self.x_checkbox.setChecked(fitting["do_along_x"])
+        self.y_checkbox.setChecked(fitting["do_along_y"])
+        self.z_checkbox.setChecked(fitting["do_along_z"])
 
         # CS Settings
         self.cs_correction.setChecked(cs["perform_cs_correction"])
