@@ -1819,18 +1819,12 @@ charaters in Assignment columns in line {}.".format(
         
         # for other cols.
         cols = [
-            'Merit',
             'Position F1',
             'Position F2',
             'Height',
             'Volume',
             'Line Width F1 (Hz)',
-            'Line Width F2 (Hz)',
-            'Fit Method',
-            'Vol. Method',
-            'Details',
-            '#',
-            'Number'
+            'Line Width F2 (Hz)'
             ]
         
         for col in cols:
