@@ -568,29 +568,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # Step 1
-            # checks for the presence misleading characters in assignment
-            # columns. This may come from entries of unassigned residues
-            # that were not removed.
-            non_digit_f1 = \
-                self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
-                    str.strip().str.contains('\W', regex=True)
-            
-            non_digit_f2 = \
-                self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
-                    str.strip().str.contains('\W', regex=True)
-            
-            if  non_digit_f1.any() or non_digit_f2.any():
-                rows_bool = non_digit_f1 | non_digit_f2
-                msg = "The peaklist [{}][{}][{}] contains misleading \
-charaters in line {}.".format(
-                    z,
-                    y,
-                    x,
-                    [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
-                    )
-                self.log_r(fsw.gen_wet('ERROR', msg, 29))
-                self.abort()
-            
+            self.checks_non_digit_chars(z, y, x)  # checks non digit
             resInfo = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
@@ -1808,5 +1786,67 @@ different lengths.".\
             
             self.log_r(fsw.gen_wet("ERROR", msg, 28))
             self.abort()
+        
+        return
+    def checks_non_digit_chars(self, z, y, x):
+        """
+        Checks for the presence misleading characters in the DataFrame.
+        This may come from entries of unassigned residues
+        that were not removed.
+        """
+        # for assignment cols
+        non_digit_f1 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        non_digit_f2 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        if  non_digit_f1.any() or non_digit_f2.any():
+            rows_bool = non_digit_f1 | non_digit_f2
+            msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in Assignment columns in line {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 29))
+            self.abort()
+        
+        # for other cols.
+        cols = [
+            'Merit',
+            'Position F1',
+            'Position F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Fit Method',
+            'Vol. Method',
+            'Details',
+            '#',
+            'Number'
+            ]
+        
+        for col in cols:
+            non_digit = self.allpeaklists[z][y][x].loc[:,col].\
+                astype(str).str.strip().str.contains(
+                    '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
+                    regex=True
+                    )
+            if non_digit.any():
+                msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in line {} of column [{}].".format(
+                    z,
+                    y,
+                    x,
+                    [2+int(i) for i in non_digit.index[non_digit].tolist()],
+                    col
+                    )
+                self.log_r(fsw.gen_wet('ERROR', msg, 29))
+                self.abort()
         
         return
