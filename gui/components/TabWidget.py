@@ -201,8 +201,8 @@ X axis conditions have a peaklist associated.''')
             elif run_msg == "Invalid Fasta":
                 msg.setText("Invalid dataset")
                 msg.setInformativeText(
-                    "This calculation requires FASTA files to be speicified "
-                    "for each y condition.")
+                    "This calculation requires FASTA files to be specified "
+                    "for each Y axis condition.")
             msg.exec_()
 
     def _add_tab_logo(self):

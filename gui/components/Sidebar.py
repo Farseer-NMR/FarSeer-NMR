@@ -149,10 +149,14 @@ class SideBar(QTreeWidget):
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     msg.setText("NmrView/NmrDraw Peaklist")
-                    msg.setInformativeText("This peaklist doesn't contain"
-                                           "residue types. Please ensure an "
-                                           "approriate FASTA file is present "
-                                           "in the correct y condition")
+                    msg.setInformativeText(
+"""This peaklist doesn't contain information residue types.
+
+Please ensure to select an approriate FASTA file
+in the correct Y axis condition.
+
+Refer to WET#26 for more details."""
+                        )
                     msg.setWindowTitle("Duplicate conditions")
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.exec_()
