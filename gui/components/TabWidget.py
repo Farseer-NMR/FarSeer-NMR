@@ -157,6 +157,21 @@ class TabWidget(QTabWidget):
         Saves configuration if not already saved.
         Performs necessary checks for execution.
         """
+
+        msg = QMessageBox()
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setIcon(QMessageBox.Warning)
+
+        if not all(x for x in self.variables["conditions"].values()) or \
+            len(self.variables["conditions"]['x']) \
+            != len(self.variables['peaklists']):
+            msg.setText('Experimental Series not set up correctly')
+            msg.setInformativeText('Please check that conditions must have'
+                                   'labels and that all x conditions have a'
+                                   'peaklist associated')
+            msg.exec_()
+            return
+
         from core.Threading import Threading
         output_path = self.interface.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables)
@@ -174,9 +189,6 @@ class TabWidget(QTabWidget):
             Threading(function=run_farseer, args=fsuv)
 
         else:
-            msg = QMessageBox()
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setIcon(QMessageBox.Warning)
             if run_msg == "Path Exists":
                 msg.setText("Output Path Exists")
                 msg.setInformativeText(
