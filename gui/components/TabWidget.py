@@ -162,9 +162,7 @@ class TabWidget(QTabWidget):
         msg.setStandardButtons(QMessageBox.Ok)
         msg.setIcon(QMessageBox.Warning)
 
-        if not all(x for x in self.variables["conditions"].values()) or \
-            len(self.variables["conditions"]['x']) \
-            != len(self.variables['peaklists']):
+        if not all(x for x in self.variables["conditions"].values()):
             msg.setText('Experimental Series not set up correctly.')
             msg.setInformativeText(
 '''Please ensure that all conditions in the
