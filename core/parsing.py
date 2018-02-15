@@ -345,6 +345,7 @@ def parse_ccpn_peaklist(peaklist_file):
     peakList = []
     reader = csv.reader(fin)
     for row in reader:
+        if not(row): continue
         atoms = []
         for v in aal1tol3.values():
             if v in row[4]:
@@ -364,7 +365,7 @@ def parse_ccpn_peaklist(peaklist_file):
                     volume_method=row[13],
                     details=row[11],
                     format='ccpn')
-
+        
         peakList.append(peak)
 
     fin.close()
