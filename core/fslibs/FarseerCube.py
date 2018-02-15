@@ -24,8 +24,9 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-from core.utils import aal1tol3, aal3tol1
+import string
 
+from core.utils import aal1tol3, aal3tol1
 import core.fslibs.wet as fsw
 
 class FarseerCube:
@@ -567,11 +568,34 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # Step 1
+            # checks for the presence misleading characters in assignment
+            # columns. This may come from entries of unassigned residues
+            # that were not removed.
+            non_digit_f1 = \
+                self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
+                    str.strip().str.contains('\W', regex=True)
+            
+            non_digit_f2 = \
+                self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
+                    str.strip().str.contains('\W', regex=True)
+            
+            if  non_digit_f1.any() or non_digit_f2.any():
+                rows_bool = non_digit_f1 | non_digit_f2
+                msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in line {}.".format(
+                    z,
+                    y,
+                    x,
+                    [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                    )
+                self.log_r(fsw.gen_wet('ERROR', msg, 29))
+                self.abort()
+            
             resInfo = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
             resInfo.columns = ['ResNo', '3-letter']
-    
+            
             # Step 2
             resInfo.loc[:,'1-letter'] = \
                 resInfo.loc[:,"3-letter"].map(aal3tol1.get)
