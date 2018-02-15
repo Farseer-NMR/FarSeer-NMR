@@ -60,15 +60,17 @@ def create_directory_structure(output_path, variables):
                                                        [y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
                 if peaklist[0].format in ['nmrdraw', 'nmrview']:
-                    fasta_file = variables['fasta_files'][y_key]
+                    fasta_file = variables['fasta_files'].get(y_key)
                     if not fasta_file:
                         print('fasta file not specified for %s' % y_key)
                         return "Invalid Fasta"
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(fout,
-                                        add_residue_information(peaklist,
-                                                                fasta_file,
-                                                                fasta_start))
+                                    add_residue_information(peaklist,
+                                                            fasta_file,
+                                                            fasta_start))
+                else:
+                    write_peaklist_file(fout, peaklist)
                 fout.close()
     return "Run"
 

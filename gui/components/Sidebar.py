@@ -99,7 +99,7 @@ class SideBar(QTreeWidget):
 
             item = self.itemAt(event.pos())
             if not item:
-                pass
+                return
             text = item.text(0)
             event.mimeData().setText(text)
 
