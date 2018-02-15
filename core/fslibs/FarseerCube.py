@@ -24,7 +24,6 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-import string
 
 from core.utils import aal1tol3, aal3tol1
 import core.fslibs.wet as fsw
