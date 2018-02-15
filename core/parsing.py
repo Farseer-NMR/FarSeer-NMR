@@ -147,14 +147,19 @@ ANSIG v3.3 export crosspeaks file
             atoms[dimension] = atom[0]
             peak_labels[dimension] = '%s%s%s' % (residue_number,
                                                  residue_name, atom[0])
-        if '?' not in peak_labels:
+
+        peak_labels.reverse()
+        peak_positions.reverse()
+        atoms.reverse()
+        line_widths.reverse()
+        if '???' not in peak_labels:
             peak = Peak(peak_number=ii+1,
-                        positions=peak_positions.reverse(),
+                        positions=peak_positions,
                         volume=volume,
                         height=height,
-                        assignments=peak_labels.reverse(),
+                        assignments=peak_labels,
                         linewidths=line_widths,
-                        atoms=atoms.reverse(),
+                        atoms=atoms,
                         format="ansig")
 
             peakList.append(peak)
