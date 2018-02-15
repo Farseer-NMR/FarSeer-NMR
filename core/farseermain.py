@@ -235,6 +235,13 @@ def config_user_variables(fsuv):
     fsuv["observables_settings"] = \
         pd.DataFrame(observables_stngs_dict, index=fsuv["obs_names"])
     
+    # adds nuclei Y axis limits for plots to the scatter flower
+    # configuration dictionary
+    fsuv["cs_scatter_flower_settings"]["xlim"] = \
+        fsuv["PosF1_settings"]["yy_scale_PosF1_delta"]
+    fsuv["cs_scatter_flower_settings"]["ylim"] = \
+        fsuv["PosF2_settings"]["yy_scale_PosF2_delta"]
+    
     return fsuv
 
 def copy_Farseer_version(
