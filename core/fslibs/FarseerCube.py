@@ -1824,7 +1824,8 @@ charaters in Assignment columns in line {}.".format(
             'Height',
             'Volume',
             'Line Width F1 (Hz)',
-            'Line Width F2 (Hz)'
+            'Line Width F2 (Hz)',
+            'Merit'
             ]
         
         for col in cols:
