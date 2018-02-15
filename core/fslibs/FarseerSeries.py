@@ -2347,10 +2347,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             y_ticks_weight=1,
             y_ticks_rot=0,
             y_ticks_len=2,
-            x_max=0.2,
-            x_min=-0.2,
-            y_max=1,
-            y_min=-1,
+            xlim=1,
+            ylim=1,
             mksize=2,
             color_grad=True,
             color_list=[],
@@ -2449,8 +2447,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             linestyles='dotted',
             linewidth=0.25
             )
-        axs[0].set_xlim(x_min, x_max)
-        axs[0].set_ylim(y_min, y_max)
+        axs[0].set_xlim(-xlim, xlim)
+        axs[0].set_ylim(-ylim, ylim)
         # remember in NMR spectra the ppm scale is 'inverted' :-)
         axs[0].invert_xaxis()
         axs[0].invert_yaxis()
