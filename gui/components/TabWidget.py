@@ -165,10 +165,11 @@ class TabWidget(QTabWidget):
         if not all(x for x in self.variables["conditions"].values()) or \
             len(self.variables["conditions"]['x']) \
             != len(self.variables['peaklists']):
-            msg.setText('Experimental Series not set up correctly')
-            msg.setInformativeText('Please check that conditions must have'
-                                   'labels and that all x conditions have a'
-                                   'peaklist associated')
+            msg.setText('Experimental Series not set up correctly.')
+            msg.setInformativeText(
+'''Please ensure that in the peaklist Tree
+all conditions have labels and that all
+X axis conditions have a peaklist associated.''')
             msg.exec_()
             return
 
