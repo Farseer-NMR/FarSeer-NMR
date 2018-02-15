@@ -566,8 +566,11 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         self.log_r(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            
+            # checks misleading chars
+            self.checks_misleading_chars(z, y, x)
+            
             # Step 1
-            self.checks_non_digit_chars(z, y, x)  # checks non digit
             resInfo = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
@@ -1787,7 +1790,7 @@ different lengths.".\
             self.abort()
         
         return
-    def checks_non_digit_chars(self, z, y, x):
+    def checks_misleading_chars(self, z, y, x):
         """
         Checks for the presence misleading characters in the DataFrame.
         This may come from entries of unassigned residues
