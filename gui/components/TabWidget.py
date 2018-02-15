@@ -167,8 +167,8 @@ class TabWidget(QTabWidget):
             != len(self.variables['peaklists']):
             msg.setText('Experimental Series not set up correctly.')
             msg.setInformativeText(
-'''Please ensure that in the peaklist Tree
-all conditions have labels and that all
+'''Please ensure that all conditions in the
+Peaklist Tree have labels and that all
 X axis conditions have a peaklist associated.''')
             msg.exec_()
             return
