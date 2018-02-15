@@ -37,7 +37,7 @@ class Comparisons:
     
     Parameters:
         dimension (str): identifies the main dimension axis of the class
-            where X = cond1, Y = cond2, Z = cond3
+            where X = along_x, Y = along_y, Z = along_z
         
         hyper_panel (5-dimension pandas.Panel): converted from dictionary     
             stores all the main axis series.

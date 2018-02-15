@@ -369,6 +369,13 @@ the possible options.'
                         format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
+                
+                if filetype == '.fasta' and resonance_type == 'Backbone':
+                    self.check_fasta(
+                        target[parts[1]][parts[2]][lessparts],
+                        parts[2],
+                        p
+                        )
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -456,7 +463,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             )
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         self.log_r(logs)
-        self.check_fasta(df, FASTApath)
+        #self.check_fasta(df, FASTApath)
         
         return df
     
@@ -500,9 +507,9 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         logs = \
 """
-* Farseer Cube X axis variables (cond1): {}
-* Farseer Cube Y axis variables (cond2): {}
-* Farseer Cube Z axis variables (cond3): {}
+* Farseer Cube X axis variables (along_x): {}
+* Farseer Cube Y axis variables (along_y): {}
+* Farseer Cube Z axis variables (along_z): {}
 """.\
             format(self.xxcoords, self.yycoords, self.zzcoords)
         self.log_r(logs)
@@ -1295,21 +1302,21 @@ more details."
         
         # transposes the Farseer-NMR cube according to the desired axis
         if along_axis=='x':
-            series_type='cond1'
+            series_type='along_x'
             owndim_pts=self.xxcoords
             next_axis = self.yycoords
             next_axis_2 = self.zzcoords
         
         elif along_axis=='y':
             self.compare_fastas()
-            series_type='cond2'
+            series_type='along_y'
             fscube = fscube.transpose(2,0,1,3,4, copy=True)
             owndim_pts=self.yycoords
             next_axis = self.zzcoords
             next_axis_2 = self.xxcoords
         
         elif along_axis=='z':
-            series_type='cond3'
+            series_type='along_z'
             fscube = fscube.transpose(1,2,0,3,4, copy=True)
             owndim_pts=self.zzcoords
             next_axis = self.xxcoords
@@ -1347,6 +1354,8 @@ more details."
                 df = fscube.loc[dp2, dp1, item, :, :]
                 df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
                 dfdict[item] = df
+            
+            self.compare_peaklists_length(dp1, dp2, series_type, dfdict)
             
             series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
             series_dct[dp2][dp1] = \
@@ -1574,7 +1583,7 @@ Correct the reference residue in the Settings Menu.'.\
         
         return
 
-    def check_fasta(self, df, fasta_path):
+    def check_fasta(self, df, yy, fasta_path):
         """
         Checks if loaded FASTA file has more residues than the reference
         experiment.
@@ -1586,16 +1595,18 @@ Correct the reference residue in the Settings Menu.'.\
             df (pd.DataFrame): contains the FASTA loaded data in
                 DataFrame format as prepared by .read_FASTA().
             
+            yy (str): the current YY data point name.
+            
             fasta_path (srt): the .fasta file path.
         """
         
         if df.shape[0] \
-                < self.allpeaklists[self.zzref][self.yyref][self.xxref].\
+                < self.allpeaklists[self.zzref][yy][self.xxref].\
                     shape[0]:
             msg = \
 'The .fasta file in {} has less residue entries than the protein sequence \
 of the reference experiment [{}][{}][{}]'.\
-                format(fasta_path, self.zzref, self.yyref, self.xxref)
+                format(fasta_path, self.zzref, yy, self.xxref)
             self.log_r(fsw.gen_wet('ERROR', msg, 18))
             self.abort()
         
@@ -1742,5 +1753,36 @@ correspond to nitrogen chemical shift values.'.format(z, y, x)
 correspond to nitrogen assignment labels.'.format(z, y, x)
                 self.log_r(fsw.gen_wet("ERROR", msg, 25))
                 self.abort()
+        
+        return
+
+    def compare_peaklists_length(self, dp1, dp2, axis, df_dict):
+        """
+        Verifies if all peaklists in a series have the same number of 
+        residues before a FarseerSeries object is created.
+        
+        Parameters:
+            - dp1 (str): datapoint name on the next dimension.
+            
+            - dp2 (str): datapoint name on the previous dimension.
+            
+            - axis (str): the axis long which the series will be generated.
+            
+            - df_dict (dict:pd.DataFrame): A dictionary containing
+                pd.DataFrames corresponding to peaklists.
+        """
+        
+        pkl_lengths = []
+        
+        for key, peaklist in df_dict.items():
+            pkl_lengths.append(peaklist.shape[0])
+        
+        if not(len(set(pkl_lengths))) == 1:
+            msg = "Peaklists proposed for series [{}][{}] along {} axis have \
+different lengths.".\
+                format(dp2, dp1, axis[-1].upper())
+            
+            self.log_r(fsw.gen_wet("ERROR", msg, 28))
+            self.abort()
         
         return

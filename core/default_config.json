@@ -272,9 +272,9 @@
         "applyFASTA": false
     },
     "fitting_settings": {
-        "do_cond1": true,
-        "do_cond2": false,
-        "do_cond3": false,
+        "do_along_x": true,
+        "do_along_y": false,
+        "do_along_z": false,
         "expand_lost_yy": false,
         "expand_lost_zz": false,
         "perform_comparisons": false
