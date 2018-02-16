@@ -24,7 +24,8 @@ import os
 
 from PyQt5 import QtCore, QtGui
 
-from core.setup_farseer_calculation import create_directory_structure
+from core.setup_farseer_calculation import create_directory_structure, \
+    check_input_construction
 
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLabel, \
      QMessageBox, QTabWidget, QWidget
@@ -173,19 +174,22 @@ X axis conditions have a peaklist associated.''')
 
         from core.Threading import Threading
         output_path = self.variables["general_settings"]["output_path"]
-        run_msg = create_directory_structure(output_path, self.variables)
+        run_msg = check_input_construction(output_path, self.variables)
+        print(run_msg)
 
         if run_msg == "Path Exists":
             msg.setText("Output Path Exists")
             msg.setInformativeText(
                 "Spectrum folder already exists in Calculation Output "
                 "Path. Calculation cannot be launched.")
+            msg.exec_()
 
         elif run_msg == "No dataset":
             msg.setText("No dataset")
             msg.setInformativeText(
                 "No Experimental dataset has been created. "
                 "Please populate Experimental Dataset Tree.")
+            msg.exec_()
         elif run_msg == "Invalid Fasta":
             msg.setText("Invalid dataset")
             msg.setInformativeText(
@@ -194,6 +198,7 @@ X axis conditions have a peaklist associated.''')
             msg.exec_()
 
         elif run_msg == "Run":
+            create_directory_structure(output_path, self.variables)
             from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
