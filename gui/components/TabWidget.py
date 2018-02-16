@@ -44,7 +44,7 @@ class TabWidget(QTabWidget):
 
     To add a new tab to the tab widget, the QWidget class of the needs to be
     imported into this file. The instantiation of the class and the addition
-    of the QWidget to the TabWidger need to be coded in the add_tabs_to_widget
+    of the QWidget to the TabWidget need to be coded in the add_tabs_to_widget
     method.
 
     Parameters:
@@ -115,6 +115,7 @@ class TabWidget(QTabWidget):
             if fname[0].split('.')[1] == 'json':
                 Variables().read(fname[0])
                 self.load_variables()
+                self.config_file = fname[0]
         return
 
     def load_variables(self):
@@ -156,6 +157,20 @@ class TabWidget(QTabWidget):
         Saves configuration if not already saved.
         Performs necessary checks for execution.
         """
+
+        msg = QMessageBox()
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setIcon(QMessageBox.Warning)
+
+        if not all(x for x in self.variables["conditions"].values()):
+            msg.setText('Experimental Series not set up correctly.')
+            msg.setInformativeText(
+'''Please ensure that all conditions in the
+Peaklist Tree have labels and that all
+X axis conditions have a peaklist associated.''')
+            msg.exec_()
+            return
+
         from core.Threading import Threading
         output_path = self.interface.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables)
@@ -173,9 +188,6 @@ class TabWidget(QTabWidget):
             Threading(function=run_farseer, args=fsuv)
 
         else:
-            msg = QMessageBox()
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setIcon(QMessageBox.Warning)
             if run_msg == "Path Exists":
                 msg.setText("Output Path Exists")
                 msg.setInformativeText(
@@ -186,6 +198,11 @@ class TabWidget(QTabWidget):
                 msg.setInformativeText(
                     "No Experimental dataset has been created. "
                     "Please populate Experimental Dataset Tree.")
+            elif run_msg == "Invalid Fasta":
+                msg.setText("Invalid dataset")
+                msg.setInformativeText(
+                    "This calculation requires FASTA files to be specified "
+                    "for each Y axis condition.")
             msg.exec_()
 
     def _add_tab_logo(self):

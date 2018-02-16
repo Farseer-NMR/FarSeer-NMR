@@ -2354,6 +2354,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             color_list=[],
             mk_start_color="#ff0000",
             mk_end_color='#30ff00',
+            res_label_color='gold',
             titration_x_values='',
             perform_resevo_fitting=''):
         """
