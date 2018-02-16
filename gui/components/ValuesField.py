@@ -20,7 +20,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-from PyQt5.QtWidgets import QLineEdit, QSizePolicy
+
+DISALLOWED_CHARS = [
+    '.',
+    ':',
+    '"',
+    '/',
+    '\\',
+    '°',
+    "'",
+    '*',
+    '?',
+    '!',
+    ';',
+    "`",
+    "^"
+]
+
+from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSizePolicy
 
 
 class ValueField(QLineEdit):
@@ -45,8 +62,27 @@ class ValueField(QLineEdit):
         self.valuesDict = valuesDict
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
 
+        self.msg = QMessageBox()
+        self.msg.setIcon(QMessageBox.Warning)
+        self.msg.setText("Invalid Characters in Condition Name")
+        self.msg.setInformativeText(
+"""These characters:
+ . : " / \ ° ' * ? ! ; ` ^ 
+cannot be used in condition names."""
+        )
+        self.msg.setWindowTitle("Invalid Characters")
+        self.msg.setStandardButtons(QMessageBox.Ok)
+
+
     def updateValuesDict(self, value):
+
+        if any(substr in DISALLOWED_CHARS for substr in value):
+            self.msg.exec_()
+            self.setText(value[:-1])
+            return
+
         self.valuesDict[self.dim][self.index] = value
+
 
     def dropEvent(self, event):
         event.ignore()
