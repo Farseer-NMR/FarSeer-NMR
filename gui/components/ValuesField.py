@@ -32,7 +32,9 @@ DISALLOWED_CHARS = [
     '*',
     '?',
     '!',
-    ';'
+    ';',
+    "`",
+    "^"
 ]
 
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSizePolicy
@@ -65,7 +67,7 @@ class ValueField(QLineEdit):
         self.msg.setText("Invalid Characters in Condition Name")
         self.msg.setInformativeText(
 """These characters:
- . : " / \ ° ' * ? ! ; 
+ . : " / \ ° ' * ? ! ; ` ^ 
 cannot be used in condition names."""
         )
         self.msg.setWindowTitle("Invalid Characters")
