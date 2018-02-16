@@ -461,6 +461,7 @@ class Settings(BaseWidget):
 
     def set_output_path_text(self, path=None):
         self.output_path.setText(path)
+        self.variables["general_settings"]["output_path"] = path
 
     def set_spectrum_path(self, path=None):
         if not path:
@@ -475,6 +476,7 @@ class Settings(BaseWidget):
                                                         'Select Directory',
                                                         os.getcwd()))
         self.output_path.setText(path)
+        self.variables["general_settings"]["output_path"] = path
 
     def load_config(self):
         msg = QMessageBox()

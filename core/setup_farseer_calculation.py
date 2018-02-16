@@ -106,7 +106,6 @@ def list_all_files_in_path(path):
 
 def add_residue_information(peak_list, fasta_file, fasta_start):
 
-    print('fasta_start: %s fasta_file: %s' % (str(fasta_start), fasta_file))
 
     cleaned_peaklist = []
 
@@ -115,9 +114,9 @@ def add_residue_information(peak_list, fasta_file, fasta_start):
     fasta_dict = {ii + fasta_start: aal1tol3.get(residue) for ii, residue in
                   enumerate(fasta)}
     import pprint
-    pprint.pprint(fasta_dict)
     for peak in peak_list:
-        if all(ass is None for ass in peak.assignments) and not '' in peak.assignments:
+        if all(ass is None for ass in peak.assignments) and \
+                not '' in peak.assignments:
             continue
         resno = peak.assignments[0].split('.')[0]
 

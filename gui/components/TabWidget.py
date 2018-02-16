@@ -172,7 +172,7 @@ X axis conditions have a peaklist associated.''')
             return
 
         from core.Threading import Threading
-        output_path = self.interface.output_path.field.text()
+        output_path = self.variables["general_settings"]["output_path"]
         run_msg = create_directory_structure(output_path, self.variables)
 
         if run_msg == "Path Exists":
@@ -197,11 +197,11 @@ X axis conditions have a peaklist associated.''')
             from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
-                fsuv = read_user_variables(path, config_name)
+                fsuv = read_user_variables(path, self.config_file)
             else:
-                self.save_config(path=os.path.join(output_path,
-                                                   'user_config.json'))
-                fsuv = read_user_variables(output_path, 'user_config.json')
+                config_path = os.path.join(output_path, 'user_config.json')
+                self.save_config(path=config_path)
+                fsuv = read_user_variables(output_path, config_path)
 
             Threading(function=run_farseer, args=fsuv)
         else:
