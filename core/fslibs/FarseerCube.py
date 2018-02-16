@@ -24,8 +24,8 @@ import os
 import numpy as np
 import pandas as pd
 import itertools as it
-from core.utils import aal1tol3, aal3tol1
 
+from core.utils import aal1tol3, aal3tol1
 import core.fslibs.wet as fsw
 
 class FarseerCube:
@@ -566,12 +566,16 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         self.log_r(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            
+            # checks misleading chars
+            self.checks_misleading_chars(z, y, x)
+            
             # Step 1
             resInfo = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.extract('(\d+)(.{3})', expand=True)
             resInfo.columns = ['ResNo', '3-letter']
-    
+            
             # Step 2
             resInfo.loc[:,'1-letter'] = \
                 resInfo.loc[:,"3-letter"].map(aal3tol1.get)
@@ -1784,5 +1788,62 @@ different lengths.".\
             
             self.log_r(fsw.gen_wet("ERROR", msg, 28))
             self.abort()
+        
+        return
+    def checks_misleading_chars(self, z, y, x):
+        """
+        Checks for the presence misleading characters in the DataFrame.
+        This may come from entries of unassigned residues
+        that were not removed.
+        """
+        # for assignment cols
+        non_digit_f1 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        non_digit_f2 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        if  non_digit_f1.any() or non_digit_f2.any():
+            rows_bool = non_digit_f1 | non_digit_f2
+            msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in Assignment columns in line {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 29))
+            self.abort()
+        
+        # for other cols.
+        cols = [
+            'Position F1',
+            'Position F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Merit'
+            ]
+        
+        for col in cols:
+            non_digit = self.allpeaklists[z][y][x].loc[:,col].\
+                astype(str).str.strip().str.contains(
+                    '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
+                    regex=True
+                    )
+            if non_digit.any():
+                msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in line {} of column [{}].".format(
+                    z,
+                    y,
+                    x,
+                    [2+int(i) for i in non_digit.index[non_digit].tolist()],
+                    col
+                    )
+                self.log_r(fsw.gen_wet('ERROR', msg, 29))
+                self.abort()
         
         return

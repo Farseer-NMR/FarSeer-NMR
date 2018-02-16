@@ -148,7 +148,10 @@ class ScatterFlowerPlotPopup(BasePopup):
                                            maximum=360,
                                            step=1
                                            )
-
+        
+        
+        self.res_label = ColourBox(self, text="Residue Label Colour")
+        
         self.layout().addWidget(self.x_label, 0, 0)
         self.layout().addWidget(self.y_label, 1, 0)
         self.layout().addWidget(self.mksize, 2, 0)
@@ -158,6 +161,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.layout().addWidget(self.x_label_fn, 6, 0)
         self.layout().addWidget(self.x_label_fs, 7, 0)
         self.layout().addWidget(self.color_list, 8, 0)
+        self.layout().addWidget(self.res_label, 8, 1)
 
         self.layout().addWidget(self.x_label_pad, 0, 1)
         self.layout().addWidget(self.x_label_weight, 1, 1)
@@ -188,7 +192,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
             clicked.connect(self.get_defaults)
 
-        self.layout().addWidget(self.buttonBox, 8, 1, 1, 2)
+        self.layout().addWidget(self.buttonBox, 9, 0, 1, 2)
 
         self.get_values()
 
@@ -200,6 +204,7 @@ class ScatterFlowerPlotPopup(BasePopup):
             self.defaults["color_grad"])
         self.color_start.get_colour(self.defaults["mk_start_color"])
         self.color_end.get_colour(self.defaults["mk_end_color"])
+        self.res_color.get_colour(self.defaults["res_label_color"])
         self.color_list.field.setText(
             ','.join(self.defaults["color_list"]))
         self.x_label_fn.select(self.defaults["x_label_fn"])
@@ -243,6 +248,8 @@ class ScatterFlowerPlotPopup(BasePopup):
             colours[self.color_start.fields.currentText()]
         self.local_variables["mk_end_color"] = \
             colours[self.color_end.fields.currentText()]
+        self.local_variables["res_label_color"] = \
+            self.res_label.fields.currentText()
 
         self.local_variables["x_label_fn"] = \
             self.x_label_fn.fields.currentText()
@@ -292,6 +299,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.color_grad.setChecked(self.local_variables["color_grad"])
         self.color_start.get_colour(self.local_variables["mk_start_color"])
         self.color_end.get_colour(self.local_variables["mk_end_color"])
+        self.res_label.get_colour(self.local_variables["res_label_color"])
         self.color_list.field.setText(','.
                                       join(self.local_variables["color_list"]))
 

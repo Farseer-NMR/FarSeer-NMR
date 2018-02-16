@@ -212,6 +212,7 @@
         "color_grad": true,
         "mk_start_color": "#696969",
         "mk_end_color": "#000000",
+        "res_label_color": "gold",
         "color_list": [],
         "x_label_fn": "Arial",
         "x_label_fs": 10,

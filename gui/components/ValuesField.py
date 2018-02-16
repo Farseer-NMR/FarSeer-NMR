@@ -47,3 +47,7 @@ class ValueField(QLineEdit):
 
     def updateValuesDict(self, value):
         self.valuesDict[self.dim][self.index] = value
+
+    def dropEvent(self, event):
+        event.ignore()
+        return
