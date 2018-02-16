@@ -29,7 +29,7 @@ from core.utils import aal1tol3
 
 
 def create_directory_structure(output_path, variables):
-    spectrum_dir = output_path+'/spectra/'
+    spectrum_dir = output_path+'spectra/'
     if os.path.exists(os.path.join(spectrum_dir)):
         return "Path Exists"
 
