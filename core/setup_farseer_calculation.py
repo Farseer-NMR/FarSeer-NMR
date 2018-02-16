@@ -42,13 +42,15 @@ def create_directory_structure(output_path, variables):
         for jj, y_key in enumerate(variables["conditions"]["y"]):
             z_name = '_'.join(["{:0>2}".format(ii), z_key])
             y_name = '_'.join(["{:0>2}".format(jj), y_key])
+            fasta_file = variables["fasta_files"].get(y_key)
+            if not fasta_file:
+                print('fasta file not specified for %s' % y_key)
+                return "Invalid Fasta"
+
             if not os.path.exists(os.path.join(spectrum_dir, z_name, y_name)):
                 os.makedirs(os.path.join(spectrum_dir, z_name, y_name))
             if variables["fasta_settings"]["applyFASTA"]:
-                fasta_file = variables["fasta_files"].get(y_key)
-                if not fasta_file:
-                    print('fasta file not specified for %s' % y_key)
-                    return "Invalid Fasta"
+
                 fasta_file = variables["fasta_files"][y_key]
                 copy2(fasta_file, os.path.join(spectrum_dir,
                                                    z_name, y_name))
@@ -60,10 +62,6 @@ def create_directory_structure(output_path, variables):
                                                        [y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
                 if peaklist[0].format in ['nmrdraw', 'nmrview']:
-                    fasta_file = variables['fasta_files'].get(y_key)
-                    if not fasta_file:
-                        print('fasta file not specified for %s' % y_key)
-                        return "Invalid Fasta"
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(fout,
                                     add_residue_information(peaklist,

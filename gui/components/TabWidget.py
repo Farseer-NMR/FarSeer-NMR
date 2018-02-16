@@ -175,7 +175,25 @@ X axis conditions have a peaklist associated.''')
         output_path = self.interface.output_path.field.text()
         run_msg = create_directory_structure(output_path, self.variables)
 
-        if run_msg == 'Run':
+        if run_msg == "Path Exists":
+            msg.setText("Output Path Exists")
+            msg.setInformativeText(
+                "Spectrum folder already exists in Calculation Output "
+                "Path. Calculation cannot be launched.")
+
+        elif run_msg == "No dataset":
+            msg.setText("No dataset")
+            msg.setInformativeText(
+                "No Experimental dataset has been created. "
+                "Please populate Experimental Dataset Tree.")
+        elif run_msg == "Invalid Fasta":
+            msg.setText("Invalid dataset")
+            msg.setInformativeText(
+                "This calculation requires FASTA files to be specified "
+                "for each Y axis condition.")
+            msg.exec_()
+
+        elif run_msg == "Run":
             from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
@@ -186,24 +204,8 @@ X axis conditions have a peaklist associated.''')
                 fsuv = read_user_variables(output_path, 'user_config.json')
 
             Threading(function=run_farseer, args=fsuv)
-
         else:
-            if run_msg == "Path Exists":
-                msg.setText("Output Path Exists")
-                msg.setInformativeText(
-                    "Spectrum folder already exists in Calculation Output "
-                    "Path. Calculation cannot be launched.")
-            elif run_msg == "No dataset":
-                msg.setText("No dataset")
-                msg.setInformativeText(
-                    "No Experimental dataset has been created. "
-                    "Please populate Experimental Dataset Tree.")
-            elif run_msg == "Invalid Fasta":
-                msg.setText("Invalid dataset")
-                msg.setInformativeText(
-                    "This calculation requires FASTA files to be specified "
-                    "for each Y axis condition.")
-            msg.exec_()
+            print('Run could not be initiated')
 
     def _add_tab_logo(self):
         """Add logo to tab header."""
