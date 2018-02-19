@@ -57,11 +57,12 @@ def check_input_construction(output_path, variables):
     if not(populated_tree):
         return "No populated Tree"
     
+    print(variables["fasta_settings"]["applyFASTA"])
     if variables["fasta_settings"]["applyFASTA"]:
         for y_key in variables["conditions"]["y"]:
             fasta_file = variables["fasta_files"].get(y_key, False)
             if not fasta_file:
-                return "Fasta file not provided"
+                return "FASTA file not provided"
     
     for kz, vz in exp_dataset.items():
         for ky, vy in vz.items():
