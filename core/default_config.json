@@ -327,6 +327,8 @@
         "gauss_x_size": 7,
         "gaussian_stdev": 1
     },
+    "pre_files": {
+    },
     "observables": {
         "plots_posf1":false,
         "plots_posf2":false,

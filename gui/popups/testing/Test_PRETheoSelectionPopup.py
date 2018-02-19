@@ -3,7 +3,7 @@ import unittest
 import json
 from PyQt5.QtWidgets import QApplication
 
-from gui.popups.FastaSelectionPopup import FastaSelectionPopup
+from gui.popups.PRETheoreticalSelectionPopup import PRETheoreticalSelectionPopup
 from core.utils import get_default_config_path
 from core.fslibs.Variables import Variables
 
@@ -18,10 +18,10 @@ class Test_FastaSelectionPopup(unittest.TestCase):
         default_config_path = get_default_config_path()
         Variables().read(default_config_path)
         fin = open(default_config_path, 'r')
-        self.defaults = json.load(fin)["fasta_files"]
+        self.defaults = json.load(fin)["pre_files"]
         fin.close()
 
-        self.popup = FastaSelectionPopup()
+        self.popup = PRETheoreticalSelectionPopup()
         self.variable_keys = tuple(self.popup.variables.keys())
         self.local_variable_keys = tuple(self.popup.local_variables.keys())
 
@@ -48,11 +48,11 @@ class Test_FastaSelectionPopup(unittest.TestCase):
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
                          '/test/path/3')
 
-        self.assertEqual(self.popup.variables["fasta_files"]["mut1"],
+        self.assertEqual(self.popup.variables["pre_files"]["mut1"],
                          '/test/path/1')
-        self.assertEqual(self.popup.variables["fasta_files"]["mut2"],
+        self.assertEqual(self.popup.variables["pre_files"]["mut2"],
                          '/test/path/2')
-        self.assertEqual(self.popup.variables["fasta_files"]["mut3"],
+        self.assertEqual(self.popup.variables["pre_files"]["mut3"],
                          '/test/path/3')
 
     def test_values_not_set(self):
@@ -71,9 +71,9 @@ class Test_FastaSelectionPopup(unittest.TestCase):
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
                          '/test/path/3')
 
-        self.assertNotIn("mut1", self.popup.variables["fasta_files"].keys())
-        self.assertNotIn("mut2", self.popup.variables["fasta_files"].keys())
-        self.assertNotIn("mut3", self.popup.variables["fasta_files"].keys())
+        self.assertNotIn("mut1", self.popup.variables["pre_files"].keys())
+        self.assertNotIn("mut2", self.popup.variables["pre_files"].keys())
+        self.assertNotIn("mut3", self.popup.variables["pre_files"].keys())
 
 
 if __name__ == "__main__":

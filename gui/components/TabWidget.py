@@ -221,6 +221,18 @@ Refer to WET#26 for more details.
 not populated. Please ensure that all branches have a peaklist assigned."
                 )
             msg.exec_()
+        
+        elif run_msg == "Para name not set":
+            msg.setText("Z names for Paramagnetic data sets")
+            msg.setInformativeText(
+"""You have activated Do PRE Analysis.
+When analysing paramagnetic data
+the Z data point names must be "dia" and "para".
+Please correct the Z names accordingly.
+"""
+                )
+            msg.exec_()
+
 
         elif run_msg == "Run":
             create_directory_structure(output_path, self.variables)

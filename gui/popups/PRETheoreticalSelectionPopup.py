@@ -30,9 +30,9 @@ from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.popups.BasePopup import BasePopup
 
 
-class FastaSelectionPopup(BasePopup):
+class PRETheoreticalSelectionPopup(BasePopup):
     """
-    A popup for setting Fasta file path settings in the Farseer-NMR
+    A popup for setting Theoretical PRE file path settings in the Farseer-NMR
     configuration.
 
     Parameters:
@@ -46,14 +46,14 @@ class FastaSelectionPopup(BasePopup):
         .raise_file_dialog(QLineEdit)
     """
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, title="FASTA Selection Popup",
-                           settings_key=["fasta_files"], layout='vbox')
+        BasePopup.__init__(self, parent, title="Theoretical PRE Selection Popup",
+                           settings_key=["pre_files"], layout='vbox')
 
         label = QLabel("Y conditions", self)
         self.layout().addWidget(label)
         self.cond_widget_dict = {}
 
-        self.fasta_files = OrderedDict(self.local_variables.items())
+        self.pre_files = OrderedDict(self.local_variables.items())
 
         self.buttonBox = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -67,27 +67,27 @@ class FastaSelectionPopup(BasePopup):
 
 
     def get_values(self):
-        if self.fasta_files:
-            for cond_name, fasta_path in self.fasta_files.items():
-                self.add_field(cond_name, fasta_path)
+        if self.pre_files:
+            for cond_name, pre_path in self.pre_files.items():
+                self.add_field(cond_name, pre_path)
         elif self.variables["conditions"]["y"]:
             for cond in self.variables["conditions"]["y"]:
                 self.add_field(cond, '')
 
     def set_values(self):
         for name, widget in self.cond_widget_dict.items():
-            self.fasta_files[name] = widget[0].field.text()
-        self.local_variables.update(self.fasta_files)
+            self.pre_files[name] = widget[0].field.text()
+        self.local_variables.update(self.pre_files)
         self.accept()
 
-    def add_field(self, cond_name, fasta_path):
+    def add_field(self, cond_name, pre_path):
 
         widget = QWidget()
         widget_layout = QHBoxLayout()
         widget.setLayout(widget_layout)
         line_edit = LabelledLineEdit(self, cond_name)
-        if fasta_path:
-            line_edit.setText(fasta_path)
+        if pre_path:
+            line_edit.setText(pre_path)
         button = QPushButton("...", self)
         line_edit.field.setMinimumWidth(250)
         button.setMaximumWidth(25)
@@ -101,11 +101,11 @@ class FastaSelectionPopup(BasePopup):
         return
 
     def raise_file_dialog(self, file_field):
-        fasta_file = QFileDialog.getOpenFileName(
+        pre_file = QFileDialog.getOpenFileName(
                                                  self,
-                                                 "Select FASTA File",
+                                                 "Select Theo. PRE File",
                                                  "",
-                                                 "*.fasta"
+                                                 "*.pre"
                                                 )
-        if fasta_file:
-            file_field.field.setText(fasta_file[0])
+        if pre_file:
+            file_field.field.setText(pre_file[0])
