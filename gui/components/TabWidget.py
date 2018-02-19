@@ -194,7 +194,7 @@ Calculation cannot be launched.""".format(run_msg)
 with the corresponding peaklist files.")
             msg.exec_()
         
-        elif run_msg == "Fasta file not provided":
+        elif run_msg == "FASTA file not provided":
             msg.setText("FASTA file not provided.")
             msg.setInformativeText(
 """The Apply FASTA box is activated.
@@ -206,7 +206,7 @@ specified for each Y axis condition.""")
             msg.setText("No FASTA for NmrDraw/NmrView peaklists")
             msg.setInformativeText(
 """You have input NmrView/NmrDraw peaklists.
-These require a FASTA file to be specific.
+These require a FASTA file to be specified.
 Plase do so in FASTA menu.
 Refer to WET#26 for more details.
 """
