@@ -32,15 +32,16 @@ def check_input_construction(output_path, variables):
     if not output_path.endswith('/'):
         output_path += '/'
     
-    spectrum_dir = output_path + 'spectra/'
-    if os.path.exists(os.path.join(spectrum_dir)):
-        return "Path Exists"
-    
+    if os.path.exists(os.path.join(output_path, 'spectra')):
+        return "Spectra"
+    if os.path.exists(os.path.join(output_path, 'Backbone')):
+        return "Backbone"
+    if os.path.exists(os.path.join(output_path, 'Sidechains')):
+        return "Sidechains"
     
     exp_dataset = variables["experimental_dataset"]
     if not exp_dataset:
         return "No dataset"
-    
     
     populated_tree = True
     for k, v in exp_dataset.items():

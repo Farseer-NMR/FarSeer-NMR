@@ -166,9 +166,10 @@ class TabWidget(QTabWidget):
         if not all(x for x in self.variables["conditions"].values()):
             msg.setText('Experimental Series not set up correctly.')
             msg.setInformativeText(
-'''Please ensure that all conditions in the
+"""Please ensure that all conditions in the
 Peaklist Tree have labels and that all
-X axis conditions have a peaklist associated.''')
+X axis conditions have a peaklist associated."""
+                )
             msg.exec_()
             return
 
@@ -177,11 +178,12 @@ X axis conditions have a peaklist associated.''')
         run_msg = check_input_construction(output_path, self.variables)
         print(run_msg)
 
-        if run_msg == "Path Exists":
-            msg.setText("Output Path Exists")
+        if run_msg in ["Spectra", "Backbone", "Sidechains"]:
+            msg.setText("{} Path Exists.".format(run_msg))
             msg.setInformativeText(
-                "Spectrum folder already exists in Calculation Output "
-                "Path. Calculation cannot be launched.")
+"""{} folder already exists in Calculation Output Path.
+Calculation cannot be launched.""".format(run_msg)
+                )
             msg.exec_()
 
         elif run_msg == "No dataset":
