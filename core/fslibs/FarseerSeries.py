@@ -145,6 +145,8 @@ class FarseerSeries(pd.Panel):
     chimera_att_folder = 'ChimeraAttributeFiles'
     export_series_folder = 'FullPeaklists'
     axis_list = ['x','y','z']
+    # allowed folder names for paramagnetic series
+    paramagnetic_names = ['para', '01_para']
     
     def create_attributes(
             self,
@@ -182,6 +184,11 @@ class FarseerSeries(pd.Panel):
         self.next_dim = next_dim
         self.prev_dim = prev_dim
         self.dim_comparison = dim_comparison
+        if self.series_axis.startswith('along') \
+                and self.series_datapoints[-1] in self.paramagnetic_names:
+            self.para_name = self.series_datapoints[-1]
+        else:
+            self.para_name = False
         self.resonance_type = resonance_type
         self.res_info = \
             self.loc[:,:,['ResNo','1-letter','3-letter','Peak Status']]
@@ -621,8 +628,8 @@ and stacked (compared) along "{}" axis'.format(
         """
         Loads theoretical PRE values to represent in bar plots.
         
-        Theorital PRE files (*.pre) should be stored in a '01_para' folder
-        at the along_z hierarchy level.
+        Theorital PRE files (*.pre) should be stored in a '01_para' 
+        or 'para' folder at the along_z hierarchy level.
         
         Reads information on the tag position stored in the
         *.pre file as an header comment, for example, '#40'.
@@ -635,9 +642,12 @@ and stacked (compared) along "{}" axis'.format(
         Modifies: 
             self: added columns 'tag', 'Theo PRE'.
         """
-        
+        if not(self.para_name):
+            self.log_r(fsw.gen_wet("ERROR", "Paramagnetic Z axis name incorrect", 1))
+            self.abort()
+            return
         self.PRE_loaded = True
-        target_folder = '{}/01_para/{}/'.format(spectra_path, datapoint)
+        target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
         if len(pre_file) > 1:
@@ -662,7 +672,7 @@ and stacked (compared) along "{}" axis'.format(
         self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
         self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
-        self.loc['01_para',:,'Theo PRE'] = predf.loc[:,'Theo PRE']
+        self.loc[self.para_name,:,'Theo PRE'] = predf.loc[:,'Theo PRE']
         # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
@@ -677,7 +687,7 @@ and stacked (compared) along "{}" axis'.format(
             self.abort()
         
         # check tag residue
-        if not(any(self.loc['01_para',:,'ResNo'].isin([tag]))):
+        if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
             msg = \
 'The residue number where the tag is placed according to the \*.pre file ({}) \
 is not part of the protein sequence ({}-{}).'.\
@@ -689,9 +699,9 @@ is not part of the protein sequence ({}-{}).'.\
             self.log_r(fsw.gen_wet('ERROR', msg, 17))
             self.abort()
         
-        self.loc['01_para',:,'tag'] = ''
-        tagmask = self.loc['01_para',:,'ResNo'] == tag
-        self.loc['01_para',tagmask,'tag'] = '*'
+        self.loc[self.para_name,:,'tag'] = ''
+        tagmask = self.loc[self.para_name,:,'ResNo'] == tag
+        self.loc[self.para_name,tagmask,'tag'] = '*'
         tagf.close()
         self.log_r('**Tag position found** at residue {}'.format(tag_num))
         
@@ -1109,9 +1119,9 @@ recipient: residues
             tag_lw (float): tag tick line width.
         """
         
-        if (self.series_axis == 'along_z' and exp == '01_para') \
+        if (self.series_axis == 'along_z' and exp == self.para_name) \
                 or (self.series_axis == 'Cz' \
-                    and (self.next_dim == '01_para' or self.prev_dim == '01_para')):
+                    and (self.next_dim in self.paramagnetic_names or self.prev_dim in self.paramagnetic_names)):
             # plot theoretical PRE
             if bartype == 'v':
                 axs.plot(

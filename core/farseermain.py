@@ -1185,8 +1185,8 @@ def PRE_analysis(farseer_series, fsuv):
     
     isalong_z = farseer_series.series_axis == 'along_z'
     iscz = farseer_series.series_axis == 'Cz'
-    isprev_para = farseer_series.prev_dim == '01_para'
-    isnext_para = farseer_series.next_dim == '01_para'
+    isprev_para = farseer_series.prev_dim in ('01_para', 'para')
+    isnext_para = farseer_series.next_dim in ('01_para', 'para')
     do_heatmap = fsuv['plotting_flags']['do_heat_map']
     
     # if analysing along_z: performs calculations.
@@ -1240,7 +1240,7 @@ def PRE_analysis(farseer_series, fsuv):
     
     # plots the DeltaPRE oscilation analysis only for <Cz> comparison.
     # because DeltaPRE oscilation represents the results obtained only
-    # for paramagnetic ('01_para') data.
+    # for paramagnetic data.
     if (iscz and (isprev_para or isnext_para)) \
             and fsuv['plotting_flags']['do_dpre_osci']:
         for sourcecol, targetcols in zip(
