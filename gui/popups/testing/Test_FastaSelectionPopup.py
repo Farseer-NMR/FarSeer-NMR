@@ -10,7 +10,7 @@ from core.fslibs.Variables import Variables
 app = QApplication(sys.argv)
 
 
-class Test_BarPlotPopup(unittest.TestCase):
+class Test_FastaSelectionPopup(unittest.TestCase):
 
     def setUp(self):
         """ Create the popup"""

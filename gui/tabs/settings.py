@@ -378,7 +378,7 @@ class Settings(BaseWidget):
         self.pre_settings.clicked.connect(partial(self.show_popup,
                                                   PreAnalysisPopup))
         
-        self.pretheo_button = QPushButton("Select The. PRE Files", self)
+        self.pretheo_button = QPushButton("Select Theo. PRE Files", self)
         self.pretheo_button.clicked.connect(partial(self.show_popup,
                                                   PRETheoreticalSelectionPopup))
         

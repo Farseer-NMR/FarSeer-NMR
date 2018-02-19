@@ -61,9 +61,10 @@ class FastaSelectionPopup(BasePopup):
         self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
 
+        self.get_values()
+
         self.layout().addWidget(self.buttonBox)
 
-        self.get_values()
 
     def get_values(self):
         if self.fasta_files:
