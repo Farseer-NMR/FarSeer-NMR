@@ -139,7 +139,7 @@ class Settings(BaseWidget):
 
         self.heat_map_button = QPushButton("Settings", self)
         self.heat_map_button.clicked.connect(partial(
-            self.show_popup, HeatMapPopup, self.variables))
+            self.show_popup, HeatMapPopup))
 
         self.dpre_button = QPushButton("Settings", self)
         self.dpre_button.clicked.connect(partial(self.show_popup,
