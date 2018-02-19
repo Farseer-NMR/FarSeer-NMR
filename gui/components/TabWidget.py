@@ -197,6 +197,14 @@ with the corresponding peaklist files.")
                 "This calculation requires FASTA files to be specified "
                 "for each Y axis condition.")
             msg.exec_()
+        
+        elif run_msg == "No populated Tree":
+            msg.setText("Tree not completely populated.")
+            msg.setInformativeText(
+                "There are branches in the Experimental Tree which are \
+not populated. Please ensure that all branches have a peaklist assigned."
+                )
+            msg.exec_()
 
         elif run_msg == "Run":
             create_directory_structure(output_path, self.variables)
