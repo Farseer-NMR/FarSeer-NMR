@@ -49,6 +49,7 @@ from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
 from gui.popups.ScatterPlotPopup import ScatterPlotPopup
 from gui.popups.SeriesPlotPopup import SeriesPlotPopup
 from gui.popups.VerticalBar import VerticalBarPopup
+from gui.popups.PRETheoreticalSelectionPopup import PRETheoreticalSelectionPopup
 
 
 class Settings(BaseWidget):
@@ -376,13 +377,19 @@ class Settings(BaseWidget):
         self.pre_settings = QPushButton("PRE Settings", self)
         self.pre_settings.clicked.connect(partial(self.show_popup,
                                                   PreAnalysisPopup))
-
+        
+        self.pretheo_button = QPushButton("Select The. PRE Files", self)
+        self.pretheo_button.clicked.connect(partial(self.show_popup,
+                                                  PRETheoreticalSelectionPopup))
+        
+        
         pre_groupbox.layout().addWidget(self.do_pre_checkbox, 0, 0)
         pre_groupbox.layout().addWidget(self.pre_settings, 0, 1)
         pre_groupbox.layout().addWidget(self.dpre_checkbox, 1, 0)
         pre_groupbox.layout().addWidget(self.dpre_button, 1, 1)
         pre_groupbox.layout().addWidget(self.heat_map_checkbox, 2, 0)
         pre_groupbox.layout().addWidget(self.heat_map_button, 2, 1)
+        pre_groupbox.layout().addWidget(self.pretheo_button, 3, 1)
 
         series_plotting_groupbox = QGroupBox()
         series_plotting_groupbox.setTitle("Series Plotting")

@@ -32,6 +32,7 @@ def check_input_construction(output_path, variables):
     if not output_path.endswith('/'):
         output_path += '/'
     
+    
     if os.path.exists(os.path.join(output_path, 'spectra')):
         return "Spectra"
     if os.path.exists(os.path.join(output_path, 'Backbone')):
@@ -94,6 +95,12 @@ def create_directory_structure(output_path, variables):
                 fasta_file = variables["fasta_files"][y_key]
                 copy2(fasta_file, os.path.join(spectrum_dir,
                                                    z_name, y_name))
+            
+            if variables["pre_settings"]["apply_PRE_analysis"] \
+                    and z_key == "para":
+                pre_file = variables["pre_files"][y_key]
+                copy2(pre_file, os.path.join(spectrum_dir, z_name, y_name))
+            
             for kk, x_key in enumerate(variables["conditions"]["x"]):
                 x_name = '_'.join(["{:0>2}".format(kk), x_key])
                 fout = open(os.path.join(spectrum_dir, z_name, y_name,
