@@ -225,12 +225,11 @@ not populated. Please ensure that all branches have a peaklist assigned."
             create_directory_structure(output_path, self.variables)
             from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
-                path, config_name = os.path.split(self.config_file)
-                fsuv = read_user_variables(path, self.config_file)
+                config_path = self.config_file
             else:
                 config_path = os.path.join(output_path, 'user_config.json')
                 self.save_config(path=config_path)
-                fsuv = read_user_variables(output_path, config_path)
+            fsuv = read_user_variables(output_path, config_path)
 
             Threading(function=run_farseer, args=fsuv)
         else:
