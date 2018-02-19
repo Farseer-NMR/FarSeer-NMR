@@ -23,7 +23,6 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 from PyQt5.QtWidgets import QWidget, QCheckBox, QLabel, QGridLayout
 from PyQt5 import QtCore
 
-
 class LabelledCheckbox(QWidget):
     """
     A combination of a QLabel and a Checkbox in a single QWidget.
@@ -42,34 +41,31 @@ class LabelledCheckbox(QWidget):
         .setChecked(bool)
         .isChecked()
     """
-
-
+    
     def __init__(self, parent, text, callback=None, **kw):
         QWidget.__init__(self, parent)
         grid = QGridLayout()
         self.setObjectName("LabelledCheckbox")
         self.setLayout(grid)
         self.checkBox = QCheckBox()
-
         label = QLabel(text, self)
-
         self.layout().addWidget(self.checkBox, 0, 0)
         self.layout().addWidget(label, 0, 1)
-
+        
         if callback:
             self.set_callback(callback)
-
+        
         label.setAlignment(QtCore.Qt.AlignLeft)
-
+    
     def set_callback(self, callback):
         self.checkBox.stateChanged.connect(callback)
-
+    
     def isChecked(self):
         return self.checkBox.isChecked()
-
+    
     def setEnabled(self, boolean):
         self.checkBox.setEnabled(boolean)
-
+    
     def setChecked(self, boolean):
         if boolean is True:
             self.checkBox.setChecked(True)
