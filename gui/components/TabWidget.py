@@ -193,11 +193,24 @@ Calculation cannot be launched.""".format(run_msg)
                 "Please define an Experimental Dataset Tree and populate it \
 with the corresponding peaklist files.")
             msg.exec_()
-        elif run_msg == "Invalid Fasta":
-            msg.setText("Invalid dataset")
+        
+        elif run_msg == "Fasta file not provided":
+            msg.setText("FASTA file not provided.")
             msg.setInformativeText(
-                "This calculation requires FASTA files to be specified "
-                "for each Y axis condition.")
+"""The Apply FASTA box is activated.
+This calculation requires FASTA files to be
+specified for each Y axis condition.""")
+            msg.exec_()
+        
+        elif run_msg == "No FASTA for peaklist":
+            msg.setText("No FASTA for NmrDraw/NmrView peaklists")
+            msg.setInformativeText(
+"""You have input NmrView/NmrDraw peaklists.
+These require a FASTA file to be specific.
+Plase do so in FASTA menu.
+Refer to WET#26 for more details.
+"""
+                )
             msg.exec_()
         
         elif run_msg == "No populated Tree":

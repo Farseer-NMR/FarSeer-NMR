@@ -57,25 +57,25 @@ def check_input_construction(output_path, variables):
     if not(populated_tree):
         return "No populated Tree"
     
-    for ii, z_key in enumerate(variables["conditions"]["z"]):
-        for jj, y_key in enumerate(variables["conditions"]["y"]):
-            if variables["fasta_settings"]["applyFASTA"]:
-                fasta_file = variables["fasta_files"].get(y_key)
-                if not fasta_file:
-                    return "Invalid Fasta"
+    print('FASTA', variables["fasta_settings"]["applyFASTA"])
+    if variables["fasta_settings"]["applyFASTA"]:
+        for y_key in variables["conditions"]["y"]:
+            fasta_file = variables["fasta_files"].get(y_key, False)
+            if not fasta_file:
+                return "Fasta file not provided"
     
-            for kk, x_key in enumerate(variables["conditions"]["x"]):
-                peaklist_path = \
-                    variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
+    for kz, vz in exp_dataset.items():
+        for ky, vy in vz.items():
+            for kx, vx in vy.items():
+                peaklist_path = variables["peaklists"][vx]
                 peaklist = read_peaklist(peaklist_path)
                 if peaklist[0].format in ['nmrdraw', 'nmrview']:
-                    fasta_file = variables["fasta_files"].get(y_key)
+                    fasta_file = variables["fasta_files"].get(ky, False)
                     if not fasta_file:
-                        print('fasta file not specified for %s' % y_key)
-                        return "Invalid Fasta"
+                        print('FASTA file not specified for {}'.format(ky))
+                        return "No FASTA for peaklist"
     
-    else:
-        return "Run"
+    return "Run"
 
 def create_directory_structure(output_path, variables):
 
