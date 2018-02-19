@@ -58,7 +58,6 @@ def check_input_construction(output_path, variables):
     if not(populated_tree):
         return "No populated Tree"
     
-    print(variables["fasta_settings"]["applyFASTA"])
     if variables["fasta_settings"]["applyFASTA"]:
         for y_key in variables["conditions"]["y"]:
             fasta_file = variables["fasta_files"].get(y_key, False)
@@ -75,6 +74,10 @@ def check_input_construction(output_path, variables):
                     if not fasta_file:
                         print('FASTA file not specified for {}'.format(ky))
                         return "No FASTA for peaklist"
+    
+    if variables["pre_settings"]["apply_PRE_analysis"]:
+        if not(all([k in ['dia', 'para'] for k in exp_dataset.keys()])):
+            return "Para name not set"
     
     return "Run"
 
