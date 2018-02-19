@@ -21,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import os
+import datetime
 
 from PyQt5 import QtCore, QtGui
 
@@ -224,13 +225,12 @@ not populated. Please ensure that all branches have a peaklist assigned."
         elif run_msg == "Run":
             create_directory_structure(output_path, self.variables)
             from core.farseermain import read_user_variables, run_farseer
-            if hasattr(self, 'config_file'):
-                config_path = self.config_file
-            else:
-                config_path = os.path.join(output_path, 'user_config.json')
-                self.save_config(path=config_path)
+            run_config_name = "user_config_{}.json".format(
+                datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                )
+            config_path = os.path.join(output_path, run_config_name)
+            self.save_config(path=config_path)
             fsuv = read_user_variables(output_path, config_path)
-
             Threading(function=run_farseer, args=fsuv)
         else:
             print('Run could not be initiated')
