@@ -97,7 +97,7 @@ def create_directory_structure(output_path, variables):
                                                    z_name, y_name))
             
             if variables["pre_settings"]["apply_PRE_analysis"] \
-                    and z_key == "para":
+                    and z_name == "01_para":
                 pre_file = variables["pre_files"][y_key]
                 copy2(pre_file, os.path.join(spectrum_dir, z_name, y_name))
             

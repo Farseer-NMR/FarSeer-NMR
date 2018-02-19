@@ -621,7 +621,7 @@ and stacked (compared) along "{}" axis'.format(
         """
         Loads theoretical PRE values to represent in bar plots.
         
-        Theorital PRE files (*.pre) should be stored in a 'para' folder
+        Theorital PRE files (*.pre) should be stored in a '01_para' folder
         at the along_z hierarchy level.
         
         Reads information on the tag position stored in the
@@ -637,7 +637,7 @@ and stacked (compared) along "{}" axis'.format(
         """
         
         self.PRE_loaded = True
-        target_folder = '{}/para/{}/'.format(spectra_path, datapoint)
+        target_folder = '{}/01_para/{}/'.format(spectra_path, datapoint)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
         if len(pre_file) > 1:
@@ -662,7 +662,7 @@ and stacked (compared) along "{}" axis'.format(
         self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
         self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
-        self.loc['para',:,'Theo PRE'] = predf.loc[:,'Theo PRE']
+        self.loc['01_para',:,'Theo PRE'] = predf.loc[:,'Theo PRE']
         # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
@@ -677,7 +677,7 @@ and stacked (compared) along "{}" axis'.format(
             self.abort()
         
         # check tag residue
-        if not(any(self.loc['para',:,'ResNo'].isin([tag]))):
+        if not(any(self.loc['01_para',:,'ResNo'].isin([tag]))):
             msg = \
 'The residue number where the tag is placed according to the \*.pre file ({}) \
 is not part of the protein sequence ({}-{}).'.\
@@ -689,9 +689,9 @@ is not part of the protein sequence ({}-{}).'.\
             self.log_r(fsw.gen_wet('ERROR', msg, 17))
             self.abort()
         
-        self.loc['para',:,'tag'] = ''
-        tagmask = self.loc['para',:,'ResNo'] == tag
-        self.loc['para',tagmask,'tag'] = '*'
+        self.loc['01_para',:,'tag'] = ''
+        tagmask = self.loc['01_para',:,'ResNo'] == tag
+        self.loc['01_para',tagmask,'tag'] = '*'
         tagf.close()
         self.log_r('**Tag position found** at residue {}'.format(tag_num))
         
@@ -1109,9 +1109,9 @@ recipient: residues
             tag_lw (float): tag tick line width.
         """
         
-        if (self.series_axis == 'along_z' and exp == 'para') \
-                or (self.series_axis == 'C3' \
-                    and ( self.next_dim == 'para' or self.prev_dim == 'para')):
+        if (self.series_axis == 'along_z' and exp == '01_para') \
+                or (self.series_axis == 'Cz' \
+                    and (self.next_dim == '01_para' or self.prev_dim == '01_para')):
             # plot theoretical PRE
             if bartype == 'v':
                 axs.plot(

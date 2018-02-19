@@ -1184,9 +1184,9 @@ def PRE_analysis(farseer_series, fsuv):
         return
     
     isalong_z = farseer_series.series_axis == 'along_z'
-    isc3 = farseer_series.series_axis == 'C3'
-    isprev_para = farseer_series.prev_dim == 'para'
-    isnext_para = farseer_series.next_dim == 'para'
+    iscz = farseer_series.series_axis == 'Cz'
+    isprev_para = farseer_series.prev_dim == '01_para'
+    isnext_para = farseer_series.next_dim == '01_para'
     do_heatmap = fsuv['plotting_flags']['do_heat_map']
     
     # if analysing along_z: performs calculations.
@@ -1210,8 +1210,8 @@ def PRE_analysis(farseer_series, fsuv):
                     )
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
-    # for along_z and for comparison C3.
-    if (isalong_z or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
+    # for along_z and for comparison Cz.
+    if (isalong_z or (iscz and (isprev_para or isnext_para))) and do_heatmap:
         for sourcecol, targetcol in zip(
                 list(fsuv["restraint_settings"].index[3:])*2,
                 ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
@@ -1238,10 +1238,10 @@ def PRE_analysis(farseer_series, fsuv):
                     fig_dpi=fsuv["general_settings"]["fig_dpi"]
                     )
     
-    # plots the DeltaPRE oscilation analysis only for <C3> comparison.
+    # plots the DeltaPRE oscilation analysis only for <Cz> comparison.
     # because DeltaPRE oscilation represents the results obtained only
-    # for paramagnetic ('para') data.
-    if (isc3 and (isprev_para or isnext_para)) \
+    # for paramagnetic ('01_para') data.
+    if (iscz and (isprev_para or isnext_para)) \
             and fsuv['plotting_flags']['do_dpre_osci']:
         for sourcecol, targetcols in zip(
                 fsuv["restraint_settings"].index[3:],
