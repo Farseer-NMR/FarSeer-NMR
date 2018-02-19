@@ -1185,8 +1185,8 @@ def PRE_analysis(farseer_series, fsuv):
     
     isalong_z = farseer_series.series_axis == 'along_z'
     iscz = farseer_series.series_axis == 'Cz'
-    isprev_para = farseer_series.prev_dim in ('01_para', 'para')
-    isnext_para = farseer_series.next_dim in ('01_para', 'para')
+    isprev_para = farseer_series.prev_dim in farseer_series.paramagnetic_names
+    isnext_para = farseer_series.next_dim in farseer_series.paramagnetic_names
     do_heatmap = fsuv['plotting_flags']['do_heat_map']
     
     # if analysing along_z: performs calculations.
