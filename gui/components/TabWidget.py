@@ -24,7 +24,8 @@ import os
 
 from PyQt5 import QtCore, QtGui
 
-from core.setup_farseer_calculation import create_directory_structure
+from core.setup_farseer_calculation import create_directory_structure, \
+    check_input_construction
 
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLabel, \
      QMessageBox, QTabWidget, QWidget
@@ -165,45 +166,75 @@ class TabWidget(QTabWidget):
         if not all(x for x in self.variables["conditions"].values()):
             msg.setText('Experimental Series not set up correctly.')
             msg.setInformativeText(
-'''Please ensure that all conditions in the
+"""Please ensure that all conditions in the
 Peaklist Tree have labels and that all
-X axis conditions have a peaklist associated.''')
+X axis conditions have a peaklist associated."""
+                )
             msg.exec_()
             return
 
         from core.Threading import Threading
-        output_path = self.interface.output_path.field.text()
-        run_msg = create_directory_structure(output_path, self.variables)
+        output_path = self.variables["general_settings"]["output_path"]
+        run_msg = check_input_construction(output_path, self.variables)
+        print(run_msg)
 
-        if run_msg == 'Run':
+        if run_msg in ["Spectra", "Backbone", "Sidechains"]:
+            msg.setText("{} Path Exists.".format(run_msg))
+            msg.setInformativeText(
+"""{} folder already exists in Calculation Output Path.
+Calculation cannot be launched.""".format(run_msg)
+                )
+            msg.exec_()
+
+        elif run_msg == "No dataset":
+            msg.setText("No dataset configured.")
+            msg.setInformativeText(
+                "No Experimental dataset has been created. "
+                "Please define an Experimental Dataset Tree and populate it \
+with the corresponding peaklist files.")
+            msg.exec_()
+        
+        elif run_msg == "FASTA file not provided":
+            msg.setText("FASTA file not provided.")
+            msg.setInformativeText(
+"""The Apply FASTA box is activated.
+This calculation requires FASTA files to be
+specified for each Y axis condition.""")
+            msg.exec_()
+        
+        elif run_msg == "No FASTA for peaklist":
+            msg.setText("No FASTA for NmrDraw/NmrView peaklists")
+            msg.setInformativeText(
+"""You have input NmrView/NmrDraw peaklists.
+These require a FASTA file to be specified.
+Plase do so in FASTA menu.
+Refer to WET#26 for more details.
+"""
+                )
+            msg.exec_()
+        
+        elif run_msg == "No populated Tree":
+            msg.setText("Tree not completely populated.")
+            msg.setInformativeText(
+                "There are branches in the Experimental Tree which are \
+not populated. Please ensure that all branches have a peaklist assigned."
+                )
+            msg.exec_()
+
+        elif run_msg == "Run":
+            create_directory_structure(output_path, self.variables)
             from core.farseermain import read_user_variables, run_farseer
             if hasattr(self, 'config_file'):
                 path, config_name = os.path.split(self.config_file)
-                fsuv = read_user_variables(path, config_name)
+                fsuv = read_user_variables(path, self.config_file)
             else:
-                self.save_config(path=os.path.join(output_path,
-                                                   'user_config.json'))
-                fsuv = read_user_variables(output_path, 'user_config.json')
+                config_path = os.path.join(output_path, 'user_config.json')
+                self.save_config(path=config_path)
+                fsuv = read_user_variables(output_path, config_path)
 
             Threading(function=run_farseer, args=fsuv)
-
         else:
-            if run_msg == "Path Exists":
-                msg.setText("Output Path Exists")
-                msg.setInformativeText(
-                    "Spectrum folder already exists in Calculation Output "
-                    "Path. Calculation cannot be launched.")
-            elif run_msg == "No dataset":
-                msg.setText("No dataset")
-                msg.setInformativeText(
-                    "No Experimental dataset has been created. "
-                    "Please populate Experimental Dataset Tree.")
-            elif run_msg == "Invalid Fasta":
-                msg.setText("Invalid dataset")
-                msg.setInformativeText(
-                    "This calculation requires FASTA files to be specified "
-                    "for each Y axis condition.")
-            msg.exec_()
+            print('Run could not be initiated')
 
     def _add_tab_logo(self):
         """Add logo to tab header."""

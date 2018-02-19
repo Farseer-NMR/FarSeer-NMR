@@ -27,28 +27,69 @@ from shutil import copy2
 from core.parsing import read_peaklist
 from core.utils import aal1tol3
 
+def check_input_construction(output_path, variables):
 
-def create_directory_structure(output_path, variables):
-    spectrum_dir = output_path+'/spectra/'
-    if os.path.exists(os.path.join(spectrum_dir)):
-        return "Path Exists"
-
-    else:
-        os.makedirs(spectrum_dir)
+    if not output_path.endswith('/'):
+        output_path += '/'
+    
+    if os.path.exists(os.path.join(output_path, 'spectra')):
+        return "Spectra"
+    if os.path.exists(os.path.join(output_path, 'Backbone')):
+        return "Backbone"
+    if os.path.exists(os.path.join(output_path, 'Sidechains')):
+        return "Sidechains"
+    
     exp_dataset = variables["experimental_dataset"]
     if not exp_dataset:
         return "No dataset"
+    
+    populated_tree = True
+    for k, v in exp_dataset.items():
+        if isinstance(v, dict): 
+            for k1, v1 in v.items():
+                if isinstance(v1, dict):
+                    for k2, v2 in v1.items():
+                        if v2:
+                            populated_tree = populated_tree & True
+                        else:
+                            populated_tree = populated_tree & False
+    
+    if not(populated_tree):
+        return "No populated Tree"
+    
+    if variables["fasta_settings"]["applyFASTA"]:
+        for y_key in variables["conditions"]["y"]:
+            fasta_file = variables["fasta_files"].get(y_key, False)
+            if not fasta_file:
+                return "Fasta file not provided"
+    
+    for kz, vz in exp_dataset.items():
+        for ky, vy in vz.items():
+            for kx, vx in vy.items():
+                peaklist_path = variables["peaklists"][vx]
+                peaklist = read_peaklist(peaklist_path)
+                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                    fasta_file = variables["fasta_files"].get(ky, False)
+                    if not fasta_file:
+                        print('FASTA file not specified for {}'.format(ky))
+                        return "No FASTA for peaklist"
+    
+    return "Run"
+
+def create_directory_structure(output_path, variables):
+
+    spectrum_dir = os.path.join(output_path, 'spectra')
+    exp_dataset = variables["experimental_dataset"]
+
     for ii, z_key in enumerate(variables["conditions"]["z"]):
         for jj, y_key in enumerate(variables["conditions"]["y"]):
             z_name = '_'.join(["{:0>2}".format(ii), z_key])
             y_name = '_'.join(["{:0>2}".format(jj), y_key])
+
             if not os.path.exists(os.path.join(spectrum_dir, z_name, y_name)):
                 os.makedirs(os.path.join(spectrum_dir, z_name, y_name))
             if variables["fasta_settings"]["applyFASTA"]:
-                fasta_file = variables["fasta_files"].get(y_key)
-                if not fasta_file:
-                    print('fasta file not specified for %s' % y_key)
-                    return "Invalid Fasta"
+
                 fasta_file = variables["fasta_files"][y_key]
                 copy2(fasta_file, os.path.join(spectrum_dir,
                                                    z_name, y_name))
@@ -60,10 +101,7 @@ def create_directory_structure(output_path, variables):
                                                        [y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
                 if peaklist[0].format in ['nmrdraw', 'nmrview']:
-                    fasta_file = variables['fasta_files'].get(y_key)
-                    if not fasta_file:
-                        print('fasta file not specified for %s' % y_key)
-                        return "Invalid Fasta"
+                    fasta_file = variables["fasta_files"].get(y_key)
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(fout,
                                     add_residue_information(peaklist,
@@ -72,7 +110,6 @@ def create_directory_structure(output_path, variables):
                 else:
                     write_peaklist_file(fout, peaklist)
                 fout.close()
-    return "Run"
 
 
 def write_peaklist_file(fin, peak_list):
@@ -108,7 +145,6 @@ def list_all_files_in_path(path):
 
 def add_residue_information(peak_list, fasta_file, fasta_start):
 
-    print('fasta_start: %s fasta_file: %s' % (str(fasta_start), fasta_file))
 
     cleaned_peaklist = []
 
@@ -117,9 +153,9 @@ def add_residue_information(peak_list, fasta_file, fasta_start):
     fasta_dict = {ii + fasta_start: aal1tol3.get(residue) for ii, residue in
                   enumerate(fasta)}
     import pprint
-    pprint.pprint(fasta_dict)
     for peak in peak_list:
-        if all(ass is None for ass in peak.assignments) and not '' in peak.assignments:
+        if all(ass is None for ass in peak.assignments) and \
+                not '' in peak.assignments:
             continue
         resno = peak.assignments[0].split('.')[0]
 

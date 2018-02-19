@@ -159,7 +159,7 @@ Refer to WET#26 for more details."""
                     msg.setWindowTitle("Duplicate conditions")
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.exec_()
-                    self.variables['fasta_settings']['applyFASTA'] = True
+                    #self.variables['fasta_settings']['applyFASTA'] = True
 
 
                 item = self.add_item(pl_name)
