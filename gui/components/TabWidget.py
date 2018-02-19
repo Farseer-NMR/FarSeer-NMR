@@ -185,10 +185,11 @@ X axis conditions have a peaklist associated.''')
             msg.exec_()
 
         elif run_msg == "No dataset":
-            msg.setText("No dataset")
+            msg.setText("No dataset configured.")
             msg.setInformativeText(
                 "No Experimental dataset has been created. "
-                "Please populate Experimental Dataset Tree.")
+                "Please define an Experimental Dataset Tree and populate it \
+with the corresponding peaklist files.")
             msg.exec_()
         elif run_msg == "Invalid Fasta":
             msg.setText("Invalid dataset")
