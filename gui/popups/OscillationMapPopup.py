@@ -21,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QDialogButtonBox
+
 from gui.components.LabelledCombobox import LabelledCombobox
 from gui.components.LabelledCheckbox import LabelledCheckbox
 from gui.components.LabelledDoubleSpinBox import LabelledDoubleSpinBox
@@ -28,9 +29,7 @@ from gui.components.LabelledSpinBox import LabelledSpinBox
 from gui.components.LabelledLineEdit import LabelledLineEdit
 from gui.components.ColourBox import ColourBox
 from gui.components.FontComboBox import FontComboBox
-
 from gui.gui_utils import font_weights, colours
-
 from gui.popups.BasePopup import BasePopup
 
 
@@ -48,93 +47,76 @@ class OscillationMapPopup(BasePopup):
         .set_values()
     """
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, title="Oscillation Map",
-                           settings_key=["dpre_osci_settings"])
-
-        self.dpre_osci_rows = LabelledSpinBox(
-                                              self,
-                                              "Number of Rows",
-                                              minimum=1,
-                                              step=1
-                                              )
+        BasePopup.__init__(
+            self,
+            parent,
+            title="Oscillation Map",
+            settings_key=["dpre_osci_settings"]
+            )
+        self.dpre_osci_rows = LabelledSpinBox(self, "Number of Rows", minimum=1, step=1)
         self.dpre_osci_width = LabelledSpinBox(self, "Scale Factor for Width")
         self.dpre_osci_y_label = LabelledLineEdit(self, "Y Label")
         self.dpre_osci_y_label_fs = LabelledSpinBox(
-                                                    self,
-                                                    "Y Label Font Size",
-                                                    minimum=0,
-                                                    step=1
-                                                    )
-        self.dpre_osci_ymax = LabelledDoubleSpinBox(
-                                                    self,
-                                                    "Y Maximum",
-                                                    minimum=0,
-                                                    step=0.1
-                                                    )
-        self.dpre_osci_dpre_ms = LabelledSpinBox(
-                                                 self,
-                                                 "Marker Size",
-                                                 minimum=0,
-                                                 step=1
-                                                 )
+            self,
+            "Y Label Font Size",
+            minimum=0,
+            step=1
+            )
+        self.dpre_osci_ymax = LabelledDoubleSpinBox(self, "Y Maximum", minimum=0, step=0.1)
+        self.dpre_osci_dpre_ms = LabelledSpinBox(self, "Marker Size", minimum=0, step=1)
         self.dpre_osci_dpre_alpha = LabelledDoubleSpinBox(
-                                                         self,
-                                                         "Marker Transparency",
-                                                         minimum=0,
-                                                         maximum=1,
-                                                         step=0.1
-                                                         )
+            self,
+            "Marker Transparency",
+            minimum=0,
+            maximum=1,
+            step=0.1
+            )
         self.dpre_osci_smooth_lw = LabelledSpinBox(
-                                                   self,
-                                                   "Smoothed DPRE Line Width",
-                                                   minimum=0,
-                                                   step=1
-                                                   )
+            self,
+            "Smoothed DPRE Line Width",
+            minimum=0,
+            step=1
+            )
         self.dpre_osci_ref_color = ColourBox(self, "Reference Data Colour")
         self.dpre_osci_color_init = ColourBox(self, "Grad Start Colour")
         self.dpre_osci_color_end = ColourBox(self, "Grad End Colour")
         self.dpre_osci_x_ticks_fn = FontComboBox(self, "X Tick Font")
         self.dpre_osci_x_ticks_fs = LabelledSpinBox(
-                                                    self,
-                                                    "X Tick Font Size",
-                                                    minimum=0,
-                                                    step=1
-                                                    )
+            self,
+            "X Tick Font Size",
+            minimum=0,
+            step=1
+            )
         self.dpre_osci_x_ticks_pad = LabelledDoubleSpinBox(
-                                                           self,
-                                                           "X Tick Padding",
-                                                           minimum=-100,
-                                                           maximum=100,
-                                                           step=0.1
-                                                           )
+            self,
+            "X Tick Padding",
+            minimum=-100,
+            maximum=100,
+            step=0.1
+            )
         self.dpre_osci_x_ticks_weight = LabelledCombobox(
-                                                         self,
-                                                         text="X Font Weight",
-                                                         items=font_weights
-                                                         )
+            self,
+            text="X Font Weight",
+            items=font_weights
+            )
         self.dpre_osci_grid_color = ColourBox(self, "Grid Colour")
-        self.dpre_osci_res_highlight = LabelledCheckbox(
-                                                        self,
-                                                        "Highlight Residues?"
-                                                        )
-        self.dpre_osci_res_highlight_list = \
-            LabelledLineEdit(self, "Residues to Highlight")
+        self.dpre_osci_res_highlight = LabelledCheckbox(self, "Highlight Residues?")
+        self.dpre_osci_res_highlight_list = LabelledLineEdit(self, "Residues to Highlight")
         self.dpre_osci_shade = LabelledCheckbox(self, "Shade Residues?")
         self.dpre_osci_regions = LabelledLineEdit(self, "Regions to Shade")
         self.dpre_osci_rh_fs = LabelledSpinBox(
-                                               self,
-                                               "Highlight Font Size ",
-                                               minimum=0,
-                                               step=1
-                                               )
+            self,
+            "Highlight Font Size ",
+            minimum=0,
+            step=1
+            )
         self.dpre_osci_rh_y = LabelledDoubleSpinBox(
-                                                    self,
-                                                    "Residue Label Scale",
-                                                    minimum=0,
-                                                    maximum=1,
-                                                    step=0.01
-                                                    )
-
+            self,
+            "Residue Label Scale",
+            minimum=0,
+            maximum=1,
+            step=0.01
+            )
         self.layout().addWidget(self.dpre_osci_rows, 0, 0)
         self.layout().addWidget(self.dpre_osci_width, 1, 0)
         self.layout().addWidget(self.dpre_osci_y_label, 2, 0)
@@ -146,10 +128,8 @@ class OscillationMapPopup(BasePopup):
         self.layout().addWidget(self.dpre_osci_x_ticks_pad, 8, 0)
         self.layout().addWidget(self.dpre_osci_x_ticks_weight, 9, 0)
         self.layout().addWidget(self.dpre_osci_grid_color, 10, 0)
-
         self.layout().addWidget(self.dpre_osci_dpre_ms, 0, 1)
         self.layout().addWidget(self.dpre_osci_dpre_alpha, 1, 1)
-
         self.layout().addWidget(self.dpre_osci_y_label_fs, 2, 1)
         self.layout().addWidget(self.dpre_osci_smooth_lw, 3, 1)
         self.layout().addWidget(self.dpre_osci_res_highlight, 4, 1)
@@ -159,18 +139,15 @@ class OscillationMapPopup(BasePopup):
         self.layout().addWidget(self.dpre_osci_rh_fs, 8, 1)
         self.layout().addWidget(self.dpre_osci_rh_y, 9, 1)
         self.layout().addWidget(self.dpre_osci_ymax, 10, 1)
-
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok |
-                                          QDialogButtonBox.Cancel |
-                                          QDialogButtonBox.RestoreDefaults)
-
+        self.buttonBox = QDialogButtonBox(
+            QDialogButtonBox.Ok |
+            QDialogButtonBox.Cancel |
+            QDialogButtonBox.RestoreDefaults
+            )
         self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
-        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).\
-            clicked.connect(self.get_defaults)
-
+        self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.get_defaults)
         self.layout().addWidget(self.buttonBox, 11, 0, 2, 2)
-
         self.get_values()
 
     def set_ranges(self, field_value):
@@ -181,99 +158,95 @@ class OscillationMapPopup(BasePopup):
         return ','.join(["%s-%s" % (x[0], x[1]) for x in ranges])
 
     def get_defaults(self):
+        # value
         self.dpre_osci_rows.setValue(self.defaults["rows"])
         self.dpre_osci_width.setValue(self.defaults["width"])
-        self.dpre_osci_y_label.setText(self.defaults["y_label"])
         self.dpre_osci_y_label_fs.setValue(self.defaults["y_label_fs"])
         self.dpre_osci_dpre_ms.setValue(self.defaults["dpre_ms"])
         self.dpre_osci_dpre_alpha.setValue(self.defaults["dpre_alpha"])
         self.dpre_osci_smooth_lw.setValue(self.defaults["smooth_lw"])
-        self.dpre_osci_ref_color.get_colour(self.defaults["ref_color"])
-        self.dpre_osci_color_init.get_colour(self.defaults["color_init"])
-        self.dpre_osci_color_end.get_colour(self.defaults["color_end"])
         self.dpre_osci_x_ticks_fs.setValue(self.defaults["x_ticks_fs"])
-        self.dpre_osci_x_ticks_fn.select(self.defaults["x_ticks_fn"])
         self.dpre_osci_x_ticks_pad.setValue(self.defaults["x_ticks_pad"])
-        self.dpre_osci_x_ticks_weight.select(self.defaults["x_ticks_weight"])
-        self.dpre_osci_grid_color.select(self.defaults["grid_color"])
-        self.dpre_osci_shade.setChecked(self.defaults["shade"])
-        self.dpre_osci_regions.setText(
-            self.get_ranges(self.defaults["shade_regions"]))
-        self.dpre_osci_res_highlight.setChecked(self.defaults["res_highlight"])
-        self.dpre_osci_res_highlight_list.field.\
-            setText(','.join(list(map(str, self.defaults["res_hl_list"]))))
         self.dpre_osci_rh_fs.setValue(self.defaults["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.defaults["res_highlight_y"])
         self.dpre_osci_ymax.setValue(self.defaults["ymax"])
-
+        # text
+        self.dpre_osci_y_label.setText(self.defaults["y_label"])
+        self.dpre_osci_regions.setText(self.get_ranges(self.defaults["shade_regions"]))
+        # colour
+        self.dpre_osci_ref_color.get_colour(self.defaults["ref_color"])
+        self.dpre_osci_color_init.get_colour(self.defaults["color_init"])
+        self.dpre_osci_color_end.get_colour(self.defaults["color_end"])
+        self.dpre_osci_grid_color.get_colour(self.defaults["grid_color"])
+        # dropdown
+        self.dpre_osci_x_ticks_fn.select(self.defaults["x_ticks_fn"])
+        self.dpre_osci_x_ticks_weight.select(self.defaults["x_ticks_weight"])
+        # check
+        self.dpre_osci_shade.setChecked(self.defaults["shade"])
+        self.dpre_osci_res_highlight.setChecked(self.defaults["res_highlight"])
+        # list
+        self.dpre_osci_res_highlight_list.field.setText(
+            ','.join(list(map(str, self.defaults["res_hl_list"])))
+            )
+    
     def set_values(self):
+        # value
         self.local_variables["rows"] = self.dpre_osci_rows.field.value()
         self.local_variables["width"] = self.dpre_osci_width.field.value()
-        self.local_variables["y_label"] = self.dpre_osci_y_label.field.text()
-        self.local_variables["y_label_fs"] = \
-            self.dpre_osci_y_label_fs.field.value()
-        self.local_variables["dpre_ms"] = \
-            self.dpre_osci_dpre_ms.field.value()
-        self.local_variables["dpre_alpha"] = \
-            self.dpre_osci_dpre_alpha.field.value()
-        self.local_variables["smooth_lw"] = \
-            self.dpre_osci_smooth_lw.field.value()
-        self.local_variables["ref_color"] = \
-            self.dpre_osci_ref_color.fields.currentText()
-        self.local_variables["color_init"] = \
-            colours[self.dpre_osci_color_init.fields.currentText()]
-        self.local_variables["color_end"] = \
-            colours[self.dpre_osci_color_end.fields.currentText()]
-        self.local_variables["x_ticks_fs"] = \
-            self.dpre_osci_x_ticks_fs.field.value()
-        self.local_variables["x_ticks_fn"] = \
-            self.dpre_osci_x_ticks_fn.fields.currentText()
-        self.local_variables["x_ticks_pad"] = \
-            self.dpre_osci_x_ticks_pad.field.value()
-        self.local_variables["x_ticks_weight"] = \
-            self.dpre_osci_x_ticks_weight.fields.currentText()
-        self.local_variables["grid_color"] = \
-            self.dpre_osci_grid_color.fields.currentText()
-        self.local_variables["shade"] = self.dpre_osci_shade.isChecked()
-        self.local_variables["shade_regions"] = \
-            self.set_ranges(self.dpre_osci_regions.field.text())
-        self.local_variables["res_highlight"] = \
-            self.dpre_osci_res_highlight.isChecked()
-        self.local_variables["res_hl_list"] = \
-            list(map(int, self.dpre_osci_res_highlight_list.field.
-                     text().split(',')))
-        self.local_variables["res_highlight_fs"] = \
-            self.dpre_osci_rh_fs.field.value()
-        self.local_variables["res_highlight_y"] = \
-            self.dpre_osci_rh_y.field.value()
+        self.local_variables["y_label_fs"] = self.dpre_osci_y_label_fs.field.value()
+        self.local_variables["dpre_ms"] = self.dpre_osci_dpre_ms.field.value()
+        self.local_variables["dpre_alpha"] = self.dpre_osci_dpre_alpha.field.value()
+        self.local_variables["smooth_lw"] = self.dpre_osci_smooth_lw.field.value()
+        self.local_variables["x_ticks_fs"] = self.dpre_osci_x_ticks_fs.field.value()
+        self.local_variables["x_ticks_pad"] = self.dpre_osci_x_ticks_pad.field.value()
+        self.local_variables["res_highlight_fs"] = self.dpre_osci_rh_fs.field.value()
+        self.local_variables["res_highlight_y"] = self.dpre_osci_rh_y.field.value()
         self.local_variables["ymax"] = self.dpre_osci_ymax.field.value()
+        # text
+        self.local_variables["y_label"] = self.dpre_osci_y_label.field.text()
+        self.local_variables["shade_regions"] = self.set_ranges(self.dpre_osci_regions.field.text())
+        self.local_variables["res_hl_list"] = \
+            list(map(int, self.dpre_osci_res_highlight_list.field.text().split(',')))
+        # dropdown
+        self.local_variables["ref_color"] = self.dpre_osci_ref_color.fields.currentText()
+        self.local_variables["x_ticks_fn"] = self.dpre_osci_x_ticks_fn.fields.currentText()
+        self.local_variables["x_ticks_weight"] = self.dpre_osci_x_ticks_weight.fields.currentText()
+        # colour
+        self.local_variables["color_init"] = colours[self.dpre_osci_color_init.fields.currentText()]
+        self.local_variables["color_end"] = colours[self.dpre_osci_color_end.fields.currentText()]
+        self.local_variables["grid_color"] = self.dpre_osci_grid_color.fields.currentText()
+        # checkbox
+        self.local_variables["shade"] = self.dpre_osci_shade.isChecked()
+        self.local_variables["res_highlight"] = self.dpre_osci_res_highlight.isChecked()
         self.accept()
 
     def get_values(self):
+        # value
         self.dpre_osci_rows.setValue(self.local_variables["rows"])
         self.dpre_osci_width.setValue(self.local_variables["width"])
-        self.dpre_osci_y_label.setText(self.local_variables["y_label"])
         self.dpre_osci_y_label_fs.setValue(self.local_variables["y_label_fs"])
         self.dpre_osci_dpre_ms.setValue(self.local_variables["dpre_ms"])
         self.dpre_osci_dpre_alpha.setValue(self.local_variables["dpre_alpha"])
         self.dpre_osci_smooth_lw.setValue(self.local_variables["smooth_lw"])
-        self.dpre_osci_ref_color.get_colour(self.local_variables["ref_color"])
-        self.dpre_osci_color_init.get_colour(self.local_variables["color_init"])
-        self.dpre_osci_color_end.get_colour(self.local_variables["color_end"])
         self.dpre_osci_x_ticks_fs.setValue(self.local_variables["x_ticks_fs"])
-        self.dpre_osci_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
-        self.dpre_osci_x_ticks_pad.setValue(
-            self.local_variables["x_ticks_pad"])
-        self.dpre_osci_x_ticks_weight.select(
-            self.local_variables["x_ticks_weight"])
-        self.dpre_osci_grid_color.select(self.local_variables["grid_color"])
-        self.dpre_osci_shade.setChecked(self.local_variables["shade"])
-        self.dpre_osci_res_highlight.setChecked(
-            self.local_variables["res_highlight"])
-        self.dpre_osci_res_highlight_list.field.setText(
-            ','.join(list(map(str, self.local_variables["res_hl_list"]))))
-        self.dpre_osci_regions.setText(self.get_ranges(
-            self.local_variables["shade_regions"]))
+        self.dpre_osci_x_ticks_pad.setValue(self.local_variables["x_ticks_pad"])
         self.dpre_osci_rh_fs.setValue(self.local_variables["res_highlight_fs"])
         self.dpre_osci_rh_y.setValue(self.local_variables["res_highlight_y"])
         self.dpre_osci_ymax.setValue(self.local_variables["ymax"])
+        # text
+        self.dpre_osci_y_label.setText(self.local_variables["y_label"])
+        self.dpre_osci_res_highlight_list.field.setText(
+            ','.join(list(map(str, self.local_variables["res_hl_list"])))
+            )
+        self.dpre_osci_regions.setText(self.get_ranges(self.local_variables["shade_regions"]))
+        # colour
+        self.dpre_osci_ref_color.get_colour(self.local_variables["ref_color"])
+        self.dpre_osci_color_init.get_colour(self.local_variables["color_init"])
+        self.dpre_osci_color_end.get_colour(self.local_variables["color_end"])
+        self.dpre_osci_grid_color.get_colour(self.local_variables["grid_color"])
+        # dropdown
+        self.dpre_osci_x_ticks_fn.select(self.local_variables["x_ticks_fn"])
+        self.dpre_osci_x_ticks_weight.select(self.local_variables["x_ticks_weight"])
+        # checked
+        self.dpre_osci_shade.setChecked(self.local_variables["shade"])
+        self.dpre_osci_res_highlight.setChecked(self.local_variables["res_highlight"])

@@ -46,48 +46,50 @@ class PRETheoreticalSelectionPopup(BasePopup):
         .raise_file_dialog(QLineEdit)
     """
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, title="Theoretical PRE Selection Popup",
-                           settings_key=["pre_files"], layout='vbox')
-
+        BasePopup.__init__(
+            self,
+            parent,
+            title="Theoretical PRE Selection Popup",
+            settings_key=["pre_files"],
+            layout='vbox'
+            )
         label = QLabel("Y conditions", self)
         self.layout().addWidget(label)
         self.cond_widget_dict = {}
-
         self.pre_files = OrderedDict(self.local_variables.items())
-
-        self.buttonBox = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.set_values)
         self.buttonBox.rejected.connect(self.reject)
-
         self.get_values()
-
         self.layout().addWidget(self.buttonBox)
-
-
+    
     def get_values(self):
+    
         if self.pre_files:
             for cond_name, pre_path in self.pre_files.items():
                 self.add_field(cond_name, pre_path)
+    
         elif self.variables["conditions"]["y"]:
             for cond in self.variables["conditions"]["y"]:
                 self.add_field(cond, '')
-
+    
     def set_values(self):
+        
         for name, widget in self.cond_widget_dict.items():
             self.pre_files[name] = widget[0].field.text()
+        
         self.local_variables.update(self.pre_files)
         self.accept()
 
     def add_field(self, cond_name, pre_path):
-
         widget = QWidget()
         widget_layout = QHBoxLayout()
         widget.setLayout(widget_layout)
         line_edit = LabelledLineEdit(self, cond_name)
+        
         if pre_path:
             line_edit.setText(pre_path)
+        
         button = QPushButton("...", self)
         line_edit.field.setMinimumWidth(250)
         button.setMaximumWidth(25)
@@ -97,15 +99,12 @@ class PRETheoreticalSelectionPopup(BasePopup):
         widget_items = (line_edit, button)
         self.cond_widget_dict[cond_name] = widget_items
         self.layout().addWidget(widget)
-
+        
         return
 
     def raise_file_dialog(self, file_field):
-        pre_file = QFileDialog.getOpenFileName(
-                                                 self,
-                                                 "Select Theo. PRE File",
-                                                 "",
-                                                 "*.pre"
-                                                )
+        pre_file = QFileDialog.getOpenFileName(self, "Select Theo. PRE File", "", "*.pre")
+        
         if pre_file:
             file_field.field.setText(pre_file[0])
+        
