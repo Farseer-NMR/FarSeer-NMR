@@ -63,7 +63,7 @@
         "do_res_evo": false,
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
-        "do_dpre_osci": false,
+        "do_DPRE_plot": false,
         "do_heat_map": false
     },
     "extended_bar_settings": {
@@ -89,7 +89,7 @@
         "cols_page": 5,
         "rows_page": 2
     },
-    "dpre_osci_settings": {
+    "DPRE_plot_settings": {
         "rows": 10,
         "width": 3,
         "y_label": "r'$\\Delta$PRE$_(rc-exp)$",

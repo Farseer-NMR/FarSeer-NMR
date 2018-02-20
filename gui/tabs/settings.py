@@ -50,7 +50,7 @@ from gui.popups.CSPExceptionsPopup import CSPExceptionsPopup
 from gui.popups.FastaSelectionPopup import FastaSelectionPopup
 from gui.popups.GeneralResidueEvolution import GeneralResidueEvolution
 from gui.popups.HeatMapPopup import HeatMapPopup
-from gui.popups.OscillationMapPopup import OscillationMapPopup
+from gui.popups.DeltaPREPlotPopup import DeltaPREPlotPopup
 from gui.popups.PreAnalysisPopup import PreAnalysisPopup
 from gui.popups.ResidueEvolution import ResidueEvolutionPopup
 from gui.popups.ScatterFlowerPlotPopup import ScatterFlowerPlotPopup
@@ -105,7 +105,7 @@ class Settings(BaseWidget):
         self.vert_bar_checkbox = LabelledCheckbox(self, "Vertical Bar")
         self.res_evo_checkbox = LabelledCheckbox(self, "Residue Evolution")
         self.scatter_checkbox = LabelledCheckbox(self, "CS Scatter")
-        self.dpre_checkbox = LabelledCheckbox(self, "Oscillation Map")
+        self.dpre_checkbox = LabelledCheckbox(self, "Delta PRE Plot")
         self.heat_map_checkbox = LabelledCheckbox(self, "Heat Map")
         self.scatter_flower_checkbox = LabelledCheckbox(self, " CS Scatter Flower")
         self.tplot_button = QPushButton("General Series Plot Settings", self)
@@ -129,7 +129,7 @@ class Settings(BaseWidget):
         self.heat_map_button = QPushButton("Settings", self)
         self.heat_map_button.clicked.connect(partial(self.show_popup, HeatMapPopup))
         self.dpre_button = QPushButton("Settings", self)
-        self.dpre_button.clicked.connect(partial(self.show_popup, OscillationMapPopup))
+        self.dpre_button.clicked.connect(partial(self.show_popup, DeltaPREPlotPopup))
         self.fasta_button = QPushButton("Select FASTA Files", self)
         self.fasta_button.clicked.connect(partial(self.show_popup, FastaSelectionPopup))
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Are Sidechain Peaks Present?")
@@ -486,7 +486,7 @@ class Settings(BaseWidget):
         self.variables["plotting_flags"]["do_cs_scatter_flower"] = \
             self.scatter_flower_checkbox.isChecked()
         self.variables["plotting_flags"]["do_heat_map"] = self.heat_map_checkbox.isChecked()
-        self.variables["plotting_flags"]["do_dpre_osci"] = self.dpre_checkbox.isChecked()
+        self.variables["plotting_flags"]["do_DPRE_plot"] = self.dpre_checkbox.isChecked()
 
 
     def run_farseer_calculation(self):
@@ -585,7 +585,7 @@ class Settings(BaseWidget):
             self.variables["plotting_flags"]["do_cs_scatter_flower"]
             )
         self.heat_map_checkbox.setChecked(self.variables["plotting_flags"]["do_heat_map"])
-        self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_dpre_osci"])
+        self.dpre_checkbox.setChecked(self.variables["plotting_flags"]["do_DPRE_plot"])
 
     def show_popup(self, popup):
         popup(self).launch()

@@ -1174,7 +1174,7 @@ def PRE_analysis(farseer_series, fsuv):
     fsuv.heat_map_rows
     fsuv.fig_height
     fsuv.fig_width
-    fsuv.dpre_osci_width
+    fsuv.DPRE_plot_width
     fsuv.fig_file_type
     fsuv.fig_dpi
     """
@@ -1238,11 +1238,11 @@ def PRE_analysis(farseer_series, fsuv):
                     fig_dpi=fsuv["general_settings"]["fig_dpi"]
                     )
     
-    # plots the DeltaPRE oscilation analysis only for <Cz> comparison.
-    # because DeltaPRE oscilation represents the results obtained only
+    # plots the DeltaPRE analysis only for <Cz> comparison.
+    # because DeltaPRE represents the results obtained only
     # for paramagnetic data.
     if (iscz and (isprev_para or isnext_para)) \
-            and fsuv['plotting_flags']['do_dpre_osci']:
+            and fsuv['plotting_flags']['do_DPRE_plot']:
         for sourcecol, targetcols in zip(
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
@@ -1251,17 +1251,17 @@ def PRE_analysis(farseer_series, fsuv):
                 farseer_series.plot_base(
                     targetcols,
                     'exp',
-                    'delta_osci',
+                    'DPRE_plot',
                     {
                         **fsuv["series_plot_settings"], 
-                        **fsuv["dpre_osci_settings"]
+                        **fsuv["DPRE_plot_settings"]
                         },
                     cols_per_page=1,
-                    rows_per_page=fsuv["dpre_osci_settings"]["rows"],
+                    rows_per_page=fsuv["DPRE_plot_settings"]["rows"],
                     fig_height=fsuv["general_settings"]["fig_height"],
                     fig_width=\
                         fsuv["general_settings"]["fig_width"]/\
-                        fsuv["dpre_osci_settings"]["width"],
+                        fsuv["DPRE_plot_settings"]["width"],
                     fig_file_type=fsuv["general_settings"]["fig_file_type"],
                     fig_dpi=fsuv["general_settings"]["fig_dpi"])
     
