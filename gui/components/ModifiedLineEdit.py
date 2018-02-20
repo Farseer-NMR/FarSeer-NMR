@@ -28,10 +28,8 @@ Katya: https://stackoverflow.com/users/1035567/katya
 ekhumoro: https://stackoverflow.com/users/984421/ekhumoro
 Avaris: https://stackoverflow.com/users/843822/avaris
 """
-
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5 import QtCore
-
 
 class ModifiedLineEdit(QLineEdit):
     """
@@ -49,22 +47,22 @@ class ModifiedLineEdit(QLineEdit):
         .checkText()
         """
     textModified = QtCore.pyqtSignal(str, str)
-
+    
     def __init__(self, parent, contents=None):
         super(ModifiedLineEdit, self).__init__(contents, parent)
         self.returnPressed.connect(self.checkText)
         self._before = contents
-
+    
     def focusInEvent(self, event):
         if event.reason() != QtCore.Qt.PopupFocusReason:
             self._before = self.text()
         super(ModifiedLineEdit, self).focusInEvent(event)
-
+    
     def focusOutEvent(self, event):
         if event.reason() != QtCore.Qt.PopupFocusReason:
             self.checkText()
         super(ModifiedLineEdit, self).focusOutEvent(event)
-
+    
     def checkText(self):
         if self._before != self.text():
             self._before = self.text()

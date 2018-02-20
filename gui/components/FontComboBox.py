@@ -20,10 +20,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-from gui.components.LabelledCombobox import LabelledCombobox
 from PyQt5 import QtCore
-
 import matplotlib.font_manager
+
+from gui.components.LabelledCombobox import LabelledCombobox
 
 fonts = [
          'Agency FB',
@@ -195,10 +195,8 @@ fonts = [
          'Wingdings'
          ]
 
-
 def get_font_from_file(fname):
     return matplotlib.font_manager.FontProperties(fname=fname).get_name()
-
 
 class FontComboBox(LabelledCombobox):
     """
@@ -207,10 +205,10 @@ class FontComboBox(LabelledCombobox):
     font availabilities, the common fonts are listed above and used to populate
     the combobox.
     """
-
+    
     def __init__(self, parent, text=None):
         LabelledCombobox.__init__(self, parent, text, fonts)
-
+    
     def select(self, item):
         """Re-implementation of the LabelledCombobox select fonts from list
         faithfully."""

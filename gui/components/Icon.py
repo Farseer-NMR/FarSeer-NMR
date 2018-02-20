@@ -21,7 +21,6 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtGui
-
 import os
 
 ICON_DIR = os.path.dirname(__file__)
@@ -29,14 +28,12 @@ ICON_DIR = os.path.dirname(__file__)
 class Icon(QtGui.QIcon):
     """A convenience subclass of QIcon to make specification of images from the
     icons directory easy."""
-
-
+    
     def __init__(self, image=None):
-
         assert image
-
+        
         if not isinstance(image, QtGui.QIcon):
             if not os.path.exists(image):
                 image = os.path.join(ICON_DIR, image)
-
+        
         QtGui.QIcon.__init__(self, image)
