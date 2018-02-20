@@ -61,7 +61,6 @@ class ValueField(QLineEdit):
         self.textChanged.connect(self.updateValuesDict)
         self.valuesDict = valuesDict
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-
         self.msg = QMessageBox()
         self.msg.setIcon(QMessageBox.Warning)
         self.msg.setText("Invalid Characters in Condition Name")
@@ -69,21 +68,19 @@ class ValueField(QLineEdit):
 """These characters:
  . : " / \ ° ' * ? ! ; ` ^ 
 cannot be used in condition names."""
-        )
+            )
         self.msg.setWindowTitle("Invalid Characters")
         self.msg.setStandardButtons(QMessageBox.Ok)
-
-
+    
     def updateValuesDict(self, value):
-
+        
         if any(substr in DISALLOWED_CHARS for substr in value):
             self.msg.exec_()
             self.setText(value[:-1])
             return
-
+        
         self.valuesDict[self.dim][self.index] = value
-
-
+    
     def dropEvent(self, event):
         event.ignore()
         return

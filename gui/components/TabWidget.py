@@ -24,20 +24,20 @@ import os
 import datetime
 
 from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import (
+    QFileDialog,
+    QGridLayout,
+    QLabel,
+    QMessageBox,
+    QTabWidget,
+    QWidget
+    )
 
-from core.setup_farseer_calculation import create_directory_structure, \
-    check_input_construction
-
-from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLabel, \
-     QMessageBox, QTabWidget, QWidget
-
+from core.setup_farseer_calculation import create_directory_structure, check_input_construction
+from core.fslibs.Variables import Variables
 from gui.components.Icon import ICON_DIR
-
-
 from gui.tabs.peaklist_selection import PeaklistSelection
 from gui.tabs.settings import Settings
-
-from core.fslibs.Variables import Variables
 
 
 class TabWidget(QTabWidget):
@@ -64,10 +64,10 @@ class TabWidget(QTabWidget):
         .run_farseer_calculation
     """
     variables = Variables()._vars
-
+    
     def __init__(self, gui_settings):
         QTabWidget.__init__(self, parent=None)
-
+        
         self.widgets = []
         self.gui_settings = gui_settings
         self._add_tab_logo()
@@ -78,10 +78,8 @@ class TabWidget(QTabWidget):
         Create instances of all widget classes and add them to the TabWidget
         """
         self.peaklist_selection = \
-            PeaklistSelection(self, gui_settings=self.gui_settings,
-                              footer=False)
-        self.interface = Settings(self, gui_settings=self.gui_settings,
-                                  footer=True)
+            PeaklistSelection(self, gui_settings=self.gui_settings, footer=False)
+        self.interface = Settings(self, gui_settings=self.gui_settings, footer=True)
         self.add_tab(self.peaklist_selection, "PeakList Selection")
         self.add_tab(self.interface, "Settings", "Settings")
         self.widgets.extend([self.peaklist_selection, self.interface])
@@ -100,6 +98,7 @@ class TabWidget(QTabWidget):
         tab.setLayout(QGridLayout())
         tab.layout().addWidget(widget)
         self.addTab(tab, name)
+        
         if object_name:
             tab.setObjectName(object_name)
 
@@ -109,15 +108,17 @@ class TabWidget(QTabWidget):
         configuration files.
         """
         if not path:
-            fname = QFileDialog.getOpenFileName(None, 'Load Configuration',
-                                                os.getcwd())
+            fname = QFileDialog.getOpenFileName(None, 'Load Configuration', os.getcwd())
+        
         else:
             fname = [path]
+        
         if fname[0]:
             if fname[0].split('.')[1] == 'json':
                 Variables().read(fname[0])
                 self.load_variables()
                 self.config_file = fname[0]
+        
         return
 
     def load_variables(self):
@@ -137,21 +138,29 @@ class TabWidget(QTabWidget):
         configuration files.
         """
         self.interface.save_config()
+        
         if not path:
             filters = "JSON files (*.json)"
             selected_filter = "JSON files (*.json)"
-            fname = QFileDialog.getSaveFileName(self, "Save Configuration",
-                                                "", filters, selected_filter)
+            fname = QFileDialog.getSaveFileName(
+                self,
+                "Save Configuration",
+                "",
+                filters,
+                selected_filter
+                )
         else:
             fname = [path]
+        
         if not fname[0].endswith('.json'):
             fname = [fname[0] + ".json"]
+        
         if fname[0]:
             with open(fname[0], 'w') as outfile:
                 Variables().write(outfile)
                 self.config_file = os.path.abspath(fname[0])
-
-        print('Configuration saved to %s' % fname[0])
+        
+        print('Configuration saved to {}'.format(fname[0]))
 
     def run_farseer_calculation(self):
         """
@@ -159,11 +168,11 @@ class TabWidget(QTabWidget):
         Saves configuration if not already saved.
         Performs necessary checks for execution.
         """
-
+        
         msg = QMessageBox()
         msg.setStandardButtons(QMessageBox.Ok)
         msg.setIcon(QMessageBox.Warning)
-
+        
         if not all(x for x in self.variables["conditions"].values()):
             msg.setText('Experimental Series not set up correctly.')
             msg.setInformativeText(
@@ -173,12 +182,12 @@ X axis conditions have a peaklist associated."""
                 )
             msg.exec_()
             return
-
+        
         from core.Threading import Threading
         output_path = self.variables["general_settings"]["output_path"]
         run_msg = check_input_construction(output_path, self.variables)
         print(run_msg)
-
+        
         if run_msg in ["Spectra", "Backbone", "Sidechains"]:
             msg.setText("{} Path Exists.".format(run_msg))
             msg.setInformativeText(
@@ -186,7 +195,7 @@ X axis conditions have a peaklist associated."""
 Calculation cannot be launched.""".format(run_msg)
                 )
             msg.exec_()
-
+        
         elif run_msg == "No dataset":
             msg.setText("No dataset configured.")
             msg.setInformativeText(
@@ -200,7 +209,8 @@ with the corresponding peaklist files.")
             msg.setInformativeText(
 """The Apply FASTA box is activated.
 This calculation requires FASTA files to be
-specified for each Y axis condition.""")
+specified for each Y axis condition."""
+                )
             msg.exec_()
         
         elif run_msg == "No FASTA for peaklist":
@@ -232,7 +242,7 @@ Please correct the Z names accordingly.
 """
                 )
             msg.exec_()
-
+        
         elif run_msg == "PRE file not provided":
             msg.setText("PRE file not provided.")
             msg.setInformativeText(
@@ -251,6 +261,7 @@ specified for each Y axis condition.""")
             self.save_config(path=config_path)
             fsuv = read_user_variables(output_path, config_path)
             Threading(function=run_farseer, args=fsuv)
+        
         else:
             print('Run could not be initiated')
 
@@ -258,11 +269,12 @@ specified for each Y axis condition.""")
         """Add logo to tab header."""
         self.tablogo = QLabel(self)
         self.tablogo.setAutoFillBackground(True)
-        self.tablogo.setAlignment(QtCore.Qt.AlignHCenter |
-                                  QtCore.Qt.AlignVCenter)
+        self.tablogo.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/header-logo.png'))
         self.tablogo.setPixmap(pixmap)
         self.tablogo.setContentsMargins(9, 0, 0, 6)
         self.setCornerWidget(self.tablogo, corner=QtCore.Qt.TopLeftCorner)
-        self.setFixedSize(QtCore.QSize(self.gui_settings['app_width'],
-                                       self.gui_settings['app_height']))
+        self.setFixedSize(QtCore.QSize(
+            self.gui_settings['app_width'],
+            self.gui_settings['app_height']
+                ))
