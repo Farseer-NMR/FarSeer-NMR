@@ -2999,6 +2999,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     ylabel=ylabel,
                     **param_dict
                     )
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
