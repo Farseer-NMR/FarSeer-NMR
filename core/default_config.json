@@ -92,7 +92,7 @@
     "DPRE_plot_settings": {
         "rows": 10,
         "width": 3,
-        "y_label": "r'$\\Delta$PRE$_(rc-exp)$",
+        "y_label": "$\\Delta$PRE$_(rc-exp)$",
         "y_label_fs": 5,
         "ymax": 1.0,
         "dpre_ms": 2,
