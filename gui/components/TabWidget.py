@@ -243,6 +243,14 @@ Please correct the Z names accordingly.
                 )
             msg.exec_()
         
+        elif run_msg == "PRE file not provided":
+            msg.setText("PRE file not provided.")
+            msg.setInformativeText(
+"""The PRE Analysis box is activated.
+This calculation requires Theoretical PRE files to be
+specified for each Y axis condition.""")
+            msg.exec_()
+        
         elif run_msg == "Run":
             create_directory_structure(output_path, self.variables)
             from core.farseermain import read_user_variables, run_farseer

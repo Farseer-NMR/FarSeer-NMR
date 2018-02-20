@@ -78,6 +78,10 @@ def check_input_construction(output_path, variables):
     if variables["pre_settings"]["apply_PRE_analysis"]:
         if not(all([k in ['dia', 'para'] for k in exp_dataset.keys()])):
             return "Para name not set"
+        for y_key in variables["conditions"]["y"]:
+            pre_file = variables["pre_files"].get(y_key, False)
+            if not pre_file:
+                return "PRE file not provided"
     
     return "Run"
 
