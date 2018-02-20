@@ -26,7 +26,7 @@ import pandas as pd
 import itertools as it
 
 from core.utils import aal1tol3, aal3tol1
-import core.fslibs.wet as fsw
+from core.fslibs import wet as fsw
 
 class FarseerCube:
     """
