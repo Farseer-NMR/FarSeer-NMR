@@ -1,0 +1,40 @@
+This is an example of a protein-protein titration experiment
+where protein1 was titrated against increasing concentration of protein2.
+Protein1 concentration was fixed to 200µM and protein2 concentration
+increased along the range: 25, 50, 100, 200, 400 and 500µM.
+
+The current config.json is configured to analyse the data along the X axis (1D).
+Open the Farseer-NMR and Load the config.json file.
+
+In the current configuration, Chemical Shift Perturbations (CSP) will be
+calculated and represented in all different plotting templates.
+
+The Parameters Evolution per Residue Plot are selected to represent the evolution
+of CSPs per residue along the titration.
+
+The continuous CSPs data is fit to the Hill Equation
+and represented in the Evolution per Residue plot. This is SIMPLY a demonstration
+of the implemented fitting platform, showing how user defined fitting functions can
+be implemented as a Farseer-NMR routine.
+
+You can also change the Settings at your will.
+
+As an advice, select the FASTA file and activate the "Apply FASTA" flag to search for
+unassigned residues.
+
+To run this experiment, simply create the Experimental Tree and populate it where
+the reference peaklist should be first followed by the others in crescent order.
+
+How to populate the Experimental Tree:
+This Tree contains 1 Z axis datapoint, 1 Y axis datapoint and 7 X axis datapoints.
+- 298K
+    - protein1
+        - ref
+        - 25uM
+        - 50uM
+        - 100uM
+        - 200uM
+        - 400uM
+        - 500uM
+
+EOF
