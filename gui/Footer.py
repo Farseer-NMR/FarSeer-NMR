@@ -99,8 +99,7 @@ class Footer(QWidget):
 
     def show_documentation(self):
         webbrowser.open_new_tab(
-            "https://github.com/joaomcteixeira/FarSeer-NMR/tree/"
-            "master/Documentation"
+            "https://groups.google.com/forum/#!forum/farseer-nmr"
             )
 
     def send_email(self):
