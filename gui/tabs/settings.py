@@ -85,7 +85,7 @@ class Settings(BaseWidget):
             "Spectrum Path",
             callback=self.set_spectrum_path_text
             )
-        self.output_path = LabelledLineEdit
+        self.output_path = LabelledLineEdit(
             self,
             "Calculation Output Folder",
             callback=self.set_output_path
