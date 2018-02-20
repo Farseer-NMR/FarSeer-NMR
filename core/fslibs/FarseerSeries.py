@@ -30,7 +30,7 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
-import core.fslibs.wet as fsw
+from core.fslibs import wet as fsw
 
 class FarseerSeries(pd.Panel):
     """

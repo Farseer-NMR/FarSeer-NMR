@@ -74,10 +74,10 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
-import core.fslibs.FarseerCube as fcube
-import core.fslibs.FarseerSeries as fss
-import core.fslibs.Comparisons as fsc
-import core.fslibs.wet as fsw
+from core.fslibs import FarseerCube as fcube
+from core.fslibs import FarseerSeries as fss
+from core.fslibs import Comparisons as fsc
+from core.fslibs import wet as fsw
 
 def read_user_variables(runfolder_path, configjson_path):
     """
