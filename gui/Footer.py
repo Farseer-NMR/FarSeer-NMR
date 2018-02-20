@@ -20,11 +20,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import os
+import webbrowser
 from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout, QToolButton
 from PyQt5 import QtCore, QtGui
-import os
+
 from gui.components.Icon import Icon, ICON_DIR
-import webbrowser
 
 
 class Footer(QWidget):
@@ -33,7 +34,6 @@ class Footer(QWidget):
         QWidget.__init__(self, parent=parent)
         self.setFixedHeight(gui_settings['footer_height'])
         self.setObjectName("footer")
-
         affiliations = '<span style="display:inline"><span style="color: #D5FD84; font-size: 6pt; display:inline">Joao MC Texeira<span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
                        '<span style="color: #D5FD84; font-size: 6pt;">Simon P. Skinner</span><span style="color: #07C3F5">**&nbsp;&nbsp;</span>' \
                        '<span style="color: #D5FD84; font-size: 6pt;"> Miguel Arbes&#250;</span><span style="color: #08F2EE">*&nbsp;&nbsp;</span>' \
@@ -41,57 +41,55 @@ class Footer(QWidget):
                        '<span style="color: #D5FD84; font-size: 6pt;"> Miquel Pons</span><span style="color: #08F2EE">*</span>'
         address1 = '<span style="color: #08F2EE; font-size: 6pt;">* BioNMR Laboratory, Inorganic and Organic Chemistry Department, Universitat de Barcelona, Baldiri Reixac 10-12, 08028 Barcelona, Spain</span>'
         address2 = '<span style="color: #07C3F5; font-size: 6pt;">** Astbury Centre for Structural Molecular Biology, Faculty of Biological Sciences, University of Leeds, LS2 9JT, UK</span>'
-
+        #
         self.label1 = QLabel(affiliations, self)
         self.label2 = QLabel(address1, self)
         self.label3 = QLabel(address2, self)
         self.label1.setObjectName('label1')
-
+        #
         layout = QGridLayout()
         self.setLayout(layout)
         # self.layout().setSpacing(6)
         self.layout().addWidget(self.label1, 0, 0)
         self.layout().addWidget(self.label2, 1, 0)
         self.layout().addWidget(self.label3, 2, 0)
-
+        #
         self.twitter_button = QToolButton()
         self.twitter_button.setCheckable(True)
         self.twitter_button.setIcon(Icon('icons/footer-icon-twitter.png'))
         self.twitter_button.toggled.connect(self.open_twitter)
-
+        #
         self.paper_button = QToolButton()
         self.paper_button.setIcon(Icon('icons/footer-icon-paper.png'))
         self.paper_button.setCheckable(True)
         self.paper_button.toggled.connect(self.show_documentation)
-
+        #
         self.email_button = QToolButton()
         self.email_button.setIcon(Icon('icons/footer-icon-email.png'))
         self.email_button.setCheckable(True)
         self.email_button.toggled.connect(self.send_email)
-
+        #
         self.twitter_button.setIconSize(self.twitter_button.size())
         self.paper_button.setIconSize(self.paper_button.size())
         self.email_button.setIconSize(self.email_button.size())
-
+        #
         self.layout().addWidget(self.paper_button, 0, 4, 3, 1)
         self.layout().addWidget(self.email_button, 0, 5, 3, 1)
         self.layout().addWidget(self.twitter_button, 0, 6, 3, 1)
-
+        #
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
                   '>v.1.0.0&nbsp;&nbsp;&nbsp;&nbsp;</span>'
         self.versionLabel = QLabel(version, self)
         self.versionLabel.setAlignment(QtCore.Qt.AlignRight)
-
+        #
         spacerLabel = QLabel('', self)
-
+        #
         self.layout().addWidget(spacerLabel, 0, 3)
         self.layout().addWidget(self.versionLabel, 0, 8, 1, 1)
-
+        #
         self.ctfpLabel = QLabel('', self)
-        pixmap = QtGui.QPixmap(os.path.join(
-            ICON_DIR,
-            'icons/footer-artistic-systems.png'))
+        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/footer-artistic-systems.png'))
         self.ctfpLabel.setPixmap(pixmap)
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
         self.layout().addWidget(self.ctfpLabel, 1, 7, 2, 2)
@@ -102,7 +100,8 @@ class Footer(QWidget):
     def show_documentation(self):
         webbrowser.open_new_tab(
             "https://github.com/joaomcteixeira/FarSeer-NMR/tree/"
-            "master/Documentation")
+            "master/Documentation"
+            )
 
     def send_email(self):
         webbrowser.open('mailto:?to=farseer-nmr@gmail.com', new=1)
