@@ -171,7 +171,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 
@@ -388,7 +388,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 
@@ -609,7 +609,7 @@ class Test_Case(unittest.TestCase):
         self.assertNotEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertNotEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertNotEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 

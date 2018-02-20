@@ -114,7 +114,7 @@ class FarseerSeries(pd.Panel):
                 .plot_cs_scatter()
                 .plot_cs_scatter_flower()
                 .plot_DPRE_heatmap()
-                .plot_delta_osci()
+                .plot_DPRE_plot()
             
             Subplot add-ons:
                 .set_item_colors()
@@ -1105,8 +1105,8 @@ recipient: residues
             
             y (float): plot's y axis limit
             
-            bartype (str): {'h', 'v', 'osci}, whether plot of type 
-                horizontal, vertical or oscilantion.
+            bartype (str): {'h', 'v', 'DPRE_plot'}, whether plot of type 
+                horizontal, vertical or DPRE_plot.
             
             pre_color (str): the colour of plot line
             
@@ -1145,7 +1145,7 @@ recipient: residues
             xtagm = self.loc[exp,:,'tag']=='*'
             xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
             
-            if bartype in ['h', 'osci']:
+            if bartype in ['h', 'DPRE_plot']:
                 axs.vlines(
                     xtag,
                     0,
@@ -2604,7 +2604,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         
         return
     
-    def plot_delta_osci(
+    def plot_DPRE_plot(
             self, calccol,
             axs, i,
             experiment,
@@ -2839,7 +2839,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i],
             experiment,
             y_lims[1]*0.1,
-            bartype = 'osci',
+            bartype = 'DPRE_plot',
             tag_color=tag_cartoon_color,
             tag_ls=tag_cartoon_ls,
             tag_lw=tag_cartoon_lw
@@ -2894,7 +2894,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             
             plot_style (str): {'bar_extended', 'bar_compacted',
                 'bar_vertical', 'res_evo', 'cs_scatter',
-                'cs_scatter_flower', 'heat_map', 'delta_osci'}
+                'cs_scatter_flower', 'heat_map', 'DPRE_plot'}
             
             param_dict (dict): kwargs to be passed to each plotting
                 function.
@@ -3007,7 +3007,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             
-        elif plot_style == 'delta_osci':
+        elif plot_style == 'DPRE_plot':
             dp_colors = self.linear_gradient(
                 param_dict['color_init'],
                 param_dict['color_end'],
@@ -3016,7 +3016,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             dp_color = it.cycle(dp_colors['hex'])
             
             for i, experiment in enumerate(self):
-                self.plot_delta_osci(
+                self.plot_DPRE_plot(
                     calccol,
                     axs,
                     i,
