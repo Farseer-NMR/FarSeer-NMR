@@ -88,7 +88,7 @@ class Test_Parsing(unittest.TestCase):
         volume_method = peaklist[0].volume_method
         details = peaklist[0].details
 
-        self.assertEqual(len(peaklist), 190)
+        self.assertEqual(len(peaklist), 182)
         self.assertEqual(len(assignments), 182)
         self.assertIsNotNone(peak_number)
         self.assertIsNotNone(peak_assigments)
@@ -165,7 +165,7 @@ class Test_Parsing(unittest.TestCase):
         self.assertIsNone(merit)
         self.assertIsNone(details)
 
-        self.assertEqual(len(peaklist), 190)
+        self.assertEqual(len(peaklist), 182)
         self.assertEqual(len(assignments), 182)
 
     def test_parse_nmrdraw(self):
@@ -176,7 +176,7 @@ class Test_Parsing(unittest.TestCase):
         assignments = [peak.assignments for peak in peaklist if '' not in
                        peak.assignments]
 
-        self.assertEqual(len(peaklist), 190)
+        self.assertEqual(len(peaklist), 182)
         self.assertEqual(len(assignments), 182)
 
         peak_number = peaklist[0].peak_number
