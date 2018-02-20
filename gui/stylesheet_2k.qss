@@ -20,6 +20,7 @@ height: 51px;
 margin-bottom: 1px;
 margin-left: 16px;
 margin-right: 16px;
+margin-right: 16px;
 margin-top: 10px;
 }
 
@@ -259,3 +260,21 @@ QCheckBox::indicator::checked {
     background-color: #000000;
 }
 
+QMenu {
+background-color: #07AFF8;
+color: #001450;
+font-size: 12pt;
+font-weight: 400;
+}
+
+QMenu::hover {
+background-color: #FBFB04;
+}
+
+QMenu::item {
+background-color: #07AFF8;
+
+}
+QMenu::item::selected {
+background-color: #FBFB04;
+}
