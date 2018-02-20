@@ -329,19 +329,19 @@ None
             positions[i] = float(position)
             linewidths[i] = float(linewidth)
             labels[i] = label
-        
-        peak = Peak(
-            peak_number=peak_number,
-            positions=positions,
-            volume=volume,
-            height=height,
-            assignments=labels,
-            linewidths=linewidths,
-            atoms=atoms,
-            details=details,
-            format="nmrview"
-            )
-        peakList.append(peak)
+        if None not in labels:
+            peak = Peak(
+                peak_number=peak_number,
+                positions=positions,
+                volume=volume,
+                height=height,
+                assignments=labels,
+                linewidths=linewidths,
+                atoms=atoms,
+                details=details,
+                format="nmrview"
+                )
+            peakList.append(peak)
     
     fin.close()
     
