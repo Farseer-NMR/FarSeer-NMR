@@ -214,7 +214,7 @@ class OscillationMapPopup(BasePopup):
         # colour
         self.local_variables["color_init"] = colours[self.dpre_osci_color_init.fields.currentText()]
         self.local_variables["color_end"] = colours[self.dpre_osci_color_end.fields.currentText()]
-        self.local_variables["grid_color"] = colours[self.dpre_osci_grid_color.fields.currentText()]
+        self.local_variables["grid_color"] = self.dpre_osci_grid_color.fields.currentText()
         # checkbox
         self.local_variables["shade"] = self.dpre_osci_shade.isChecked()
         self.local_variables["res_highlight"] = self.dpre_osci_res_highlight.isChecked()
