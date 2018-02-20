@@ -30,7 +30,7 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
-import core.fslibs.wet as fsw
+from core.fslibs import wet as fsw
 
 class FarseerSeries(pd.Panel):
     """
@@ -2556,6 +2556,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         
         if i == len(self.items)-1:
+            
             cbar = plt.colorbar(
                 cleg,
                 ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
@@ -2861,6 +2862,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 labelleft='off',
                 labelbottom='off'
                 )
+            axs[i].patch.set_alpha(0)
         
         return
     
@@ -2999,6 +3001,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     ylabel=ylabel,
                     **param_dict
                     )
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
