@@ -249,3 +249,22 @@ padding-left: 5px;
 .QGroupBox {
 margin: 2px;
 }
+
+QMenu {
+background-color: #07AFF8;
+color: #001450;
+font-size: 12pt;
+font-weight: 400;
+}
+
+QMenu::hover {
+background-color: #FBFB04;
+}
+
+QMenu::item {
+background-color: #07AFF8;
+
+}
+QMenu::item::selected {
+background-color: #FBFB04;
+}
