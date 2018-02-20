@@ -2556,6 +2556,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         
         if i == len(self.items)-1:
+            
             cbar = plt.colorbar(
                 cleg,
                 ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
@@ -2861,6 +2862,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 labelleft='off',
                 labelbottom='off'
                 )
+            axs[i].patch.set_alpha(0)
         
         return
     
