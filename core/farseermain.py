@@ -94,16 +94,58 @@ def read_user_variables(runfolder_path, configjson_path):
     Returns:
         fsuv (dictionary): contains the user preferences.
     """
+    how_to_run = \
+"""*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+    
+    
     # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # Reads Run calculation folder absolut path
     run_cwd =  os.path.abspath(runfolder_path)
     # Reads json config absolut path
     json_cwd = os.path.abspath(configjson_path)
     # loads and reads json config file
-    fsuv = json.load(open(json_cwd, 'r'))
+    try:
+        fsuv = json.load(open(json_cwd, 'r'))
+    except json.decoder.JSONDecodeError as jsonerror:
+        msg = \
+"""
+***************************************
+*** Error loading JSON file:
+*** {}
+*** {}
+***************************************
+""".\
+            format(json_cwd, jsonerror)
+        sys.exit(msg)
+    except IsADirectoryError as direrr:
+        msg = \
+"""
+***************************************
+*** A directory was passed as argument instead of a json file.
+*** {}
+***
+{}
+***************************************
+""".\
+            format(direrr, how_to_run)
+        sys.exit(msg)
     # changes current directory to the run directory which is that where
     # spectra/ folder is.
-    os.chdir(run_cwd)
+    try:
+        os.chdir(run_cwd)
+    except NotADirectoryError as notdirerr: 
+        msg = \
+"""
+***************************************
+*** A file was passed as argument instead of a directory path.
+*** {}
+***
+{}
+***************************************
+""".\
+            format(notdirerr, how_to_run)
+        sys.exit(msg)
     # stores path to spectra/ folder
     fsuv["general_settings"]["input_spectra_path"] = \
         '{}/spectra'.format(run_cwd)
