@@ -1,3 +1,9 @@
+![FarSeer Banner](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Figures/FS_banner.png?raw=true)
+
+Find, download and fork the full project at [GitHub](https://github.com/joaomcteixeira/FarSeer-NMR).
+
+_Website currently under development_
+
 # Welcome to Farseer-NMR
 
 A fully community driven and ever growing suite to analyse **peaklist files** extracted from multivariable series of biomolecular NMR experiments. Up to three different experimental variables can be combined and analysed together.  
@@ -6,8 +12,6 @@ With Farseer-NMR, you can automatically calculate structural parameters from pea
 Conveniently save and load your configuration files and re-run your operations with one-click!
 
 Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
-
-![FarSeer Banner](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Figures/FS_banner.png?raw=true)
 
 ## Requirements and Configuration
 
