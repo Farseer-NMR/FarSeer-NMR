@@ -19,7 +19,7 @@ Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). At
 Farseer-NMR has been built in its entirety using [Python](https://www.python.org/) libraries and we try to keep it up-to-date with the Python community. We advise you to install and manage your Python packages with [Anaconda](https://www.anaconda.com/download/).  
 In the case of a library incompatibility, you can find the [spec-files under the Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) required to create [Anaconda environments](https://conda.io/docs/user-guide/tasks/manage-environments.html) on your computer in order to run Farseer-NMR.
 
-## Running
+## Running Farseer-NMR
 
 There are two ways to run Farseer-NMR: using the fully featured graphical user interface (GUI) or directly in a ```Terminal``` emulator. There are no advantages to running Farseer-NMR directly on the command line, rather than using the GUI version. All released features can be configured using the GUI; only under development features are kept solely in the Core (terminal version) and can be accessed (if available) by direct editing the JSON config file.
 
@@ -30,24 +30,24 @@ We **strongly** advise users to run the GUI version.
 Using the GUI is as simple as running the main GUI file through Python.
 
 ```
-python main.py
+python <path_to>/main.py
 ```
 
 ### Via terminal
 
 ```
-python core/farseemain.py <path to calculation folder> <path to conf.json file>
+python <path_to>/farseemain.py <CALCULATION_FOLDER> <CONFIG.JSON>
 ```
 
-where ```calculation folder``` is the folder containing the hierarchical spectra/ folder. The GUI will create the spectra/ folder for you automatically, whereas to run Farseer-NMR via the terminal you have to create it yourself.
-
-### Changing the config file
-
-Alternatively, you can always change the calculation settings manually by editing the .json configuration file, loading your configuration via GUI and continue from there. Anyway, we don't see a point in doing this rather than using the GUI. :-P
+where ```CALCULATION_FOLDER``` is the folder containing the hierarchical ```spectra/``` folder. The GUI will create the ```spectra/``` folder for you automatically, whereas to run Farseer-NMR via the terminal you have to create it yourself or use a previously created one, this includes ```peaklists.csv``` files and also FASTA files or of any other kind necessary for the calculation to run. The ```CONFIG.JSON``` is any config file saved by the GUI, having or not information on the peaklist experimental tree. It is possible to change the calculation settings manually by editing the ```.json``` configuration file or loading your configuration via GUI and set it up there, you can also take as initial template the ```defaulf_config.json``` provided in the repository. But consider, unless you are developing new features, we don't see a point in doing this rather than using the GUI. :-P
 
 ## Documentation
 
 We have a [Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files. There is also an online [Wiki](https://github.com/joaomcteixeira/FarSeer-NMR/wiki) page with additional links and infomation regarding the Farseer-NMR Documentation. These pages are dynamic updated according to the needs of the project/community.
+
+## Tutorials and Examples
+
+Currently we provide a Tutorial folder with artificial datasets that you can use to try out Farseer-NMR and understand its functionalities. We will keep this folder updated as the projects evolves and the interaction with the users also grows. Find our tutorials [here](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation/Tutorial_Datasets).
 
 ## Participate in the Farseer-NMR community
 
