@@ -33,25 +33,31 @@ chmod u+rwx Linux_install.sh
 ```
 4. Run Linux_install.sh. This will install a Miniconda distribution with all libraries required to run Farseer-NMR.
 ```
-./Linux_install.sh
+./Linux_install_Miniconda.sh
 ```
 
 ### With Anaconda already installed
 
-If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to perturb you main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) for Farseer-NMR using the corresponding `spec-files` under the Documention folder. For example for 64-bit machines:
+If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to perturb you main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html):
 
+1. Give execution permissions to setup_env.sh
 ```
-conda create --name farseernmr --file spec-file_64bit.txt
+chmod u+x Linux_install_ENV.sh
 ```
-
-Give execution persions to the running script:
+2. Run setup_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR.
 ```
-chmod u+x run_farseer.sh
+./Linux_install_env.sh
 ```
 
 ### Manual installation without Anaconda
 
 If you are an advanced user who is used to manually manage your installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the corresponding `spec-files` under the Documention folder.
+
+Run:
+```
+./Linux_install_manual.sh
+```
+to create the run_farseer.sh file.
 
 ## Running Farseer-NMR
 
