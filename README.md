@@ -57,7 +57,7 @@ chmod u+x Linux_install_env.sh
 
 ### Manual installation without Anaconda
 
-If you are an advanced user who is used to manually manage your installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the corresponding `spec-files` under the Documention folder. Afterwards, to create the run_farseer.sh file run:
+If you are an advanced user who is used to manually manage your installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the architecture respective `spec-files` under the Documention folder. Afterwards, to create the run_farseer.sh file run:
 
 ```
 ./Linux_install_manual.sh
