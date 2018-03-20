@@ -23,22 +23,22 @@ Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). At
 
 ### Setting up a Miniconda for Farseer-NMR
 
-The easiest way to setup Farseer-NMR is to install a separated Miniconda distribution inside the Farseer-NMR main folder. This setup demands extra disk space (approximatelly 3GBs) but ensures that you can run Farseer-NMR indenpendently from you Python installation setup. Do this with the following steps:
+The easiest way to setup Farseer-NMR is to install a separated Miniconda distribution inside the Farseer-NMR main folder. This setup demands extra disk space (approximatelly 3GBs) but ensures that you can run Farseer-NMR indenpendently from your Python installation setup. Do this with the following steps:
 
 1. Unpack the downloaded version.
-1. Navigate to the Farseer-NMR folder.
+1. Navigate to the unpacked Farseer-NMR folder.
 1. Give execution permissions to Linux_install.sh
 ```
 chmod u+rwx Linux_install.sh
 ```
-1. Inside the Farseer-NMR folder run Linux_install.sh, this will install a Miniconda distribution with everythin necessary to run Farseer-NMR.
+4. Run Linux_install.sh. This will install a Miniconda distribution with all libraries required to run Farseer-NMR.
 ```
 ./Linux_install.sh
 ```
 
 ### With Anaconda already installed
 
-If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Otherwise, is you do not want to perturb you main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) for Farseer-NMR using the corresponding `spec-files` under the Documention folder. For example for 64-bit machines:
+If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to perturb you main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) for Farseer-NMR using the corresponding `spec-files` under the Documention folder. For example for 64-bit machines:
 
 ```
 conda create --name farseernmr --file spec-file_64bit.txt
@@ -57,30 +57,22 @@ If you are an advanced user who is used to manually manage your installed Python
 
 Before running Farseer-NMR, please read carefully the [Installation](https://joaomcteixeira.github.io/FarSeer-NMR/#installation) section.
 
-There are two ways to run Farseer-NMR: using the fully featured graphical user interface (GUI) or directly in a ```Terminal``` emulator. There are no advantages to running Farseer-NMR directly on the command line, rather than using the GUI version. All released features can be configured using the GUI; only under development features are kept solely in the Core (terminal version) and can be accessed (if available) by direct editing the JSON config file.
-
-We **strongly** advise users to run the GUI version.  
-
-### Using the GUI
-
-1. Run Farseer-NMR GUI version:
+1. To run Farseer-NMR:
 ```
 ./run_farseer.sh
 ```
 
 ### Running without the GUI
 
-_If you reading this section we assume you are an advanced user, so we skip any further instructions._
+A Farseer-NMR calculation can be run directly from a previously setup folder and from a previously configured `config` file. we advise that only advanced users use this feature and, even for those users, we see no advantage in not using the GUI version because all released features can be configured using the GUI. Only under development features are kept solely in the Core version, these can be accessed (if available) by manually edit of the JSON config file.
 
 ```
 python <path_to>/farseemain.py <CALCULATION_FOLDER> <CONFIG.JSON>
 ```
 
-where ```CALCULATION_FOLDER``` is the folder containing the hierarchical ```spectra/``` folder. The GUI will create the ```spectra/``` folder for you automatically, whereas to run Farseer-NMR via the terminal you have to create it yourself or use a previously created one, this includes ```peaklists.csv``` files and also FASTA files or of any other kind necessary for the calculation to run.
+where ```CALCULATION_FOLDER``` is the folder containing the hierarchical ```spectra/``` folder (see Documentation Manual). Whereas the GUI will create the ```spectra/``` folder for you automatically, to run Farseer-NMR from the Core you have to create this folder yourself or use a previously created one, containing the ```peaklists.csv``` files and also FASTA files or of any other necessary files.
 
-## Advanced considerations on the CONFIG file
-
-The ```CONFIG.JSON``` is any config file saved by the GUI, having or not information on the peaklist experimental tree. It is possible to change the calculation settings manually by editing the ```.json``` configuration file or loading your configuration via GUI and set it up there, you can also take as initial template the ```defaulf_config.json``` provided in the repository. But consider, unless you are developing new features, we don't see a point in doing this rather than using the GUI. :-P
+The ```CONFIG.JSON``` is any config file saved by the GUI, having or not information on the peaklist experimental tree. It is possible to change the calculation settings manually by editing the ```.json``` configuration file or loading your configuration via GUI and set it up there, you can also take as initial template the ```defaulf_config.json``` provided in the repository.
 
 ## Documentation
 
