@@ -6,7 +6,7 @@ tee run_farseer.sh <<< \
 export FARSEER_ROOT="$(pwd)"
 export PYTHONPATH=$PYTHONPATH:${FARSEER_ROOT}
 
-python $FARSEER_ROOT/main.py $*
+python $FARSEER_ROOT/gui/main.py $*
 '
 
 echo \

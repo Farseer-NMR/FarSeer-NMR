@@ -35,7 +35,7 @@ export PYTHONPATH=$PYTHONPATH:${FARSEER_ROOT}
 
 source activate farseernmr
 
-python $FARSEER_ROOT/main.py $*
+python $FARSEER_ROOT/gui/main.py $*
 '
 
 chmod u+x run_farseer.sh
