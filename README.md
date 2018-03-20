@@ -18,7 +18,7 @@ With Farseer-NMR, you have:
 
 ## Download
 
-Download the stable release [here](https://github.com/joaomcteixeira/FarSeer-NMR/releases).
+Download the latest release [here](https://github.com/joaomcteixeira/FarSeer-NMR/releases).
 
 ## Installation
 
@@ -102,7 +102,7 @@ If you find bugs, mis-functional or non-functional features during your calculat
 
 ### Become a collaborator
 
-Help us implement new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork this project to your own GitHub account, write the functionalities and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guide](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent. We kindly request that contributors to the project adhere to this style guide.
+Help us implement new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork the [Farseer-NMR project](https://github.com/joaomcteixeira/FarSeer-NMR) to your own GitHub account, write the functionalities and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guide](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent. We kindly request that contributors to the project adhere to this style guide.
 
 Even if you're not an experienced programmer, please get contact with us and we will be happy join forces with you to introduce your functionalities!
 
