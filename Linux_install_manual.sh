@@ -9,6 +9,8 @@ export PYTHONPATH=$PYTHONPATH:${FARSEER_ROOT}
 python $FARSEER_ROOT/gui/main.py $*
 '
 
+chmod u+x run_farseer.sh
+
 echo \
 "
     run_farseer.sh has been created.
