@@ -29,7 +29,6 @@ from PyQt5.QtWidgets import QApplication, QSplashScreen, QVBoxLayout, QWidget
 
 from gui.components.TabWidget import TabWidget
 from gui.Footer import Footer
-
 from gui import resources_rc
 
 from core.fslibs.Variables import Variables
@@ -40,7 +39,7 @@ class Main(QWidget):
     def __init__(self, parent=None, gui_settings=None, config=None, **kw):
         QWidget.__init__(self, parent=parent)
         default_config = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'core',
             'default_config.json'
             )
