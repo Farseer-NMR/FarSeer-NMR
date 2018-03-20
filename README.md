@@ -1,17 +1,20 @@
+_Website currently under strong development_
+
 ![FarSeer Banner](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Figures/FS_banner.png?raw=true)
-
-Find, download and fork the full project at [GitHub](https://github.com/joaomcteixeira/FarSeer-NMR).
-
-_Website currently under development_
 
 # Welcome to Farseer-NMR
 
-A fully community driven and ever growing suite to analyse **peaklist files** extracted from multivariable series of biomolecular NMR experiments. Up to three different experimental variables can be combined and analysed together.  
-With Farseer-NMR, you can automatically calculate structural parameters from peaklist datasets, which are then comprehensively and conveniently represented in publication-ready plots.
+A fully community driven and ever growing suite to analyse datasets of **peaklist files** extracted from multivariable series of biomolecular NMR experiments. 
 
-Conveniently save and load your configuration files and re-run your operations with one-click!
+With Farseer-NMR, you have:
 
-Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
+* Automatic analysis of large and multivariable NMR **peaklist files** datasets
+* Peaklist parsing and treatment
+* Identification of _missing_ and _unassigned_ residues
+* Automatic calculation NMR parameters
+* Comprehensive organization of the output results
+* Automatic publication ready plot generation
+* Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
 
 ## Download
 
@@ -19,19 +22,22 @@ Download the stable release [here](https://github.com/joaomcteixeira/FarSeer-NMR
 
 ## Installation
 
-Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). Attempting to run the current version under Windows machines will fail. Farseer-NMR has been built in its entirety using [Python](https://www.python.org/) libraries and we try to keep it up-to-date with the Python community. Bellow, three different ways to install Farseer-NMR.
+Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). Attempting to run the current version under Windows machines will fail. Farseer-NMR has been built in its entirety using [Python](https://www.python.org/) libraries and we try to keep it up-to-date with the Python community. To install Farseer-NMR firstly:
+
+1. Unpack the [downloaded](https://joaomcteixeira.github.io/FarSeer-NMR/#Download) version.
+1. In your Terminal emulator, navigate to the unpacked Farseer-NMR folder.
+
+There are three different ways to install Farseer-NMR according to your system setup:
 
 ### Setting up a Miniconda for Farseer-NMR
 
-The easiest way to setup Farseer-NMR is to install a separated Miniconda distribution inside the Farseer-NMR main folder. This setup demands extra disk space (approximatelly 3GBs) but ensures that you can run Farseer-NMR indenpendently from your Python installation setup. Do this with the following steps:
+The easiest way to setup Farseer-NMR is to install a dedicated Miniconda distribution inside the Farseer-NMR main folder. This setup demands extra disk space (approximatelly 3GBs) but ensures that you can run Farseer-NMR indenpendently from your Python installation setup. Do this with the following steps:
 
-1. Unpack the downloaded version.
-1. Navigate to the unpacked Farseer-NMR folder.
-1. Give execution permissions to Linux_install.sh
+1. Give execution permissions to Linux_install_Miniconda.sh
 ```
-chmod u+rwx Linux_install.sh
+chmod u+rwx Linux_install_Miniconda.sh
 ```
-4. Run Linux_install.sh. This will install a Miniconda distribution with all libraries required to run Farseer-NMR.
+2. Run Linux_install_Miniconda.sh. This will install a Miniconda distribution with all libraries required to run Farseer-NMR.
 ```
 ./Linux_install_Miniconda.sh
 ```
@@ -40,24 +46,22 @@ chmod u+rwx Linux_install.sh
 
 If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to perturb you main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html):
 
-1. Give execution permissions to setup_env.sh
+1. Give execution permissions to Linux_install_env.sh
 ```
-chmod u+x Linux_install_ENV.sh
+chmod u+x Linux_install_env.sh
 ```
-2. Run setup_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR.
+2. Run Linux_install_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR.
 ```
 ./Linux_install_env.sh
 ```
 
 ### Manual installation without Anaconda
 
-If you are an advanced user who is used to manually manage your installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the corresponding `spec-files` under the Documention folder.
+If you are an advanced user who is used to manually manage your installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the corresponding `spec-files` under the Documention folder. Afterwards, to create the run_farseer.sh file run:
 
-Run:
 ```
 ./Linux_install_manual.sh
 ```
-to create the run_farseer.sh file.
 
 ## Running Farseer-NMR
 
@@ -112,6 +116,6 @@ Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-auto
 
 ## License
 
-The entire Farseer-NMR code base comes with no liability and is licensed under the GPL-3.0.
+The entire Farseer-NMR code base comes with no liability and is licensed under the [GPL-3.0](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/COPYING).
 
 <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/GPLv3_Logo.svg/1200px-GPLv3_Logo.svg.png" width="75" height="37"></a>
