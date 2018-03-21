@@ -2,6 +2,11 @@
 
 export CONDA_ROOT="$(pwd)/miniconda3"
 
+miniconda32="Miniconda3-latest-Linux-x86.sh"
+miniconda64="Miniconda3-latest-Linux-x86_64.sh"
+spec32="spec-file_32bit.txt"
+spec64="spec-file_64bit.txt"
+
 # Miniconda doesn't work for directory structures with spaces
 if [[ $(pwd) == *" "* ]]
 then
@@ -10,6 +15,8 @@ then
     echo
     exit 1
 fi
+
+echo "*** Reading computer architecture..."
 
 # https://stackoverflow.com/questions/7066625/how-to-find-the-linux-processor-chip-architecture
 architecture=$(lscpu | grep Architecture)
@@ -20,31 +27,61 @@ arch="${array[1]}"
 bit32="i686"
 bit64="x86_64"
 
+function queryuser {
+    echo \
+"*** Farseer-NMR could not detect your computer's architecture.
+*** Please select one of the following options:
+*** (1) 64-bit (2) 32-bit: "; read OPTION
+}
+
 #echo "${array[1]}"
 
-if [ "$arch" == "$bit64" ]
-then
-    minicondaversion="Miniconda3-latest-Linux-x86_64.sh"
-    spec="spec-file_64bit.txt"
-    echo "Found 64-bit architecture..."
+if [ $arch == $bit64 ]; then
+    minicondaversion=$miniconda64
+    spec=$spec64
+    echo "*** Found 64-bit architecture!"
+    echo
+
+elif [ $arch == $bit32 ]; then
+    minicondaversion=$miniconda32
+    spec=$spec32
+    echo "*** Found 32-bit architecture!"
+    echo
+else
+    OPTION="99"
+    while [ $OPTION != "1" -a  $OPTION != "2" ]; do
+        queryuser
+    done
+    
+    if [ $OPTION == "1" ]; then
+        minicondaversion=$miniconda64
+        spec=$spec64
+        CHOICE="64"
+    elif [ $OPTION == "2" ]; then
+        minicondaversion=$miniconda32
+        spec=$spec32
+        CHOICE="32"
+    fi
+    echo "*** You have selected ${CHOICE}-bit architecture."
 fi
 
-if [ "$arch" == "$bit32" ]
-then
-    minicondaversion="Miniconda3-latest-Linux-x86.sh"
-    spec="spec-file_32bit.txt"
-    echo "Found 32-bit architecture..."
-fi
-
+echi
+echo "*** Downloading Miniconda from https://repo.continuum.io/miniconda/${minicondaversion}"
+echo
 wget "https://repo.continuum.io/miniconda/${minicondaversion}"
-chmod a+rwx $minicondaversion
+
+echo
+echo "*** Starting Miniconda installation..."
+echo
+chmod u+x $minicondaversion
 bash $minicondaversion -b -f -p $CONDA_ROOT
 
-chmod u+rwx run_farseer.sh
+echo
+echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
-
 $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile
 
+echo "*** Configuring run_farseer.sh file..."
 tee run_farseer.sh <<< \
 '#!/usr/bin/env bash
 
@@ -60,7 +97,7 @@ chmod u+x run_farseer.sh
 echo \
 "   *****
     
-    Farseer-NMR as been correctly configured and
+    Farseer-NMR as been correctly configured
     
     TO LAUNCH FARSEER-NMR:
     
