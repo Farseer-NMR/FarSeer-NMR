@@ -24,5 +24,9 @@ echo \
     
     ./run_farseer.sh
     
+    or
+    
+    double click on the run_farseer.sh file
+    
     :-)
 "

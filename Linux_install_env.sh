@@ -6,7 +6,7 @@ spec64="spec-file_64bit.txt"
 # https://stackoverflow.com/questions/7066625/how-to-find-the-linux-processor-chip-architecture
 architecture=$(lscpu | grep Architecture)
 
-echo "*** Reading computer architecture..."
+echo "*** Reading computer's architecture..."
 # https://stackoverflow.com/questions/10586153/split-string-into-an-array-in-bash
 read -r -a array <<< "$architecture"
 arch="${array[1]}"
@@ -75,6 +75,10 @@ echo \
     TO LAUNCH FARSEER-NMR:
     
     ./run_farseer.sh
+    
+    or
+    
+    double click on the run_farseer.sh file
     
     :-)
 "
