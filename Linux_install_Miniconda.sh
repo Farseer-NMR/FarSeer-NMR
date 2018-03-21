@@ -81,8 +81,8 @@ echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
 $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile
 
+echo
 echo "*** Configuring run_farseer.sh file..."
-
 tee run_farseer.sh <<< \
 "#!/usr/bin/env bash
 
