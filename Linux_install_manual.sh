@@ -1,13 +1,13 @@
 #!/bin/bash
 
 tee run_farseer.sh <<< \
-'#!/usr/bin/env bash
+"#!/usr/bin/env bash
 
-export FARSEER_ROOT="$(pwd)"
-export PYTHONPATH=$PYTHONPATH:${FARSEER_ROOT}
+export FARSEER_ROOT=\"$(pwd)\"
+export PYTHONPATH=\$PYTHONPATH:\${FARSEER_ROOT}
 
-python $FARSEER_ROOT/gui/main.py $*
-'
+python \$FARSEER_ROOT/gui/main.py \$*
+"
 
 chmod u+x run_farseer.sh
 
