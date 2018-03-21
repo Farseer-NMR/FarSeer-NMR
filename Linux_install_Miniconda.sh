@@ -65,7 +65,7 @@ else
     echo "*** You have selected ${CHOICE}-bit architecture."
 fi
 
-echi
+echo
 echo "*** Downloading Miniconda from https://repo.continuum.io/miniconda/${minicondaversion}"
 echo
 wget "https://repo.continuum.io/miniconda/${minicondaversion}"
@@ -82,17 +82,21 @@ specfile="$(pwd)/Documentation/${spec}"
 $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile
 
 echo "*** Configuring run_farseer.sh file..."
+
 tee run_farseer.sh <<< \
-'#!/usr/bin/env bash
+"#!/usr/bin/env bash
 
-export CONDA_ROOT="$(pwd)/miniconda3/envs/farseernmr"
-export FARSEER_ROOT="$(pwd)"
-export PYTHONPATH=${CONDA_ROOT}:${FARSEER_ROOT}
+export CONDA_ROOT=\"$(pwd)/miniconda3/envs/farseernmr\"
+export FARSEER_ROOT=\"$(pwd)\"
+export PYTHONPATH=\${CONDA_ROOT}:\${FARSEER_ROOT}
 
-$CONDA_ROOT/bin/python $FARSEER_ROOT/gui/main.py $*
-'
-
+\$CONDA_ROOT/bin/python \$FARSEER_ROOT/gui/main.py \$*
+"
 chmod u+x run_farseer.sh
+echo "*** Done..."
+echo "*** Cleaning..."
+# cleaning
+rm $minicondaversion
 
 echo \
 "   *****
@@ -105,6 +109,3 @@ echo \
     
     :-)
 "
-
-# cleaning
-rm $minicondaversion
