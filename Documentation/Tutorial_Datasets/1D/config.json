@@ -6,20 +6,20 @@
         "subtitle_weight": "normal",
         "x_label_fn": "Arial",
         "x_label_fs": 8,
-        "x_label_pad": 2,
+        "x_label_pad": 2.0,
         "x_label_weight": "bold",
         "y_label_fn": "Arial",
         "y_label_fs": 8,
-        "y_label_pad": 3,
+        "y_label_pad": 3.0,
         "y_label_weight": "bold",
-        "x_ticks_pad": 2,
-        "x_ticks_len": 2,
+        "x_ticks_pad": 2.0,
+        "x_ticks_len": 2.0,
         "y_ticks_fn": "Arial",
         "y_ticks_fs": 6,
         "y_ticks_rot": 0,
-        "y_ticks_pad": 1,
+        "y_ticks_pad": 1.0,
         "y_ticks_weight": "normal",
-        "y_ticks_len": 2,
+        "y_ticks_len": 2.0,
         "y_grid_flag": true,
         "y_grid_color": "lightgrey",
         "y_grid_linestyle": "-",
@@ -38,13 +38,13 @@
         "lost_color": "red",
         "unassigned_color": "lightgrey",
         "bar_width": 0.8,
-        "bar_alpha": 1,
-        "bar_linewidth": 0,
+        "bar_alpha": 1.0,
+        "bar_linewidth": 0.0,
         "threshold_flag": true,
         "threshold_color": "red",
         "threshold_linewidth": 0.5,
         "threshold_alpha": 0.8,
-        "mark_fontsize": 3,
+        "mark_fontsize": 4,
         "mark_prolines_flag": true,
         "mark_prolines_symbol": "P",
         "mark_user_details_flag": false,
@@ -59,10 +59,10 @@
     "plotting_flags": {
         "do_ext_bar": true,
         "do_comp_bar": true,
-        "do_vert_bar": true,
+        "do_vert_bar": false,
         "do_res_evo": true,
         "do_cs_scatter": true,
-        "do_cs_scatter_flower": true,
+        "do_cs_scatter_flower": false,
         "do_DPRE_plot": false,
         "do_heat_map": false
     },
@@ -92,7 +92,7 @@
     "DPRE_plot_settings": {
         "rows": 10,
         "width": 3,
-        "y_label": "r'$\\Delta$PRE$_(rc-exp)$",
+        "y_label": "$\\Delta$PRE$_(rc-exp)$",
         "y_label_fs": 5,
         "ymax": 1.0,
         "dpre_ms": 2,
@@ -148,7 +148,7 @@
         "y_ticks_pad": 1.0,
         "y_ticks_weight": "normal",
         "y_ticks_rot": 0,
-        "perform_resevo_fitting": true,
+        "perform_resevo_fitting": false,
         "titration_x_values": [
             0.0,
             25.0,
@@ -164,7 +164,7 @@
         "rows_page": 8,
         "set_x_values": true,
         "x_ticks_nbins": 5,
-        "x_label": "Protein2 (\u00b5M)",
+        "x_label": "ProteinB (\u00b5M)",
         "line_style": "-",
         "line_width": 1,
         "line_color": "red",
@@ -265,12 +265,31 @@
         "cs_lost": "prev",
         "csp_res4alpha": 0.14,
         "csp_res_exceptions": {
-            "G": 0.2
+            "G": 0.2,
+            "A": 0.14,
+            "R": 0.14,
+            "N": 0.14,
+            "D": 0.14,
+            "C": 0.14,
+            "Q": 0.14,
+            "E": 0.14,
+            "H": 0.14,
+            "I": 0.14,
+            "L": 0.14,
+            "K": 0.14,
+            "M": 0.14,
+            "F": 0.14,
+            "P": 0.14,
+            "S": 0.14,
+            "T": 0.14,
+            "W": 0.14,
+            "Y": 0.14,
+            "V": 0.14
         },
         "calccol_name_CSP": "CSP",
         "calcs_CSP": true,
         "yy_label_CSP": "CSPs (ppm)",
-        "yy_scale_CSP": 0.2
+        "yy_scale_CSP": 0.3
     },
     "fasta_settings": {
         "FASTAstart": 1,
@@ -347,8 +366,11 @@
             100000
         ]
     },
-    "experimental_dataset": {},
-    "peaklists": {},
+    "experimental_dataset": {
+
+    },
+    "peaklists": {
+    },
     "conditions": {
         "x": [
             ""
@@ -360,7 +382,8 @@
             ""
         ]
     },
-    "fasta_files": {},
+    "fasta_files": {
+    },
     "paraset": {
         "pcs": {},
         "rdc": {},
