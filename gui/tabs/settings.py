@@ -82,7 +82,7 @@ class Settings(BaseWidget):
         #
         self.spectrum_path = LabelledLineEdit(
             self,
-            "Spectrum Path",
+            "Peaklists Dataset folder",
             callback=self.set_spectrum_path_text
             )
         self.output_path = LabelledLineEdit(
