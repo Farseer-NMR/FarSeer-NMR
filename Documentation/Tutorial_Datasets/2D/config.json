@@ -60,7 +60,7 @@
         "do_ext_bar": false,
         "do_comp_bar": true,
         "do_vert_bar": false,
-        "do_res_evo": false,
+        "do_res_evo": true,
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
         "do_DPRE_plot": false,
@@ -92,7 +92,7 @@
     "DPRE_plot_settings": {
         "rows": 10,
         "width": 3,
-        "y_label": "r'$\\Delta$PRE$_(rc-exp)$",
+        "y_label": "$\\Delta$PRE$_(rc-exp)$",
         "y_label_fs": 5,
         "ymax": 1.0,
         "dpre_ms": 2,
@@ -264,9 +264,9 @@
             "G": 0.2
         },
         "calccol_name_CSP": "CSP",
-        "calcs_CSP": true,
+        "calcs_CSP": false,
         "yy_label_CSP": "CSPs (ppm)",
-        "yy_scale_CSP": 0.1
+        "yy_scale_CSP": 0.3
     },
     "fasta_settings": {
         "FASTAstart": 1,
@@ -293,8 +293,8 @@
         "has_sidechains": false,
         "use_sidechains": false,
         "logfile_name": "farseer_log.md",
-        "output_path": "",
-        "spectra_path": ""
+        "output_path": "/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/git",
+        "spectra_path": "/home/joao/Dropbox/labo-documents/Projects/Programming/FarSeer/git"
     },
     "PosF1_settings": {
         "calccol_name_PosF1_delta": "H1_delta",
@@ -356,7 +356,9 @@
             ""
         ]
     },
-    "fasta_files": {},
+    "fasta_files": {
+        "": ""
+    },
     "paraset": {
         "pcs": {},
         "rdc": {},
