@@ -57,7 +57,14 @@ fi
 
 echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
-conda create --name farseernmr --file $specfile
+
+if conda create --name farseernmr --file $specfile; then
+    echo "Miniconda environment successfully installed"
+else
+    echo "ERROR: Cannot configure Miniconda environment" >&2
+    echo "Exiting..."
+    exit 1
+fi
 echo "*** Done..."
 
 echo

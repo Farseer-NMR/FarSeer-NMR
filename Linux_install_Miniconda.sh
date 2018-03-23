@@ -83,12 +83,26 @@ echo
 echo "*** Starting Miniconda installation..."
 echo
 chmod u+x $minicondaversion
-bash $minicondaversion -b -f -p $CONDA_ROOT
+
+if bash $minicondaversion -b -f -p $CONDA_ROOT; then
+    echo "Miniconda successfully installed"
+else
+    echo "ERROR: Cannot install Miniconda" >&2
+    echo "Exiting..."
+    exit 1
+fi
 
 echo
 echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
-$CONDA_ROOT/bin/conda create --name farseernmr --file $specfile
+
+if $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile; then
+    echo "Miniconda environment successfully installed"
+else
+    echo "ERROR: Cannot configure Miniconda environment" >&2
+    echo "Exiting..."
+    exit 1
+fi
 
 echo
 echo "*** Configuring run_farseer.sh file..."
