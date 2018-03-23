@@ -1,5 +1,13 @@
 #!/bin/bash
 
+echo "Checking there is sufficient space for installation"
+FREE_SPACE=`df -H "$PWD" | awk '{print $4'} | cut -d'G' -f1`
+
+if [[$FREE_SPACE -lt 3 ]]; then
+    echo "Less than 3GB free space, cannot install Miniconda, stopping"
+    exit 1
+fi
+
 spec32="spec-file_32bit.txt"
 spec64="spec-file_64bit.txt"
 

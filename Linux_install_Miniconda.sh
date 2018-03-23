@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+echo "Checking there is sufficient space for installation"
+FREE_SPACE=`df -H "$PWD" | awk '{print $4'} | cut -d'G' -f1`
+
+if [[$FREE_SPACE -lt 3 ]]; then
+    echo "Less than 3GB free space, cannot install Miniconda, stopping"
+    exit 1
+fi
+
+
 export CONDA_ROOT="$(pwd)/miniconda3"
 
 miniconda32="Miniconda3-latest-Linux-x86.sh"
