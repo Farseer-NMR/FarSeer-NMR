@@ -87,4 +87,9 @@ if __name__ == '__main__':
     app.setStyleSheet(stylesheet)
     ex.show()
     ex.raise_()
-    sys.exit(app.exec_())
+    execution = app.exec_()
+
+    del ex
+    del app
+
+    sys.exit(execution)

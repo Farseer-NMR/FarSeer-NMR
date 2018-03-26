@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+echo "Checking there is sufficient space for installation"
+FREE_SPACE=`df -H "$PWD" | awk '{print $4'} | cut -d'G' -f1`
+
+if [[$FREE_SPACE -lt 3 ]]; then
+    echo "Less than 3GB free space, cannot install Miniconda, stopping"
+    exit 1
+fi
+
+
 export CONDA_ROOT="$(pwd)/miniconda3"
 
 miniconda32="Miniconda3-latest-Linux-x86.sh"
@@ -74,12 +83,28 @@ echo
 echo "*** Starting Miniconda installation..."
 echo
 chmod u+x $minicondaversion
-bash $minicondaversion -b -f -p $CONDA_ROOT
+
+if bash $minicondaversion -b -f -p $CONDA_ROOT; then
+    echo "*** Miniconda successfully installed!"
+else
+    echo "*** ERROR: Cannot install Miniconda" >&2
+    echo "*** Please confirm you have at least 4GB of free disk space"
+    echo "*** Exiting..."
+    exit 1
+fi
 
 echo
 echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
-$CONDA_ROOT/bin/conda create --name farseernmr --file $specfile
+
+if $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile; then
+    echo "*** Miniconda environment successfully installed"
+else
+    echo "*** ERROR: Cannot configure Miniconda environment" >&2
+    echo "*** Please confirm you have at least 4GB of free disk space"
+    echo "*** Exiting..."
+    exit 1
+fi
 
 echo
 echo "*** Configuring run_farseer.sh file..."
