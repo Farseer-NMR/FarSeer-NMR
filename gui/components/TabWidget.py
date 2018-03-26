@@ -247,8 +247,8 @@ Please correct the Z names accordingly.
             msg.setText("PRE file not provided.")
             msg.setInformativeText(
 """The PRE Analysis box is activated.
-This calculation requires Theoretical PRE files to be
-specified for each Y axis condition.""")
+This calculation requires Theoretical PRE files
+to be specified for each Y axis condition.""")
             msg.exec_()
         
         elif run_msg == "Run":
