@@ -85,10 +85,11 @@ echo
 chmod u+x $minicondaversion
 
 if bash $minicondaversion -b -f -p $CONDA_ROOT; then
-    echo "Miniconda successfully installed"
+    echo "*** Miniconda successfully installed!"
 else
-    echo "ERROR: Cannot install Miniconda" >&2
-    echo "Exiting..."
+    echo "*** ERROR: Cannot install Miniconda" >&2
+    echo "*** Please confirm you have at least 4GB of free disk space"
+    echo "*** Exiting..."
     exit 1
 fi
 
@@ -97,10 +98,11 @@ echo "*** Creating Farseer-NMR environment..."
 specfile="$(pwd)/Documentation/${spec}"
 
 if $CONDA_ROOT/bin/conda create --name farseernmr --file $specfile; then
-    echo "Miniconda environment successfully installed"
+    echo "*** Miniconda environment successfully installed"
 else
-    echo "ERROR: Cannot configure Miniconda environment" >&2
-    echo "Exiting..."
+    echo "*** ERROR: Cannot configure Miniconda environment" >&2
+    echo "*** Please confirm you have at least 4GB of free disk space"
+    echo "*** Exiting..."
     exit 1
 fi
 
