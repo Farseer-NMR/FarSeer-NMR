@@ -11,14 +11,14 @@ With Farseer-NMR, you have:
 * Automatic analysis of large and multivariable NMR **peaklist files** datasets
 * Peaklist parsing and treatment
 * Identification of _missing_ and _unassigned_ residues
-* Automatic calculation NMR parameters
-* Comprehensive organization of the output results
-* Automatic publication ready plot generation
+* Automatic calculation of NMR parameters
+* Comprehensive organization of the output
+* Large suite of publication-ready plotting templates
 * Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
 
-## Download
+## Project Repository and Download
 
-Download the latest release [here](https://github.com/joaomcteixeira/FarSeer-NMR/releases).
+You can download the latest stable release [here](https://github.com/joaomcteixeira/FarSeer-NMR/releases) or browse the project code and current state in our [GitHub repository](https://github.com/joaomcteixeira/FarSeer-NMR).
 
 ## Installation
 
@@ -27,7 +27,7 @@ Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). At
 1. Unpack the [downloaded](https://joaomcteixeira.github.io/FarSeer-NMR/#Download) version.
 1. In your Terminal emulator, navigate to the unpacked Farseer-NMR folder.
 
-There are three different ways to install Farseer-NMR according to your system setup:
+There are three different ways to install Farseer-NMR according to your system setup, here are organised from the simplest to the hardest:
 
 ### Setting up a Miniconda for Farseer-NMR
 
@@ -42,22 +42,22 @@ chmod u+rwx Linux_install_Miniconda.sh
 ./Linux_install_Miniconda.sh
 ```
 
-### With Anaconda already installed
+### Creating a dedicated Anaconda environment
 
-If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to change your main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html):
+If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to change your main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) dedicated to Farseer-NMR:
 
 1. Give execution permissions to Linux_install_env.sh
 ```
 chmod u+x Linux_install_env.sh
 ```
-2. Run Linux_install_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR inside the envs directory of your Anaconda installation.
+2. Run Linux_install_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR inside the `envs` directory of your Anaconda installation.
 ```
 ./Linux_install_env.sh
 ```
 
-### Manual installation without Anaconda
+### Installation for advanced users
 
-If you are an advanced user who is used to manually managing your own installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the architecture respective `spec-files` in the Documention folder. Afterwards, to create the run_farseer.sh file run:
+If you are an advanced user who is proficient in manually managing your own installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the architecture respective `spec-files` in the Documention folder. Afterwards, to create the run_farseer.sh file run:
 
 ```
 ./Linux_install_manual.sh
@@ -74,23 +74,15 @@ Before running Farseer-NMR, please read carefully the [Installation](https://joa
 
 ### Running without the GUI
 
-A Farseer-NMR calculation can be run directly from a previously setup folder and from a previously configured `config` file. we advise that only advanced users use this feature and, even for those users, we see no advantage in not using the GUI version because all released features can be configured using the GUI. Only under development features are kept solely in the Core version, these can be accessed (if available) by manually edit of the JSON config file.
-
-```
-python <path_to>/farseemain.py <CALCULATION_FOLDER> <CONFIG.JSON>
-```
-
-where ```CALCULATION_FOLDER``` is the folder containing the hierarchical ```spectra/``` folder (see Documentation Manual). Whereas the GUI will create the ```spectra/``` folder for you automatically, to run Farseer-NMR from the Core you have to create this folder yourself or use a previously created one, containing the ```peaklists.csv``` files and also FASTA files or of any other necessary files.
-
-The ```CONFIG.JSON``` is any config file saved by the GUI, having or not information on the peaklist experimental tree. It is possible to change the calculation settings manually by editing the ```.json``` configuration file or loading your configuration via GUI and set it up there, you can also take as initial template the ```defaulf_config.json``` provided in the repository.
+A Farseer-NMR calculation run can be launched without the GUI interface. Nevertheless we advocate the use of the GUI version for all users, advanced and beginners. All implemented and functional features are available through the GUI. We advice the use of the command line version only for developers. Read further in section *III.d* of the Documentation Manual.
 
 ## Documentation
 
-We have a [Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files. There is also an online [Wiki](https://github.com/joaomcteixeira/FarSeer-NMR/wiki) page with additional links and infomation regarding the Farseer-NMR Documentation. These pages are dynamic updated according to the needs of the project/community.
+We have a [Documentation folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files along with the Full Documentation PDF. There is also an online a list of [helpful links](https://github.com/joaomcteixeira/FarSeer-NMR/wiki/Farseer-NMR-Helpful-links) to guide you in the use of Farseer-NMR.
 
 ## Tutorials and Examples
 
-Currently we provide a Tutorial folder with artificial datasets that you can use to try out Farseer-NMR and understand its functionalities. We will keep this folder updated as the projects evolves and the interaction with the users also grows. Find our tutorials [here](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation/Tutorial_Datasets).
+Currently we provide a [Tutorial folder](https://github.com/joaomcteixeira/FarSeer-NMR/tree/master/Documentation/Tutorial_Datasets) with artificial datasets that you can use to try out Farseer-NMR and understand its functionalities. Tutorials explanation can be found in the [Full Documentation PDF](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/Documentation/Farseer-NMR_Documentation.pdf).
 
 ## Participate in the Farseer-NMR community
 
@@ -98,7 +90,7 @@ There are several ways that you can help us improve Farseer-NMR and be part of i
 
 ### Reporting a bug
 
-If you find bugs, mis-functional or non-functional features during your calculation runs, please report them by using the [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues). We have prepared a set of labels that help you to specify the nature of the issues. You can use the tab [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues) to suggest new features that you would like us to implement or that you would like help implementing.
+If you find bugs, mis-functional or non-functional features during your calculation runs, please report them by using the [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues). We have prepared a set of labels that help you to specify the nature of the issues. You can use the [Issues tab](https://github.com/joaomcteixeira/FarSeer-NMR/issues) to suggest new features that you would like us to implement or that you would like help implementing.
 
 ### Become a collaborator
 
