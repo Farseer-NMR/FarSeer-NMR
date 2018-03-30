@@ -369,10 +369,10 @@ def log_init(fsuv):
 def log_end(fsuv):
     """Operations performed when finalizing the log file."""
     
+    print("*** Used JSON config file will be copied to the end of MD log file")
     fout = fsuv["general_settings"]["logfile_name"]
     logs(fsw.end_good(), fout)
     log_time_stamp(fout, state='ENDED')
-    print("*** Used JSON config file will be copied to the end of MD log file")
     logs("*** USED CONFIG FILE ***\n", fout, printit=False)
     fsuv_tmp = fsuv.copy()
     
