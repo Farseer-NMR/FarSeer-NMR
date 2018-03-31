@@ -35,8 +35,19 @@ def get_peaklist_format(file_path):
         print('Invalid File Extension')
         return
     
-    if file_path.split('.')[-1] not in file_extensions:
-        print('Invalid File Extension. Suffix not in accepted format.')
+    file_ext = file_path.split('.')[-1]
+    if file_ext not in file_extensions:
+        msg = \
+"""*** The following file was not recognised as a valid peaklist
+*** {}
+*** suffix not in accepted formats. Accepted formats are:
+*** *.peaks *.xpk *.out and *.csv (CCPNMR2)
+*** visit folder Documentation/Accepted_Peaklists_Formats for more information.
+*** If this file is not a peaklists, simply IGNORE this message.
+""".\
+            format(file_path)
+        print(msg)
+        #print('Invalid File Extension. Suffix not in accepted format.')
         return
     
     for line in fin:

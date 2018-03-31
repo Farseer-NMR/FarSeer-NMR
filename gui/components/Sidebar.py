@@ -177,7 +177,7 @@ Refer to WET#26 for more details."""
                 return pl_name, file_path
             
             else:
-                print("Invalid peak list file: %s" % file_path)
+                #print("*** File not loaded into SideBar\n***")
                 return None, None
         
         else:

@@ -1,8 +1,2 @@
-This folder contains artificially generated data to be used as tutorial datasets in Farseer-NMR.
-The three most common cases are represented:
-
-1) analysis of a simple NMR series
-2) analysis of two NMR series separately and combined
-3) paramagnetic analysis of four NMR series with respective comparison
-
-EOF
+To learn from the tutorials please follow the instructions
+provided in Section VII-Tutorials of the Farseer-NMR Documentation PDF.

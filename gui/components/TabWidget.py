@@ -233,11 +233,13 @@ not populated. Please ensure that all branches have a peaklist assigned."
             msg.exec_()
         
         elif run_msg == "Para name not set":
-            msg.setText("Z names for Paramagnetic data sets")
+            msg.setText("You have activated Do PRE Analysis")
             msg.setInformativeText(
-"""You have activated Do PRE Analysis.
-When analysing paramagnetic data
-the Z data point names must be "dia" and "para".
+"""When analysing paramagnetic data, the datapoint names
+of the Z axis must be exactly "dia" and "para"
+for diamagnetic and paramagnetic datasets, respectively.
+
+We appologise but other words are not accepted.
 Please correct the Z names accordingly.
 """
                 )
@@ -247,8 +249,8 @@ Please correct the Z names accordingly.
             msg.setText("PRE file not provided.")
             msg.setInformativeText(
 """The PRE Analysis box is activated.
-This calculation requires Theoretical PRE files to be
-specified for each Y axis condition.""")
+This calculation requires Theoretical PRE files
+to be specified for each Y axis condition.""")
             msg.exec_()
         
         elif run_msg == "Run":

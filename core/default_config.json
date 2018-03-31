@@ -337,28 +337,26 @@
         "plots_height":false,
         "height_scale":[0,100000]
     },
-
     "experimental_dataset": {
-
     },
     "peaklists": {
     },
     "conditions": {
         "x": [
+            ""
         ],
         "z": [
+            ""
         ],
         "y": [
+            ""
         ]
     },
     "fasta_files": {
-
     },
-
     "paraset": {
         "pcs": {},
         "rdc": {},
         "pre": {}
-
     }
 }
