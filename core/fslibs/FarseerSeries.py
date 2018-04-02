@@ -78,8 +78,8 @@ class FarseerSeries(pd.Panel):
         restraint_list (list): ORDERED names of the restraints that can
             be calculated.
         
-        cs_lost (str): {'prev', 'full', 'zero'}, how to represent bars
-            for lost residues.
+        cs_missing (str): {'prev', 'full', 'zero'}, how to represent bars
+            for missing residues.
             
         csp_alpha4res (dict): a dictionary containing the alpha values
             to be used for each residue in the CSP calculation formula.
@@ -158,7 +158,7 @@ class FarseerSeries(pd.Panel):
             resonance_type='Backbone',
             csp_alpha4res=0.14,
             csp_res_exceptions={'G':0.2},
-            cs_lost='prev',
+            cs_missing='prev',
             restraint_list=[
                 'H1_delta',
                 'N15_delta',
@@ -170,7 +170,7 @@ class FarseerSeries(pd.Panel):
             log_export_name='FarseerSet_log.md'):
         """Creates the instance attributes."""
         
-        self.cs_lost = cs_lost
+        self.cs_missing = cs_missing
         # normalization value for F2 dimension.
         self.csp_alpha4res = \
             {key:csp_alpha4res for key in 'ARNDCEQGHILKMFPSTWYV'}
@@ -551,22 +551,22 @@ and stacked (compared) along "{}" axis'.format(
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
         
-        # sets lost peaks results according to the self.cs_lost
-        if self.cs_lost == 'full':
+        # sets missing peaks results according to the self.cs_missing
+        if self.cs_missing == 'full':
             for item in self.items:
-                mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
-                self.loc[item,mask_lost,calccol] = 1.
+                mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
+                self.loc[item,mask_missing,calccol] = 1.
         
-        elif self.cs_lost == 'prev':
+        elif self.cs_missing == 'prev':
             for iitem in range(1, len(self.items)):
-                mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = \
-                    self.ix[iitem-1,mask_lost,calccol]
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = \
+                    self.ix[iitem-1,mask_missing,calccol]
         
-        elif self.cs_lost == 'zero':
+        elif self.cs_missing == 'zero':
             for iitem in range(1, len(self.items)):
-                mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = 0
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = 0
         
         self.log_r('**Calculated** {}'.format(calccol))
         
@@ -855,7 +855,7 @@ with window size {} and stdev {}'.\
         formatting = {'ResNo': resform}
         
         for item in self.items:
-            mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
+            mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
             mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
             mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
             file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
@@ -869,7 +869,7 @@ with window size {} and stdev {}'.\
             attheader = \
 """#
 #
-# lost peaks {}
+# missing peaks {}
 #
 # unassigned peaks {}
 #
@@ -878,7 +878,7 @@ match mode: 1-to-1
 recipient: residues
 \t""".\
                 format(
-                    resformat+self.loc[item,mask_lost,'ResNo'].\
+                    resformat+self.loc[item,mask_missing,'ResNo'].\
                         to_string(header=False, index=False).\
                             replace(' ', '').replace('\n', ','),
                     resformat+self.loc[item,mask_unassigned,'ResNo'].\
@@ -1206,7 +1206,7 @@ recipient: residues
         ylabel='ppm or ratio',
         measured_color='black',
         status_color_flag=True,
-        lost_color='red',
+        missing_color='red',
         unassigned_color='grey',
         bar_width=0.7,
         bar_alpha=1,
@@ -1325,7 +1325,7 @@ recipient: residues
                     self.loc[experiment,0::xtick_spacing,'Peak Status'],
                     {
                         'measured':measured_color,
-                        'lost':lost_color,
+                        'missing':missing_color,
                         'unassigned':unassigned_color
                         }
                     )
@@ -1362,7 +1362,7 @@ recipient: residues
                     self.loc[experiment, :, 'Peak Status'],
                     {
                         'measured':measured_color,
-                        'lost':lost_color,
+                        'missing':missing_color,
                         'unassigned':unassigned_color
                         }
                     )
@@ -1427,7 +1427,7 @@ recipient: residues
             self.loc[experiment,:,'Peak Status'],
             {
                 'measured':measured_color,
-                'lost':lost_color,
+                'missing':missing_color,
                 'unassigned':unassigned_color
                 }
             )
@@ -1545,7 +1545,7 @@ recipient: residues
             ylabel='ppm or ratio',
             measured_color='black',
             status_color_flag=True,
-            lost_color='red',
+            missing_color='red',
             unassigned_color='grey',
             bar_width=0.7,
             bar_alpha=1,
@@ -1667,7 +1667,7 @@ recipient: residues
             self.loc[experiment,:,'Peak Status'],
             {
                 'measured':measured_color,
-                'lost':lost_color,
+                'missing':missing_color,
                 'unassigned':unassigned_color
                 }
             )
@@ -1678,7 +1678,7 @@ recipient: residues
                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
                 {
                     'measured':measured_color,
-                    'lost':lost_color,
+                    'missing':missing_color,
                     'unassigned':unassigned_color
                     }
                 )
@@ -1986,8 +1986,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             
             return
         
-        # do not represent the lost peaks.
-        mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'lost')
+        # do not represent the missing peaks.
+        mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'missing')
         y = y[mes_mask]
         x = x[mes_mask]
         # Plots data
@@ -2089,8 +2089,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             markers=['^','>','v','<','s','p','h','8','*','D'],
             mk_color=['none'],
             mk_edgecolors='black',
-            mk_lost_color='red',
-            hide_lost=False,
+            mk_missing_color='red',
+            hide_missing=False,
             titration_x_values='',
             rows_page='',
             cols_page='',
@@ -2210,20 +2210,20 @@ variable or confirm you have not forgot any peaklist [{}].".\
             cedge = it.cycle(mk_edgecolors)
             
             for k, j in enumerate(self.items):
-                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned'] \
-                        and hide_lost:
+                if self.ix[j,i,'Peak Status'] in ['missing', 'unassigned'] \
+                        and hide_missing:
                     next(mcycle)
                     next(ccycle)
                     next(cedge)
                 
-                elif self.ix[j,i,'Peak Status'] == 'lost':
+                elif self.ix[j,i,'Peak Status'] == 'missing':
                     axs[i].scatter(
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker=next(mcycle),
                         s=mksize,
                         c=next(ccycle),
-                        edgecolors=mk_lost_color
+                        edgecolors=mk_missing_color
                         )
                     next(cedge)
                 
@@ -2245,17 +2245,17 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 n=self.shape[0]
                 )
             # this is used instead of passing a list to .scatter because
-            # of colouring in red the lost peaks.
+            # of colouring in red the missing peaks.
             mccycle = it.cycle(mk_color['hex'])
             
             for j in self.items:
-                if self.ix[j,i,'Peak Status'] == 'lost':
+                if self.ix[j,i,'Peak Status'] == 'missing':
                     axs[i].scatter(
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker='o',
                         s=mksize,
-                        c=mk_lost_color,
+                        c=mk_missing_color,
                         edgecolors='none'
                         )
                 

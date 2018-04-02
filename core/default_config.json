@@ -35,7 +35,7 @@
     "bar_plot_settings": {
         "measured_color": "black",
         "status_color_flag": true,
-        "lost_color": "red",
+        "missing_color": "red",
         "unassigned_color": "lightgrey",
         "bar_width": 0.8,
         "bar_alpha": 1,
@@ -202,8 +202,8 @@
         "mk_edgecolors": [
             "black"
         ],
-        "mk_lost_color": "red",
-        "hide_lost": false
+        "mk_missing_color": "red",
+        "hide_missing": false
     },
     "cs_scatter_flower_settings": {
         "x_label": "1H (ppm)",
@@ -258,7 +258,7 @@
         "perform_cs_correction": false
     },
     "csp_settings": {
-        "cs_lost": "prev",
+        "cs_missing": "prev",
         "csp_res4alpha": 0.14,
         "csp_res_exceptions": {
             "G": 0.2
@@ -276,8 +276,8 @@
         "do_along_x": true,
         "do_along_y": false,
         "do_along_z": false,
-        "expand_lost_yy": false,
-        "expand_lost_zz": false,
+        "expand_missing_yy": false,
+        "expand_missing_zz": false,
         "perform_comparisons": false
     },
 
