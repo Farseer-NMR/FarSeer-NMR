@@ -302,7 +302,7 @@ class Settings(BaseWidget):
         self.dpre_checkbox.setEnabled(False)
         self.pre_settings = QPushButton("PRE Settings", self)
         self.pre_settings.clicked.connect(partial(self.show_popup, PreAnalysisPopup))
-        self.pretheo_button = QPushButton("Select theo. PRE Files", self)
+        self.pretheo_button = QPushButton("Select PRE Files", self)
         self.pretheo_button.clicked.connect(partial(self.show_popup,PRETheoreticalSelectionPopup))
         pre_groupbox.layout().addWidget(self.do_pre_checkbox, 0, 0)
         pre_groupbox.layout().addWidget(self.pre_settings, 0, 1)
