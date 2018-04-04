@@ -74,9 +74,10 @@ class FastaSelectionPopup(BasePopup):
             for cond_name, fasta_path in self.fasta_files.items():
                 self.add_field(cond_name, fasta_path)
         
-        elif self.variables["conditions"]["y"]:
+        if self.variables["conditions"]["y"]:
             for cond in self.variables["conditions"]["y"]:
-                self.add_field(cond, '')
+                if cond not in self.cond_widget_dict.keys():
+                    self.add_field(cond, '')
     
     def set_values(self):
         for name, widget in self.cond_widget_dict.items():
