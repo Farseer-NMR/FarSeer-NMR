@@ -137,8 +137,8 @@ class Settings(BaseWidget):
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
         self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
         self.fasta_start = LabelledSpinBox(self, "Fasta start", maximum=10000, step=1)
-        self.expand_lost_yy = LabelledCheckbox(self, "Search lost residues along Y axis?")
-        self.expand_lost_zz = LabelledCheckbox(self, "Search lost residues along Z axis?")
+        self.expand_missing_yy = LabelledCheckbox(self, "Search missing residues along Y axis?")
+        self.expand_missing_zz = LabelledCheckbox(self, "Search missing residues along Z axis?")
         self.figure_width = LabelledDoubleSpinBox(
             self,
             "Figure Width",
@@ -204,12 +204,12 @@ class Settings(BaseWidget):
         cs_norm_groupbox.setLayout(cs_groupbox_layout)
         cs_norm_groupbox.layout().addWidget(self.cs_correction)
         cs_norm_groupbox.layout().addWidget(self.cs_correction_res_ref)
-        lost_analysis_groupbox = QGroupBox()
-        lost_analysis_groupbox.setTitle("Search lost residues across axes")
-        lost_analysis_groupbox_layout = QVBoxLayout()
-        lost_analysis_groupbox.setLayout(lost_analysis_groupbox_layout)
-        lost_analysis_groupbox.layout().addWidget(self.expand_lost_yy)
-        lost_analysis_groupbox.layout().addWidget(self.expand_lost_zz)
+        missing_analysis_groupbox = QGroupBox()
+        missing_analysis_groupbox.setTitle("Search missing residues across axes")
+        missing_analysis_groupbox_layout = QVBoxLayout()
+        missing_analysis_groupbox.setLayout(missing_analysis_groupbox_layout)
+        missing_analysis_groupbox.layout().addWidget(self.expand_missing_yy)
+        missing_analysis_groupbox.layout().addWidget(self.expand_missing_zz)
         cs_groupbox = QGroupBox()
         cs_groupbox.setTitle("CSP Specific")
         cs_groupbox_layout = QVBoxLayout()
@@ -221,15 +221,15 @@ class Settings(BaseWidget):
             maximum=1,
             step=0.01
             )
-        self.csp_lost = LabelledCombobox(
+        self.csp_missing = LabelledCombobox(
             self,
-            text="Show Lost Residues",
+            text="Show Missing Residues",
             items=['prev', 'full', 'zero']
             )
         self.csp_exceptions = QPushButton("Alpha by residue", self)
         self.csp_exceptions.clicked.connect(partial(self.show_popup, CSPExceptionsPopup))
         cs_groupbox.layout().addWidget(self.csp_alpha)
-        cs_groupbox.layout().addWidget(self.csp_lost)
+        cs_groupbox.layout().addWidget(self.csp_missing)
         cs_groupbox.layout().addWidget(self.csp_exceptions)
         restraint_groupbox = QGroupBox()
         restraint_groupbox.setTitle("Parameter Calculation")
@@ -310,7 +310,7 @@ class Settings(BaseWidget):
         pre_groupbox.layout().addWidget(self.dpre_button, 1, 1)
         pre_groupbox.layout().addWidget(self.heat_map_checkbox, 2, 0)
         pre_groupbox.layout().addWidget(self.heat_map_button, 2, 1)
-        pre_groupbox.layout().addWidget(self.pretheo_button, 3, 1)
+        pre_groupbox.layout().addWidget(self.pretheo_button)
         series_plotting_groupbox = QGroupBox()
         series_plotting_groupbox.setTitle("Series Plotting")
         series_plotting_groupbox_layout = QGridLayout()
@@ -338,7 +338,7 @@ class Settings(BaseWidget):
         grid.layout().addWidget(fasta_groupbox, 7, 4, 4, 4)
         grid.layout().addWidget(sidechains_groupbox, 3, 4, 4, 4)
         grid.layout().addWidget(cs_norm_groupbox, 7, 0, 4, 4)
-        grid.layout().addWidget(lost_analysis_groupbox, 3, 0, 4, 4)
+        grid.layout().addWidget(missing_analysis_groupbox, 3, 0, 4, 4)
         grid.layout().addWidget(series_groupbox, 3, 8, 6, 4)
         grid.layout().addWidget(figure_groupbox, 3, 12, 6, 4)
         grid.layout().addWidget(figure_groupbox, 3, 12, 6, 4)
@@ -426,8 +426,8 @@ class Settings(BaseWidget):
         general["fig_file_type"] = self.figure_format.fields.currentText()
 
         # Fitting Settings
-        fitting["expand_lost_yy"] = self.expand_lost_yy.isChecked()
-        fitting["expand_lost_zz"] = self.expand_lost_zz.isChecked()
+        fitting["expand_missing_yy"] = self.expand_missing_yy.isChecked()
+        fitting["expand_missing_zz"] = self.expand_missing_zz.isChecked()
         fitting["perform_comparisons"] = self.perform_comparisons_checkbox.isChecked()
         fitting["do_along_x"] = self.x_checkbox.isChecked()
         fitting["do_along_y"] = self.y_checkbox.isChecked()
@@ -439,7 +439,7 @@ class Settings(BaseWidget):
 
         # CSP Settings
         csp["csp_res4alpha"] = round(self.csp_alpha.field.value(), 2)
-        csp["cs_lost"] = self.csp_lost.fields.currentText()
+        csp["cs_missing"] = self.csp_missing.fields.currentText()
 
         # FASTA Settings
         fasta["applyFASTA"] = self.apply_fasta_checkbox.isChecked()
@@ -523,8 +523,8 @@ class Settings(BaseWidget):
         self.figure_format.select(general["fig_file_type"])
 
         # Fitting Settings
-        self.expand_lost_yy.setChecked(fitting["expand_lost_yy"])
-        self.expand_lost_zz.setChecked(fitting["expand_lost_zz"])
+        self.expand_missing_yy.setChecked(fitting["expand_missing_yy"])
+        self.expand_missing_zz.setChecked(fitting["expand_missing_zz"])
         self.perform_comparisons_checkbox.setChecked(fitting["perform_comparisons"])
         self.x_checkbox.setChecked(fitting["do_along_x"])
         self.y_checkbox.setChecked(fitting["do_along_y"])
@@ -536,7 +536,7 @@ class Settings(BaseWidget):
 
         # CSP Settings
         self.csp_alpha.setValue(csp["csp_res4alpha"])
-        self.csp_lost.select(csp["cs_lost"])
+        self.csp_missing.select(csp["cs_missing"])
 
         # FASTA Settings
         self.apply_fasta_checkbox.setChecked(fasta["applyFASTA"])

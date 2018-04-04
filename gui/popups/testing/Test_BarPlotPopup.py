@@ -31,8 +31,8 @@ class Test_BarPlotPopup(unittest.TestCase):
                          self.defaults["status_color_flag"])
         self.assertEqual(self.popup.meas_bar_colour.fields.currentText(),
                          self.defaults["measured_color"])
-        self.assertEqual(self.popup.lost_bar_colour.fields.currentText(),
-                         self.defaults["lost_color"])
+        self.assertEqual(self.popup.missing_bar_colour.fields.currentText(),
+                         self.defaults["missing_color"])
         self.assertEqual(self.popup.unassigned_bar_colour.fields.currentText(),
                          self.defaults["unassigned_color"])
         self.assertEqual(self.popup.bar_width.field.value(),
@@ -63,7 +63,7 @@ class Test_BarPlotPopup(unittest.TestCase):
     def test_set_values(self):
         self.popup.apply_status.setChecked(False)
         self.popup.meas_bar_colour.select('peru')
-        self.popup.lost_bar_colour.select('bisque')
+        self.popup.missing_bar_colour.select('bisque')
         self.popup.unassigned_bar_colour.select('white')
         self.popup.bar_width.setValue(0.6)
         self.popup.bar_alpha.setValue(0.5)
@@ -86,10 +86,10 @@ class Test_BarPlotPopup(unittest.TestCase):
                          'peru')
         self.assertEqual(self.popup.variables["bar_plot_settings"][
                              "measured_color"], 'peru')
-        self.assertEqual(self.popup.lost_bar_colour.fields.currentText(),
+        self.assertEqual(self.popup.missing_bar_colour.fields.currentText(),
                          'bisque')
         self.assertEqual(self.popup.variables["bar_plot_settings"][
-                             "lost_color"], 'bisque')
+                             "missing_color"], 'bisque')
         self.assertEqual(self.popup.unassigned_bar_colour.fields
                          .currentText(), 'white')
         self.assertEqual(self.popup.variables["bar_plot_settings"][
@@ -140,7 +140,7 @@ class Test_BarPlotPopup(unittest.TestCase):
     def test_values_not_set(self):
         self.popup.apply_status.setChecked(True)
         self.popup.meas_bar_colour.select('peru')
-        self.popup.lost_bar_colour.select('bisque')
+        self.popup.missing_bar_colour.select('bisque')
         self.popup.unassigned_bar_colour.select('white')
         self.popup.bar_width.setValue(0.6)
         self.popup.bar_alpha.setValue(0.5)
@@ -161,10 +161,10 @@ class Test_BarPlotPopup(unittest.TestCase):
                          'peru')
         self.assertNotEqual(self.popup.variables["bar_plot_settings"][
                                 "measured_color"], 'peru')
-        self.assertEqual(self.popup.lost_bar_colour.fields.currentText(),
+        self.assertEqual(self.popup.missing_bar_colour.fields.currentText(),
                          'bisque')
         self.assertNotEqual(self.popup.variables["bar_plot_settings"][
-                                "lost_color"], 'bisque')
+                                "missing_color"], 'bisque')
         self.assertEqual(self.popup.unassigned_bar_colour.fields
                          .currentText(), 'white')
         self.assertNotEqual(self.popup.variables["bar_plot_settings"][

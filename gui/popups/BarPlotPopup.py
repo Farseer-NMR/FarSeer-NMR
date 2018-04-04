@@ -49,7 +49,7 @@ class BarPlotPopup(BasePopup):
         BasePopup.__init__(self, parent, "bar_plot_settings", "Bar Plot")
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
         self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
-        self.lost_bar_colour = ColourBox(self, text="Lost Bar Colour")
+        self.missing_bar_colour = ColourBox(self, text="Missing Bar Colour")
         self.unassigned_bar_colour = ColourBox(self, text="Unassigned Bar Colour")
         self.bar_width = LabelledDoubleSpinBox(
             self,
@@ -95,7 +95,7 @@ class BarPlotPopup(BasePopup):
         self.user_markers_button.clicked.connect(self.launch_user_marker_popup)
         self.layout().addWidget(self.apply_status, 0, 0)
         self.layout().addWidget(self.meas_bar_colour, 1, 0)
-        self.layout().addWidget(self.lost_bar_colour, 2, 0)
+        self.layout().addWidget(self.missing_bar_colour, 2, 0)
         self.layout().addWidget(self.unassigned_bar_colour, 3, 0)
         self.layout().addWidget(self.bar_width, 4, 0)
         self.layout().addWidget(self.bar_alpha, 5, 0)
@@ -133,7 +133,7 @@ class BarPlotPopup(BasePopup):
         self.colour_user_details.setChecked(self.defaults["color_user_details_flag"])
         # colours
         self.meas_bar_colour.get_colour(self.defaults["measured_color"])
-        self.lost_bar_colour.get_colour(self.defaults["lost_color"])
+        self.missing_bar_colour.get_colour(self.defaults["missing_color"])
         self.unassigned_bar_colour.get_colour(self.defaults["unassigned_color"])
         self.bar_threshold_colour.get_colour(self.defaults["threshold_color"])
         # values
@@ -155,7 +155,7 @@ class BarPlotPopup(BasePopup):
         self.colour_user_details.setChecked(self.local_variables["color_user_details_flag"])
         # colours
         self.meas_bar_colour.get_colour(self.local_variables["measured_color"])
-        self.lost_bar_colour.get_colour(self.local_variables["lost_color"])
+        self.missing_bar_colour.get_colour(self.local_variables["missing_color"])
         self.unassigned_bar_colour.get_colour(self.local_variables["unassigned_color"])
         self.bar_threshold_colour.get_colour(self.local_variables["threshold_color"])
         # values
@@ -178,7 +178,7 @@ class BarPlotPopup(BasePopup):
         self.local_variables["color_user_details_flag"] = self.colour_user_details.isChecked()
         # colours
         self.local_variables["measured_color"] = self.meas_bar_colour.fields.currentText()
-        self.local_variables["lost_color"] = self.lost_bar_colour.fields.currentText()
+        self.local_variables["missing_color"] = self.missing_bar_colour.fields.currentText()
         self.local_variables["unassigned_color"] = self.unassigned_bar_colour.fields.currentText()
         self.local_variables["threshold_color"] = self.bar_threshold_colour.fields.currentText()
         # values

@@ -346,7 +346,7 @@ the possible options.'
             return
         
         # loads files in nested dictionaries
-        # piece of code found in stackoverflow, reference lost
+        # piece of code found in stackoverflow, reference missing
         for p in self.paths:
             parts = p.split('spectra')[-1].split('/')
             branch = target
@@ -550,7 +550,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         peaklist pd.Dataframe. And adds column 'Peak Status' with value
         'measured'.
         
-            3.1 if peaklist is empty adds all dummy rows of type <lost>.
+            3.1 if peaklist is empty adds all dummy rows of type <missing>.
         
         4. Sorts the peaklist according to 'ResNo' just in case the
         original .CSV file was not sorted. For correct sorting 'ResNo'
@@ -589,7 +589,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             # identified in the NMR spectrum. Therefore all the peaks here
             # are labeled as 'measured'. On later stages of the script
             # peaks not identified will be added to the peaklist, and those
-            # peaks will be label as 'lost' or 'unassigned'.
+            # peaks will be label as 'missing' or 'unassigned'.
             try:
                 self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
             
@@ -609,7 +609,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                         'Line Width F2 (Hz)'
                         ]
                     ] = [
-                            'lost',
+                            'missing',
                             np.nan,
                             np.nan,
                             np.nan,
@@ -903,7 +903,7 @@ more details."
         Modifies:
             The values in self.allpeaklists or self.allsidechains.
         """
-        title = 'adds lost residues along axis {}'.format(along_axis)
+        title = 'adds missing residues along axis {}'.format(along_axis)
         self.log_r(title, istitle=True)
         
         if resonance_type == 'Backbone':
@@ -999,7 +999,7 @@ more details."
     
     def finds_missing(
             self, fillna_dict, 
-            missing='lost',
+            missing='missing',
             resonance_type='Backbone'):
         """
         Finds missing residues.
@@ -1008,7 +1008,7 @@ more details."
         comparing each data point to the reference experiment on that
         series.
         
-        Missing residues can be of type 'lost' or 'unassigned'.
+        Missing residues can be of type 'missing' or 'unassigned'.
         
         Parameters:
             fillna_dict (dict): a dictionary of kwargs that define
@@ -1017,7 +1017,7 @@ more details."
                      'Merit': 0.0,
                      'Details': 'None'}
             
-            missing (str): {'lost', 'unassigned'}
+            missing (str): {'missing', 'unassigned'}
             
             resonance_type (str): {'Backbone', 'Sidechains'}
         
@@ -1028,8 +1028,8 @@ more details."
         title = 'Searches for {} residues'.format(missing)
         self.log_r(title, istitle=True)
         
-        if not(missing in ['lost', 'unassigned']):
-            msg = "<missing> argument must be 'lost' or 'unassigned'."
+        if not(missing in ['missing', 'unassigned']):
+            msg = "<missing> argument must be 'missing' or 'unassigned'."
             self.log_r(msg)
             return
         
@@ -1053,7 +1053,7 @@ more details."
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # sets the reference peaklist
-            if x == self.xxref and missing == 'lost':
+            if x == self.xxref and missing == 'missing':
                 ref_pkl = target[z][y][x]
                 refz = z
                 refy = y
@@ -1579,7 +1579,7 @@ Names must be equal accross every Y axis datapoint folder.".\
         else:
             msg = \
 'The reference residue you selected, {}, is not part of the protein sequence \
-or is an <unassigned> or <lost> residue. \
+or is an <unassigned> or <missing> residue. \
 Correct the reference residue in the Settings Menu.'.\
                 format(ref_res)
             self.log_r(fsw.gen_wet('ERROR', msg, 16))

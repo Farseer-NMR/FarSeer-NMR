@@ -55,10 +55,10 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.cs_scatter_mk_edgecolors.field.text(),
                          ','.join(self.defaults["mk_edgecolors"]))
         self.assertEqual(
-            self.popup.cs_scatter_mk_lost_color.fields.currentText(),
-            self.defaults["mk_lost_color"])
-        self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(),
-                         self.defaults["hide_lost"])
+            self.popup.cs_scatter_mk_missing_color.fields.currentText(),
+            self.defaults["mk_missing_color"])
+        self.assertEqual(self.popup.cs_scatter_hide_missing.isChecked(),
+                         self.defaults["hide_missing"])
 
     def test_set_values(self):
         self.popup.cs_scatter_cols_page.setValue(6)
@@ -74,8 +74,8 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.popup.cs_scatter_markers.setText("^,>,v,<,s,p,h,8")
         self.popup.cs_scatter_mk_color.setText("blue")
         self.popup.cs_scatter_mk_edgecolors.field.setText("red,blue")
-        self.popup.cs_scatter_mk_lost_color.select("orange")
-        self.popup.cs_scatter_hide_lost.setChecked(True)
+        self.popup.cs_scatter_mk_missing_color.select("orange")
+        self.popup.cs_scatter_hide_missing.setChecked(True)
 
         self.popup.set_values()
 
@@ -97,8 +97,8 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.cs_scatter_mk_edgecolors.field.text(),
                          "red,blue")
         self.assertEqual(
-            self.popup.cs_scatter_mk_lost_color.fields.currentText(), "orange")
-        self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(), True)
+            self.popup.cs_scatter_mk_missing_color.fields.currentText(), "orange")
+        self.assertEqual(self.popup.cs_scatter_hide_missing.isChecked(), True)
 
         self.assertEqual(self.popup.cs_scatter_cols_page.field.value(),
                          self.popup.variables["cs_scatter_settings"][
@@ -134,11 +134,11 @@ class Test_ScatterPlotPopup(unittest.TestCase):
                          ','.join(self.popup.variables["cs_scatter_settings"][
                                       "mk_edgecolors"]))
         self.assertEqual(
-            self.popup.cs_scatter_mk_lost_color.fields.currentText(),
-            self.popup.variables["cs_scatter_settings"]["mk_lost_color"])
-        self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(),
+            self.popup.cs_scatter_mk_missing_color.fields.currentText(),
+            self.popup.variables["cs_scatter_settings"]["mk_missing_color"])
+        self.assertEqual(self.popup.cs_scatter_hide_missing.isChecked(),
                          self.popup.variables["cs_scatter_settings"][
-                             "hide_lost"])
+                             "hide_missing"])
 
         self.assertEqual(tuple(self.popup.local_variables.keys()),
                          self.local_variable_keys)
@@ -159,8 +159,8 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.popup.cs_scatter_markers.setText("^,>,v,<,s,p,h,8")
         self.popup.cs_scatter_mk_color.setText("blue")
         self.popup.cs_scatter_mk_edgecolors.field.setText("red, blue")
-        self.popup.cs_scatter_mk_lost_color.select("orange")
-        self.popup.cs_scatter_hide_lost.setChecked(True)
+        self.popup.cs_scatter_mk_missing_color.select("orange")
+        self.popup.cs_scatter_hide_missing.setChecked(True)
 
         self.assertEqual(self.popup.cs_scatter_cols_page.field.value(), 6)
         self.assertEqual(self.popup.cs_scatter_rows_page.field.value(), 8)
@@ -181,8 +181,8 @@ class Test_ScatterPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.cs_scatter_mk_edgecolors.field.text(),
                          "red, blue")
         self.assertEqual(
-            self.popup.cs_scatter_mk_lost_color.fields.currentText(), "orange")
-        self.assertEqual(self.popup.cs_scatter_hide_lost.isChecked(), True)
+            self.popup.cs_scatter_mk_missing_color.fields.currentText(), "orange")
+        self.assertEqual(self.popup.cs_scatter_hide_missing.isChecked(), True)
 
         self.assertNotEqual(self.popup.cs_scatter_cols_page.field.value(),
                             self.popup.variables["cs_scatter_settings"][
@@ -225,11 +225,11 @@ class Test_ScatterPlotPopup(unittest.TestCase):
                                 self.popup.variables["cs_scatter_settings"][
                                     "mk_edgecolors"]))
         self.assertNotEqual(
-            self.popup.cs_scatter_mk_lost_color.fields.currentText(),
-            self.popup.variables["cs_scatter_settings"]["mk_lost_color"])
-        self.assertNotEqual(self.popup.cs_scatter_hide_lost.isChecked(),
+            self.popup.cs_scatter_mk_missing_color.fields.currentText(),
+            self.popup.variables["cs_scatter_settings"]["mk_missing_color"])
+        self.assertNotEqual(self.popup.cs_scatter_hide_missing.isChecked(),
                             self.popup.variables["cs_scatter_settings"][
-                                "hide_lost"])
+                                "hide_missing"])
 
 
 if __name__ == "__main__":

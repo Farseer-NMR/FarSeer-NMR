@@ -66,9 +66,9 @@ class ScatterPlotPopup(BasePopup):
         self.cs_scatter_mk_end_color = ColourBox(self, text="Mark End Colour")
         self.cs_scatter_markers = LabelledLineEdit(self, "Sequential Markers")
         self.cs_scatter_mk_color = LabelledLineEdit(self, text="Mark Colours")
-        self.cs_scatter_mk_lost_color = ColourBox(self, "Lost Mark Colour")
+        self.cs_scatter_mk_missing_color = ColourBox(self, "Missing Mark Colour")
         self.cs_scatter_mk_edgecolors = LabelledLineEdit(self, "Marker Edge Colours")
-        self.cs_scatter_hide_lost = LabelledCheckbox(self, "Hide Lost Data Points")
+        self.cs_scatter_hide_missing = LabelledCheckbox(self, "Hide Missing Data Points")
         # layout
         self.layout().addWidget(self.cs_scatter_cols_page, 0, 0)
         self.layout().addWidget(self.cs_scatter_rows_page, 1, 0)
@@ -82,8 +82,8 @@ class ScatterPlotPopup(BasePopup):
         self.layout().addWidget(self.cs_scatter_markers, 2, 1)
         self.layout().addWidget(self.cs_scatter_mk_color, 3, 1)
         self.layout().addWidget(self.cs_scatter_mk_edgecolors, 4, 1)
-        self.layout().addWidget(self.cs_scatter_mk_lost_color, 5, 1)
-        self.layout().addWidget(self.cs_scatter_hide_lost, 6, 1)
+        self.layout().addWidget(self.cs_scatter_mk_missing_color, 5, 1)
+        self.layout().addWidget(self.cs_scatter_hide_missing, 6, 1)
         self.buttonBox = QDialogButtonBox(
             QDialogButtonBox.Ok |
             QDialogButtonBox.Cancel |
@@ -112,9 +112,9 @@ class ScatterPlotPopup(BasePopup):
         # colour
         self.cs_scatter_mk_start_color.get_colour(self.defaults["mk_start_color"])
         self.cs_scatter_mk_end_color.get_colour(self.defaults["mk_end_color"])
-        self.cs_scatter_mk_lost_color.get_colour(self.defaults["mk_lost_color"])
+        self.cs_scatter_mk_missing_color.get_colour(self.defaults["mk_missing_color"])
         # check
-        self.cs_scatter_hide_lost.setChecked(self.defaults["hide_lost"])
+        self.cs_scatter_hide_missing.setChecked(self.defaults["hide_missing"])
 
     def set_values(self):
         # value
@@ -138,9 +138,9 @@ class ScatterPlotPopup(BasePopup):
             [x.translate(translator) for x in self.cs_scatter_mk_color.field.text().split(',')]
         self.local_variables["mk_edgecolors"] = \
             [x.translate(translator) for x in self.cs_scatter_mk_edgecolors.field.text().split(',')]
-        self.local_variables["mk_lost_color"] = self.cs_scatter_mk_lost_color.fields.currentText()
+        self.local_variables["mk_missing_color"] = self.cs_scatter_mk_missing_color.fields.currentText()
         # checked
-        self.local_variables["hide_lost"] = self.cs_scatter_hide_lost.isChecked()
+        self.local_variables["hide_missing"] = self.cs_scatter_hide_missing.isChecked()
         self.accept()
 
     def get_values(self):
@@ -160,6 +160,6 @@ class ScatterPlotPopup(BasePopup):
         # colours
         self.cs_scatter_mk_start_color.get_colour(self.local_variables["mk_start_color"])
         self.cs_scatter_mk_end_color.get_colour(self.local_variables["mk_end_color"])
-        self.cs_scatter_mk_lost_color.get_colour(self.local_variables["mk_lost_color"])
+        self.cs_scatter_mk_missing_color.get_colour(self.local_variables["mk_missing_color"])
         # check
-        self.cs_scatter_hide_lost.setChecked(self.local_variables["hide_lost"])
+        self.cs_scatter_hide_missing.setChecked(self.local_variables["hide_missing"])

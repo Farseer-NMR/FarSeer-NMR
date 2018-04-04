@@ -47,7 +47,7 @@ Methods:
     .identify_residues()
     .correct_shifts()
     .fill_na()
-    .expand_lost()
+    .expand_missing()
     .add_missing()
     .organize_columns()
     .init_fs_cube()
@@ -704,7 +704,7 @@ def fill_na(peak_status, merit=0, details='None'):
     missing residues are fill.
     
     Parameters:
-        peak_status (str): {'lost', 'unassigned'},
+        peak_status (str): {'missing', 'unassigned'},
             how to fill 'Peak Status' column.
         
         merit (int/str): how to fill the 'Merit' column.
@@ -715,7 +715,7 @@ def fill_na(peak_status, merit=0, details='None'):
         Dictionary of kwargs.
     """
     
-    if not(peak_status in ['lost', 'unassigned']):
+    if not(peak_status in ['missing', 'unassigned']):
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
             )
@@ -729,15 +729,15 @@ def fill_na(peak_status, merit=0, details='None'):
     
     return d
 
-def expand_lost(exp, resonance_type='Backbone', dim='z'):
+def expand_missing(exp, resonance_type='Backbone', dim='z'):
     """
-    Checks for 'lost' residues accross the reference experiments
+    Checks for 'missing' residues accross the reference experiments
     for Y and Z axes.
     
     Uses FarseerCube.finds_missing().
     
     Compares reference peaklists along Y and Z axis of the Farseer-NMR
-    Cube and generates the corresponding 'lost' residues.
+    Cube and generates the corresponding 'missing' residues.
     This function is useful when analysing dia/ and paramagnetic/ series
     along the Z axis.
     
@@ -756,14 +756,14 @@ def expand_lost(exp, resonance_type='Backbone', dim='z'):
         return
     
     exp.compares_references(
-        fill_na('lost'),
+        fill_na('missing'),
         along_axis=dim,
         resonance_type=resonance_type
         )
     
     return
 
-def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
+def add_missing(exp, peak_status='missing', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
     Uses FarseerCube.finds_missing().
@@ -771,14 +771,14 @@ def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        peak_status (str): {'lost', 'unassigned'}, defaults to 'lost'.
+        peak_status (str): {'missing', 'unassigned'}, defaults to 'missing'.
             Peak status for the new generated entries for missing peaks. 
         
         resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
             'Backbone'.
     """
     
-    if not(peak_status in ['lost', 'unassigned']):
+    if not(peak_status in ['missing', 'unassigned']):
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
             )
@@ -864,7 +864,7 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
     Depends on:
     fsuv.csp_alpha4res
     fsuv.csp_res_exceptions
-    fsuv.cs_lost
+    fsuv.cs_missing
     fsuv.restraint_names
     """
     
@@ -878,7 +878,7 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
         'resonance_type':resonance_type,
         'csp_alpha4res':fsuv["csp_settings"]["csp_res4alpha"],
         'csp_res_exceptions':fsuv["csp_settings"]["csp_res_exceptions"],
-        'cs_lost':fsuv["csp_settings"]["cs_lost"],
+        'cs_missing':fsuv["csp_settings"]["cs_missing"],
         'restraint_list':fsuv["restraint_names"],
         'log_export_onthefly':True,
         'log_export_name':fsuv["general_settings"]["logfile_name"]
@@ -1805,24 +1805,24 @@ def run_farseer(fsuv):
         if exp.has_sidechains and use_sidechains:
             correct_shifts(exp, fsuv, resonance_type='Sidechains')
     
-    # expands lost residues to other dimensions
-    if fitting["expand_lost_yy"]:
-        expand_lost(exp, dim='y')
+    # expands missing residues to other dimensions
+    if fitting["expand_missing_yy"]:
+        expand_missing(exp, dim='y')
         
         if exp.has_sidechains and use_sidechains:
-            expand_lost(exp, dim='y', resonance_type='Sidechains')
+            expand_missing(exp, dim='y', resonance_type='Sidechains')
     
-    if fitting["expand_lost_zz"]:
-        expand_lost(exp, dim='z')
+    if fitting["expand_missing_zz"]:
+        expand_missing(exp, dim='z')
         
         if exp.has_sidechains and use_sidechains:
-            expand_lost(exp, dim='z', resonance_type='Sidechains')
+            expand_missing(exp, dim='z', resonance_type='Sidechains')
     
-    ## identifies lost residues
-    add_missing(exp, peak_status='lost')
+    ## identifies missing residues
+    add_missing(exp, peak_status='missing')
     
     if exp.has_sidechains and use_sidechains:
-        add_missing(exp, peak_status='lost', resonance_type='Sidechains')
+        add_missing(exp, peak_status='missing', resonance_type='Sidechains')
     
     # adds fasta
     if fasta["applyFASTA"]:
