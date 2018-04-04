@@ -32,9 +32,13 @@ class Variables(dict):
 
     def read(self, fname):
         fin = open(fname, 'r')
-        variables = json.load(fin)
-        self._vars.update(variables)
-        fin.close()
+        try:
+            variables = json.load(fin)
+            self._vars.update(variables)
+        except json.decoder.JSONDecodeError as err:
+            print("Invalid JSON format\n%s" % err)
+        finally:
+            fin.close()
 
     def write(self, fout):
         json.dump(self._vars, fout, indent=4)
