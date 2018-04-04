@@ -138,7 +138,7 @@ class TabWidget(QTabWidget):
         configuration files.
         """
         self.interface.save_config()
-        
+
         if not path:
             filters = "JSON files (*.json)"
             selected_filter = "JSON files (*.json)"
