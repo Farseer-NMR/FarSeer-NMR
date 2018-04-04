@@ -60,7 +60,6 @@ def check_input_construction(output_path, variables):
     
     if not(populated_tree):
         return "No populated Tree"
-    
     if variables["fasta_settings"]["applyFASTA"]:
         for y_key in variables["conditions"]["y"]:
             fasta_file = variables["fasta_files"].get(y_key, False)

@@ -135,7 +135,7 @@ class Settings(BaseWidget):
         self.has_sidechains_checkbox = LabelledCheckbox(self, "Are Sidechain Peaks Present?")
         self.use_sidechains_checkbox = LabelledCheckbox(self, "Analyse Sidechains?")
         self.perform_comparisons_checkbox = LabelledCheckbox(self, "Perform Comparisons?")
-        self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?")
+        self.apply_fasta_checkbox = LabelledCheckbox(self, "Apply FASTA?", callback=self.activate_fasta)
         self.fasta_start = LabelledSpinBox(self, "Fasta start", maximum=10000, step=1)
         self.expand_lost_yy = LabelledCheckbox(self, "Search lost residues along Y axis?")
         self.expand_lost_zz = LabelledCheckbox(self, "Search lost residues along Z axis?")
@@ -351,6 +351,12 @@ class Settings(BaseWidget):
         #
         self.load_variables()
 
+
+    def activate_fasta(self, value):
+        self.variables["fasta_settings"]["applyFASTA"] = value
+        print(self.variables["fasta_settings"]["applyFASTA"])
+
+
     def activate_pre(self):
         if self.plot_height_ratio.isChecked() or self.plot_volume_ratio.isChecked():
             self.do_pre_checkbox.setEnabled(True)
@@ -442,7 +448,7 @@ class Settings(BaseWidget):
         csp["cs_lost"] = self.csp_lost.fields.currentText()
 
         # FASTA Settings
-        fasta["applyFASTA"] = self.apply_fasta_checkbox.isChecked()
+        fasta["applyFASTA"] = self.apply_fasta_checkbox.checkBox.isChecked()
         fasta["FASTAstart"] = self.fasta_start.field.value()
 
         self.variables["pre_settings"]["apply_PRE_analysis"] = self.do_pre_checkbox.isChecked()
@@ -539,7 +545,7 @@ class Settings(BaseWidget):
         self.csp_lost.select(csp["cs_lost"])
 
         # FASTA Settings
-        self.apply_fasta_checkbox.setChecked(fasta["applyFASTA"])
+        self.apply_fasta_checkbox.checkBox.setChecked(fasta["applyFASTA"])
         self.fasta_start.setValue(fasta["FASTAstart"])
 
         # PRE settings
