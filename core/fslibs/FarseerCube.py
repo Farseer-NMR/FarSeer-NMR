@@ -1797,6 +1797,23 @@ different lengths.".\
         that were not removed.
         """
         # for assignment cols
+        ## empty
+        empty_cells_f1 = self.allpeaklists[z][y][x].loc[:,'Assign F1'].isnull()
+        empty_cells_f2 = self.allpeaklists[z][y][x].loc[:,'Assign F2'].isnull()
+        
+        if empty_cells_f1.values.any() or empty_cells_f2.values.any():
+            rows_bool = empty_cells_f1 | empty_cells_f2
+            msg = "The peaklist [{}][{}][{}] contains no assignment \
+information in lines {}. Please review that peaklist.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 29))
+            self.abort()
+        
+        ## misleading chars
         non_digit_f1 = \
             self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
                 str.strip().str.contains('\W', regex=True)
@@ -1817,7 +1834,7 @@ charaters in Assignment columns in line {}.".format(
             self.log_r(fsw.gen_wet('ERROR', msg, 29))
             self.abort()
         
-        # for other cols.
+        ## for other cols.
         cols = [
             'Position F1',
             'Position F2',
