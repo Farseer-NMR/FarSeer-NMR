@@ -183,7 +183,6 @@ class PeakListArea(QWidget):
                 return
         
         self.peak_list_objects = []
-        self.fasta_files = {}
         self.peak_list_dict = {}
         self.show()
         self.side_bar().refresh_sidebar()
@@ -195,6 +194,10 @@ class PeakListArea(QWidget):
         num_y = len(y_conds)
         num_z = len(z_conds)
         total_x = num_x*num_y*num_z
+        keys_to_remove = [k for k in self.variables['fasta_files'].keys() if k not in y_conds]
+        for k in keys_to_remove:
+            del self.variables['fasta_files'][k]
+
         
         if total_x > 10:
             self.scrollContents.setSceneRect(0, 0, width, total_x * 22)
@@ -226,7 +229,6 @@ class PeakListArea(QWidget):
             
             for j, y in enumerate(y_conds):
                 self.peak_list_dict[z][y] = {}
-                self.fasta_files[y] = ''
                 x_markers = []
                 
                 for k, x in enumerate(x_conds):
@@ -307,9 +309,10 @@ class PeakListArea(QWidget):
             
             for x_marker in y_markers:
                 self.add_connecting_line(zz, x_marker)
-        
+
         self.updateClicks += 1
         self.variables["experimental_dataset"] = self.peak_list_dict
+
     
     def add_connecting_line(self, atom1, atom2):
         
