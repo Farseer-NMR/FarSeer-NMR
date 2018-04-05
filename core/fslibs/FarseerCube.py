@@ -942,8 +942,8 @@ more details."
                 
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl, 
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(), 
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
@@ -974,8 +974,8 @@ more details."
         
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl,
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(),
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
