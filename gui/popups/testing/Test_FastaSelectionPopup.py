@@ -28,7 +28,7 @@ class Test_FastaSelectionPopup(unittest.TestCase):
     def test_defaults(self):
         """Test popup reads and sets default variables"""
 
-        self.assertEqual(list(self.popup.cond_widget_dict.keys()), [])
+        self.assertEqual(list(self.popup.cond_widget_dict.keys()), [''])
 
     def test_set_values(self):
         self.popup.add_field('mut1', '/test/path/1')
