@@ -369,13 +369,6 @@ the possible options.'
                         format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
-                
-                if filetype == '.fasta' and resonance_type == 'Backbone':
-                    self.check_fasta(
-                        target[parts[1]][parts[2]][lessparts],
-                        parts[2],
-                        p
-                        )
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -463,7 +456,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             )
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         self.log_r(logs)
-        #self.check_fasta(df, FASTApath)
         
         return df
     
@@ -619,19 +611,12 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                             np.nan
                             ]
             
-            # Step 4
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x]['ResNo'].astype(int)
-            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
-            self.allpeaklists[z][y][x].reset_index(inplace=True)
             # sidechains entries always end with an 'a' or 'b' in the AssignF1
             # use of regex: http://www.regular-expressions.info/tutorial.html
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
-                    loc[:,'Assign F1'].str.match('\w+[ab]$')
+                    loc[:,'Assign F1'].str.contains('[ab]$')
             # initiates SD counter
             sd_count = {True:0}
             
@@ -661,6 +646,15 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # creates backbone peaklist without sidechains
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
+            
+            # Step 4
+            self.check_res_duplicates(self.allpeaklists, z, y, x)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x]['ResNo'].astype(int)
+            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
+            self.allpeaklists[z][y][x].reset_index(inplace=True)
             
             # Writes sanity check
             if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
@@ -940,8 +934,8 @@ more details."
                 
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl, 
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(), 
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
@@ -972,8 +966,8 @@ more details."
         
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl,
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(),
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
@@ -1068,8 +1062,8 @@ more details."
             
             target[z][y][x], popi = \
                 self.seq_expand(
-                    ref_pkl,
-                    target[z][y][x],
+                    ref_pkl.copy(),
+                    target[z][y][x].copy(),
                     resonance_type,
                     fillna_dict
                     )
@@ -1586,36 +1580,7 @@ Correct the reference residue in the Settings Menu.'.\
             self.abort()
         
         return
-
-    def check_fasta(self, df, yy, fasta_path):
-        """
-        Checks if loaded FASTA file has more residues than the reference
-        experiment.
-        
-        FASTA cannot has less rows than the reference experiment.
-        WET#18
-        
-        Parameters:
-            df (pd.DataFrame): contains the FASTA loaded data in
-                DataFrame format as prepared by .read_FASTA().
-            
-            yy (str): the current YY data point name.
-            
-            fasta_path (srt): the .fasta file path.
-        """
-        
-        if df.shape[0] \
-                < self.allpeaklists[self.zzref][yy][self.xxref].\
-                    shape[0]:
-            msg = \
-'The .fasta file in {} has less residue entries than the protein sequence \
-of the reference experiment [{}][{}][{}]'.\
-                format(fasta_path, self.zzref, yy, self.xxref)
-            self.log_r(fsw.gen_wet('ERROR', msg, 18))
-            self.abort()
-        
-        return
-
+    
     def compare_fastas(self):
         """
         Compares all .fasta files to confirm they have the same size.
@@ -1864,3 +1829,24 @@ charaters in line {} of column [{}].".format(
                 self.abort()
         
         return
+
+    def check_res_duplicates(self, df, z, y, x):
+        """
+        Checks if there are duplicated residue entries in peaklists.
+        
+        Parameters:
+            - df (pd.DataFrame): the peaklist dataframe to investigate
+        """
+        where_duplicates = df[z][y][x].loc[:,'ResNo'].duplicated(keep=False)
+        
+        if where_duplicates.any():
+            msg = "The peaklist [{}][{}][{}] contains repeated residue entries \
+in lines: {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in \
+                    where_duplicates.index[where_duplicates].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 24))
+            self.abort()
