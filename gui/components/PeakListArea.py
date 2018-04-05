@@ -183,7 +183,6 @@ class PeakListArea(QWidget):
                 return
         
         self.peak_list_objects = []
-        self.fasta_files = {}
         self.peak_list_dict = {}
         self.show()
         self.side_bar().refresh_sidebar()
@@ -226,7 +225,6 @@ class PeakListArea(QWidget):
             
             for j, y in enumerate(y_conds):
                 self.peak_list_dict[z][y] = {}
-                self.fasta_files[y] = ''
                 x_markers = []
                 
                 for k, x in enumerate(x_conds):
@@ -310,6 +308,7 @@ class PeakListArea(QWidget):
         
         self.updateClicks += 1
         self.variables["experimental_dataset"] = self.peak_list_dict
+
     
     def add_connecting_line(self, atom1, atom2):
         

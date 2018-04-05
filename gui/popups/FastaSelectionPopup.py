@@ -70,6 +70,7 @@ class FastaSelectionPopup(BasePopup):
         self.layout().addWidget(self.buttonBox)
     
     def get_values(self):
+        print(self.fasta_files)
         if self.fasta_files:
             for cond_name, fasta_path in self.fasta_files.items():
                 self.add_field(cond_name, fasta_path)
