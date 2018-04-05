@@ -126,22 +126,18 @@ def deliver_settings(resolution):
 
     if (resolution.height(), resolution.width()) == (1440, 2560):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_2k.qss')).read()
-        print('2k')
         return settings_2k, stylesheet
     elif (resolution.height(), resolution.width()) == (1080, 1920) or \
             1040 < resolution.height() < 1440:
-        print('1k')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_1k.qss')).read()
         return settings_1k, stylesheet
     elif (resolution.height(), resolution.width()) == (800, 1280):
-        print('1280x800')
         msg = " @@@@@@@@@@@@@@@@@@@@@@ \nATTENTION YOU WILL BE USING A PROTOTYPE GUI DEVELOPED ONLY TO BE FUNCTIONAL IN 1280X800 SCREENS. IT IS NOT SUPPOSED TO HAVE A GOOD LOOK.\n@@@@@@@@@@@@@@@@@@@@@@"
         print(msg)
         stylesheet = open(os.path.join(GUI_DIR,
                                        'stylesheet_1280x800.qss')).read()
         return settings_1280x800, stylesheet
     else:
-        print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
 

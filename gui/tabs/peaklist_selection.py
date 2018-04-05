@@ -136,7 +136,7 @@ class PeaklistSelection(BaseWidget):
         layout = self.widget2.layout()
         colCount = layout.columnCount()
         valuesDict = self.variables["conditions"]
-        
+
         for m in range(3, colCount):
             item = layout.itemAtPosition(row, m)
            

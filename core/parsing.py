@@ -377,7 +377,7 @@ def parse_ccpn_peaklist(peaklist_file):
             if v in row[5]:
                 a2 = row[5].strip().split(v)[-1]
                 atoms.append(a2)
-    
+
         peak = Peak(
             peak_number=row[1],
             positions=[row[2], row[3]],
@@ -391,7 +391,7 @@ def parse_ccpn_peaklist(peaklist_file):
             details=row[11],
             format='ccpn'
             )
-        
+
         peakList.append(peak)
     
     fin.close()

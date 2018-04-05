@@ -197,9 +197,7 @@ def add_residue_information(peak_list, fasta_file, fasta_start):
     fasta_dict = \
         {ii + fasta_start: aal1tol3.get(residue)
             for ii, residue in enumerate(fasta)}
-    
-    import pprint
-    
+
     for peak in peak_list:
         if all(ass is None for ass in peak.assignments) and \
                 not '' in peak.assignments:
