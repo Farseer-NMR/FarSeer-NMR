@@ -370,12 +370,12 @@ the possible options.'
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
                 
-                if filetype == '.fasta' and resonance_type == 'Backbone':
-                    self.check_fasta(
-                        target[parts[1]][parts[2]][lessparts],
-                        parts[2],
-                        p
-                        )
+                # if filetype == '.fasta' and resonance_type == 'Backbone':
+                    # self.check_fasta(
+                        # target[parts[1]][parts[2]][lessparts],
+                        # parts[2],
+                        # p
+                        # )
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -619,19 +619,12 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                             np.nan
                             ]
             
-            # Step 4
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x]['ResNo'].astype(int)
-            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
-            self.allpeaklists[z][y][x].reset_index(inplace=True)
             # sidechains entries always end with an 'a' or 'b' in the AssignF1
             # use of regex: http://www.regular-expressions.info/tutorial.html
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
-                    loc[:,'Assign F1'].str.match('\w+[ab]$')
+                    loc[:,'Assign F1'].str.contains('[ab]$')
             # initiates SD counter
             sd_count = {True:0}
             
@@ -661,6 +654,15 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # creates backbone peaklist without sidechains
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
+            
+            # Step 4
+            self.check_res_duplicates(self.allpeaklists, z, y, x)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x]['ResNo'].astype(int)
+            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
+            self.allpeaklists[z][y][x].reset_index(inplace=True)
             
             # Writes sanity check
             if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
@@ -1864,3 +1866,24 @@ charaters in line {} of column [{}].".format(
                 self.abort()
         
         return
+
+    def check_res_duplicates(self, df, z, y, x):
+        """
+        Checks if there are duplicated residue entries in peaklists.
+        
+        Parameters:
+            - df (pd.DataFrame): the peaklist dataframe to investigate
+        """
+        where_duplicates = df[z][y][x].loc[:,'ResNo'].duplicated(keep=False)
+        
+        if where_duplicates.any():
+            msg = "The peaklist [{}][{}][{}] contains repeated residue entries \
+in lines: {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in \
+                    where_duplicates.index[where_duplicates].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 24))
+            self.abort()
