@@ -1070,8 +1070,8 @@ more details."
             
             target[z][y][x], popi = \
                 self.seq_expand(
-                    ref_pkl,
-                    target[z][y][x],
+                    ref_pkl.copy(),
+                    target[z][y][x].copy(),
                     resonance_type,
                     fillna_dict
                     )
