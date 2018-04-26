@@ -73,7 +73,7 @@ def get_peaklist_format(file_path):
         
         
         # because columns in ccpnmr peaklists may be swapped
-        ls = set(line.split(','))
+        ls = set(line.strip().split(','))
         set_headers = set([
             '#',
             'Position F1',
@@ -90,6 +90,8 @@ def get_peaklist_format(file_path):
             'Vol. Method',
             'Number'
                 ])
+        print(ls)
+        print(set_headers)
         if ls == set_headers:
             fin.close()
             return "CCPN"
