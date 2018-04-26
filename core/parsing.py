@@ -378,42 +378,52 @@ None
 
 
 def parse_ccpn_peaklist(peaklist_file):
-    fin = open(peaklist_file, 'r')
-    next(fin)
-    peakList = []
-    reader = csv.reader(fin)
+    #fin = open(peaklist_file, 'r')
+    #next(fin)
+    #peakList = []
+    #reader = csv.reader(fin)
     
-    for row in reader:
-        if not(row): continue
-        atoms = []
+    #for row in reader:
+        #if not(row): continue
+        #atoms = []
     
-        for v in aal1tol3.values():
-            if v in row[4]:
-                a1 = row[4].strip().split(v)[-1]
-                atoms.append(a1)
+        #for v in aal1tol3.values():
+            #if v in row[4]:
+                #a1 = row[4].strip().split(v)[-1]
+                #atoms.append(a1)
     
-            if v in row[5]:
-                a2 = row[5].strip().split(v)[-1]
-                atoms.append(a2)
-
-        peak = Peak(
-            peak_number=row[1],
-            positions=[row[2], row[3]],
-            assignments=[row[4], row[5]],
-            atoms=atoms,
-            linewidths=[row[8], row[9]],
-            volume=row[7],
-            height=row[6],
-            fit_method=row[12], merit=row[10],
-            volume_method=row[13],
-            details=row[11],
-            format='ccpn'
-            )
-
-        peakList.append(peak)
+            #if v in row[5]:
+                #a2 = row[5].strip().split(v)[-1]
+                #atoms.append(a2)
+        
+        #import pandas as pd
+        #peaklist = pd.read_csv(peaklist_file)
+        #peak = Peak(
+            #peak_number=row[1],
+            #positions=[row[2], row[3]],
+            #assignments=[row[4], row[5]],
+            #atoms=atoms,
+            #linewidths=[row[8], row[9]],
+            #volume=row[7],
+            #height=row[6],
+            #fit_method=row[12], merit=row[10],
+            #volume_method=row[13],
+            #details=row[11],
+            #format='ccpn'
+            #)
     
-    fin.close()
-    return peakList
+    
+    
+    
+        #peakList.append(peak)
+    
+    #fin.close()
+    
+    # Review this parsing routine if necessary!
+    # it currently requires ordered columns, that's incorrect.
+    
+    #return peakList
+    return None
 
 
 def parse_sparky_peaklist(peaklist_file):
