@@ -90,8 +90,6 @@ def get_peaklist_format(file_path):
             'Vol. Method',
             'Number'
                 ])
-        print(ls)
-        print(set_headers)
         if ls == set_headers:
             fin.close()
             return "CCPN"
