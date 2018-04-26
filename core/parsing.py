@@ -71,10 +71,28 @@ def get_peaklist_format(file_path):
             fin.close()
             return "NMRVIEW"
         
-        if line.startswith("Number"):
+        
+        # because columns in ccpnmr peaklists may be swapped
+        ls = set(line.split(','))
+        set_headers = set([
+            '#',
+            'Position F1',
+            'Position F2',
+            'Assign F1',
+            'Assign F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Merit',
+            'Details',
+            'Fit Method',
+            'Vol. Method',
+            'Number'
+                ])
+        if ls == set_headers:
             fin.close()
             return "CCPN"
-
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
