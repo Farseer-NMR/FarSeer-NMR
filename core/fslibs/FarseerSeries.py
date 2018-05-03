@@ -945,8 +945,8 @@ recipient: residues
         """
         
         for i, it in zip(series.index, items):
-            if series[i] in d.keys():
-                it.set_color(d[series[i]])
+            if str(series[i]) in d.keys():
+                it.set_color(d[str(series[i])])
             
             else:
                 continue
