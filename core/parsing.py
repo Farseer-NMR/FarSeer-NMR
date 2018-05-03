@@ -22,9 +22,11 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import re
 import csv
+import pandas as pd
 
 from core.utils import aal1tol3
 from core.fslibs.Peak import Peak
+from core.fslibs import wet as fsw
 
 file_extensions = ['peaks', 'xpk', 'out', 'csv']
 
@@ -50,31 +52,57 @@ def get_peaklist_format(file_path):
         #print('Invalid File Extension. Suffix not in accepted format.')
         return
     
+    ccpnmr_headers = set([
+            '#',
+            'Position F1',
+            'Position F2',
+            'Assign F1',
+            'Assign F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Merit',
+            'Details',
+            'Fit Method',
+            'Vol. Method',
+            'Number'
+                ])
+    
     for line in fin:
         if not line.strip():
             continue
         
-        if (line.lstrip().startswith("Assignment") and "w1" in line) or \
+        elif (line.lstrip().startswith("Assignment") and "w1" in line) or \
                 line.startswith("<sparky save file>"):
             fin.close()
             return "SPARKY"
         
-        if line.lstrip().startswith("ANSIG") and "crosspeak" in line:
+        elif line.lstrip().startswith("ANSIG") and "crosspeak" in line:
             fin.close()
             return "ANSIG"
         
-        if line.startswith("DATA") and "X_AXIS" in line:
+        elif line.startswith("DATA") and "X_AXIS" in line:
             fin.close()
             return "NMRDRAW"
         
-        if line.split()[0].isdigit() and line.split()[1].startswith('{'):
+        elif line.split()[0].isdigit() and line.split()[1].startswith('{'):
             fin.close()
             return "NMRVIEW"
         
-        if line.startswith("Number"):
+        # because columns in ccpnmr peaklists may be swapped
+        elif set(line.strip().split(',')) == ccpnmr_headers:
             fin.close()
             return "CCPN"
-
+        
+        else:
+            msg = \
+"""We could not read peaklist file: {}.
+Mostly likely due to a bad peaklist formatting syntax.
+""".\
+                format(file_path)
+            print(fsw.gen_wet("ERROR", msg, 30))
+            return "Bad peaklist format"
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
@@ -360,43 +388,52 @@ None
 
 
 def parse_ccpn_peaklist(peaklist_file):
-    fin = open(peaklist_file, 'r')
-    next(fin)
+    """
+    Parses CCPNMRv2 peaklists into the peakList class format.
+    
+    Parameters:
+        - peaklist_file: path to peaklist file.
+    
+    Returns peakList object
+    """
+    fin = pd.read_csv(peaklist_file)
     peakList = []
-    reader = csv.reader(fin)
+    atoms = []
     
-    for row in reader:
-        if not(row): continue
-        atoms = []
-    
-        for v in aal1tol3.values():
-            if v in row[4]:
-                a1 = row[4].strip().split(v)[-1]
-                atoms.append(a1)
-    
-            if v in row[5]:
-                a2 = row[5].strip().split(v)[-1]
-                atoms.append(a2)
-
+    for row in fin.index:
+        
+        if fin.loc[row,'Assign F1'] in aal1tol3.values():
+            atoms.append(fin.loc[row,'Assign F1'][-1])
+        
+        if fin.loc[row,'Assign F2'] in aal1tol3.values():
+            atoms.append(fin.loc[row,'Assign F2'][-1])
+        
         peak = Peak(
-            peak_number=row[1],
-            positions=[row[2], row[3]],
-            assignments=[row[4], row[5]],
+            peak_number=fin.loc[row,'Number'],
+            positions=[
+                fin.loc[row,'Position F1'],
+                fin.loc[row,'Position F2']
+                ],
+            assignments=[
+                fin.loc[row,'Assign F1'],
+                fin.loc[row,'Assign F2']
+                ],
             atoms=atoms,
-            linewidths=[row[8], row[9]],
-            volume=row[7],
-            height=row[6],
-            fit_method=row[12], merit=row[10],
-            volume_method=row[13],
-            details=row[11],
+            linewidths=[
+                fin.loc[row,'Line Width F1 (Hz)'],
+                fin.loc[row,'Line Width F1 (Hz)']
+                ],
+            volume=fin.loc[row,'Volume'],
+            height=fin.loc[row,'Height'],
+            fit_method=fin.loc[row,'Fit Method'],
+            merit=fin.loc[row,'Merit'],
+            volume_method=fin.loc[row,'Vol. Method'],
+            details=fin.loc[row,'Details'],
             format='ccpn'
             )
-
         peakList.append(peak)
     
-    fin.close()
     return peakList
-
 
 def parse_sparky_peaklist(peaklist_file):
     peakList = []
@@ -459,3 +496,6 @@ def read_peaklist(fin):
     
     elif file_format == 'CCPN':
         return parse_ccpn_peaklist(peaklist_file)
+    
+    elif file_format == "Bad peaklist format":
+        return None
