@@ -945,8 +945,8 @@ recipient: residues
         """
         
         for i, it in zip(series.index, items):
-            if series[i] in d.keys():
-                it.set_color(d[series[i]])
+            if str(series[i]) in d.keys():
+                it.set_color(d[str(series[i])])
             
             else:
                 continue
@@ -993,7 +993,7 @@ recipient: residues
                 return (x*-1)-(yy_scale/20)
         
         for i, bar in zip(series.index, axbar):
-            if series[i] in d.keys():
+            if str(series[i]) in d.keys():
                 x0, y0 = bar.xy
                 if orientation == 'vertical':
                     hpos = hpos_sign(bar.get_width(), x0)
@@ -1008,7 +1008,7 @@ recipient: residues
                 ax.text(
                     hpos,
                     vpos,
-                    d[series[i]],
+                    d[str(series[i])],
                     ha='center',
                     va=vaa,
                     fontsize=fs

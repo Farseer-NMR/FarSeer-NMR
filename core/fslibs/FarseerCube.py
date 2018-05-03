@@ -1221,7 +1221,9 @@ more details."
         self.log_r(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            # arranges cols
             target[z][y][x] = target[z][y][x][col_order]
+            #logs
             self.log_r(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
                 )
