@@ -22,6 +22,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import re
 import csv
+import pandas as pd
 
 from core.utils import aal1tol3
 from core.fslibs.Peak import Peak
@@ -378,53 +379,52 @@ None
 
 
 def parse_ccpn_peaklist(peaklist_file):
-    #fin = open(peaklist_file, 'r')
-    #next(fin)
-    #peakList = []
-    #reader = csv.reader(fin)
+    """
+    Parses CCPNMRv2 peaklists into the peakList class format.
     
-    #for row in reader:
-        #if not(row): continue
-        #atoms = []
+    Parameters:
+        - peaklist_file: path to peaklist file.
     
-        #for v in aal1tol3.values():
-            #if v in row[4]:
-                #a1 = row[4].strip().split(v)[-1]
-                #atoms.append(a1)
+    Returns peakList object
+    """
+    fin = pd.read_csv(peaklist_file)
+    peakList = []
+    atoms = []
     
-            #if v in row[5]:
-                #a2 = row[5].strip().split(v)[-1]
-                #atoms.append(a2)
+    for row in fin.index:
         
-        #import pandas as pd
-        #peaklist = pd.read_csv(peaklist_file)
-        #peak = Peak(
-            #peak_number=row[1],
-            #positions=[row[2], row[3]],
-            #assignments=[row[4], row[5]],
-            #atoms=atoms,
-            #linewidths=[row[8], row[9]],
-            #volume=row[7],
-            #height=row[6],
-            #fit_method=row[12], merit=row[10],
-            #volume_method=row[13],
-            #details=row[11],
-            #format='ccpn'
-            #)
+        if fin.loc[row,'Assign F1'] in aal1tol3.values():
+            atoms.append(fin.loc[row,'Assign F1'][-1])
+        
+        if fin.loc[row,'Assign F2'] in aal1tol3.values():
+            atoms.append(fin.loc[row,'Assign F2'][-1])
+        
+        peak = Peak(
+            peak_number=fin.loc[row,'Number'],
+            positions=[
+                fin.loc[row,'Position F1'],
+                fin.loc[row,'Position F2']
+                ],
+            assignments=[
+                fin.loc[row,'Assign F1'],
+                fin.loc[row,'Assign F2']
+                ],
+            atoms=atoms,
+            linewidths=[
+                fin.loc[row,'Line Width F1 (Hz)'],
+                fin.loc[row,'Line Width F1 (Hz)']
+                ],
+            volume=fin.loc[row,'Volume'],
+            height=fin.loc[row,'Height'],
+            fit_method=fin.loc[row,'Fit Method'],
+            merit=fin.loc[row,'Merit'],
+            volume_method=fin.loc[row,'Vol. Method'],
+            details=fin.loc[row,'Details'],
+            format='ccpn'
+            )
+        peakList.append(peak)
     
-    
-    
-    
-        #peakList.append(peak)
-    
-    #fin.close()
-    
-    # Review this parsing routine if necessary!
-    # it currently requires ordered columns, that's incorrect.
-    
-    #return peakList
-    return None
-
+    return peakList
 
 def parse_sparky_peaklist(peaklist_file):
     peakList = []
