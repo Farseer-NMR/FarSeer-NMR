@@ -1224,8 +1224,8 @@ more details."
             # arranges cols
             target[z][y][x] = target[z][y][x][col_order]
             # converts "Details" column to "string"
-+           target[z][y][x].loc[:,'Details'] = \
-+               target[z][y][x].loc[:,'Details'].astype(str)
+            target[z][y][x].loc[:,'Details'] = \
+                target[z][y][x].loc[:,'Details'].astype(str)
             #logs
             self.log_r(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
