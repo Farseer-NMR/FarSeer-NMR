@@ -26,6 +26,7 @@ import pandas as pd
 
 from core.utils import aal1tol3
 from core.fslibs.Peak import Peak
+from core.fslibs import wet as fsw
 
 file_extensions = ['peaks', 'xpk', 'out', 'csv']
 
@@ -51,31 +52,7 @@ def get_peaklist_format(file_path):
         #print('Invalid File Extension. Suffix not in accepted format.')
         return
     
-    for line in fin:
-        if not line.strip():
-            continue
-        
-        if (line.lstrip().startswith("Assignment") and "w1" in line) or \
-                line.startswith("<sparky save file>"):
-            fin.close()
-            return "SPARKY"
-        
-        if line.lstrip().startswith("ANSIG") and "crosspeak" in line:
-            fin.close()
-            return "ANSIG"
-        
-        if line.startswith("DATA") and "X_AXIS" in line:
-            fin.close()
-            return "NMRDRAW"
-        
-        if line.split()[0].isdigit() and line.split()[1].startswith('{'):
-            fin.close()
-            return "NMRVIEW"
-        
-        
-        # because columns in ccpnmr peaklists may be swapped
-        ls = set(line.strip().split(','))
-        set_headers = set([
+    ccpnmr_headers = set([
             '#',
             'Position F1',
             'Position F2',
@@ -91,9 +68,41 @@ def get_peaklist_format(file_path):
             'Vol. Method',
             'Number'
                 ])
-        if ls == set_headers:
+    
+    for line in fin:
+        if not line.strip():
+            continue
+        
+        elif (line.lstrip().startswith("Assignment") and "w1" in line) or \
+                line.startswith("<sparky save file>"):
+            fin.close()
+            return "SPARKY"
+        
+        elif line.lstrip().startswith("ANSIG") and "crosspeak" in line:
+            fin.close()
+            return "ANSIG"
+        
+        elif line.startswith("DATA") and "X_AXIS" in line:
+            fin.close()
+            return "NMRDRAW"
+        
+        elif line.split()[0].isdigit() and line.split()[1].startswith('{'):
+            fin.close()
+            return "NMRVIEW"
+        
+        # because columns in ccpnmr peaklists may be swapped
+        elif set(line.strip().split(',')) == ccpnmr_headers:
             fin.close()
             return "CCPN"
+        
+        else:
+            msg = \
+"""We could not read peaklist file: {}.
+Mostly likely due to a bad peaklist formatting syntax.
+""".\
+                format(file_path)
+            print(fsw.gen_wet("ERROR", msg, 30))
+            return "Bad peaklist format"
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
@@ -487,3 +496,6 @@ def read_peaklist(fin):
     
     elif file_format == 'CCPN':
         return parse_ccpn_peaklist(peaklist_file)
+    
+    elif file_format == "Bad peaklist format":
+        return None
