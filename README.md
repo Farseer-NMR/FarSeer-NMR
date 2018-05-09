@@ -106,6 +106,10 @@ Post on our [mailing list](https://groups.google.com/forum/#!forum/farseer-nmr) 
 
 Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data) and on [Twitter](https://twitter.com/farseer_nmr)!
 
+## Citing
+
+Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M (Accepted: 2018) Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. Journal of Biomolecular NMR. DOI: 10.1007/s10858-018-0182-5 (In Press) 
+
 ## License
 
 The entire Farseer-NMR code base comes with no liability and is licensed under the [GPL-3.0](https://github.com/joaomcteixeira/FarSeer-NMR/blob/master/COPYING).
