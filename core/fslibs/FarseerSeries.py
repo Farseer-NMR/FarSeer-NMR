@@ -1884,12 +1884,14 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 self.abort()
             
             x = np.array(titration_x_values)
+            xmin = titration_x_values[0]
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
         elif (self.series_axis in ['along_y', 'along_z']) \
                 or (self.dim_comparison in ['along_y', 'along_z']):
             x = np.arange(0, len(y))
+            xmin = 0
             xmax = len(y)-1
             axs[i].set_xticks(x)
             xlabels = self.items
@@ -1900,11 +1902,12 @@ variable or confirm you have not forgot any peaklist [{}].".\
         else:
             x = np.arange(0, len(y))
             axs[i].set_xticks(x)
+            xmin = 0
             xmax = len(y)-1
             xlabels = x
         
         # Configure Axis Ticks
-        axs[i].set_xlim(0, xmax)
+        axs[i].set_xlim(xmin, xmax)
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
         if set_x_values \
