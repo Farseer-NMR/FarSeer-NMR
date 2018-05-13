@@ -2184,6 +2184,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
+            axs[i].invert_xaxis()
             axs[i].invert_yaxis()
             return
         
@@ -2201,6 +2202,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
+            axs[i].invert_xaxis()
             axs[i].invert_yaxis()
             return
         
