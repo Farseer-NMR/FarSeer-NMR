@@ -28,9 +28,9 @@
         "vspace": 0.5,
         "theo_pre_color": "black",
         "theo_pre_lw": 1.0,
-        "tag_cartoon_color": "green",
+        "tag_cartoon_color": "red",
         "tag_cartoon_lw": 1.0,
-        "tag_cartoon_ls": ":"
+        "tag_cartoon_ls": "-"
     },
     "bar_plot_settings": {
         "measured_color": "black",
@@ -249,7 +249,7 @@
         "right_margin": 0.22,
         "bottom_margin": 0.6,
         "cbar_font_size": 4,
-        "tag_line_color": "black",
+        "tag_line_color": "red",
         "tag_line_ls": "-",
         "tag_line_lw": 0.8
     },
