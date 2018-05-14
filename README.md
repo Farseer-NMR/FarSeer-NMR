@@ -16,65 +16,9 @@ With Farseer-NMR, you have:
 * Large suite of publication-ready plotting templates
 * Full traceability via [Markdown](https://en.wikipedia.org/wiki/Markdown) formatted log file.
 
-## Project Repository and Download
+## Download, Install and Update
 
-You can download the latest stable release [here](https://github.com/joaomcteixeira/FarSeer-NMR/releases) or browse the project code and current state in our [GitHub repository](https://github.com/joaomcteixeira/FarSeer-NMR).
-
-## Installation
-
-Farseer-NMR runs on [Unix based systems](https://en.wikipedia.org/wiki/Unix). Attempting to run the current version under Windows machines will fail. Farseer-NMR has been built in its entirety using [Python](https://www.python.org/) libraries and we try to keep it up-to-date with the Python community. To install Farseer-NMR firstly:
-
-1. Unpack the [downloaded](https://joaomcteixeira.github.io/FarSeer-NMR/#Download) version.
-1. In your Terminal emulator, navigate to the unpacked Farseer-NMR folder.
-
-There are three different ways to install Farseer-NMR according to your system setup, here are organised from the simplest to the hardest:
-
-### Setting up a Miniconda for Farseer-NMR
-
-The easiest way to setup Farseer-NMR is to install a dedicated Miniconda distribution inside the Farseer-NMR main folder. This setup demands extra disk space (approximatelly 3GBs) but ensures that you can run Farseer-NMR indenpendently from your Python installation setup. Do this with the following steps:
-
-1. Give execution permissions to Linux_install_Miniconda.sh
-```
-chmod u+rwx Linux_install_Miniconda.sh
-```
-2. Run Linux_install_Miniconda.sh. This will install a Miniconda distribution with all libraries required to run Farseer-NMR.
-```
-./Linux_install_Miniconda.sh
-```
-
-### Creating a dedicated Anaconda environment
-
-If you use [Anaconda](https://www.anaconda.com/download/) as your Python distribution you can try to run Farseer-NMR directly, most likely all the required libraries are already installed. Alternatively, if you do not want to change your main Anaconda Python environment, you can create a secondary [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html) dedicated to Farseer-NMR:
-
-1. Give execution permissions to Linux_install_env.sh
-```
-chmod u+x Linux_install_env.sh
-```
-2. Run Linux_install_env.sh. This will create an Anaconda environment with all the required libraries to run Farseer-NMR inside the `envs` directory of your Anaconda installation.
-```
-./Linux_install_env.sh
-```
-
-### Installation for advanced users
-
-If you are an advanced user who is proficient in manually managing your own installed Python libraries, you can get a list of the libraries required to run Farseer-NMR in the architecture respective `spec-files` in the Documention folder. Afterwards, to create the run_farseer.sh file run:
-
-```
-./Linux_install_manual.sh
-```
-
-## Running Farseer-NMR
-
-Before running Farseer-NMR, please read carefully the [Installation](https://joaomcteixeira.github.io/FarSeer-NMR/#installation) section.
-
-1. To run Farseer-NMR:
-```
-./run_farseer.sh
-```
-
-### Running without the GUI
-
-A Farseer-NMR calculation run can be launched without the GUI interface. Nevertheless we advocate the use of the GUI version for all users, advanced and beginners. All implemented and functional features are available through the GUI. We advice the use of the command line version only for developers. Read further in section *III.d* of the Documentation Manual.
+Read [here](https://github.com/joaomcteixeira/FarSeer-NMR/wiki/Download,-Install-and-Update) on how to setup your Farseer-NMR installation - it's very easy!
 
 ## Documentation
 
@@ -108,7 +52,7 @@ Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-auto
 
 ## Citing
 
-Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M (Accepted: 2018) Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. Journal of Biomolecular NMR. DOI: 10.1007/s10858-018-0182-5 (In Press) 
+Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. Journal of Biomolecular NMR (2018), _In Press_. DOI: [10.1007/s10858-018-0182-5](https://link.springer.com/article/10.1007/s10858-018-0182-5)
 
 ## License
 
