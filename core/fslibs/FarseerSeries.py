@@ -1134,7 +1134,11 @@ recipient: residues
             
             elif bartype == 'h':
                 axs.plot(
-                    self.loc[exp,:,'ResNo'].astype(float),
+                    np.arange(
+                        float(self.loc[exp,:,'ResNo'].head(n=1))-1,
+                        float(self.loc[exp,:,'ResNo'].tail(n=1)),
+                        1,
+                        ),
                     self.loc[exp,:,'Theo PRE'],
                     zorder=9,
                     color=pre_color,
@@ -1143,7 +1147,7 @@ recipient: residues
             
             # plot tag position
             xtagm = self.loc[exp,:,'tag']=='*'
-            xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
+            xtag = float(self.loc[exp,xtagm,'ResNo'])-1
             
             if bartype in ['h', 'DPRE_plot']:
                 axs.vlines(
