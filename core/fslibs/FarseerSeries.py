@@ -1345,9 +1345,8 @@ recipient: residues
             # Configure XX ticks and Label
             axs[i].set_xticks(self.major_axis)
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            print(self.loc[experiment,:,'ResNo'])
             axs[i].set_xticklabels(
-                self.loc[experiment,:,['ResNo','1-letter', 'ATOM']].\
+                self.loc[experiment,:,['ResNo', 'ATOM','1-letter']].\
                     apply(lambda x: ''.join(x), axis=1),
                 fontname=x_ticks_fn,
                 fontsize=x_ticks_fs,
