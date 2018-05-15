@@ -2409,7 +2409,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
                 self.ix[0,residue,'ResNo'],
                 fontsize=4,
-                color='#c99543',
+                color=res_label_color,
                 zorder=10
                 )
         
