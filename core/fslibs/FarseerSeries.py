@@ -780,10 +780,20 @@ with window size {} and stdev {}'.\
             data_table = self.loc[:,:,tablecol]
             is_float = False
             
-        table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
+        if resonance_type == 'Backbone':
+            table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
-            table.loc[:,'ResNo'] = table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
+            #table.loc[:,'ResNo'] = table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
+            table = pd.concat(
+                [
+                    self.res_info.iloc[0,:,0],
+                    self.ix[0,:,'ATOM'],
+                    self.res_info.iloc[0,:,1:3],
+                    data_table
+                    ],
+                axis=1
+                )
         
         tablefolder = '{}/{}'.format(
             self.tables_and_plots_folder, 
