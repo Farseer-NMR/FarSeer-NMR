@@ -616,7 +616,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
-                    loc[:,'Assign F1'].str.contains('[ab]$')
+                    loc[:,'Assign F1'].str.contains('[^HN]$')
             # initiates SD counter
             sd_count = {True:0}
             
@@ -630,8 +630,10 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 self.allsidechains[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[sidechains_bool,:]
                 # adds 'a' or 'b'
+                print(self.allsidechains[z][y][x].loc[:,'Assign F1'].str.split('[HN]', expand=True))
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
-                    self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
+                    self.allsidechains[z][y][x].loc[:,'Assign F1'].\
+                        str.split('[HN]', expand=True).loc[:,1]
                 # resets index
                 self.allsidechains[z][y][x].reset_index(inplace=True)
                 # ResNo column to int preparing for reindex
