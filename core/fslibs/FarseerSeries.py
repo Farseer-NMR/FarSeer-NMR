@@ -1114,8 +1114,8 @@ recipient: residues
             
             y (float): plot's y axis limit
             
-            bartype (str): {'h', 'v', 'DPRE_plot'}, whether plot of type 
-                horizontal, vertical or DPRE_plot.
+            bartype (str): {'h', 'v', 'hm'}, whether plot of type 
+                horizontal, vertical or Heat Map.
             
             pre_color (str): the colour of plot line
             
@@ -1132,10 +1132,17 @@ recipient: residues
                 or (self.series_axis == 'Cz' \
                     and (self.next_dim in self.paramagnetic_names or self.prev_dim in self.paramagnetic_names)):
             # plot theoretical PRE
+            
+            x_axis_values = np.arange(
+                float(self.loc[exp,:,'ResNo'].head(n=1))-1,
+                float(self.loc[exp,:,'ResNo'].tail(n=1)),
+                1,
+                )
+            
             if bartype == 'v':
                 axs.plot(
                     self.loc[exp,:,'Theo PRE'],
-                    self.loc[exp,::-1,'ResNo'].astype(float),
+                    x_axis_values,
                     zorder=9,
                     color=pre_color,
                     lw=pre_lw
@@ -1143,7 +1150,7 @@ recipient: residues
             
             elif bartype == 'h':
                 axs.plot(
-                    self.loc[exp,:,'ResNo'].astype(float),
+                    x_axis_values,
                     self.loc[exp,:,'Theo PRE'],
                     zorder=9,
                     color=pre_color,
@@ -1152,7 +1159,7 @@ recipient: residues
             
             # plot tag position
             xtagm = self.loc[exp,:,'tag']=='*'
-            xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
+            xtag = float(self.loc[exp,xtagm,'ResNo'])-1
             
             if bartype in ['h', 'DPRE_plot']:
                 axs.vlines(
@@ -1174,7 +1181,6 @@ recipient: residues
                     )
             
             elif bartype == 'v':
-                xtag = self.shape[1]-xtag+1
                 axs.hlines(
                     xtag,
                     0,
@@ -1195,7 +1201,7 @@ recipient: residues
             
             elif bartype == 'hm':
                 axs.vlines(
-                    xtag-0.5,
+                    xtag,
                     0,
                     y,
                     colors=tag_color,
