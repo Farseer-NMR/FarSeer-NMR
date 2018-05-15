@@ -616,7 +616,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
-                    loc[:,'Assign F1'].str.contains('[ab]$')
+                    loc[:,'Assign F1'].str.contains('[^HN]$')
             # initiates SD counter
             sd_count = {True:0}
             
@@ -629,9 +629,10 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # DataFrame with side chains
                 self.allsidechains[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-                # adds 'a' or 'b'
+                # adds sidechain nomenclature
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
-                    self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
+                    self.allsidechains[z][y][x].loc[:,'Assign F1'].\
+                        str.split('[HN]', expand=True).loc[:,1]
                 # resets index
                 self.allsidechains[z][y][x].reset_index(inplace=True)
                 # ResNo column to int preparing for reindex
@@ -857,8 +858,8 @@ more details."
         # reverts previous merge
         if resonance_type=='Sidechains':
             target_pkl.loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
-            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
+            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
+            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
         
         return \
             target_pkl, \
