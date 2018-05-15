@@ -858,8 +858,8 @@ more details."
         # reverts previous merge
         if resonance_type=='Sidechains':
             target_pkl.loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
-            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
+            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
+            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
         
         return \
             target_pkl, \
