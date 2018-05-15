@@ -629,8 +629,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # DataFrame with side chains
                 self.allsidechains[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-                # adds 'a' or 'b'
-                print(self.allsidechains[z][y][x].loc[:,'Assign F1'].str.split('[HN]', expand=True))
+                # adds sidechain nomenclature
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
                     self.allsidechains[z][y][x].loc[:,'Assign F1'].\
                         str.split('[HN]', expand=True).loc[:,1]

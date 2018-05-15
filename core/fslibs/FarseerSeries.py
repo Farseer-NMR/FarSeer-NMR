@@ -784,7 +784,6 @@ with window size {} and stdev {}'.\
             table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
-            #table.loc[:,'ResNo'] = table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
             table = pd.concat(
                 [
                     self.res_info.iloc[0,:,0],
@@ -1356,7 +1355,7 @@ recipient: residues
             axs[i].set_xticks(self.major_axis)
             ## https://github.com/matplotlib/matplotlib/issues/6266
             axs[i].set_xticklabels(
-                self.loc[experiment,:,['ResNo', 'ATOM','1-letter']].\
+                self.loc[experiment,:,['ResNo', '1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
                 fontname=x_ticks_fn,
                 fontsize=x_ticks_fs,
