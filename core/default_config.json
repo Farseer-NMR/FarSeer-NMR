@@ -26,9 +26,9 @@
         "y_grid_linewidth": 0.2,
         "y_grid_alpha": 0.8,
         "vspace": 0.5,
-        "theo_pre_color": "black",
+        "theo_pre_color": "red",
         "theo_pre_lw": 1.0,
-        "tag_cartoon_color": "red",
+        "tag_cartoon_color": "black",
         "tag_cartoon_lw": 1.0,
         "tag_cartoon_ls": "-"
     },
