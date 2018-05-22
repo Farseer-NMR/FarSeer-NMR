@@ -41,7 +41,7 @@ alignment: bottom;
 QTabBar::tab {
 background-color: #001450;
 border-bottom: 4px solid #036D8F;
-color: #05A7BE;
+color: #08F2EE;
 font-size: 10pt;
 font-weight: 400;
 height: 26px;
@@ -72,7 +72,7 @@ width: 51px;
 }
 
 QLineEdit {
-background-color: #05A7BE;
+background-color: #08F2EE;
 border: 1px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
@@ -100,7 +100,7 @@ margin-left: 15px;
 }
 
 QComboBox {
-background-color: #05A7BE;
+background-color: #08F2EE;
 border: 2px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
@@ -111,7 +111,7 @@ width: 80px;
 }
 
 QAbstractSpinBox::hover {
-background-color: #FBFB04;
+background-color: #08F2EE;
 border: 2px solid #FFAF02;
 }
 
@@ -121,7 +121,7 @@ border: 2px solid #FFAF02;
 }
 
 QAbstractSpinBox {
-background-color: #05A7BE;
+background-color: #08F2EE;
 border: 2px solid #058BD2;
 color: #012C6E;
 font-size: 10pt;
@@ -130,7 +130,7 @@ width: 80px;
 }
 
 QPushButton {
-background-color: #05A7BE;
+background-color: #08F2EE;
 border: 2px solid #FAFAF7;
 color: #012C6E;
 font-weight: 400;
