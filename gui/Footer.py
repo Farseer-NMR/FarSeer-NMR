@@ -76,6 +76,11 @@ class Footer(QWidget):
         self.git_button.setCheckable(True)
         self.git_button.toggled.connect(self.show_git)
         #
+        self.rg = QToolButton()
+        self.rg.setIcon(Icon('icons/footer-icon-rg.png'))
+        self.rg.setCheckable(True)
+        self.rg.toggled.connect(self.open_research_gate)
+        #
         self.twitter_button = QToolButton()
         self.twitter_button.setCheckable(True)
         self.twitter_button.setIcon(Icon('icons/footer-icon-twitter.png'))
@@ -85,13 +90,15 @@ class Footer(QWidget):
         self.mailing_list_button.setIconSize(self.mailing_list_button.size())
         self.documentation.setIconSize(self.documentation.size())
         self.git_button.setIconSize(self.git_button.size())
+        self.rg.setIconSize(self.rg.size())
         self.twitter_button.setIconSize(self.twitter_button.size())
         #
         self.layout().addWidget(self.paper_button, 0, 4, 3, 1)
         self.layout().addWidget(self.documentation, 0, 5, 3, 1)
         self.layout().addWidget(self.mailing_list_button, 0, 6, 3, 1)
         self.layout().addWidget(self.git_button, 0, 7, 3, 1)
-        self.layout().addWidget(self.twitter_button, 0, 8, 3, 1)
+        self.layout().addWidget(self.rg, 0, 8, 3, 1)
+        self.layout().addWidget(self.twitter_button, 0, 9, 3, 1)
         #
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
@@ -102,13 +109,13 @@ class Footer(QWidget):
         spacerLabel = QLabel('', self)
         #
         self.layout().addWidget(spacerLabel, 0, 3)
-        self.layout().addWidget(self.versionLabel, 0, 9, 1, 1)
+        self.layout().addWidget(self.versionLabel, 0, 10, 1, 1)
         #
         self.ctfpLabel = QLabel('', self)
         pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/footer-artistic-systems.png'))
         self.ctfpLabel.setPixmap(pixmap)
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
-        self.layout().addWidget(self.ctfpLabel, 1, 8, 2, 2)
+        self.layout().addWidget(self.ctfpLabel, 1, 9, 2, 2)
 
     def link_to_article(self):
         webbrowser.open_new_tab(
@@ -129,6 +136,12 @@ class Footer(QWidget):
         webbrowser.open_new_tab(
             "https://github.com/joaomcteixeira/FarSeer-NMR"
             )
+    
+    def open_research_gate(self):
+        webbrowser.open_new_tab(
+            "https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-analysis-and-plotting-of-large-multi-variable-NMR-data"
+            )
+    
     
     def open_twitter(self):
         webbrowser.open_new_tab("https://twitter.com/farseer_nmr")
