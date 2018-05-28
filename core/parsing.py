@@ -337,7 +337,7 @@ def read_peaklist(fin):
     file_format = get_peaklist_format(peaklist_file)
     
     if file_format == 'ANSIG':
-        return parse_ansig_peaklist(peaklist_file)
+        return fspr.ansig(peaklist_file)
     
     elif file_format == 'NMRDRAW':
         return parse_nmrdraw_peaklist(peaklist_file)

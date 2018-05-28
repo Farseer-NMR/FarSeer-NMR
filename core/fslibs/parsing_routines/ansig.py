@@ -23,6 +23,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import string
+from core.fslibs.Peak import Peak
+
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
        From ANSIG Manual:
@@ -52,78 +55,49 @@ ANSIG v3.3 export crosspeaks file
     # FarSeer-NMR only supports peaklists so dimension_count must equal 2
     dimension_count = 2
     # Each chemical shift is 13 characters wide and intensity
-    # always follows chemical shifts
-    intensity_column_number = 13*dimension_count
-    # assignment field occurs after 13 character intensity
-    # field, plus 12 character spectrum name field and seven 6
-    # character symmetry and connection fields
-    assignment_field_start_index = intensity_column_number+13+12+7*6
+    
     fin = open(peaklist_file, 'r')
     lines = fin.readlines()
-    first_two_lines = lines[:2]
+    fin.close()
     
-    if first_two_lines[1][11] != '2':
+    if lines[1].split()[-1] != '2':
         print("Peak list is not from a 2D spectrum")
         return
     
+    counter = 1
     for ii, line in enumerate(lines[2:]):
+        ls = line.strip().split()
         
-        if line.strip().startswith('!'):
+        if len(ls) < 15 \
+                or line.strip().startswith('!') \
+                or line.strip().startswith('ANSIG'):
             continue
         
-        if line.strip().startswith('ANSIG'):
+        peak_number = counter
+        positions = [ls[1], ls[0]]
+        
+        if ls[-2] == 'N' and ls[-1] == 'HN':
+            atoms = ['H', 'N']
+        else:
             continue
         
-        height = float(
-            line[intensity_column_number:intensity_column_number+13].strip() \
-                or '0')
+        residue_number = ls[10]
+        residue_type = ls[11]
+        height = ls[2].rstrip(string.ascii_letters+string.punctuation)
         volume = height
-        peak_positions = [0] * dimension_count
-        peak_labels = [None] * dimension_count
-        line_widths = [None] * dimension_count
-        atoms = [None] * dimension_count
-        
-        for dimension in range(dimension_count):
-            
-            shifts_field = dimension*13
-            sequence_code_field = assignment_field_start_index + (dimension*4)
-            residue_name_field = \
-                assignment_field_start_index \
-                + (dimension_count*4) \
-                + (dimension*4)
-            atom_name_field = \
-                assignment_field_start_index \
-                + (dimension_count*8) \
-                + (dimension*4)
-            peak_positions[dimension] = \
-                float(line[shifts_field:shifts_field+13])
-            residue_number = line[sequence_code_field:sequence_code_field+4].\
-                strip() or '?'
-            residue_name = line[residue_name_field:residue_name_field+4].\
-                strip() or '?'
-            atom = line[atom_name_field:atom_name_field+4].strip() or '?'
-            atoms[dimension] = atom[0]
-            peak_labels[dimension] = '%s%s%s' % (
-                residue_number,
-                residue_name, atom[0]
-                )
-        peak_labels.reverse()
-        peak_positions.reverse()
-        atoms.reverse()
-        line_widths.reverse()
-        
-        if '???' not in peak_labels:
-            peak = Peak(
-                peak_number=ii+1,
-                positions=peak_positions,
+        linewidths = [0, 0]
+        peak = Peak(
+                peak_number=counter,
+                positions=positions,
                 volume=volume,
                 height=height,
-                assignments=peak_labels,
-                linewidths=line_widths,
+                residue_number=residue_number,
+                residue_type=residue_type,
+                linewidths=linewidths,
                 atoms=atoms,
-                format="ansig"
+                format_="ansig"
                 )
-            peakList.append(peak)
-    fin.close()
+        peakList.append(peak)
+        counter += 1
     
     return peakList
