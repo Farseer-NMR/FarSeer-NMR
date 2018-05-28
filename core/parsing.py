@@ -289,47 +289,7 @@ None
     
     return peakList
 
-def parse_sparky_peaklist(peaklist_file):
-    peakList = []
-    with open(peaklist_file) as f:
-        lines = f.readlines()[1:]
-        f.close()
-    
-    for ii, line in enumerate(lines):
-        line_list = line.strip().split()
-    
-        if len(line_list) < 4:
-            continue
-    
-        if '?' in line_list[0]:
-            continue
-    
-        assignment = re.sub(
-            r"([A-Z])([0-9]+)([A-Z])",
-            "\\1 \\2 \\3",
-            line_list[0]
-            ).split()
-        resname = assignment[0]
-        resnumber = assignment[1]
-        atoms = [assignment[2].split('-')[0], assignment[-1]]
-        annotations = [resnumber+aal1tol3[resname]+x[0] for x in atoms]
-        linewidths = [None] * 2
-        ppms = [line_list[1], line_list[2]]
-        height = line_list[3]
-        volume = line_list[4]
-        peak = Peak(
-            peak_number=ii+1,
-            positions=ppms,
-            assignments=annotations,
-            atoms=atoms,
-            linewidths=linewidths,
-            volume=volume,
-            height=height,
-            format="sparky"
-            )
-        peakList.append(peak)
-    
-    return peakList
+
 
 def read_peaklist(fin):
     
@@ -346,7 +306,7 @@ def read_peaklist(fin):
         return parse_nmrview_peaklist(peaklist_file)
     
     elif file_format == 'SPARKY':
-        return parse_sparky_peaklist(peaklist_file)
+        return fspr.sparky(peaklist_file)
     
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
