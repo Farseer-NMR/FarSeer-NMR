@@ -71,7 +71,7 @@ def check_input_construction(output_path, variables):
             for kx, vx in vy.items():
                 peaklist_path = variables["peaklists"][vx]
                 peaklist = read_peaklist(peaklist_path)
-                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                if peaklist[0].format_ in ['nmrdraw', 'nmrview']:
                     fasta_file = variables["fasta_files"].get(ky, False)
                     if not fasta_file:
                         print('FASTA file not specified for {}'.format(ky))
@@ -124,7 +124,7 @@ def create_directory_structure(output_path, variables):
                     variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
                 
-                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                if peaklist[0].format_ in ['nmrdraw', 'nmrview']:
                     fasta_file = variables["fasta_files"].get(y_key)
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(
@@ -167,8 +167,8 @@ def write_peaklist_file(fin, peak_list):
                 peak.peak_number,
                 peak.positions[0],
                 peak.positions[1],
-                "".join(peak.residue_number, peak.residue_type, peak. atom[0]),
-                "".join(peak.residue_number, peak.residue_type, peak. atom[1]),
+                "".join([peak.residue_number, peak.residue_type, peak.atoms[0]]),
+                "".join([peak.residue_number, peak.residue_type, peak.atoms[1]]),
                 peak.height,
                 peak.volume,
                 peak.linewidths[0],

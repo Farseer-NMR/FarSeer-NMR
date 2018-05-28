@@ -23,6 +23,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import pandas as pd
+from core.utils import aal1tol3
+from core.fslibs.Peak import Peak
+
 def parse_ccpnmrv2_peaklist(peaklist_file):
     """
     Parses CCPNMRv2 peaklists into the peakList class format.
@@ -34,14 +38,13 @@ def parse_ccpnmrv2_peaklist(peaklist_file):
     """
     fin = pd.read_csv(peaklist_file)
     peakList = []
-    atoms = []
     
     for row in fin.index:
-        
-        if fin.loc[row,'Assign F1'] in aal1tol3.values():
+        atoms = []
+        if fin.loc[row,'Assign F1'][-4:-1] in aal1tol3.values():
             atoms.append(fin.loc[row,'Assign F1'][-1])
         
-        if fin.loc[row,'Assign F2'] in aal1tol3.values():
+        if fin.loc[row,'Assign F2'][-4:-1] in aal1tol3.values():
             atoms.append(fin.loc[row,'Assign F2'][-1])
         
         peak = Peak(
@@ -51,8 +54,8 @@ def parse_ccpnmrv2_peaklist(peaklist_file):
                 fin.loc[row,'Position F2']
                 ],
             atoms=atoms,
-            residue_number=fin.loc[row,'Assign F1'].str[:,-4],
-            residue_type=fin.loc[row,'Assign F1'].str[-4,:],
+            residue_number=str(fin.loc[row,'Assign F1'])[:-4],
+            residue_type=str(fin.loc[row,'Assign F1'])[-4:-1],
             linewidths=[
                 fin.loc[row,'Line Width F1 (Hz)'],
                 fin.loc[row,'Line Width F2 (Hz)']
@@ -63,7 +66,7 @@ def parse_ccpnmrv2_peaklist(peaklist_file):
             merit=fin.loc[row,'Merit'],
             volume_method=fin.loc[row,'Vol. Method'],
             details=fin.loc[row,'Details'],
-            format='ccpnmrv2'
+            format_='ccpnmrv2'
             )
         peakList.append(peak)
     

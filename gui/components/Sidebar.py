@@ -154,7 +154,7 @@ class SideBar(QTreeWidget):
             if peaklist:
                 pl_name = name
                 
-                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                if peaklist[0].format_ in ['nmrdraw', 'nmrview']:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
                     msg.setText("NmrView/NmrDraw Peaklist")
