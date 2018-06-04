@@ -29,7 +29,8 @@ from core.fslibs.Peak import Peak
 
 def parse_nmrdraw_peaklist(peaklist_file):
     """Parse a 2D peaklist in NmrDraw format
-REMARK
+
+REMARK File written by CcpNmrFormat converter.
 
 DATA  X_AXIS 1H           1  2048   12.685ppm   -3.277ppm
 DATA  Y_AXIS 15N          1  1024  135.000ppm  103.035ppm
@@ -48,49 +49,66 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
    31   655.592   258.869  2.000  2.000    7.581  126.943  3066.220   491.641   5.359   8.513   25.065   16.167  654  656  257  259  7.345364e+04  0.000000e+00  5.971680e+05 0.00000 1 682.H;682.N    0    0    0
 
     Line starting VARS or variables contains contents of each column.
+
+    Sidechain information is not parsed yet.
+
+    Parameters:
+        - peaklist_file (str): path to peaklist file.
+
+    Returns:
+        - peakList (list): list of Peak objects.
     """
+    # prepares a list that will contain the Peak objects
     peakList = []
+    # links dimension labels
     dimension_labels = {
         'X_AXIS':('X_PPM', 'XW'),
         'Y_AXIS':('Y_PPM', 'YW'),
         'Z_AXIS':('Z_PPM', 'ZW')
         }
-
+    # open file
     fin = open(peaklist_file, 'r')
 
-    # create a dictionary to store key:value pairs of
-    # column_label: column_index
+    # create a dictionary to store nuclei:AXIS
+    # for example: {"H":"X_AXIS"}
     field_dictionary = {}
 
+    # how many lines will be skipped as comments
     # http://pandas.pydata.org/pandas-docs/version/0.23/generated/pandas.read_csv.html
     line_counter = 0
 
     for line in fin:
 
         line = line.strip()
-        # ignore blank lines and lines starting with REMARK
 
+        # ignore lines with unnecessary information
         if not line \
                 or line.startswith('REMARK') \
                 or line.startswith('FORMAT'):
             line_counter += 1
             continue
 
+        # lines with information on dimensions/nuclei
         elif line.startswith('DATA'):
+            # finds which nuclei is observed in which dimension
             dim = re.search('[a-zA-Z]+', line.split()[2]).group(0)
-            print(dim)
+            # populates linking dictionary
             field_dictionary[dim] = line.split()[1]
             line_counter += 1
             continue
 
         elif line.startswith('VARS') or line.startswith('variables'):
+            # reads header for dataframe
             df_header = line.split()[1:]
             line_counter += 1
             break
 
         elif line.split()[0].isdigit():
+            # all heading information has been read
+            # the actual peaklist starts and this loop is no longer necessary
             break
 
+    # creates DataFrame from peaklist file
     pkl = pd.read_csv(peaklist_file,
         sep='\s+',
         skiprows=line_counter,
@@ -99,17 +117,19 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
         index_col=False
         )
 
+
     for row in pkl.index:
+        # is the row as assignment information...
         atoms = re.findall('[HN]', str(pkl.loc[row,'ASS']))
 
         if atoms:
             peak = Peak(
-                peak_number=pkl.loc[row,'INDEX'],
-                residue_number=re.search('^\d+', str(pkl.loc[row,'ASS'])),
+                peak_number=int(pkl.loc[row,'INDEX']),
+                residue_number=re.search('^\d+', str(pkl.loc[row,'ASS'])).group(0),
                 residue_type=None,
                 atoms=atoms,
-                height=pkl.loc[row,'HEIGHT'],
-                volume=pkl.loc[row,'VOL'],
+                height=float(pkl.loc[row,'HEIGHT']),
+                volume=float(pkl.loc[row,'VOL']),
                 positions=[
                     float(pkl.loc[row,dimension_labels[field_dictionary['H']][0]]),
                     float(pkl.loc[row,dimension_labels[field_dictionary['N']][0]])

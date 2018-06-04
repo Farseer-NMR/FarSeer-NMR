@@ -26,6 +26,7 @@ from shutil import copy2
 
 from core.parsing import read_peaklist
 from core.utils import aal1tol3, read_fasta_file
+from core.fslibs import wet as fsw
 
 def check_input_construction(output_path, variables):
 
@@ -130,6 +131,7 @@ def create_directory_structure(output_path, variables):
                     write_peaklist_file(
                         fout,
                         add_residue_information(
+                            peaklist_path,
                             peaklist,
                             fasta_file,
                             fasta_start
@@ -161,6 +163,7 @@ def write_peaklist_file(fin, peak_list):
     writer.writerow(header)
 
     for ii, peak in enumerate(peak_list):
+        print(peak.residue_number, peak.residue_type, peak.atoms[0])
         writer.writerow(
             [
                 ii,
@@ -187,12 +190,13 @@ def list_all_files_in_path(path):
             for f in filenames]
     return result
 
-def add_residue_information(peak_list, fasta_path, fasta_start):
+def add_residue_information(peaklist_path, peak_list, fasta_path, fasta_start):
     """
     Parameters:
+        - peaklist_path (str): the path for the peaklist original file.
         - peak_list (list): a list of Peak objects.
-        - fasta_path (str): a string with the path for the FASTA file
-        - fasta_start (int): the FASTA's first residue number
+        - fasta_path (str): a string with the path for the FASTA file.
+        - fasta_start (int): the FASTA's first residue number.
 
     Returns:
         - cleaned_peaklist (list): a list of Peak objects with residue type
@@ -205,13 +209,24 @@ def add_residue_information(peak_list, fasta_path, fasta_start):
     fasta_dict = \
         {ii + fasta_start: aal1tol3.get(residue)
             for ii, residue in enumerate(fasta)}
-    #print(fasta_dict)
 
     for peak in peak_list:
 
-        if peak.residue_type == None:
-            res_type = fasta_dict.get(int(peak.residue_number))
+        try:
+            res_type = fasta_dict[int(peak.residue_number)]
+        except KeyError:
+            msg = \
+"""There is a residue number in your peaklist file:
+{}
+that is not present in your FASTA file
+{}
 
+Please review the agreement between your peaklists and FASTA file.
+""".\
+                format(peaklist_path, fasta_path)
+            print(fsw.gen_wet("ERROR", msg, 31))
+            return "Bad peaklist format"
+        peak.residue_type = res_type
         cleaned_peaklist.append(peak)
 
     return cleaned_peaklist
