@@ -34,28 +34,37 @@ class Test_Case(unittest.TestCase):
         self.maxDiff = None
 
     def test_format_detected(self):
-        self.assertEqual(self.nmrdraw_peaklist[0].format, 'nmrdraw')
-        self.assertEqual(self.nmrview_peaklist[0].format, 'nmrview')
+        self.assertEqual(self.nmrdraw_peaklist[0].format_, 'nmrdraw')
+        self.assertEqual(self.nmrview_peaklist[0].format_, 'nmrview')
 
     def test_correct_fasta_addition_nmrdraw(self):
-        nmrdraw_out = add_residue_information(self.nmrdraw_peaklist,
-                                              self.fasta_file,
-                                              458)
+    #peaklist_path, peak_list, fasta_path, fasta_start
+        nmrdraw_out = add_residue_information(
+            'no_path',
+            self.nmrdraw_peaklist,
+            self.fasta_file,
+            458
+            )
 
         self.assertEqual(len(self.result_peaklist), len(nmrdraw_out))
         for rpeak, npeak in zip(self.result_peaklist, nmrdraw_out):
-            self.assertEqual(rpeak.assignments, npeak.assignments)
+            self.assertEqual(rpeak.residue_type, npeak.residue_type)
+            self.assertEqual(rpeak.residue_number, npeak.residue_number)
 
 
 
     def test_correct_fasta_addition_nmrview(self):
-        nmrview_out = add_residue_information(self.nmrview_peaklist,
-                                              self.fasta_file,
-                                              458)
+        nmrview_out = add_residue_information(
+            'no_path',
+            self.nmrdraw_peaklist,
+            self.fasta_file,
+            458
+            )
         write_peaklist_file(open('nv_test.csv', 'w'), nmrview_out)
         self.assertEqual(len(self.result_peaklist), len(nmrview_out))
         for rpeak, npeak in zip(self.result_peaklist, nmrview_out):
-            self.assertEqual(rpeak.assignments, npeak.assignments)
+            self.assertEqual(rpeak.residue_type, npeak.residue_type)
+            self.assertEqual(rpeak.residue_number, npeak.residue_number)
 
 
 

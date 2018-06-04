@@ -1,6 +1,7 @@
 import unittest
 
 from core import parsing
+import core.fslibs.parsing_routines as fspr
 
 ansig_peaklist = 'test_data/ansig_peaklist.xpk'
 sparky_peaklist = 'test_data/sparky_peaklist.peaks'
@@ -60,26 +61,25 @@ class Test_Parsing(unittest.TestCase):
                             'NMRVIEW')
 
         self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'CCPN')
+                            'CCPNMRV2')
         self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'CCPN')
+                            'CCPNMRV2')
         self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'CCPN')
+                            'CCPNMRV2')
         self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'CCPN')
-        self.assertEqual(parsing.get_peaklist_format(ccpn_peaklist), 'CCPN')
+                            'CCPNMRV2')
+        self.assertEqual(parsing.get_peaklist_format(ccpn_peaklist), 'CCPNMRV2')
 
     def test_parse_ansig(self):
         """
         Test ansig peaklist parsing
         """
-        peaklist = parsing.parse_ansig_peaklist(ansig_peaklist)
-        assignments = [peak.assignments for peak in peaklist if '???'
-                       not in peak.assignments]
+        peaklist = fspr.ansig(ansig_peaklist)
+        residue_type = peaklist[0].residue_type
+        residue_number = peaklist[0].residue_number
         peak_number = peaklist[0].peak_number
         positions = peaklist[0].positions
         atoms = peaklist[0].atoms
-        peak_assigments = peaklist[0].assignments
         linewidths = peaklist[0].linewidths
         volume = peaklist[0].volume
         height = peaklist[0].height
@@ -89,9 +89,10 @@ class Test_Parsing(unittest.TestCase):
         details = peaklist[0].details
 
         self.assertEqual(len(peaklist), 182)
-        self.assertEqual(len(assignments), 182)
+        #self.assertEqual(len(residue_number), 182)
         self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(peak_assigments)
+        self.assertIsNotNone(residue_type)
+        self.assertIsNotNone(residue_number)
         self.assertIsNotNone(positions)
         self.assertIsNotNone(atoms)
         self.assertIsNotNone(linewidths)
@@ -106,12 +107,13 @@ class Test_Parsing(unittest.TestCase):
         """
         Test sparky peaklist parsing
         """
-        peaklist = parsing.parse_sparky_peaklist(sparky_peaklist)
+        peaklist = fspr.sparky(sparky_peaklist)
         peak_number = peaklist[0].peak_number
         positions = peaklist[0].positions
         atoms = peaklist[0].atoms
         linewidths = peaklist[0].linewidths
-        peak_assigments = peaklist[0].assignments
+        residue_type = peaklist[0].residue_type
+        residue_number = peaklist[0].residue_number
         volume = peaklist[0].volume
         height = peaklist[0].height
         fit_method = peaklist[0].fit_method
@@ -120,7 +122,8 @@ class Test_Parsing(unittest.TestCase):
         details = peaklist[0].details
 
         self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(peak_assigments)
+        self.assertIsNotNone(residue_type)
+        self.assertIsNotNone(residue_number)
         self.assertIsNotNone(positions)
         self.assertIsNotNone(atoms)
         self.assertIn(None, linewidths)
@@ -137,15 +140,13 @@ class Test_Parsing(unittest.TestCase):
         """
         Test nmrview peaklist parsing
         """
-        peaklist = parsing.parse_nmrview_peaklist(nmrview_peaklist)
-        assignments = [peak.assignments for peak in peaklist if None not in
-                       peak.assignments]
-
+        peaklist = fspr.nmrview(nmrview_peaklist)
+        residue_types = any([peak.residue_type for peak in peaklist])
+        residue_number = peaklist[0].residue_number
         peak_number = peaklist[0].peak_number
         positions = peaklist[0].positions
         atoms = peaklist[0].atoms
         linewidths = peaklist[0].linewidths
-        peak_assigments = peaklist[0].assignments
         volume = peaklist[0].volume
         height = peaklist[0].height
         fit_method = peaklist[0].fit_method
@@ -154,7 +155,8 @@ class Test_Parsing(unittest.TestCase):
         details = peaklist[0].details
 
         self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(peak_assigments)
+        self.assertFalse(residue_types)
+        self.assertIsNotNone(residue_number)
         self.assertIsNotNone(positions)
         self.assertIsNotNone(atoms)
         self.assertNotIn(None, linewidths)
@@ -166,24 +168,19 @@ class Test_Parsing(unittest.TestCase):
         self.assertIsNone(details)
 
         self.assertEqual(len(peaklist), 182)
-        self.assertEqual(len(assignments), 182)
+        #self.assertEqual(len(residue_number), 182)
 
     def test_parse_nmrdraw(self):
         """
-        Test nmrdraw peaklist parsing
+        Test nmrview peaklist parsing
         """
-        peaklist = parsing.parse_nmrdraw_peaklist(nmrdraw_peaklist)
-        assignments = [peak.assignments for peak in peaklist if '' not in
-                       peak.assignments]
-
-        self.assertEqual(len(peaklist), 182)
-        self.assertEqual(len(assignments), 182)
-
+        peaklist = fspr.nmrview(nmrview_peaklist)
+        residue_types = any([peak.residue_type for peak in peaklist])
+        residue_number = peaklist[0].residue_number
         peak_number = peaklist[0].peak_number
         positions = peaklist[0].positions
         atoms = peaklist[0].atoms
         linewidths = peaklist[0].linewidths
-        peak_assigments = peaklist[0].assignments
         volume = peaklist[0].volume
         height = peaklist[0].height
         fit_method = peaklist[0].fit_method
@@ -192,7 +189,8 @@ class Test_Parsing(unittest.TestCase):
         details = peaklist[0].details
 
         self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(peak_assigments)
+        self.assertFalse(residue_types)
+        self.assertIsNotNone(residue_number)
         self.assertIsNotNone(positions)
         self.assertIsNotNone(atoms)
         self.assertNotIn(None, linewidths)
@@ -202,20 +200,21 @@ class Test_Parsing(unittest.TestCase):
         self.assertIsNone(volume_method)
         self.assertIsNone(merit)
         self.assertIsNone(details)
+
+        self.assertEqual(len(peaklist), 182)
+        #self.assertEqual(len(residue_number), 182)
 
     def test_parse_ccpn(self):
         """
         Test CCPN peaklist parsing
         """
-        peaklist = parsing.parse_ccpn_peaklist(ccpn_peaklist)
-        assignments = [peak.assignments for peak in peaklist if '' not in
-                       peak.assignments]
-
+        peaklist = fspr.ccpnmrv2(ccpn_peaklist)
         peak_number = peaklist[0].peak_number
         positions = peaklist[0].positions
         atoms = peaklist[0].atoms
         linewidths = peaklist[0].linewidths
-        peak_assigments = peaklist[0].assignments
+        residue_type = peaklist[0].residue_type
+        residue_number = peaklist[0].residue_number
         volume = peaklist[0].volume
         height = peaklist[0].height
         fit_method = peaklist[0].fit_method
@@ -224,7 +223,6 @@ class Test_Parsing(unittest.TestCase):
         details = peaklist[0].details
 
         self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(peak_assigments)
         self.assertIsNotNone(positions)
         self.assertIsNotNone(atoms)
         self.assertNotIn(None, linewidths)
@@ -236,7 +234,7 @@ class Test_Parsing(unittest.TestCase):
         self.assertIsNotNone(details)
 
         self.assertEqual(len(peaklist), 58)
-        self.assertEqual(len(assignments), 58)
+        #self.assertEqual(len(residue_number), 58)
 
 
 if __name__ == "__main__":
