@@ -26,7 +26,7 @@ import pandas as pd
 
 from core.utils import aal1tol3
 from core.fslibs import wet as fsw
-import core.fslibs.parsing_routines as fspr 
+import core.fslibs.parsing_routines as fspr
 
 file_extensions = [
     'peaks',
@@ -38,11 +38,11 @@ file_extensions = [
 
 def get_peaklist_format(file_path):
     fin = open(file_path, 'r')
-    
+
     if len(file_path.split('.')) < 2:
         print('Invalid File Extension')
         return
-    
+
     file_ext = file_path.split('.')[-1]
     if file_ext not in file_extensions:
         msg = \
@@ -57,7 +57,7 @@ def get_peaklist_format(file_path):
         print(msg)
         #print('Invalid File Extension. Suffix not in accepted format.')
         return
-    
+
     ccpnmr_headers = set([
             '#',
             'Position F1',
@@ -74,33 +74,34 @@ def get_peaklist_format(file_path):
             'Vol. Method',
             'Number'
                 ])
-    
+
     for line in fin:
         if not line.strip():
             continue
-        
+
         elif (line.lstrip().startswith("Assignment") and "w1" in line) or \
                 line.startswith("<sparky save file>"):
             fin.close()
             return "SPARKY"
-        
+
         elif line.lstrip().startswith("ANSIG") and "crosspeak" in line:
             fin.close()
             return "ANSIG"
-        
-        elif line.startswith("DATA") and "X_AXIS" in line:
+
+        elif line.startswith("DATA") and "X_AXIS" in line \
+                or line.startswith('REMARK'):
             fin.close()
             return "NMRDRAW"
-        
+
         elif line.split()[0].isdigit() and line.split()[1].startswith('{'):
             fin.close()
             return "NMRVIEW"
-        
+
         # because columns in ccpnmr peaklists may be swapped
         elif set(line.strip().split(',')) == ccpnmr_headers:
             fin.close()
             return "CCPNMRV2"
-        
+
         else:
             msg = \
 """We could not read peaklist file: {}.
@@ -109,104 +110,6 @@ Mostly likely due to a bad peaklist formatting syntax.
                 format(file_path)
             print(fsw.gen_wet("ERROR", msg, 30))
             return "Bad peaklist format"
-
-
-
-def parse_nmrdraw_peaklist(peaklist_file):
-    """Parse a 2D peaklist in NmrDraw format
-REMARK
-
-DATA  X_AXIS 1H           1  2048   12.685ppm   -3.277ppm
-DATA  Y_AXIS 15N          1  1024  135.000ppm  103.035ppm
-
-variables   INDEX X_AXIS Y_AXIS DX DY X_PPM Y_PPM X_HZ Y_HZ XW YW XW_HZ YW_HZ X1 X3 Y1 Y3 HEIGHT DHEIGHT VOL PCHI2 TYPE ASS CLUSTID MEMCNT TROUBLE
-FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.3f %4d %4d %4d %4d %13e %13e %13e %.5f %d %s %4d %4d %4d
-
-    7   502.767   136.454  2.000  2.000    8.772  130.768  2351.453   259.152   7.349   9.187   34.372   17.448  501  503  135  137  1.008628e+05  0.000000e+00  8.272293e+05 0.00000 1 480.H;480.N    0    0    0
-    9   517.575   155.785  2.000  2.000    8.657  130.164  2420.710   295.866   9.572  10.187   44.768   19.346  516  518  154  156  5.761750e+04  0.000000e+00  4.936973e+05 0.00000 1 640.H;640.N    0    0    0
-   11   493.340   164.410  2.000  2.000    8.846  129.894  2307.361   312.246   6.402  10.046   29.940   19.080  492  494  163  165  8.121486e+04  0.000000e+00  6.773006e+05 0.00000 1 739.H;739.N    0    0    0
-   19   518.456   203.628  2.000  2.000    8.650  128.669  2424.833   386.727   6.995   9.486   32.714   18.015  517  519  202  204  1.150421e+05  0.000000e+00  9.242484e+05 0.00000 1 508.H;508.N    0    0    0
-   20   682.727   211.562  2.000  2.000    7.369  128.421  3193.130   401.797   7.168   9.734   33.525   18.487  681  683  210  212  1.136131e+05  0.000000e+00  9.425642e+05 0.00000 1 542.H;542.N    0    0    0
-   21   567.806   215.211  2.000  2.000    8.265  128.307  2655.641   408.726   6.202   8.294   29.007   15.752  566  568  214  216  5.714155e+04  0.000000e+00  4.769788e+05 0.00000 1 494.H;494.N    0    0    0
-   23   617.869   218.059  2.000  2.000    7.875  128.218  2889.787   414.136   3.580   7.180   16.742   13.637  616  618  217  219  2.160228e+06  0.000000e+00  1.713618e+07 0.00000 1 765.H;765.N    0    0    0
-   26   509.184   222.297  2.000  2.000    8.722  128.085  2381.465   422.184   6.314   9.337   29.531   17.733  508  510  221  223  1.404175e+05  0.000000e+00  1.127275e+06 0.00000 1 510.H;510.N    0    0    0
-   31   655.592   258.869  2.000  2.000    7.581  126.943  3066.220   491.641   5.359   8.513   25.065   16.167  654  656  257  259  7.345364e+04  0.000000e+00  5.971680e+05 0.00000 1 682.H;682.N    0    0    0
-
-    Line starting VARS or variables contains contents of each column.
-    """
-
-    peakList = []
-    isotopes = []
-    fin = open(peaklist_file, 'r')
-    dimension_count = 0
-
-    # create a dictionary to store key:value pairs of
-    # column_label: column_index
-    field_dictionary = {}
-
-    for line in fin:
-        line = line.strip()
-        # ignore blank lines and lines starting with REMARK
-        
-        if not line:
-            continue
-        
-        if line.startswith('REMARK'):
-            continue
-        
-        data = line.split()
-        
-        if line.startswith('DATA'):
-            dimension_count += 1
-            continue
-        
-        if line.startswith('VARS') or line.startswith('variables'):
-            # populate field_dictionary with key:value pairs
-            # of column_label: column_index
-            for i, key in enumerate(data[1:]):
-                field_dictionary[key] = i
-            continue
-        
-        # if field dictionary is empty
-        elif not field_dictionary:
-            continue
-        
-        # if field doesn't begin with an integer
-        elif not line[0].isdigit():
-            continue
-        
-        positions = [0] * dimension_count
-        linewidths = [None] * dimension_count
-        dimension_labels = (('X_PPM', 'XW'), ('Y_PPM', 'YW'), ('Z_PPM', 'ZW'))
-        
-        height = float(data[field_dictionary['HEIGHT']])
-        volume = float(data[field_dictionary['VOL']])
-        annotations = data[field_dictionary['ASS']].split(';')
-        atoms = [annotation.split('.')[1] for annotation in annotations
-                 if annotation]
-        
-        for dimension in range(dimension_count):
-            ppm_heading, linewidth_heading = dimension_labels[dimension]
-            positions[dimension] = float(data[field_dictionary[ppm_heading]])
-            linewidths[dimension] = \
-                float(data[field_dictionary[linewidth_heading]])
-        
-        if '' not in annotations:
-            peak = Peak(
-                peak_number=data[0],
-                assignments=annotations,
-                atoms=atoms,
-                height=height,
-                volume=volume,
-                positions=positions,
-                linewidths=linewidths,
-                format="nmrdraw"
-                )
-            peakList.append(peak)
-    
-    fin.close()
-    
-    return peakList
 
 
 def parse_nmrview_peaklist(peaklist_file):
@@ -234,14 +137,14 @@ None
     dimension_headings = \
         [x for x in dimension_headings if x[0] in dimension_names]
     field_count = int(len(dimension_headings) / dimension_count)
-    
+
     for line in lines[6:]:
         fields = line.strip().split()
         volume, height, status, comment = fields[-5:-1]
-        
+
         if line[1] == '{}' or status == '-1':
             continue
-        
+
         peak_data = fields[:-5]
         peak_number = int(peak_data[0])
         volume = float(volume)
@@ -251,23 +154,23 @@ None
         labels = [None] * dimension_count
         linewidths = [None] * dimension_count
         atoms = [None] * dimension_count
-        
+
         if details == '?':
             details = None
-        
+
         for i in range(dimension_count):
             field_start = 1 + i*field_count
             field_end = field_start+1*field_count
             dimension_data = peak_data[field_start:field_end]
             label, position, linewidth = dimension_data[:3]
-            
+
             label = label[1:-1]
-            
+
             if label == '?':
                 label = None
             if label:
                 atoms[i] = label.split('.')[1]
-            
+
             positions[i] = float(position)
             linewidths[i] = float(linewidth)
             labels[i] = label
@@ -284,32 +187,32 @@ None
                 format="nmrview"
                 )
             peakList.append(peak)
-    
+
     fin.close()
-    
+
     return peakList
 
 
 
 def read_peaklist(fin):
-    
+
     peaklist_file = fin
     file_format = get_peaklist_format(peaklist_file)
-    
+
     if file_format == 'ANSIG':
         return fspr.ansig(peaklist_file)
-    
+
     elif file_format == 'NMRDRAW':
-        return parse_nmrdraw_peaklist(peaklist_file)
-    
+        return fspr.nmrdraw(peaklist_file)
+
     elif file_format == 'NMRVIEW':
         return parse_nmrview_peaklist(peaklist_file)
-    
+
     elif file_format == 'SPARKY':
         return fspr.sparky(peaklist_file)
-    
+
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
-    
+
     elif file_format == "Bad peaklist format":
         return None

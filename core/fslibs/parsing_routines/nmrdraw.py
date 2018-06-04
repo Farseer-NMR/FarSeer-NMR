@@ -24,6 +24,8 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import pandas as pd
+import re
+from core.fslibs.Peak import Peak
 
 def parse_nmrdraw_peaklist(peaklist_file):
     """Parse a 2D peaklist in NmrDraw format
@@ -47,11 +49,14 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
 
     Line starting VARS or variables contains contents of each column.
     """
-    print('here')
     peakList = []
-    isotopes = []
+    dimension_labels = {
+        'X_AXIS':('X_PPM', 'XW'),
+        'Y_AXIS':('Y_PPM', 'YW'),
+        'Z_AXIS':('Z_PPM', 'ZW')
+        }
+
     fin = open(peaklist_file, 'r')
-    dimension_count = 0
 
     # create a dictionary to store key:value pairs of
     # column_label: column_index
@@ -72,13 +77,14 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
             continue
 
         elif line.startswith('DATA'):
-            dimension_count += 1
+            dim = re.search('[a-zA-Z]+', line.split()[2]).group(0)
+            print(dim)
+            field_dictionary[dim] = line.split()[1]
             line_counter += 1
             continue
 
         elif line.startswith('VARS') or line.startswith('variables'):
             df_header = line.split()[1:]
-            print(df_header)
             line_counter += 1
             break
 
@@ -89,51 +95,32 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
         sep='\s+',
         skiprows=line_counter,
         header=0,
-        names=df_header
+        names=df_header,
+        index_col=False
         )
 
+    for row in pkl.index:
+        atoms = re.findall('[HN]', str(pkl.loc[row,'ASS']))
 
+        if atoms:
+            peak = Peak(
+                peak_number=pkl.loc[row,'INDEX'],
+                residue_number=re.search('^\d+', str(pkl.loc[row,'ASS'])),
+                residue_type=None,
+                atoms=atoms,
+                height=pkl.loc[row,'HEIGHT'],
+                volume=pkl.loc[row,'VOL'],
+                positions=[
+                    float(pkl.loc[row,dimension_labels[field_dictionary['H']][0]]),
+                    float(pkl.loc[row,dimension_labels[field_dictionary['N']][0]])
+                    ],
+                linewidths=[
+                    float(pkl.loc[row,dimension_labels[field_dictionary['H']][1]]),
+                    float(pkl.loc[row,dimension_labels[field_dictionary['N']][1]])
+                    ],
+                format_="nmrdraw"
+                )
+            peakList.append(peak)
 
-
-
-
-        ## if field dictionary is empty
-        #elif not field_dictionary:
-            #continue
-
-        ## if field doesn't begin with an integer
-        #elif not line[0].isdigit():
-            #continue
-
-        #positions = [0] * dimension_count
-        #linewidths = [None] * dimension_count
-        #dimension_labels = (('X_PPM', 'XW'), ('Y_PPM', 'YW'), ('Z_PPM', 'ZW'))
-
-        #height = float(data[field_dictionary['HEIGHT']])
-        #volume = float(data[field_dictionary['VOL']])
-        #annotations = data[field_dictionary['ASS']].split(';')
-        #atoms = [annotation.split('.')[1] for annotation in annotations
-                 #if annotation]
-
-        #for dimension in range(dimension_count):
-            #ppm_heading, linewidth_heading = dimension_labels[dimension]
-            #positions[dimension] = float(data[field_dictionary[ppm_heading]])
-            #linewidths[dimension] = \
-                #float(data[field_dictionary[linewidth_heading]])
-
-        #if '' not in annotations:
-            #peak = Peak(
-                #peak_number=data[0],
-                #assignments=annotations,
-                #atoms=atoms,
-                #height=height,
-                #volume=volume,
-                #positions=positions,
-                #linewidths=linewidths,
-                #format="nmrdraw"
-                #)
-            #peakList.append(peak)
-
-    #fin.close()
-
+    fin.close()
     return peakList
