@@ -176,7 +176,7 @@ ANSIG v3.3 export crosspeaks file
  1.203800E+02 7.354604E+00 2.150600E+06Trosy_highCo     0     0     0     0     0     0     0172 172 Val Val N   HN  
  1.234526E+02 8.370509E+00 1.310016E+06Trosy_highCo     0     0     0     0     0     0     055  55  Ala Ala N   HN  
  1.279629E+02 9.313813E+00 6.982157E+05Trosy_highCo     0     0     0     0     0     0     057  57  Lys Lys N   HN  
- 1.038497E+02 8.648385E+00-4.040852E+05Trosy_highCo     0     0     0     0     0     0     0107 107 Ala Ala N   HN  
+ 1.038497E+02 8.648385E+00 4.040852E+05Trosy_highCo     0     0     0     0     0     0     0107 107 Ala Ala N   HN  
  1.052393E+02 7.927045E+00 5.725581E+05Trosy_highCo     0     0     0     0     0     0     0                        
  1.091242E+02 7.943591E+00 8.170696E+05Trosy_highCo     0     0     0     0     0     0     0                        
  1.335337E+02 8.822095E+00 6.613139E+05Trosy_highCo     0     0     0     0     0     0     016  16  Leu Leu N   HN  

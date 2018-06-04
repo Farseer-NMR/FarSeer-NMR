@@ -25,6 +25,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import string
 from core.fslibs.Peak import Peak
+from core.fslibs import wet as fsw
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
@@ -55,32 +56,42 @@ ANSIG v3.3 export crosspeaks file
     # FarSeer-NMR only supports peaklists so dimension_count must equal 2
     dimension_count = 2
     # Each chemical shift is 13 characters wide and intensity
-    
+
     fin = open(peaklist_file, 'r')
     lines = fin.readlines()
     fin.close()
-    
+
     if lines[1].split()[-1] != '2':
         print("Peak list is not from a 2D spectrum")
         return
-    
+
     counter = 1
     for ii, line in enumerate(lines[2:]):
         ls = line.strip().split()
-        
-        if len(ls) < 15 \
-                or line.strip().startswith('!') \
+
+        if line.strip().startswith('!') \
                 or line.strip().startswith('ANSIG'):
             continue
-        
+
+        if len(ls) < 15 and len(line.split('-')) > 1:
+            msg = "Line {} of peaklist {} can't be parsed".format(
+                counter+2,
+                peaklist_file
+                )
+            print(fsw.gen_wet('ERROR', msg, 31))
+            fsw.abort(m="Aborting...")
+
+        elif len(ls) < 15:
+            continue
+
         peak_number = counter
         positions = [ls[1], ls[0]]
-        
+
         if ls[-2] == 'N' and ls[-1] == 'HN':
             atoms = ['H', 'N']
         else:
             continue
-        
+
         residue_number = ls[10]
         residue_type = ls[11]
         height = ls[2].rstrip(string.ascii_letters+string.punctuation)
@@ -99,5 +110,5 @@ ANSIG v3.3 export crosspeaks file
                 )
         peakList.append(peak)
         counter += 1
-    
+
     return peakList
