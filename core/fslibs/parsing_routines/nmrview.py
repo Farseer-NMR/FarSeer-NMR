@@ -98,7 +98,6 @@ None
             labels[i] = label
 
         if None not in labels:
-            print(labels)
             peak = Peak(
                 peak_number=peak_number,
                 positions=positions,
