@@ -111,7 +111,6 @@ None
                 format_="nmrview"
                 )
             peakList.append(peak)
-
+    
     fin.close()
-
     return peakList

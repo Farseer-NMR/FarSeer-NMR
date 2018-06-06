@@ -23,3 +23,65 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+from core.fslibs.Peak import Peak
+
+def parse_cara_simple_peaklist(peaklist_file):
+    """
+    Parses a CARA peaklist.
+    
+    According to the format:
+    
+        1  10.494 0.000 H     238
+        2 130.175 0.000 N     238
+        4   9.965 0.000 H     216
+        5 125.165 0.000 N     216
+    
+    In the current version, only H and N atoms are considered.
+    
+    Returns:
+        a list fo Peak objects.
+    """
+    
+    fin = open(peaklist_file, 'r')
+    peakList = []
+    
+    current_residue = None
+    count_residue = 0
+    
+    for line in fin:
+        
+        if not line.strip():
+            continue
+        
+        ls = line.strip().split()
+        
+        if ls[3] not in ('N', 'H'):
+            continue
+        
+        if ls[-1] != current_residue:
+            current_residue = ls[-1]
+            position = [ls[1]]
+            atom = [ls[3]]
+            count_residue += 1
+        
+        elif ls[-1] == current_residue:
+            position.append(ls[1])
+            atom.append(ls[3])
+            
+            peak = Peak(
+                peak_number=count_residue,
+                positions=position,
+                residue_number=current_residue,
+                residue_type=None,
+                atoms=atom,
+                linewidths=[0, 0],
+                volume=0,
+                height=0,
+                format_='CARA_simple'
+                )
+            
+            peakList.append(peak)
+    
+    fin.close()
+    
+    return peakList 

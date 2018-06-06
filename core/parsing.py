@@ -74,44 +74,56 @@ def get_peaklist_format(file_path):
             'Vol. Method',
             'Number'
                 ])
-
+    
     for line in fin:
         if not line.strip():
             continue
-
+        
         elif (line.lstrip().startswith("Assignment") and "w1" in line) or \
                 line.startswith("<sparky save file>"):
             fin.close()
             return "SPARKY"
-
+        
         elif line.lstrip().startswith("ANSIG") and "crosspeak" in line:
             fin.close()
             return "ANSIG"
-
+        
         elif line.startswith("DATA") and "X_AXIS" in line:
             fin.close()
             return "NMRDRAW"
-
+        
         elif line.split()[0].isdigit() and line.split()[1].startswith('{'):
             fin.close()
             return "NMRVIEW"
-
+        
         # because columns in ccpnmr peaklists may be swapped
         elif set(line.strip().split(',')) == ccpnmr_headers:
             fin.close()
             return "CCPNMRV2"
-
+        
+        elif (line.strip().split()[0].isdigit() \
+                and line.strip().split()[-1].isdigit() \
+                and file_path.endswith('.prot')):
+            fin.close()
+            return "CARA_simple"
+        
+        elif line.strip().startswith('_') \
+                or line.strip().endswith('_') \
+                or file_path.endswith('.str'):
+            fin.close()
+            return "CARA_full"
+        
         else:
             continue
 
     else:
-            msg = \
+        msg = \
 """We could not read peaklist file: {}.
 Mostly likely due to a bad peaklist formatting syntax.
 """.\
-                format(file_path)
-            print(fsw.gen_wet("ERROR", msg, 30))
-            return "Bad peaklist format"
+            format(file_path)
+        print(fsw.gen_wet("ERROR", msg, 30))
+        return "Bad peaklist format"
 
 def read_peaklist(fin):
 
@@ -132,6 +144,12 @@ def read_peaklist(fin):
 
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
-
+    
+    elif file_format == 'CARA_simple':
+        return fspr.cara_simple(peaklist_file)
+    
+    elif file_format == 'CARA_full':
+        return fspr.cara_full(peaklist_file)
+    
     elif file_format == "Bad peaklist format":
         return None
