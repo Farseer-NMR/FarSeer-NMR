@@ -125,7 +125,7 @@ def create_directory_structure(output_path, variables):
                     variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
 
-                if peaklist[0].format_ in ['nmrdraw', 'nmrview']:
+                if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
                     fasta_file = variables["fasta_files"].get(y_key)
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(

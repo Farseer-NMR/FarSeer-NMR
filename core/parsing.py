@@ -33,7 +33,8 @@ file_extensions = [
     'xpk',
     'out',
     'csv',
-    'str'
+    'str',
+    'prot'
     ]
 
 def get_peaklist_format(file_path):

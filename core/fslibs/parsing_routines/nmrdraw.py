@@ -116,12 +116,12 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
         names=df_header,
         index_col=False
         )
-
-
+    
+    
     for row in pkl.index:
         # is the row as assignment information...
         atoms = re.findall('[HN]', str(pkl.loc[row,'ASS']))
-
+        
         if atoms:
             peak = Peak(
                 peak_number=int(pkl.loc[row,'INDEX']),
@@ -141,6 +141,6 @@ FORMAT %5d %9.3f %9.3f %6.3f %6.3f %8.3f %8.3f %9.3f %9.3f %7.3f %7.3f %8.3f %8.
                 format_="nmrdraw"
                 )
             peakList.append(peak)
-
+    
     fin.close()
     return peakList
