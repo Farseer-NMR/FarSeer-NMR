@@ -23,6 +23,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+from core.fslibs.Peak import Peak
 def parse_cara_full_peaklist(peaklist_file):
     """
     Parses a CARA peaklist.
@@ -66,7 +67,7 @@ def parse_cara_full_peaklist(peaklist_file):
             continue
         
         if ls[1] != current_residue:
-            current_residue = ls[-1]
+            current_residue = ls[1]
             positions = [ls[5]]
             atom = [ls[3]]
             residue_counter += 1
@@ -90,5 +91,4 @@ def parse_cara_full_peaklist(peaklist_file):
             peakList.append(peak)
     
     fin.close()
-    
     return peakList

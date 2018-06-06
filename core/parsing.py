@@ -110,7 +110,8 @@ def get_peaklist_format(file_path):
         
         elif line.strip().startswith('_') \
                 or line.strip().endswith('_') \
-                or file_path.endswith('.str'):
+                and file_path.endswith('.str'):
+            
             fin.close()
             return "CARA_full"
         

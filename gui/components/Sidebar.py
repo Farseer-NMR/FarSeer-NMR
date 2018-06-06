@@ -157,7 +157,7 @@ class SideBar(QTreeWidget):
                 if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
-                    msg.setText("NmrView/NmrDraw Peaklist")
+                    msg.setText("NmrView/NmrDraw or CARA Peaklist")
                     msg.setInformativeText(
 """This peaklist doesn't contain information residue types.
 
