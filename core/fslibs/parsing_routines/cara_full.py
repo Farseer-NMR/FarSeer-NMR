@@ -82,7 +82,7 @@ def parse_cara_full_peaklist(peaklist_file):
                 residue_type=ls[2],
                 residue_number=ls[1],
                 atoms=atom,
-                linewidths=None,
+                linewidths=[0, 0],
                 volume=0,
                 height=0,
                 format_='CARA_full'
