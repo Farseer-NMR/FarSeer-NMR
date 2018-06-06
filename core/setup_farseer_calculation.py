@@ -225,7 +225,7 @@ Please review the agreement between your peaklists and FASTA file.
 """.\
                 format(peaklist_path, fasta_path)
             print(fsw.gen_wet("ERROR", msg, 31))
-            return "Bad peaklist format"
+            fsw.abort(m="Bad peaklist format")
         peak.residue_type = res_type
         cleaned_peaklist.append(peak)
 
