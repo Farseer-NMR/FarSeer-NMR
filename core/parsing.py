@@ -88,8 +88,7 @@ def get_peaklist_format(file_path):
             fin.close()
             return "ANSIG"
 
-        elif line.startswith("DATA") and "X_AXIS" in line \
-                or line.startswith('REMARK'):
+        elif line.startswith("DATA") and "X_AXIS" in line:
             fin.close()
             return "NMRDRAW"
 
