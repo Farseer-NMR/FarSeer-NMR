@@ -7,6 +7,8 @@ To add your parsing routine, you sould:
 2) add a import statment in the __init__.py file according to the
     given examples.
 3) code the identification snipet in core.fslibs.parsing.get_peaklist_format()
+    Add, if necessary, a file extention to the list:
+        core.fslibs.parsing.file_extensions
 4) if your peaklist requires a FASTA file to read residue types, add your
     peaklist format code (defined in 3) in the list:
         core.fslibs.setup_farseer_calculation.peaklist_format_requires_fasta
