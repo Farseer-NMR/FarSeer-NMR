@@ -25,10 +25,8 @@ import os
 from shutil import copy2
 
 from core.parsing import read_peaklist
-from core.utils import aal1tol3, read_fasta_file
+from core.utils import aal1tol3, read_fasta_file, peaklist_format_requires_fasta
 from core.fslibs import wet as fsw
-
-peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'CARA_simple']
 
 def check_input_construction(output_path, variables):
 

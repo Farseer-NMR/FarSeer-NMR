@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
 
 from core.parsing import read_peaklist
 from core.fslibs.Variables import Variables
-
+from core.utils import peaklist_format_requires_fasta
 
 class SideBar(QTreeWidget):
     """
@@ -154,10 +154,10 @@ class SideBar(QTreeWidget):
             if peaklist:
                 pl_name = name
                 
-                if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
+                if peaklist[0].format_ in peaklist_format_requires_fasta:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
-                    msg.setText("NmrView/NmrDraw or CARA Peaklist")
+                    msg.setText("Peaklist with no residue type information")
                     msg.setInformativeText(
 """This peaklist doesn't contain information residue types.
 
