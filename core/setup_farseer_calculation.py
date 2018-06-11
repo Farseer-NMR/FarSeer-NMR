@@ -28,6 +28,8 @@ from core.parsing import read_peaklist
 from core.utils import aal1tol3, read_fasta_file
 from core.fslibs import wet as fsw
 
+peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'CARA_simple']
+
 def check_input_construction(output_path, variables):
 
     if not output_path.endswith('/'):
@@ -72,7 +74,7 @@ def check_input_construction(output_path, variables):
             for kx, vx in vy.items():
                 peaklist_path = variables["peaklists"][vx]
                 peaklist = read_peaklist(peaklist_path)
-                if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
+                if peaklist[0].format_ in peaklist_format_requires_fasta:
                     fasta_file = variables["fasta_files"].get(ky, False)
                     if not fasta_file:
                         print('FASTA file not specified for {}'.format(ky))
@@ -125,7 +127,7 @@ def create_directory_structure(output_path, variables):
                     variables["peaklists"][exp_dataset[z_key][y_key][x_key]]
                 peaklist = read_peaklist(peaklist_path)
 
-                if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
+                if peaklist[0].format_ in peaklist_format_requires_fasta:
                     fasta_file = variables["fasta_files"].get(y_key)
                     fasta_start = variables['fasta_settings']['FASTAstart']
                     write_peaklist_file(
