@@ -72,7 +72,7 @@ def check_input_construction(output_path, variables):
             for kx, vx in vy.items():
                 peaklist_path = variables["peaklists"][vx]
                 peaklist = read_peaklist(peaklist_path)
-                if peaklist[0].format_ in ['nmrdraw', 'nmrview']:
+                if peaklist[0].format_ in ['nmrdraw', 'nmrview', 'CARA_simple']:
                     fasta_file = variables["fasta_files"].get(ky, False)
                     if not fasta_file:
                         print('FASTA file not specified for {}'.format(ky))
