@@ -115,6 +115,12 @@ def get_peaklist_format(file_path):
             fin.close()
             return "CARA_full"
         
+        # INSERT YOUR VALIDATION CODE HERE
+        # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
+        #elif ****:
+            #fin.close()
+            #return "YOUR_FORMAT"
+        
         else:
             continue
 
@@ -152,6 +158,9 @@ def read_peaklist(fin):
     
     elif file_format == 'CARA_full':
         return fspr.cara_full(peaklist_file)
+    
+    #elif file_format == "YOUR_FORMAT":
+        #return fspr.your_function(peaklist_file)
     
     elif file_format == "Bad peaklist format":
         return None
