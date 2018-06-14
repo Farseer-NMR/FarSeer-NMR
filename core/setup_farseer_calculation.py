@@ -163,7 +163,6 @@ def write_peaklist_file(fin, peak_list):
     writer.writerow(header)
 
     for ii, peak in enumerate(peak_list):
-        print(peak)
         writer.writerow(
             [
                 ii,
