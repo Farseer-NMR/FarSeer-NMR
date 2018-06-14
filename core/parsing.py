@@ -33,7 +33,6 @@ file_extensions = [
     'xpk',
     'out',
     'csv',
-    'str',
     'prot'
     ]
 
@@ -102,19 +101,6 @@ def get_peaklist_format(file_path):
             fin.close()
             return "CCPNMRV2"
         
-        elif (line.strip().split()[0].isdigit() \
-                and line.strip().split()[-1].isdigit() \
-                and file_path.endswith('.prot')):
-            fin.close()
-            return "CARA_simple"
-        
-        elif line.strip().startswith('_') \
-                or line.strip().endswith('_') \
-                and file_path.endswith('.str'):
-            
-            fin.close()
-            return "CARA_full"
-        
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
         #elif ****:
@@ -152,12 +138,6 @@ def read_peaklist(fin):
 
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
-    
-    elif file_format == 'CARA_simple':
-        return fspr.cara_simple(peaklist_file)
-    
-    elif file_format == 'CARA_full':
-        return fspr.cara_full(peaklist_file)
     
     #elif file_format == "YOUR_FORMAT":
         #return fspr.your_function(peaklist_file)
