@@ -133,14 +133,12 @@ charaters in Assignment columns in line {}.".format(
         ]
     
     for col in cols:
-        #if not any(pkl_df.loc[:,col].isnull()):
-            #continue
         non_digit = pkl_df.loc[:,col].\
             astype(str).str.strip().str.contains(
                 '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
                 regex=True
                 )
-        print(non_digit)
+        
         if non_digit.any():
             msg = "The peaklist {} contains misleading \
 charaters in line {} of column [{}].".format(
