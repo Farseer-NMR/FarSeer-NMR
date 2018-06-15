@@ -197,7 +197,7 @@ class Settings(BaseWidget):
         figure_groupbox.layout().addWidget(self.figure_dpi)
         figure_groupbox.layout().addWidget(self.figure_format)
         self.cs_correction = LabelledCheckbox(self, "CS Correction?")
-        self.cs_correction_res_ref = LabelledSpinBox(self, text="Correction Residue")
+        self.cs_correction_res_ref = LabelledSpinBox(self, text="Correction Residue", maximum=10000000)
         cs_norm_groupbox = QGroupBox()
         cs_norm_groupbox.setTitle("Chemical Shift Normalisation")
         cs_groupbox_layout = QVBoxLayout()
