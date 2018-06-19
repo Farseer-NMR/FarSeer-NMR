@@ -44,7 +44,7 @@ class LabelledSpinBox(QWidget):
         .setValue(float)
         .set_callback(function)
         """
-    def __init__(self, parent, text, callback=None, minimum=None, maximum=None, step=None):
+    def __init__(self, parent, text, callback=None, minimum=-100000, maximum=100000, step=1):
         QWidget.__init__(self, parent)
         layout = QHBoxLayout()
         self.setLayout(layout)
