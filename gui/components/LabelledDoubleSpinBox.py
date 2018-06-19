@@ -48,9 +48,9 @@ class LabelledDoubleSpinBox(QWidget):
             self, parent,
             text,
             callback=None,
-            minimum=None,
-            maximum=None,
-            step=None,
+            minimum=-100000,
+            maximum=100000,
+            step=0.1,
             unit=None
             ):
         QWidget.__init__(self, parent)
