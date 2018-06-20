@@ -25,11 +25,12 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from core.fslibs.Peak import Peak
 
-def parse_cara_simple_peaklist(peaklist_file):
+def parse_user1_peaklist(peaklist_file):
     """
-    Parses a CARA peaklist.
+    Parses a user defined CARA-derived peaklist.
     
-    According to the format:
+    File extention: *.prot
+    Peaklist format:
     
         1  10.494 0.000 H     238
         2 130.175 0.000 N     238

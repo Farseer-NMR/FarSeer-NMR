@@ -33,7 +33,8 @@ file_extensions = [
     'xpk',
     'out',
     'csv',
-    'prot'
+    'prot',
+    'str'
     ]
 
 def get_peaklist_format(file_path):
@@ -102,11 +103,12 @@ def get_peaklist_format(file_path):
             fin.close()
             return "CCPNMRV2"
         
-        elif line.strip()[0].isdigit() \
-                and line.strip()[-1].isdigit():
+        elif line.strip().split()[0].isdigit() \
+                and line.strip().split()[-1].isdigit() \
+                and file_path.endswith('.prot'):
+            ls = line.strip().split()
             try:
-                ls = line.strip().split()
-                condition = [
+                element_types = [
                     ls[0].isdigit(),
                     ls[1].isdigit(),
                     ls[2].isdigit(),
@@ -115,7 +117,34 @@ def get_peaklist_format(file_path):
                     ]
             except IndexError:
                 continue
-            if 
+            
+            if all(element_types):
+                fin.close()
+                return "user_def_1"
+        
+        elif line.strip().startswith('loop_') \
+                or line.strip().endswith('_') \
+                and file_path.endswith('.str'):
+            
+            ls = line.strip().split()
+            try:
+                element_types = [
+                    ls[0].isdigit(),
+                    ls[1].isdigit(),
+                    ls[2].isalpha(),
+                    ls[3].isalpha(),
+                    ls[4].isalpha(),
+                    ls[5].isdigit(),
+                    ls[6].isdigit(),
+                    ls[7].isdigit()
+                    ]
+            except IndexError:
+                continue
+            
+            if all(element_types):
+                fin.close()
+                return "user_def_2"
+        
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
         #elif ****:
@@ -154,6 +183,11 @@ def read_peaklist(fin):
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
     
+    elif file_format == 'user_def_1':
+        return fspr.user1(peaklist_file)
+    
+    elif file_format == 'user_def_2':
+        return fspr.user2(peaklist_file)
     #elif file_format == "YOUR_FORMAT":
         #return fspr.your_function(peaklist_file)
     

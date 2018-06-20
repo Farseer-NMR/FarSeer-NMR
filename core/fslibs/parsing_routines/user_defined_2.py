@@ -25,11 +25,12 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from core.fslibs.Peak import Peak
 
-def parse_cara_full_peaklist(peaklist_file):
+def parse_user2_peaklist(peaklist_file):
     """
     Parses a CARA peaklist.
     
-    According to the format:
+    File extention: *.str
+    Peaklist format:
     
            loop_
       _Atom_shift_assign_ID
