@@ -78,7 +78,7 @@ def parse_user1_peaklist(peaklist_file):
                 linewidths=[0, 0],
                 volume=0,
                 height=0,
-                format_='user_def_1'
+                format_='user_pkl_1'
                 )
             
             peakList.append(peak)
