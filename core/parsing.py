@@ -36,6 +36,13 @@ file_extensions = [
     'prot',
     'str'
     ]
+    
+def eval_str_to_float(string):
+    try:
+        float(string)
+    except ValueError:
+        return False
+    return True
 
 def get_peaklist_format(file_path):
     fin = open(file_path, 'r')
@@ -78,6 +85,8 @@ def get_peaklist_format(file_path):
     
     for line in fin:
         
+        ls = line.strip().split()
+        
         if not line.strip():
             continue
         
@@ -106,39 +115,30 @@ def get_peaklist_format(file_path):
         elif line.strip().split()[0].isdigit() \
                 and line.strip().split()[-1].isdigit() \
                 and file_path.endswith('.prot'):
-            ls = line.strip().split()
             
-            for e, f in zip(ls, [int,float,float,str,int]):
-                try:
-                    f(e)
-                except ValueError:
-                    continue
-            else:
+            is_user_pkl_1 = []
+            element_list_pkl_1 = [
+                str.isdigit,
+                eval_str_to_float,
+                eval_str_to_float,
+                str.isalpha,
+                str.isdigit
+                ]
+            
+            for e, f in zip(ls, element_list_pkl_1):
+                is_user_pkl_1.append(f(e))
+                
+            if all(is_user_pkl_1):
                 fin.close()
-                return "USER_PKL1"
+                return "USER_PKL_1"
         
-        elif line.strip().startswith('loop_') \
-                or line.strip().endswith('_') \
+        elif (line.strip() == 'loop_' \
+                    or line.strip() == '_Atom_shift_assign_ID') \
                 and file_path.endswith('.str'):
             
-            ls = line.strip().split()
-            try:
-                element_types = [
-                    ls[0].isdigit(),
-                    ls[1].isdigit(),
-                    ls[2].isalpha(),
-                    ls[3].isalpha(),
-                    ls[4].isalpha(),
-                    ls[5].isdigit(),
-                    ls[6].isdigit(),
-                    ls[7].isdigit()
-                    ]
-            except IndexError:
-                continue
+            fin.close()
+            return "USER_PKL_2"
             
-            if all(element_types):
-                fin.close()
-                return "USER_PKL2"
         
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
@@ -178,10 +178,10 @@ def read_peaklist(fin):
     elif file_format == 'CCPNMRV2':
         return fspr.ccpnmrv2(peaklist_file)
     
-    elif file_format == 'USER_PKL1':
+    elif file_format == 'USER_PKL_1':
         return fspr.user1(peaklist_file)
     
-    elif file_format == 'USER_PKL2':
+    elif file_format == 'USER_PKL_2':
         return fspr.user2(peaklist_file)
     #elif file_format == "YOUR_FORMAT":
         #return fspr.your_function(peaklist_file)
