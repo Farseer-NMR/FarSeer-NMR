@@ -25,7 +25,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from core.fslibs.Peak import Peak
 
-def parse_user1_peaklist(peaklist_file):
+def parse_user_peaklist_1(peaklist_file):
     """
     Parses a user defined CARA-derived peaklist.
     

@@ -72,7 +72,7 @@ aal1tol3 = {
 }
 
 # peaklists that require FASTA files to complete information on residue type
-peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'user_pkl_2']
+peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'user_pkl_1']
 
 def combine_dicts(dictionaries):
     tmp_dict = {}
