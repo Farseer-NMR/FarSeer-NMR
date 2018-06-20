@@ -76,6 +76,7 @@ def get_peaklist_format(file_path):
                 ])
     
     for line in fin:
+        
         if not line.strip():
             continue
         
@@ -101,6 +102,20 @@ def get_peaklist_format(file_path):
             fin.close()
             return "CCPNMRV2"
         
+        elif line.strip()[0].isdigit() \
+                and line.strip()[-1].isdigit():
+            try:
+                ls = line.strip().split()
+                condition = [
+                    ls[0].isdigit(),
+                    ls[1].isdigit(),
+                    ls[2].isdigit(),
+                    ls[3].isalpha(),
+                    ls[4].isdigit()
+                    ]
+            except IndexError:
+                continue
+            if 
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
         #elif ****:
