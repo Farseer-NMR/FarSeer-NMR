@@ -24,7 +24,7 @@ import re
 import csv
 import pandas as pd
 
-from core.utils import aal1tol3
+from core.utils import aal1tol3, eval_str_to_float
 from core.fslibs import wet as fsw
 import core.fslibs.parsing_routines as fspr
 
@@ -37,12 +37,31 @@ file_extensions = [
     'str'
     ]
     
-def eval_str_to_float(string):
-    try:
-        float(string)
-    except ValueError:
-        return False
-    return True
+eval_elements_usr_pkl_1 = [
+    str.isdigit,
+    eval_str_to_float,
+    eval_str_to_float,
+    str.isalpha,
+    str.isdigit
+    ]
+
+ccpnmr_headers = set([
+            '#',
+            'Position F1',
+            'Position F2',
+            'Assign F1',
+            'Assign F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Merit',
+            'Details',
+            'Fit Method',
+            'Vol. Method',
+            'Number'
+                ])
+
 
 def get_peaklist_format(file_path):
     fin = open(file_path, 'r')
@@ -65,23 +84,6 @@ def get_peaklist_format(file_path):
         print(msg)
         #print('Invalid File Extension. Suffix not in accepted format.')
         return
-
-    ccpnmr_headers = set([
-            '#',
-            'Position F1',
-            'Position F2',
-            'Assign F1',
-            'Assign F2',
-            'Height',
-            'Volume',
-            'Line Width F1 (Hz)',
-            'Line Width F2 (Hz)',
-            'Merit',
-            'Details',
-            'Fit Method',
-            'Vol. Method',
-            'Number'
-                ])
     
     for line in fin:
         
@@ -114,23 +116,11 @@ def get_peaklist_format(file_path):
         
         elif line.strip().split()[0].isdigit() \
                 and line.strip().split()[-1].isdigit() \
-                and file_path.endswith('.prot'):
-            
-            is_user_pkl_1 = []
-            element_list_pkl_1 = [
-                str.isdigit,
-                eval_str_to_float,
-                eval_str_to_float,
-                str.isalpha,
-                str.isdigit
-                ]
-            
-            for e, f in zip(ls, element_list_pkl_1):
-                is_user_pkl_1.append(f(e))
+                and file_path.endswith('.prot') \
+                and all([f(e) for e, f in zip(ls, eval_elements_usr_pkl_1)]):
                 
-            if all(is_user_pkl_1):
-                fin.close()
-                return "USER_PKL_1"
+            fin.close()
+            return "USER_PKL_1"
         
         elif (line.strip() == 'loop_' \
                     or line.strip() == '_Atom_shift_assign_ID') \
@@ -179,10 +169,10 @@ def read_peaklist(fin):
         return fspr.ccpnmrv2(peaklist_file)
     
     elif file_format == 'USER_PKL_1':
-        return fspr.user1(peaklist_file)
+        return fspr.user_pkl_1(peaklist_file)
     
     elif file_format == 'USER_PKL_2':
-        return fspr.user2(peaklist_file)
+        return fspr.user_pkl_2(peaklist_file)
     #elif file_format == "YOUR_FORMAT":
         #return fspr.your_function(peaklist_file)
     
