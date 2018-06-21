@@ -24,6 +24,8 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from core.fslibs.Peak import Peak
+from core.utils import eval_str_to_float
+from core.fslibs import wet as fsw
 
 def parse_user_peaklist_1(peaklist_file):
     """
@@ -49,12 +51,33 @@ def parse_user_peaklist_1(peaklist_file):
     current_residue = None
     count_residue = 0
     
+    counter = -1
+    
+    eval_elements = [
+        str.isdigit,
+        eval_str_to_float,
+        eval_str_to_float,
+        str.isalpha,
+        str.isdigit
+        ]
+    
     for line in fin:
-        
-        if not line.strip():
-            continue
+        counter += 1
         
         ls = line.strip().split()
+        
+        if not ls:
+            continue
+        
+        elif all([f(e) for e, f in zip(ls, eval_elements)]) \
+                and len(ls) == 5:
+            pass
+        
+        else:
+            msg = "The peaklist {} contains a wrong line format in line {}."\
+                .format(peaklist_file, counter)
+            print(fsw.gen_wet('ERROR', msg, 29))
+            fsw.abort()
         
         if ls[3] not in ('N', 'H'):
             continue

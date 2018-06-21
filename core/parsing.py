@@ -117,6 +117,7 @@ def get_peaklist_format(file_path):
         elif line.strip().split()[0].isdigit() \
                 and line.strip().split()[-1].isdigit() \
                 and file_path.endswith('.prot') \
+                and len(ls) == 5 \
                 and all([f(e) for e, f in zip(ls, eval_elements_usr_pkl_1)]):
                 
             fin.close()
