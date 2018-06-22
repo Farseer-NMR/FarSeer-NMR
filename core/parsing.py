@@ -46,22 +46,35 @@ eval_elements_usr_pkl_1 = [
     ]
 
 ccpnmr_headers = set([
-            '#',
-            'Position F1',
-            'Position F2',
-            'Assign F1',
-            'Assign F2',
-            'Height',
-            'Volume',
-            'Line Width F1 (Hz)',
-            'Line Width F2 (Hz)',
-            'Merit',
-            'Details',
-            'Fit Method',
-            'Vol. Method',
-            'Number'
-                ])
+    '#',
+    'Position F1',
+    'Position F2',
+    'Assign F1',
+    'Assign F2',
+    'Height',
+    'Volume',
+    'Line Width F1 (Hz)',
+    'Line Width F2 (Hz)',
+    'Merit',
+    'Details',
+    'Fit Method',
+    'Vol. Method',
+    'Number'
+        ])
 
+user3_headers = set([
+    'Peak',
+    'Region',
+    'Type',
+    'Index (F2)',
+    'Index (F1)',
+    '?(F2) [ppm]',
+    '?(F1) [ppm]',
+    '?(F2) [Hz]',
+    '?(F1) [Hz]',
+    'Intensity [abs]',
+    'Annotation'
+    ])
 
 def get_peaklist_format(file_path):
     fin = open(file_path, 'r')
@@ -129,7 +142,14 @@ def get_peaklist_format(file_path):
             
             fin.close()
             return "USER_PKL_2"
+        
+        
+        elif set(line.strip().rstrip(',').split(',')) == user3_headers \
+                and file_ext == 'csv':
             
+            fin.close()
+            return "USER_PKL_3"
+        
         
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
@@ -138,6 +158,7 @@ def get_peaklist_format(file_path):
             #return "YOUR_FORMAT"
         
         else:
+            print('here')
             continue
 
     else:
@@ -174,6 +195,10 @@ def read_peaklist(fin):
     
     elif file_format == 'USER_PKL_2':
         return fspr.user_pkl_2(peaklist_file)
+    
+    elif file_format == 'USER_PKL_3':
+        return fspr.user_pkl_3(peaklist_file)
+    
     #elif file_format == "YOUR_FORMAT":
         #return fspr.your_function(peaklist_file)
     
