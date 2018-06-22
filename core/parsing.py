@@ -81,7 +81,7 @@ def get_peaklist_format(file_path):
 
     if len(file_path.split('.')) < 2:
         print('Invalid File Extension')
-        return
+        return "Not accepted suffix"
 
     file_ext = file_path.split('.')[-1]
     if file_ext not in file_extensions:
@@ -127,25 +127,25 @@ def get_peaklist_format(file_path):
             fin.close()
             return "CCPNMRV2"
         
-        elif line.strip().split()[0].isdigit() \
+        elif file_path.endswith('.prot') \
+                and line.strip().split()[0].isdigit() \
                 and line.strip().split()[-1].isdigit() \
-                and file_path.endswith('.prot') \
                 and len(ls) == 5 \
                 and all([f(e) for e, f in zip(ls, eval_elements_usr_pkl_1)]):
                 
             fin.close()
             return "USER_PKL_1"
         
-        elif (line.strip() == 'loop_' \
-                    or line.strip() == '_Atom_shift_assign_ID') \
-                and file_path.endswith('.str'):
+        elif file_path.endswith('.str') \
+                and (line.strip() == 'loop_' \
+                        or line.strip() == '_Atom_shift_assign_ID'):
             
             fin.close()
             return "USER_PKL_2"
         
         
-        elif set(line.strip().rstrip(',').split(',')) == user3_headers \
-                and file_ext == 'csv':
+        elif file_ext == 'csv' \
+                and set(line.strip().rstrip(',').split(',')) == user3_headers:
             
             fin.close()
             return "USER_PKL_3"
@@ -158,7 +158,6 @@ def get_peaklist_format(file_path):
             #return "YOUR_FORMAT"
         
         else:
-            print('here')
             continue
 
     else:
