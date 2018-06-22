@@ -200,33 +200,4 @@ def read_peaklist(peaklist_file):
         }
     
     return dict_of_parsing_functs[file_format](peaklist_file)
-    
-    # if file_format == 'ANSIG':
-        # return fspr.ansig(peaklist_file)
 
-    # elif file_format == 'NMRDRAW':
-        # return fspr.nmrdraw(peaklist_file)
-
-    # elif file_format == 'NMRVIEW':
-        # return fspr.nmrview(peaklist_file)
-
-    # elif file_format == 'SPARKY':
-        # return fspr.sparky(peaklist_file)
-
-    # elif file_format == 'CCPNMRV2':
-        # return fspr.ccpnmrv2(peaklist_file)
-    
-    # elif file_format == 'USER_PKL_1':
-        # return fspr.user_pkl_1(peaklist_file)
-    
-    # elif file_format == 'USER_PKL_2':
-        # return fspr.user_pkl_2(peaklist_file)
-    
-    # elif file_format == 'USER_PKL_3':
-        # return fspr.user_pkl_3(peaklist_file)
-    
-    # #elif file_format == "YOUR_FORMAT":
-        # #return fspr.your_function(peaklist_file)
-    
-    # elif file_format == "Bad peaklist format":
-        # return None
