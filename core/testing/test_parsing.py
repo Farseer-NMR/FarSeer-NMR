@@ -43,67 +43,6 @@ class Test_Parsing(unittest.TestCase):
                     pkl_current
                     )
             
-        
-        
-        
-        
-        self.assertEqual(parsing.get_peaklist_format(ansig_peaklist),
-                         'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'ANSIG')
-        #self.assertNotEqual(parsing.get_peaklist_format(user_pkl1),
-        #                    'ANSIG')
-        #self.assertNotEqual(parsing.get_peaklist_format(user_pkl2),
-        #                    'ANSIG')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'SPARKY')
-        self.assertEqual(parsing.get_peaklist_format(sparky_peaklist),
-                         'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'SPARKY')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'NMRDRAW')
-        self.assertEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                         'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'NMRDRAW')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'NMRVIEW')
-        self.assertEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                         'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'NMRVIEW')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'CCPNMRV2')
-        self.assertEqual(parsing.get_peaklist_format(ccpn_peaklist), 'CCPNMRV2')
 
     def test_parse_ansig(self):
         """
