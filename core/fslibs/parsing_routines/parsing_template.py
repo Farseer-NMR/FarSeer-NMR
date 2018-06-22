@@ -15,7 +15,7 @@ To add your parsing routine, you sould:
 """
 from core.fslibs.Peak import Peak
 
-def parse_YOUR_FORMAT_peaklists(peaklist_file):
+def parse_user_peaklist_NUM(peaklist_file):
     """
     Parses YOUR FORMAT peaklist.
     
