@@ -96,7 +96,7 @@ def get_peaklist_format(file_path):
             format(file_path)
         print(msg)
         #print('Invalid File Extension. Suffix not in accepted format.')
-        return
+        return "Not accepted suffix"
     
     for line in fin:
         
@@ -170,37 +170,63 @@ Mostly likely due to a bad peaklist formatting syntax.
         print(fsw.gen_wet("ERROR", msg, 30))
         return "Bad peaklist format"
 
-def read_peaklist(fin):
-
-    peaklist_file = fin
+def read_peaklist(peaklist_file):
+    """
+    Reads peaklist file to Farseer-NMR format.
+    
+    Parameters:
+        -peaklist_file (str): path to original file
+    
+    Returns:
+        - list (core.Peak): list of Peak objects or None if peaklist_file
+            cannot be parsed.
+    """
+    
+    def give_none(x): return None
+    
     file_format = get_peaklist_format(peaklist_file)
-
-    if file_format == 'ANSIG':
-        return fspr.ansig(peaklist_file)
-
-    elif file_format == 'NMRDRAW':
-        return fspr.nmrdraw(peaklist_file)
-
-    elif file_format == 'NMRVIEW':
-        return fspr.nmrview(peaklist_file)
-
-    elif file_format == 'SPARKY':
-        return fspr.sparky(peaklist_file)
-
-    elif file_format == 'CCPNMRV2':
-        return fspr.ccpnmrv2(peaklist_file)
     
-    elif file_format == 'USER_PKL_1':
-        return fspr.user_pkl_1(peaklist_file)
+    dict_of_parsing_functs = {
+        'ANSIG':fspr.ansig,
+        'NMRDRAW':fspr.nmrdraw,
+        'NMRVIEW':fspr.nmrview,
+        'SPARKY':fspr.sparky,
+        'CCPNMRV2':fspr.ccpnmrv2,
+        'USER_PKL_1':fspr.user_pkl_1,
+        'USER_PKL_2':fspr.user_pkl_2,
+        'USER_PKL_3':fspr.user_pkl_3,
+        'Bad peaklist format': give_none,
+        'Not accepted suffix': give_none
+        }
     
-    elif file_format == 'USER_PKL_2':
-        return fspr.user_pkl_2(peaklist_file)
+    return dict_of_parsing_functs[file_format](peaklist_file)
     
-    elif file_format == 'USER_PKL_3':
-        return fspr.user_pkl_3(peaklist_file)
+    # if file_format == 'ANSIG':
+        # return fspr.ansig(peaklist_file)
+
+    # elif file_format == 'NMRDRAW':
+        # return fspr.nmrdraw(peaklist_file)
+
+    # elif file_format == 'NMRVIEW':
+        # return fspr.nmrview(peaklist_file)
+
+    # elif file_format == 'SPARKY':
+        # return fspr.sparky(peaklist_file)
+
+    # elif file_format == 'CCPNMRV2':
+        # return fspr.ccpnmrv2(peaklist_file)
     
-    #elif file_format == "YOUR_FORMAT":
-        #return fspr.your_function(peaklist_file)
+    # elif file_format == 'USER_PKL_1':
+        # return fspr.user_pkl_1(peaklist_file)
     
-    elif file_format == "Bad peaklist format":
-        return None
+    # elif file_format == 'USER_PKL_2':
+        # return fspr.user_pkl_2(peaklist_file)
+    
+    # elif file_format == 'USER_PKL_3':
+        # return fspr.user_pkl_3(peaklist_file)
+    
+    # #elif file_format == "YOUR_FORMAT":
+        # #return fspr.your_function(peaklist_file)
+    
+    # elif file_format == "Bad peaklist format":
+        # return None
