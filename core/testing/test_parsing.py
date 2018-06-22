@@ -18,7 +18,8 @@ pkls_types = {
     'NMRVIEW':'test_data/nmrview_peaklist.xpk',
     'CCPNMRV2':'test_data/ccpn_peaklist.csv',
     'USER_PKL_1':'test_data/user_pkl_1.prot',
-    'USER_PKL_2':'test_data/user_pkl_2.str'
+    'USER_PKL_2':'test_data/user_pkl_2.str',
+    'USER_PKL_3':'test_data/user_pkl_3.csv'
     }
 
 class Test_Parsing(unittest.TestCase):
