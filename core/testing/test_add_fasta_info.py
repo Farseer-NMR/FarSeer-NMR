@@ -32,10 +32,15 @@ class Test_Case(unittest.TestCase):
         self.result_peaklist = read_peaklist('test_data/nmr_view_draw_result.csv')
         self.fasta_file = 'test_data/nmr_view_draw.fasta'
         self.maxDiff = None
+        
+        self.user_pkl_1 = read_peaklist('test_data/user_pkl_1.prot')
+        self.fasta_user_1 = 'test_data/user_pkl_1.fasta'
+        self.user_pkl_1_result = read_peaklist('test_data/user_pkl_1_result.csv')
 
     def test_format_detected(self):
         self.assertEqual(self.nmrdraw_peaklist[0].format_, 'nmrdraw')
         self.assertEqual(self.nmrview_peaklist[0].format_, 'nmrview')
+        self.assertEqual(self.user_pkl_1[0].format_, 'user_pkl_1')
 
     def test_correct_fasta_addition_nmrdraw(self):
     #peaklist_path, peak_list, fasta_path, fasta_start
@@ -51,8 +56,6 @@ class Test_Case(unittest.TestCase):
             self.assertEqual(rpeak.residue_type, npeak.residue_type)
             self.assertEqual(rpeak.residue_number, npeak.residue_number)
 
-
-
     def test_correct_fasta_addition_nmrview(self):
         nmrview_out = add_residue_information(
             'no_path',
@@ -66,7 +69,18 @@ class Test_Case(unittest.TestCase):
             self.assertEqual(rpeak.residue_type, npeak.residue_type)
             self.assertEqual(rpeak.residue_number, npeak.residue_number)
 
-
+    def test_correct_fasta_addition_user_pkl_1(self):
+        user_pkl_1_out = add_residue_information(
+            'no_path',
+            self.user_pkl_1,
+            self.fasta_user_1,
+            1
+            )
+        write_peaklist_file(open('nv_test.csv', 'w'), user_pkl_1_out)
+        self.assertEqual(len(self.user_pkl_1_result), len(user_pkl_1_out))
+        for rpeak, npeak in zip(self.user_pkl_1_result, user_pkl_1_out):
+            self.assertEqual(rpeak.residue_type, npeak.residue_type)
+            self.assertEqual(rpeak.residue_number, npeak.residue_number)
 
 if __name__ == "__main__":
     unittest.main()

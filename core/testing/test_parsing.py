@@ -1,5 +1,5 @@
 import unittest
-
+import itertools as it
 from core import parsing
 import core.fslibs.parsing_routines as fspr
 
@@ -8,7 +8,19 @@ sparky_peaklist = 'test_data/sparky_peaklist.peaks'
 nmrdraw_peaklist = 'test_data/nmrdraw_peaklist.peaks'
 nmrview_peaklist = 'test_data/nmrview_peaklist.xpk'
 ccpn_peaklist = 'test_data/ccpn_peaklist.csv'
+user_pkl_1 = 'test_data/user_pkl_1.prot'
+user_pkl_2 = 'test_data/user_pkl_2.str'
 
+pkls_types = {
+    'ANSIG':'test_data/ansig_peaklist.xpk',
+    'SPARKY':'test_data/sparky_peaklist.peaks',
+    'NMRDRAW':'test_data/nmrdraw_peaklist.peaks',
+    'NMRVIEW':'test_data/nmrview_peaklist.xpk',
+    'CCPNMRV2':'test_data/ccpn_peaklist.csv',
+    'USER_PKL_1':'test_data/user_pkl_1.prot',
+    'USER_PKL_2':'test_data/user_pkl_2.str',
+    'USER_PKL_3':'test_data/user_pkl_3.csv'
+    }
 
 class Test_Parsing(unittest.TestCase):
 
@@ -16,59 +28,22 @@ class Test_Parsing(unittest.TestCase):
         """
         Test that peaklist format detection returns correct values.
         """
-        self.assertEqual(parsing.get_peaklist_format(ansig_peaklist),
-                         'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'ANSIG')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'ANSIG')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'SPARKY')
-        self.assertEqual(parsing.get_peaklist_format(sparky_peaklist),
-                         'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'SPARKY')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'SPARKY')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'NMRDRAW')
-        self.assertEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                         'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'NMRDRAW')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'NMRDRAW')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'NMRVIEW')
-        self.assertEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                         'NMRVIEW')
-        self.assertNotEqual(parsing.get_peaklist_format(ccpn_peaklist),
-                            'NMRVIEW')
-
-        self.assertNotEqual(parsing.get_peaklist_format(ansig_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(sparky_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrdraw_peaklist),
-                            'CCPNMRV2')
-        self.assertNotEqual(parsing.get_peaklist_format(nmrview_peaklist),
-                            'CCPNMRV2')
-        self.assertEqual(parsing.get_peaklist_format(ccpn_peaklist), 'CCPNMRV2')
+        
+        for pkl_current, pkl_test in \
+            it.product(pkls_types.keys(), pkls_types.keys()):
+                
+            if pkl_current == pkl_test:
+                self.assertEqual(
+                    parsing.get_peaklist_format(pkls_types[pkl_test]),
+                    pkl_current
+                    )
+            
+            elif pkl_current != pkl_test:
+                self.assertNotEqual(
+                    parsing.get_peaklist_format(pkls_types[pkl_test]),
+                    pkl_current
+                    )
+            
 
     def test_parse_ansig(self):
         """

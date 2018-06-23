@@ -14,8 +14,9 @@ To add your parsing routine, you sould:
         core.fslibs.setup_farseer_calculation.peaklist_format_requires_fasta
 """
 from core.fslibs.Peak import Peak
+from core.utils import aal1tol3
 
-def parse_user_peaklist_NUM(peaklist_file):
+def parse_user_peaklist_3(peaklist_file):
     """
     Parses YOUR FORMAT peaklist.
     
@@ -29,5 +30,33 @@ def parse_user_peaklist_NUM(peaklist_file):
     Returns:
         peakList (list): a list of Peak objects.
     """
+    fin = open(peaklist_file, 'r')
     peakList = []
+    
+    
+    for line in fin:
+        
+        ls = line.strip().rstrip(',').split(',')
+        
+        if not line.strip() or not ls[0].isdigit():
+            continue
+        
+        pk = Peak(
+            peak_number=ls[0],
+            positions=ls[5:7],
+            atoms=['H','N'],
+            residue_type=aal1tol3[ls[-1][0]],
+            residue_number=ls[-1][1:],
+            linewidths=ls[7:9],
+            height=ls[9],
+            volume=ls[9],
+            details=ls[2],
+            format_='user_pkl_3'
+            )
+        
+        peakList.append(pk)
+        
+    else:
+        fin.close()
+    
     return peakList

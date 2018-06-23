@@ -72,7 +72,7 @@ aal1tol3 = {
 }
 
 # peaklists that require FASTA files to complete information on residue type
-peaklist_format_requires_fasta = ['nmrdraw', 'nmrview']
+peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'user_pkl_1']
 
 def combine_dicts(dictionaries):
     tmp_dict = {}
@@ -105,6 +105,14 @@ def get_default_config_path():
     core_path = os.path.dirname(__file__)
     default_path = os.path.join(core_path, 'default_config.json')
     return default_path
+
+def eval_str_to_float(string):
+    try:
+        float(string)
+    except ValueError:
+        return False
+    return True
+
 
 def read_fasta_file(fasta_path):
     """

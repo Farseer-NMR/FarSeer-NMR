@@ -1,0 +1,5 @@
+Number,#,Position F1,Position F2,Assign F1,Assign F2,Height,Volume,Line Width F1 (Hz),Line Width F2 (Hz),Merit,Details,Fit Method,Vol. Method
+0,1,10.494,130.175,3LeuH,3LeuN,0,0,0,0,,,,
+1,2,9.965,125.165,4LysH,4LysN,0,0,0,0,,,,
+2,3,9.748,123.874,5AsnH,5AsnN,0,0,0,0,,,,
+3,4,9.978,121.313,1CysH,1CysN,0,0,0,0,,,,
