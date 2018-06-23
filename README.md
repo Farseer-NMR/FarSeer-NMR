@@ -52,7 +52,7 @@ Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-auto
 
 ## Citing
 
-Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. Journal of Biomolecular NMR (2018), _In Press_. DOI: [10.1007/s10858-018-0182-5](https://link.springer.com/article/10.1007/s10858-018-0182-5)
+Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. J Biomol NMR (2018) 71: 1. DOI: [10.1007/s10858-018-0182-5](https://link.springer.com/article/10.1007/s10858-018-0182-5)
 
 ## License
 
