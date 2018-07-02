@@ -46,7 +46,7 @@ class BarPlotPopup(BasePopup):
         .set_values()
     """
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, ["bar_plot_settings"], "Bar Plot")
+        BasePopup.__init__(self, parent, "bar_plot_settings", "Bar Plot")
         self.meas_bar_colour = ColourBox(self, text="Measured Bar Colour")
         self.apply_status = LabelledCheckbox(self, text="Apply Peak Status")
         self.missing_bar_colour = ColourBox(self, text="Missing Bar Colour")

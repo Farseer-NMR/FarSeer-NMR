@@ -63,6 +63,7 @@ class BasePopup(QDialog):
         if settings_key:
             if isinstance(settings_key, str):
                 self.local_variables = self.variables[settings_key]
+                self.defaults = defaults[settings_key]
 
             elif isinstance(settings_key, list):
                 self.local_variables = get_nested_value(self.variables, settings_key)
