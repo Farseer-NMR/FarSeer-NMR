@@ -35,13 +35,13 @@ defaults = json.load(open(
 line_styles = ['-', '--', '-.', ':', 'o']
 
 # https://matplotlib.org/examples/color/named_colors.html
-matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
+# matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
-colours = OrderedDict(sorted(
-    matplt_colours_dict.items(),
-    key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))
-    ))
-
+# colours = OrderedDict(sorted(
+#     matplt_colours_dict.items(),
+#     key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))
+#     ))
+colours = OrderedDict()
 keylist = list(colours.keys())
 
 for key in keylist:

@@ -46,7 +46,7 @@ class CompactBarPopup(BasePopup):
         .set_values()
     """
     def __init__(self, parent=None, **kw):
-        BasePopup.__init__(self, parent, "compact_bar_settings", "Compact Bar" "Plot")
+        BasePopup.__init__(self, parent, ["compact_bar_settings"], "Compact Bar" "Plot")
         self.bar_cols = LabelledSpinBox(
             self,
             text="Columns Per Page",
