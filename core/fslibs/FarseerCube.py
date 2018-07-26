@@ -31,19 +31,6 @@ import core.fslibs.log_config as fslogconf
 from core.utils import aal1tol3, aal3tol1
 from core.fslibs import wet as fsw
 
-def starts_logger():
-    """
-    Initiates logger.
-        
-    Returns:
-        - logger instance
-    """
-
-    
-
-    
-    return logger
-
 class FarseerCube:
     """
     The Farseer-NMR Data set.
