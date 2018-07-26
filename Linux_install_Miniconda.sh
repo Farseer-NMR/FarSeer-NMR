@@ -107,8 +107,8 @@ else
 fi
 
 echo
-echo "*** Configuring run_farseer.sh file..."
-tee run_farseer.sh <<< \
+echo "*** Configuring run_farseer_gui.sh file..."
+tee run_farseer_gui.sh <<< \
 "#!/usr/bin/env bash
 
 export CONDA_ROOT=\"$(pwd)/miniconda3/envs/farseernmr\"
@@ -117,8 +117,22 @@ export PYTHONPATH=\${CONDA_ROOT}:\${FARSEER_ROOT}
 
 \$CONDA_ROOT/bin/python \$FARSEER_ROOT/gui/main.py \$*
 "
-chmod u+x run_farseer.sh
+chmod u+x run_farseer_gui.sh
 echo "*** Done..."
+
+echo "*** Configuring run_farseer_commandline.sh file..."
+tee run_farseer_commandline.sh <<< \
+"#!/usr/bin/env bash
+
+export CONDA_ROOT=\"$(pwd)/miniconda3/envs/farseernmr\"
+export FARSEER_ROOT=\"$(pwd)\"
+export PYTHONPATH=\${CONDA_ROOT}:\${FARSEER_ROOT}
+
+\$CONDA_ROOT/bin/python \$FARSEER_ROOT/core/farseermain.py \$*
+"
+chmod u+x run_farseer_commandline.sh
+echo "*** Done..."
+
 echo "*** Cleaning..."
 # cleaning
 rm $minicondaversion
@@ -126,15 +140,11 @@ rm $minicondaversion
 echo \
 "   *****
     
-    Farseer-NMR as been correctly configured
+    Farseer-NMR run files have been correctly configured
     
-    TO LAUNCH FARSEER-NMR:
+    TO LAUNCH FARSEER-NMR GUI:
     
-    ./run_farseer.sh
+    ./run_farseer_gui.sh
     
-    or
-    
-    double click on the run_farseer.sh file
-    
-    :-)
+    or double click on the file :-)
 "

@@ -1,7 +1,8 @@
 # GitHub .gitignore boilerplate from https://github.com/github/gitignore/blob/master/Python.gitignore
 
-# Added by @miguelarbesu to ignore the local ./run_farseer.sh 
-run_farseer.sh
+# Ignore the local run_farseer*.sh files
+run_farseer_gui.sh
+run_farseer_commandline.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

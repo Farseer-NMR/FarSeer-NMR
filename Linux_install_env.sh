@@ -69,8 +69,10 @@ fi
 echo "*** Done..."
 
 echo
-echo "*** Configuring run_farseer.sh file..."
-tee run_farseer.sh <<< \
+echo
+echo "*** Configuring run_farseer_gui.sh file..."
+echo
+tee run_farseer_gui.sh <<< \
 "#!/usr/bin/env bash
 
 export FARSEER_ROOT=\"$(pwd)\"
@@ -80,21 +82,32 @@ source activate farseernmr
 
 python \$FARSEER_ROOT/gui/main.py \$*
 "
-chmod u+x run_farseer.sh
+chmod u+x run_farseer_gui.sh
+
+echo
+echo "*** Configuring run_farseer_commandline.sh file..."
+echo
+tee run_farseer_commandline.sh <<< \
+"#!/usr/bin/env bash
+
+export FARSEER_ROOT=\"$(pwd)\"
+export PYTHONPATH=\$PYTHONPATH:\${FARSEER_ROOT}
+
+source activate farseernmr
+
+python \$FARSEER_ROOT/core/farseermain.py \$*
+"
+chmod u+x run_farseer_commandline.sh
+
 echo "*** Done..."
 echo
 echo \
-"   *****
+"
+    Farseer-NMR run files have been correctly configured
     
-    Farseer-NMR as been correctly configured and
+    TO LAUNCH FARSEER-NMR GUI:
     
-    TO LAUNCH FARSEER-NMR:
+    ./run_farseer_gui.sh
     
-    ./run_farseer.sh
-    
-    or
-    
-    double click on the run_farseer.sh file
-    
-    :-)
+    or double click on the file :-)
 "
