@@ -1827,6 +1827,7 @@ def run_farseer(fsuv, logger=None):
         fsuv (module): contains user defined variables (preferences)
             after .read_user_variables().
     """
+    logger = logger or start_logger(fsuv["general_settings"]["output_path"])
     
     general = fsuv["general_settings"]
     fitting = fsuv["fitting_settings"]
