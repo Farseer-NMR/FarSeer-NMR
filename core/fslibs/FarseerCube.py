@@ -20,13 +20,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
+import logging.config
 import os
 import numpy as np
 import pandas as pd
 import itertools as it
 
+import core.fslibs.log_config as fslogconf
 from core.utils import aal1tol3, aal3tol1
 from core.fslibs import wet as fsw
+
+def starts_logger():
+    """
+    Initiates logger.
+        
+    Returns:
+        - logger instance
+    """
+
+    
+
+    
+    return logger
 
 class FarseerCube:
     """
@@ -137,6 +153,9 @@ class FarseerCube:
         
         FASTAstart (int): The first residue in the FASTA file.
         """
+        self.logger = fslogconf.getLogger(__name__)
+        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger.debug('logger initiated')
         
         # Decomposing the spectra/ path
         # self.paths will be used in load_experiments()
