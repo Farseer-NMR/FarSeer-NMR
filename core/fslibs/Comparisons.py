@@ -20,8 +20,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
+import logging.config
 import numpy as np
 import pandas as pd
+import core.fslibs.log_config as fslogconf
 
 class Comparisons:
     """
@@ -82,6 +85,9 @@ class Comparisons:
             dimension_dict (dict): is a dictionary containing all the
             series for the main dimension.
         """
+        self.logger = logging.getLogger(__name__)
+        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger.debug('logger initiated')
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
             klass_name='Panel5D',

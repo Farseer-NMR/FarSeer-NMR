@@ -36,7 +36,7 @@ farseer_log_config = {
         "console": {
             "class": "logging.StreamHandler",
             "level": "INFO",
-            "formatter": "debug_format",
+            "formatter": "info_format",
             "stream": "ext://sys.stdout"
         },
         "info_file_handler": {
