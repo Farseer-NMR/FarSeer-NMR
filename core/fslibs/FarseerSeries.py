@@ -20,6 +20,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
+import logging.config
 import glob
 import os
 import numpy as np
@@ -30,6 +32,7 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
+import core.fslibs.log_config as fslogconf
 from core.fslibs import wet as fsw
 
 class FarseerSeries(pd.Panel):
@@ -169,6 +172,10 @@ class FarseerSeries(pd.Panel):
             log_export_onthefly=False,
             log_export_name='FarseerSet_log.md'):
         """Creates the instance attributes."""
+        
+        self.logger = fslogconf.getLogger(__name__)
+        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger.debug('logger initiated')
         
         self.cs_missing = cs_missing
         # normalization value for F2 dimension.
