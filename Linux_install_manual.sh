@@ -30,8 +30,9 @@ echo "*** Done..."
 echo
 echo \
 "
-    run_farseer_gui.sh and run_farseer_commandline.sh have been created.
-    you may wish to complete this file with
+    Farseer-NMR run files have been correctly configured.
+
+    You may wish to complete this file with
     the necessary EXPORTS according to your Python setup.
     
     TO RUN FARSEER-NMR GUI:
