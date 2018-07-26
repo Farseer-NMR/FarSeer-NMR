@@ -43,7 +43,7 @@ farseer_log_config = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "info_format",
-            "filename": "farseernmr_log.md",
+            "filename": "farseernmr.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
