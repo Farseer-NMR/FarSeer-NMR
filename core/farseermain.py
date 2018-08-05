@@ -66,7 +66,8 @@ Methods:
 """
 
 #  
-import importlib.util
+import logging
+import logging.config
 import sys
 import os
 import shutil
@@ -74,12 +75,66 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
+import core.fslibs.log_config as fslogconf
 from core.fslibs import FarseerCube as fcube
 from core.fslibs import FarseerSeries as fss
 from core.fslibs import Comparisons as fsc
 from core.fslibs import wet as fsw
 
-def read_user_variables(runfolder_path, configjson_path):
+def changes_current_dir(path):
+    """
+    Changes running dir to path. Exists if path is not a valid directory.
+    
+    Parameters:
+        - path (str): target directory
+    
+    Returns:
+        - Absolute path for new running dir.
+    """
+    how_to_run = \
+"""*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+    
+    try:
+        os.chdir(path)
+    except NotADirectoryError as notdirerr: 
+        msg = \
+"""
+***************************************
+*** A file was passed as argument instead of a directory path.
+*** {}
+***
+{}
+***************************************
+""".\
+            format(notdirerr, how_to_run)
+        sys.exit(msg)
+    
+    return os.path.abspath(path)
+
+def start_logger(target_path):
+    """
+    Initiates logger.
+    
+    Parameters:
+        - target_path (str): path to were logs are written.
+        
+    Returns:
+        - logger instance
+    """
+    
+    if os.getcwd() != os.path.abspath(target_path):
+        changes_current_dir(target_path)
+    
+    logger = fslogconf.getLogger(__name__)
+    logging.config.dictConfig(fslogconf.farseer_log_config)
+    
+    logger.debug('os.getcwd equals target_path:: %s', (os.getcwd() == os.path.abspath(target_path)))
+    logger.debug('logger initiated')
+    
+    return logger
+
+def read_user_variables(runfolder_path, configjson_path, logger=None):
     """
     Sets calculation folder to the folder where spectra/ is.
     Reads user definitions from config.json file to a dictionary.
@@ -90,14 +145,16 @@ def read_user_variables(runfolder_path, configjson_path):
         runfolder_path (str): Calculation run folder. Parent path of
             spectra/ folder.
         configjson_path (str) path to config.json file.
+        logger (logger obj): (optional) logger object
     
     Returns:
         fsuv (dictionary): contains the user preferences.
     """
+    logger = logger or start_logger(runfolder_path)
+    
     how_to_run = \
 """*** execute Farseer-NMR as
 *** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
-    
     
     # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # Reads Run calculation folder absolut path
@@ -117,7 +174,8 @@ def read_user_variables(runfolder_path, configjson_path):
 ***************************************
 """.\
             format(json_cwd, jsonerror)
-        sys.exit(msg)
+        logger.error(msg)
+        sys.exit()
     except IsADirectoryError as direrr:
         msg = \
 """
@@ -129,23 +187,13 @@ def read_user_variables(runfolder_path, configjson_path):
 ***************************************
 """.\
             format(direrr, how_to_run)
-        sys.exit(msg)
+        logger.error(msg)
+        sys.exit()
     # changes current directory to the run directory which is that where
     # spectra/ folder is.
-    try:
-        os.chdir(run_cwd)
-    except NotADirectoryError as notdirerr: 
-        msg = \
-"""
-***************************************
-*** A file was passed as argument instead of a directory path.
-*** {}
-***
-{}
-***************************************
-""".\
-            format(notdirerr, how_to_run)
-        sys.exit(msg)
+    if os.getcwd() != os.path.abspath(runfolder_path):
+        logger.debug('cwd differs from runfolder_path')
+        changes_current_dir(runfolder_path)
     # stores path to spectra/ folder
     fsuv["general_settings"]["input_spectra_path"] = \
         '{}/spectra'.format(run_cwd)
@@ -1771,7 +1819,7 @@ def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     
     return comp_dct
 
-def run_farseer(fsuv):
+def run_farseer(fsuv, logger=None):
     """
     Runs the whole Farseer-NMR standard algorithm.
     
@@ -1779,6 +1827,7 @@ def run_farseer(fsuv):
         fsuv (module): contains user defined variables (preferences)
             after .read_user_variables().
     """
+    logger = logger or start_logger(fsuv["general_settings"]["output_path"])
     
     general = fsuv["general_settings"]
     fitting = fsuv["fitting_settings"]
@@ -1893,7 +1942,8 @@ def run_farseer(fsuv):
 
 if __name__ == '__main__':
     
-    fsuv = read_user_variables(sys.argv[1], sys.argv[2])
+    logger = start_logger(sys.argv[1])
+    fsuv = read_user_variables(sys.argv[1], sys.argv[2], logger=logger)
     # copy_Farseer_version(fsuv)
     
     # path evaluations now consider the absolute path, always.
@@ -1901,7 +1951,6 @@ if __name__ == '__main__':
     # input from any other folder.
     # path should be the folder where the 'spectra/' are stored and NOT the
     # path to the 'spectra/' folder.
-    # if running from the actual folder, use:
-    # $ python farseer_main.py .
-    run_farseer(fsuv)
-    print('Farseermain.py finished with __name__ == "__main__"')
+    
+    run_farseer(fsuv, logger=logger)
+    logger.debug('Farseermain.py finished with __name__ == "__main__"')
