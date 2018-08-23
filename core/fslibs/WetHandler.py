@@ -30,15 +30,15 @@ import core.fslibs.log_config as fslogconf
 class WetHandler:
     """Handles Warning, Errors and Troubleshooting messages"""
     
-    def __init__(self, msg_type='', msg='', wet_num=0):
+    def __init__(self, msg_title='', msg='', wet_num=0, gen=True):
         
         # initiates log
         self.logger = fslogconf.getLogger(__name__)
         logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
-        if not msg_type:
-            self.logger.debug('WET Message type not provided')
+        if not msg_title:
+            self.logger.debug('WET Message title not provided')
         
         if not msg:
             self.logger.debug('WET Message not provided')
@@ -46,15 +46,16 @@ class WetHandler:
         if not wet_num:
             self.logger.debug('WET Number not provided')
         
-        self.msg_type = msg_type
+        self.msg_title = msg_title
         self.msg = msg
         self.wet_num = wet_num
         self.logger.debug('Type, MSG and NUM configured correctly')
         
-        self.generate_wet()
+        if gen:
+            self.generate_wet()
     
-    def _title(self, msg_type=''):
-        return "    {:@^72}  ".format(" " + msg_type + " ")
+    def _title(self, msg_title=''):
+        return "    {:@^72}  ".format(" " + msg_title + " ")
     
     def _bottom(self):
         return "    {:@^72}  ".format('')
@@ -63,7 +64,7 @@ class WetHandler:
         return "    @{:^70}@  ".format(s)
 
     def referwet(self, n):
-        return line("+ Refer to WET #{} +".format(n))
+        return self._line("+ Refer to WET #{} +".format(n))
 
     def _format_msg(self, s):
         return "    @{:^70}@  ".format(s)
@@ -98,17 +99,17 @@ class WetHandler:
 
     """.\
             format(
-                _title(t),
-                _line(),
-                 "\n".join(map(_format_msg, textwrap.wrap(msg, width=67))),
-                _line(),
-                referwet(n),
-                _line(s="please visit"),
-                _line(
+                self._title(t),
+                self._line(),
+                 "\n".join(map(self._format_msg, textwrap.wrap(msg, width=67))),
+                self._line(),
+                self.referwet(wet_num),
+                self._line(s="please visit"),
+                self._line(
                     s="github.com/joaomcteixeira/FarSeer-NMR/wiki/WET-List#wet{}".\
-                        format(n)
+                        format(wet_num)
                     ),
-                _bottom()
+                self._bottom()
                 )
         
         self.logger.debug('WET Msg generated correctly')
@@ -120,7 +121,7 @@ class WetHandler:
         print(self.wet)
         return None
 
-    def continue_abort(self, choice=z):
+    def continue_abort(self, choice='Z'):
         """
         Asks user to decide behaviour. A predifined choice can be given.
         
@@ -137,13 +138,60 @@ class WetHandler:
         self.logger.debug('Choice selected "{}"'.format(choice))
         
         if choice == 'A':
-            self.abort(abort_msg)
+            self.abort(messages.abort_msg)
         
         elif choice == 'C':
             return 'Continuing...'
 
     def abort(self, m=''):
+        abort_msg = m or self.abort_msg()
         sys.exit(m)
         return
+    
+    def end_well(self):
+        """Returns the message annoucing Farseer-NMR performed correctly."""
+        end_well = \
+    """
+{}
+{}
+{}
+{}
+    """.\
+            format(
+                self._bottom(), 
+                self._line('Farseer-NMR completed correctly'),
+                self._line('Bye :-)'),
+                self._bottom()
+                )
+        return s
 
+    def abort_msg(self):
+        """Returns the abort message."""
+        abort_msg = \
+        """
+        {}
+        {}
+        {}
+        {}
+        """.\
+            format(
+                self._bottom(), 
+                self._line('Farseer-NMR aborted'),
+                self._line('Bye :-('),
+                self._bottom()
+                )
+        
+        return abort_msg
 
+if __name__ == '__main__':
+    
+    wet = WetHandler(
+        msg_title='c00l',
+        msg='does everythin looks good?',
+        wet_num=999)
+    
+    wet.wet()
+    wet.print_wet()
+    
+    wet.continue_abort(choice='C')
+    wet.continue_abort(choice='A')

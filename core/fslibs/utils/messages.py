@@ -33,8 +33,6 @@ end_good = \
             line('Bye :-)'),
             bottom()
             )
-    
-    return s
 
 abort_msg = \
 """
