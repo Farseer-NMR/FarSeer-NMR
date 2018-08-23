@@ -19,8 +19,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
-
-Functions that format error messages.
 """
 import sys
 import textwrap
@@ -148,33 +146,4 @@ class WetHandler:
         sys.exit(m)
         return
 
-def end_good():
-    s = \
-"""
-{}
-{}
-{}
-{}
-""".\
-        format(
-            bottom(), 
-            line('Farseer-NMR completed correctly'),
-            line('Bye :-)'),
-            bottom()
-            )
-    
-    return s
 
-abort_msg = \
-"""
-{}
-{}
-{}
-{}
-""".\
-    format(
-        bottom(), 
-        line('Farseer-NMR aborted'),
-        line('Bye :-('),
-        bottom()
-        )
