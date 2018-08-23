@@ -34,7 +34,7 @@ class WetHandler:
             self,
             msg_title='WET title not provided',
             msg='WET Message not provided',
-            wet_num='No web link provided',
+            wet_num='WET Number not provided',
             gen=True):
         
         # initiates log
@@ -45,6 +45,13 @@ class WetHandler:
         self.msg_title = msg_title
         self.msg = msg
         self.wet_num = wet_num
+        if isinstance(wet_num, int):
+            self.web_link = \
+                "github.com/joaomcteixeira/FarSeer-NMR/wiki/WET-List#wet{}".\
+                        format(self.wet_num)
+        else:
+            self.web_link = 'Web link not provided'
+        
         self.logger.debug('Type, MSG and NUM configured correctly')
         
         if gen:
@@ -103,10 +110,7 @@ class WetHandler:
                 self._line(),
                 self.referwet(wet_num),
                 self._line(s="please visit"),
-                self._line(
-                    s="github.com/joaomcteixeira/FarSeer-NMR/wiki/WET-List#wet{}".\
-                        format(wet_num)
-                    ),
+                self._line(self.web_link),
                 self._bottom()
                 )
         
@@ -200,5 +204,7 @@ if __name__ == '__main__':
     print(wet1.abort_msg())
     
     wet1.continue_abort(choice='C')
+    print('continuing automatically...')
     wet1.continue_abort()
+    print('continuing mannually...')
     wet1.continue_abort(choice='A')
