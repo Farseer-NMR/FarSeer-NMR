@@ -30,21 +30,17 @@ import core.fslibs.log_config as fslogconf
 class WetHandler:
     """Handles Warning, Errors and Troubleshooting messages"""
     
-    def __init__(self, msg_title='', msg='', wet_num=0, gen=True):
+    def __init__(
+            self,
+            msg_title='WET title not provided',
+            msg='WET Message not provided',
+            wet_num='No web link provided',
+            gen=True):
         
         # initiates log
         self.logger = fslogconf.getLogger(__name__)
         logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
-        
-        if not msg_title:
-            self.logger.debug('WET Message title not provided')
-        
-        if not msg:
-            self.logger.debug('WET Message not provided')
-        
-        if not wet_num:
-            self.logger.debug('WET Number not provided')
         
         self.msg_title = msg_title
         self.msg = msg
@@ -53,6 +49,8 @@ class WetHandler:
         
         if gen:
             self.generate_wet()
+        else:
+            sefl.wet = 'No WET defined'
     
     def _title(self, msg_title=''):
         return "    {:@^72}  ".format(" " + msg_title + " ")
@@ -138,14 +136,14 @@ class WetHandler:
         self.logger.debug('Choice selected "{}"'.format(choice))
         
         if choice == 'A':
-            self.abort(messages.abort_msg)
+            self.abort()
         
         elif choice == 'C':
             return 'Continuing...'
 
     def abort(self, m=''):
         abort_msg = m or self.abort_msg()
-        sys.exit(m)
+        sys.exit(abort_msg)
         return
     
     def end_well(self):
@@ -163,16 +161,16 @@ class WetHandler:
                 self._line('Bye :-)'),
                 self._bottom()
                 )
-        return s
+        return end_well
 
     def abort_msg(self):
         """Returns the abort message."""
         abort_msg = \
         """
-        {}
-        {}
-        {}
-        {}
+{}
+{}
+{}
+{}
         """.\
             format(
                 self._bottom(), 
@@ -185,13 +183,22 @@ class WetHandler:
 
 if __name__ == '__main__':
     
-    wet = WetHandler(
+    wet1 = WetHandler(
         msg_title='c00l',
-        msg='does everythin looks good?',
+        msg='Does everything looks good?',
         wet_num=999)
     
-    wet.wet()
-    wet.print_wet()
+    wet2 = WetHandler()
     
-    wet.continue_abort(choice='C')
-    wet.continue_abort(choice='A')
+    wet1.wet
+    wet1.print_wet()
+    
+    wet2.wet
+    wet2.print_wet()
+    
+    print(wet1.end_well())
+    print(wet1.abort_msg())
+    
+    wet1.continue_abort(choice='C')
+    wet1.continue_abort()
+    wet1.continue_abort(choice='A')
