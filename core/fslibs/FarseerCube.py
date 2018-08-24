@@ -378,8 +378,7 @@ the possible options.'
                     msg = \
 "The file {} is empty. To introduce an empty data point, add the header.".\
                         format(filetype)
-                    wet14 = fsw(msg_title='ERROR', msg=msg, wet_num=14)
-                    self.abort(wet14)
+                    self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=14))
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -854,9 +853,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         except ValueError:
             msg = "Farseer-NMR could not reindex this peaklist. There are \
 several input errors that may occur in this case. Read the Documentation for \
-more details."
-            wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24)
-            self.abort(wet24)
+more details." 
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=24))
         
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
@@ -1480,15 +1478,13 @@ more details."
 "File type {} not recognized. Why you want to read these files \
 if Farseer-NMR can't do nothing with them? :-)".\
                 format(filetype)
-            wet13 = fsw(msg_title='ERROR', msg=msg, wet_num=13)
-            self.abort(wet13)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=13))
         
         # checks if files exists
         if not(any([p.endswith(filetype) for p in self.paths])):
             msg = "There are no files in spectra/ with extension {}".\
                 format(filetype)
-            wet9 = fsw(msg_title='ERROR', msg=msg, wet_num=9)
-            self.abort(wet9)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=9))
             
         return
     
@@ -1529,8 +1525,7 @@ if Farseer-NMR can't do nothing with them? :-)".\
             msg = \
 "Y axis folder names are not coherent. \
 Names must be equal accross every Z axis datapoint folder."
-            wet11 = fsw(msg_title='ERROR', msg=msg, wet_num=11)
-            self.abort(wet11)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=11))
         
         if filetype == '.fasta':
             all_fasta_files = \
@@ -1542,8 +1537,7 @@ Names must be equal accross every Z axis datapoint folder."
 "There are too many or missing {0} files. \
 Confirm there is only ONE {0} file for each Y datapoint folder.".\
                     format(filetype)
-                wet12 = fsw(msg_title='ERROR', msg=msg, wet_num=12)
-                self.abort(wet12)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=12))
         
         ### Checks coherency of x files
         elif filetype == '.csv':
@@ -1553,8 +1547,7 @@ Confirm there is only ONE {0} file for each Y datapoint folder.".\
 'The no. of files of type {} is not the same for every series folder. \
 Check for the missing ones!'.\
                     format(filetype)
-                wet8 = fsw(msg_title='ERROR', msg=msg, wet_num=8)
-                self.abort(wet8)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=8))
             
             x_files_names = set(
                 [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
@@ -1565,9 +1558,7 @@ Check for the missing ones!'.\
 "X axis datapoints file names are not coherent. \
 Names must be equal accross every Y axis datapoint folder.".\
                     format(filetype)
-                wet10 = fsw(msg_title='ERROR', msg=msg, wet_num=10)
-                self.log_r(wet10.wet)
-                self.abort(wet10)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=10))
         
         # writes confirmation message
         self.log_r('> All <{}> files found and correct - OK!'.format(filetype))
@@ -1593,8 +1584,7 @@ Names must be equal accross every Y axis datapoint folder.".\
 or is an <unassigned> or <missing> residue. \
 Correct the reference residue in the Settings Menu.'.\
                 format(ref_res)
-            wet16 = fsw(msg_title='ERROR', msg=msg, wet_num=16)
-            self.abort(wet16)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=16))
         
         return
     
@@ -1626,8 +1616,7 @@ Correct the reference residue in the Settings Menu.'.\
 '.fasta files have not the same size and they should have the same size \
 when performing calculations along the Y axis. \
 Please correct your .fasta files.'
-            wet21 = fsw(msg_title='ERROR', msg=msg, wet_num=21)
-            self.abort(wet21)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=21))
         
         return
         
@@ -1676,8 +1665,7 @@ residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
 which will results in peaklist truncation. \
 You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
-                wet22 = fsw(msg_title='ERROR', msg=msg, wet_num=22)
-                self.abort(wet22)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
             
             elif fasta_last_residue < peaklist_last_residue:
                 msg = \
@@ -1686,13 +1674,11 @@ last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
 which will results in peaklist truncation. \
 You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
-                wet22 = fsw(msg_title='ERROR', msg=msg, wet_num=22)
-                self.abort(wet22)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
             
             else:
                 msg = 'Something is wrong in .checks_fasta_start_number()'
-                wet0 = fsw.gen_wet('DEVELOPER ISSUE', msg, -1)
-                self.abort(wet0)
+                self.abort(fsw.gen_wet('DEVELOPER ISSUE', msg, -1))
             
         else:
             msg = "> FASTA files starting number is consistent with peaklists"
@@ -1763,8 +1749,7 @@ correspond to nitrogen assignment labels.'.format(z, y, x)
             msg = "Peaklists proposed for series [{}][{}] along {} axis have \
 different lengths.".\
                 format(dp2, dp1, axis[-1].upper())
-            wet28 = fsw(msg_title="ERROR", msg=msg, wet_num=28)
-            self.abort(wet28)
+            self.abort(fsw(msg_title="ERROR", msg=msg, wet_num=28))
         
         return
     
@@ -1788,8 +1773,7 @@ information in lines {}. Please review that peaklist.".format(
                 x,
                 [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
                 )
-            wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-            self.abort(wet29)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
         
         ## misleading chars
         non_digit_f1 = \
@@ -1809,8 +1793,7 @@ charaters in Assignment columns in line {}.".format(
                 x,
                 [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
                 )
-            wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-            self.abort(wet29)
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
         
         ## for other cols.
         cols = [
@@ -1838,8 +1821,7 @@ charaters in line {} of column [{}].".format(
                     [2+int(i) for i in non_digit.index[non_digit].tolist()],
                     col
                     )
-                wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-                self.abort(wet29)
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
         
         return
 
@@ -1861,6 +1843,4 @@ in lines: {}.".format(
                 [2+int(i) for i in \
                     where_duplicates.index[where_duplicates].tolist()]
                 )
-            wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24)
-            self.log_r(wet24.wet)
-            self.abort(wet24)
+            self.abort(wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24))
