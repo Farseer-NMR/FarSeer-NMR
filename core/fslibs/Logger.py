@@ -1,25 +1,5 @@
 import logging
-import inspect
-
-class ImprovedDebug(logging.Logger):
-    """
-    Improves debug level output.
-    code from: http://www.karoltomala.com/blog/?p=720
-    """	
-    
-    def debug(self, msg, *args, **kwargs):
-        method = inspect.stack()[1][3]
-        frm = inspect.stack()[1][0]
-        if 'self' in frm.f_locals:
-            clsname = frm.f_locals['self'].__class__.__name__
-            method = clsname + '.' + method
-        if not method.startswith('<'):
-            method += '()'
-        msg = ':'.join((method, str(frm.f_lineno), msg))
-        self.__class__.__bases__[0].debug(self, msg, *args, **kwargs)
-
-logging.setLoggerClass(ImprovedDebug)
-getLogger = logging.getLogger
+import logging.config
 
 # Farseer-NMR logging configuration
 farseer_log_config = {
@@ -27,11 +7,11 @@ farseer_log_config = {
     "disable_existing_loggers": False,
     "formatters": {
         "debug_format": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            "format": "%(asctime)s - %(levelname)s - %(filename)s:%(name)s:%(funcName)s:%(lineno)d - %(message)s"
         },
         "info_format": {}
     },
-
+    
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
@@ -58,11 +38,20 @@ farseer_log_config = {
             "encoding": "utf8"
         }
     },
-
+    
     "loggers": {},
-
+    
     "root": {
         "level": "DEBUG",
         "handlers": ["console", "info_file_handler", "debug_file_handler"]
     }
 }
+
+logging.config.dictConfig(farseer_log_config)
+getLogger = logging.getLogger
+
+if __name__ == "__main__":
+    
+    loggy = logging.getLogger(__name__)
+    loggy.debug('llala')
+    loggy.info('lele')
