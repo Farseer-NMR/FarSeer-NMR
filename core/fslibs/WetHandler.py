@@ -56,6 +56,7 @@ class WetHandler:
         self.msg_title = msg_title
         self.msg = msg
         self.wet_num = wet_num
+        self.gen = gen
         # these variables are normally unused but they can be set nonetheless
         self.text_wrap_width = text_wrap_width
         self.title_bottom_width = text_wrap_width + 5
@@ -74,10 +75,10 @@ class WetHandler:
         # generate_wet() is used when a WET message is wanted. If only 
         # a end_well or abort_msg is required the user can instantiate the
         # class without generating the WET message.
-        if gen:
+        if self.gen:
             self.generate_wet()
         else:
-            sefl.wet = 'No WET defined'
+            self.wet = 'No WET defined'
     
     def _title(self, msg_title='', width=0):
         """
@@ -249,6 +250,12 @@ class WetHandler:
 
 if __name__ == '__main__':
     
+    def print_wet_handlers(wet):
+        wet.print_wet()
+        if not wet.gen:
+            print(wet.end_well())
+            print(wet.abort_msg())
+    
     # a series of very simple tests
     
     wet1 = WetHandler(
@@ -257,12 +264,6 @@ if __name__ == '__main__':
         wet_num=999)
     
     wet2 = WetHandler()
-    
-    wet1.wet
-    wet1.print_wet()
-    
-    wet2.wet
-    wet2.print_wet()
     
     super_message = \
 """
@@ -276,10 +277,12 @@ without any restrictions on size and whatever it does not matter just going very
         msg=super_message,
         wet_num=9999999999)
     
-    print(wet3.wet)
+    wet4 = WetHandler(gen=False)
     
-    print(wet1.end_well())
-    print(wet1.abort_msg())
+    print_wet_handlers(wet1)
+    print_wet_handlers(wet2)
+    print_wet_handlers(wet3)
+    print_wet_handlers(wet4)
     
     wet1.continue_abort(choice='C')
     print('continuing automatically...')

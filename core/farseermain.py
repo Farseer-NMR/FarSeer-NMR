@@ -419,7 +419,7 @@ def log_end(fsuv):
     
     print("*** Used JSON config file will be copied to the end of MD log file")
     fout = fsuv["general_settings"]["logfile_name"]
-    logs(fsw(gen=False).end_good(), fout)
+    logs(fsw(gen=False).end_well(), fout)
     log_time_stamp(fout, state='ENDED')
     logs("*** USED CONFIG FILE ***\n", fout, printit=False)
     fsuv_tmp = fsuv.copy()
