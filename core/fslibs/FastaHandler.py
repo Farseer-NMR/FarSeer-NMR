@@ -26,6 +26,7 @@ import logging
 import logging.config
 import core.fslibs.log_config as fslogconf
 from core.fslibs.WetHandler import WetHandler as fsw
+from core.utils import aal1tol3, aal3tol1
 
 class FastaHandler:
     """
@@ -44,7 +45,42 @@ class FastaHandler:
         self.logger.debug('FASTA file path read: OK')
         
     
-    def read_FASTA(self, fasta_path='', atom1='H', atom2='N', details='None'):
+    def _check_presence_of_digits(self, fasta_string, fasta_path=''):
+        """
+        Checks the presence of digits in the FASTA string.
+        
+        If digits are found user is prompt if to abort or parse them out.
+        
+        Returns:
+            FASTA without digits (user choice)
+        """
+        
+        if ''.join(c for c in fasta_string if c.isdigit()):
+            msg = \
+'We found digits in your FASTA string coming from file {}. Be aware of \
+mistakes resulting from wrong FASTA file. You may wish to abort \
+and correct the file. \
+If you choose continue, Farseer-NMR will parse out the digits.'.\
+                format(self.fasta_path)
+            
+            wet22 = fsw(msg_title='WARNING', msg=msg, wet_num=22)
+            self.logger.info(wet22.wet)
+            wet22.continue_abort()
+            fasta_string_no_digit = \
+                ''.join(c for c in fasta_string if not c.isdigit())
+            
+            return fasta_string_no_digit
+        
+        else:
+            return fasta_string
+    
+    def read_fasta_file(
+            self,
+            fasta_path='',
+            atom1='H',
+            atom2='N',
+            details='None'
+            ):
         """
         Reads a FASTA file to a pd.DataFrame.
         
@@ -59,14 +95,14 @@ class FastaHandler:
         dataframes.
         
         Returns:
-            pd.DataFrame
+            Returns and assigns self.fasta_df
         """
         fasta_path = fasta_path or self.fasta_path
         
         # Opens the FASTA file, which is a string of capital letters
         # 1-letter residue code that can be split in several lines.
         fasta_file = open(fasta_path, 'r')
-        fl = fasta_file.readlines()
+        fl = fasta_file.readlines()  # list of lines in fasta_file
         
         # Generates a single string from the FASTA file
         fasta_string = ''
@@ -78,17 +114,9 @@ class FastaHandler:
             else:
                 fasta_string += i.replace(' ', '').replace('\n', '').upper()
         
-        if ''.join(c for c in fasta_string if c.isdigit()):
-            msg = \
-'We found digits in your FASTA string coming from file {}. Be aware of \
-mistakes resulting from wrong FASTA file. You may wish to abort \
-and correct the file. \
-If you choose continue, Farseer-NMR will parse out the digits.'.\
-                format(fasta_path)
-            wet22 = fsw(msg_title='WARNING', msg=msg, wet_num=22)
-            self.log_r(wet22.wet)
-            wet22.continue_abort()
-            fasta_string = ''.join(c for c in fasta_string if not c.isdigit())
+        # performs checks on the fasta string
+        fasta_string = \
+            self._check_presence_of_digits(fasta_string, fasta_path=fasta_path)
         
         fasta_file.close()
         # Generates FASTA reference dataframe
@@ -110,7 +138,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             [str(i+j+atom2) for i, j in zip(dd["ResNo"], dd["3-letter"])]
         # Details set to 'None' as it is by default in CCPNMRv2 peaklists
         dd['Details'] = [details for i in fasta_string]
-        df = pd.DataFrame(
+        self.fasta_df = pd.DataFrame(
             dd,
             columns=[
                 'ResNo',
@@ -121,7 +149,94 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 'Details'
                 ]
             )
-        logs = '  * {}-{}-{}'.format(self.fasta_start_num, fasta_string, dd['ResNo'][-1])
-        self.log_r(logs)
+        logs = '  * {}-{}-{}'.format(
+            self.fasta_start_num,
+            fasta_string,
+            dd['ResNo'][-1])
+        self.logger.info(logs)
         
-        return df
+        return self.fasta_df
+
+if __name__ == "__main__":
+    import os
+    
+    
+    # the following FASTA examples are the same fasta sequence in
+    # different file formats or with wrong characters in between.
+    fasta_clean = 'ASDFGHKLMMMQPPCVASDFGHKLMMMQPPCVASDFGHKLMMMQPPCV'
+    fasta_complex = \
+"""
+> multiline FASTA header
+ASDFGHKLMM
+MQPPCVASDFGHKLMM
+MQPPCV
+ASDFGHKLMM
+MQPPCV
+"""
+
+    fasta_with_numbers = \
+"""
+> multiline FASTA with numbers header
+ASDFGHKLMM
+MQPP3CVASDFG4HKLMM
+MQPPCV
+ASD1FGHKLMM
+MQPPCV5
+"""
+    f1 = open('fasta_clean.fasta', 'w')
+    f2 = open('fasta_complex.fasta', 'w')
+    f3 = open('fasta_with_numbers.fasta', 'w')
+    
+    f1.write(fasta_clean)
+    f2.write(fasta_complex)
+    f3.write(fasta_with_numbers)
+    
+    f1.close()
+    f2.close()
+    f3.close()
+    
+    fh1 = FastaHandler('fasta_clean.fasta', 1)
+    fh2 = FastaHandler('fasta_complex.fasta', 1)
+    fh3 = FastaHandler('fasta_with_numbers.fasta', 1)
+    
+    fh1.read_fasta_file()
+    fh2.read_fasta_file()
+    fh3.read_fasta_file()
+    
+    # sets data frame for comparison
+    dd = {}
+    dd["ResNo"] = [str(i) for i in range(1, (1 + len(fasta_clean)))]
+    dd["1-letter"] = list(fasta_clean)
+    dd["3-letter"] = [aal1tol3[i] for i in fasta_clean]
+    dd["Assign F1"] = [str(i+j+'H') for i, j in zip(dd["ResNo"], dd["3-letter"])]
+    dd["Assign F2"] = [str(i+j+'N') for i, j in zip(dd["ResNo"], dd["3-letter"])]
+    dd['Details'] = ['None' for i in fasta_clean]
+    fasta_df = pd.DataFrame(
+        dd,
+        columns=[
+            'ResNo',
+            '3-letter',
+            '1-letter',
+            'Assign F1',
+            'Assign F2',
+            'Details'
+            ]
+        )
+    
+    print('f1 correct: {}'.format(fh1.fasta_df.equals(fasta_df)))
+    print('f2 correct: {}'.format(fh2.fasta_df.equals(fasta_df)))
+    print('f3 correct: {}'.format(fh3.fasta_df.equals(fasta_df)))
+    
+    # removing files
+    
+    fasta_file_list = [
+        'fasta_clean.fasta',
+        'fasta_complex.fasta',
+        'fasta_with_numbers.fasta'
+        ]
+    
+    for ffile in fasta_file_list:
+        if os.path.exists(ffile):
+            os.remove(ffile)
+            print("... removed {}".format(ffile))
+    
