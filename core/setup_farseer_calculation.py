@@ -26,7 +26,7 @@ from shutil import copy2
 
 from core.parsing import read_peaklist
 from core.utils import aal1tol3, read_fasta_file, peaklist_format_requires_fasta
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 def check_input_construction(output_path, variables):
 
@@ -223,8 +223,9 @@ that is not present in your FASTA file
 Please review the agreement between your peaklists and FASTA file.
 """.\
                 format(peaklist_path, fasta_path)
-            print(fsw.gen_wet("ERROR", msg, 31))
-            fsw.abort(m="Bad peaklist format")
+            wet31 = fsw(msg_title='ERROR', msg=msg, wet_num=31)
+            print(wet31.wet)
+            wet31.abort(m="Bad peaklist format")
         peak.residue_type = res_type
         cleaned_peaklist.append(peak)
 
