@@ -119,30 +119,20 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             self.logger.debug('no digits found')
             return fasta_string
     
-    def read_fasta_file(
-            self,
-            fasta_path='',
-            atom1='H',
-            atom2='N',
-            details='None'
-            ):
+    def reads_fasta_from_file(self, fasta_path=''):
         """
-        Reads a FASTA file to a pd.DataFrame.
+        Reads FASTA string from FASTA file.
         
         Parameters:
-            - fasta_path (opt, str): the FASTA file path.
-            - atom1 (opt, str): the atom type for assign F1 column (def: 'H')
-            - atom2 (opt, str): the atom type for assign F2 column (def: 'N')
-            - details (opt,str): fill Details column (def: 'None')
-        
-        Reads the FASTA file and generates a 5 column DataFrame
-        with the information ready to be incorporated in the peaklists
-        dataframes.
-        
+            - fasta_path (opt, str): the path to the fasta file
+            
         Returns:
-            Returns and assigns self.fasta_df
+            - fasta_string (str): the FASTA string in capital letters.
+            - Assigns self.fasta_string attribute
         """
+        self.logger.debug('fasta_path parameter set to {}'.format(fasta_path))
         fasta_path = fasta_path or self.fasta_path
+        self.logger.debug('Reading FASTA from file {}'.format(fasta_path))
         
         # Opens the FASTA file, which is a string of capital letters
         # 1-letter residue code that can be split in several lines.
@@ -166,6 +156,47 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             self._check_wrong_aminoacid_codes(fasta_string, fasta_path=fasta_path)
         
         fasta_file.close()
+        
+        self.fasta_string = fasta_string
+        
+        return self.fasta_string
+    
+    def reads_fasta_to_dataframe(
+            self,
+            fasta_string='',
+            atom1='H',
+            atom2='N',
+            details='None',
+            reads_from_file=False,
+            fasta_path=''
+            ):
+        """
+        Reads a FASTA string to a structured pd.DataFrame.
+        
+        Parameters:
+            - fasta_string (opt, str): the FASTA string
+            - atom1 (opt, str): the atom type for assign F1 column (def: 'H').
+            - atom2 (opt, str): the atom type for assign F2 column (def: 'N').
+            - details (opt,str): fill Details column (def: 'None').
+            - reads_from_file (opt, bool): if should read from file instead
+                of from string.
+            - fasta_path (opt, str): path to fasta file, might be used if
+                reads_from_file True.
+        
+        Reads the FASTA string and generates a 5 column DataFrame
+        with the information ready to be incorporated in the peaklists
+        dataframes.
+        
+        Returns:
+            Returns and assigns self.fasta_df
+        """
+        fasta_path = fasta_path or self.fasta_path
+        fasta_string = fasta_string or \
+            (self.reads_fasta_from_file(fasta_path) if reads_from_file \
+                else self.fasta_string)
+        
+        self.logger.debug(fasta_string)
+        
         # Generates FASTA reference dataframe
         dd = {}
         # ResNo is kept as str() to allow reindexing
@@ -278,9 +309,15 @@ MQPPCV
         f = open(f_file, 'w')
         f.write(f_str)
         f.close()
+        
         fh = FastaHandler(f_file, 1)
-        fh.read_fasta_file()
+        
+        fh.reads_fasta_from_file()
+        print("{} correct FASTA: {}".format(f_file, fasta_clean == fh.fasta_string))
+        
+        fh.reads_fasta_to_dataframe(reads_from_file=True)
         print("{} correct: {}".format(f_file, fh.fasta_df.equals(fasta_df)))
+        
         if os.path.exists(f_file):
             os.remove(f_file)
             print("... removed {}".format(f_file))

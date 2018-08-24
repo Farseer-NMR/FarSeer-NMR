@@ -30,6 +30,7 @@ import itertools as it
 import core.fslibs.log_config as fslogconf
 from core.utils import aal1tol3, aal3tol1
 from core.fslibs.WetHandler import WetHandler as fsw
+from core.fslibs.FastaHandler import FastaHandler
 
 class FarseerCube:
     """
@@ -372,7 +373,15 @@ the possible options.'
                 lessparts = parts[-1].split('.')[0]
                 
                 try:
-                    branch[lessparts] = branch.get(parts[-1], f(p))
+                    if filetype == '.csv':
+                        branch[lessparts] = branch.get(parts[-1], f(p))
+                    elif filetype == '.fasta':
+                        fh = FastaHandler(
+                                fasta_file_path=p,
+                                fasta_start_num=self.FASTAstart
+                                )
+                        fh.reads_fasta_to_dataframe(reads_from_file=True)
+                        branch[lessparts] = branch.get(parts[-1], fh.fasta_df)
                 
                 except pd.errors.EmptyDataError:
                     msg = \
