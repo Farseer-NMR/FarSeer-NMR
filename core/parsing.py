@@ -25,7 +25,7 @@ import csv
 import pandas as pd
 
 from core.utils import aal1tol3, eval_str_to_float
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 import core.fslibs.parsing_routines as fspr
 
 file_extensions = [
@@ -166,7 +166,7 @@ def get_peaklist_format(file_path):
 Mostly likely due to a bad peaklist formatting syntax.
 """.\
             format(file_path)
-        print(fsw.gen_wet("ERROR", msg, 30))
+        print(fsw(msg_title="ERROR", msg=msg, wet_num=30).wet)
         return "Bad peaklist format"
 
 def read_peaklist(peaklist_file):

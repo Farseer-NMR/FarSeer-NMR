@@ -26,7 +26,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 import pandas as pd
 from core.utils import aal1tol3
 from core.fslibs.Peak import Peak
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 def parse_ccpnmrv2_peaklist(peaklist_file):
     """
@@ -101,8 +101,9 @@ information in lines {}. Please review that peaklist.".format(
             pkl_file_path,
             [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
             )
-        print(fsw.gen_wet('ERROR', msg, 29))
-        fsw.abort()
+        wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
+        print(wet29.wet)
+        wet29.abort()
     
     ## misleading chars
     non_digit_f1 = \
@@ -118,8 +119,9 @@ charaters in Assignment columns in line {}.".format(
             pkl_file_path,
             [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
             )
-        print(fsw.gen_wet('ERROR', msg, 29))
-        fsw.abort()
+        wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
+        print(wet29.wet)
+        wet29.abort()
     
     ## for other cols.
     cols = [
@@ -146,7 +148,8 @@ charaters in line {} of column [{}].".format(
                 [2+int(i) for i in non_digit.index[non_digit].tolist()],
                 col
                 )
-            print(fsw.gen_wet('ERROR', msg, 29))
-            fsw.abort()
+            wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
+            print(wet29.wet)
+            wet29.abort()
     
     return

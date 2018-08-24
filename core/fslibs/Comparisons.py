@@ -25,6 +25,7 @@ import logging.config
 import numpy as np
 import pandas as pd
 import core.fslibs.log_config as fslogconf
+from core.fslibs.WetHandler import WetHandler as fsw
 
 class Comparisons:
     """
@@ -162,10 +163,16 @@ class Comparisons:
         
         return
     
-    def abort(self):
-        """Aborts Farseer-NMR run"""
-        self.log_r(fsw.abort_msg)
-        fsw.abort()
+    def abort(self, wet):
+        """
+        Aborts run with message. Writes message to log.
+        
+        Parameters:
+            - wet (WetHandler)
+        """
+        self.log_r(wet.wet)
+        self.log_r(wet.abort_msg())
+        wet.abort()
         
         return
         

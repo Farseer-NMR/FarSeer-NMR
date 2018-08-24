@@ -79,7 +79,7 @@ import core.fslibs.log_config as fslogconf
 from core.fslibs import FarseerCube as fcube
 from core.fslibs import FarseerSeries as fss
 from core.fslibs import Comparisons as fsc
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 def changes_current_dir(path):
     """
@@ -419,7 +419,7 @@ def log_end(fsuv):
     
     print("*** Used JSON config file will be copied to the end of MD log file")
     fout = fsuv["general_settings"]["logfile_name"]
-    logs(fsw.end_good(), fout)
+    logs(fsw(gen=False).end_well(), fout)
     log_time_stamp(fout, state='ENDED')
     logs("*** USED CONFIG FILE ***\n", fout, printit=False)
     fsuv_tmp = fsuv.copy()
@@ -481,12 +481,10 @@ All these variables should be set to True for PRE Analysis to be executed.".\
                     or fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
                 fsuv["fitting_settings"]["perform_comparisons"]
                 )
-        logs(
-            fsw.gen_wet('ERROR', msg, 1),
-            fsuv["general_settings"]["logfile_name"]
-            )
-        logs(fsw.abort_msg, fsuv["general_settings"]["logfile_name"])
-        fsw.abort()
+        wet1 = fsw(msg_title='ERROR', msg=msg, wet_num=1)
+        logs(wet1.wet, fsuv["general_settings"]["logfile_name"])
+        logs(wet.abort_msg(), fsuv["general_settings"]["logfile_name"])
+        wet.abort()
     
     return
 
@@ -508,10 +506,8 @@ def checks_cube_axes_flags(fsuv):
         msg = \
 "Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
 There is nothing to calculate. Confirm this is actually what you want."
-        logs(
-            fsw.gen_wet('NOTE', msg, 2),
-            fsuv["general_settings"]["logfile_name"]
-            )
+        wet2 = fsw(msg_title='NOTE', msg=msg, wet_num=2)
+        logs(wet2.wet, fsuv["general_settings"]["logfile_name"])
         return False
     
     else:
@@ -546,7 +542,8 @@ def checks_plotting_flags(farseer_series, fsuv, resonance_type):
 Confirm in the Settings menu if this is the desired configuration. \
 I won't leave you with empty hands though, all calculated restraints, \
 NMR observables and user notes will be exported in nicely formatted tables ;-)"
-        farseer_series.log_r(fsw.gen_wet('NOTE', msg, 3))
+        wet3 = fsw(msg_title='NOTE', msg=msg, wet_num=3)
+        farseer_series.log_r(wet3.wet)
         return False
     
     return True
@@ -564,10 +561,8 @@ def checks_calculation_flags(fsuv):
         msg = \
 "All restraints calculation routines are deactivated. \
 Nothing will be calculated."
-        logs(
-            fsw.gen_wet('WARNING', msg, 14),
-            fsuv["general_settings"]["logfile_name"]
-            )
+        wet14 = fsw(msg_title='WARNING', msg=msg, wet_num=14)
+        logs(wet14.wet, fsuv["general_settings"]["logfile_name"])
     
     return
 
@@ -589,7 +584,8 @@ def checks_fit_input(series, fsuv):
 'There are negative values in titration_x_values variable. \
 Fitting to the Hill Equation does not accept negative values. \
 Please revisit your input'
-        series.log_r(fsw.gen_wet('ERROR', msg, 6))
+        wet6 = fsw(msg_title='ERROR', msg=msg, wet_num=6)
+        series.log_r(wet6.wet)
         series.abort()
     
     elif len(x_values) != len(series.items):
@@ -599,7 +595,8 @@ Please revisit your input'
 along_x ,i.e. input peaklists. Please correct <fitting_x_values> variable or \
 confirm you have not forgot any peaklist [{}].".\
             format(x_values, series.items)
-        series.log_r(fsw.gen_wet('ERROR', msg, 5))
+        wet5 = fsw(msg_title='ERROR', msg=msg, wet_num=5)
+        series.log_r(wet5.wet)
         series.abort()
     
     else:
@@ -608,7 +605,8 @@ confirm you have not forgot any peaklist [{}].".\
 number of input peaklists, and no negative value was found. Data fit to the \
 Hill Equation will be performed with the following values: {}.".\
             format(x_values)
-        series.log_r(fsw.gen_wet('NOTE', msg, 7))
+        wet7 = fsw(msg_title='NOTE', msg=msg, wet_num=7)
+        series.log_r(wet7.wet)
     
     return
 
@@ -633,10 +631,8 @@ no datapoints along this axis so that a series could not be created and \
 analysed. Confirm the axis analysis flags are correctly set in the Run \
 Settings.'.\
         format(dim)    
-    logs(
-        fsw.gen_wet('WARNING', msg, 20),
-        fsuv["general_settings"]["logfile_name"]
-        )
+    wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
+    logs(wet20.wet, fsuv["general_settings"]["logfile_name"])
     
     return
     
@@ -1048,10 +1044,8 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
         msg = \
 'The overall combination of data and calculation flags is not consistent and \
 any series set was created along an axis. Nothing will be calculated.'
-        logs(
-            fsw.gen_wet('WARNING', msg, 20),
-            fsuv["general_settings"]["logfile_name"]
-            )
+        wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
+        logs(wet20.wet, fsuv["general_settings"]["logfile_name"])
     
     return series_dct
 
