@@ -251,11 +251,12 @@ FASTA starting residue: {}  """.\
     
     def abort(self, wet):
         """
-        Aborts run with message.
+        Aborts run with message. Writes message to log.
         
         Parameters:
             - wet (WetHandler)
         """
+        self.log_r(wet.wet)
         self.log_r(wet.abort_msg())
         wet.abort()
         
@@ -378,7 +379,6 @@ the possible options.'
 "The file {} is empty. To introduce an empty data point, add the header.".\
                         format(filetype)
                     wet14 = fsw(msg_title='ERROR', msg=msg, wet_num=14)
-                    self.log_r(wet14.wet)
                     self.abort(wet14)
         
         self.checks_xy_datapoints_coherency(target, filetype)
@@ -856,7 +856,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
 several input errors that may occur in this case. Read the Documentation for \
 more details."
             wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24)
-            self.log_r(wet24.wet)
             self.abort(wet24)
         
         # reads length of the expanded peaklist
@@ -1482,7 +1481,6 @@ more details."
 if Farseer-NMR can't do nothing with them? :-)".\
                 format(filetype)
             wet13 = fsw(msg_title='ERROR', msg=msg, wet_num=13)
-            self.log_r(wet13.wet)
             self.abort(wet13)
         
         # checks if files exists
@@ -1490,7 +1488,6 @@ if Farseer-NMR can't do nothing with them? :-)".\
             msg = "There are no files in spectra/ with extension {}".\
                 format(filetype)
             wet9 = fsw(msg_title='ERROR', msg=msg, wet_num=9)
-            self.log_r(wet9.wet)
             self.abort(wet9)
             
         return
@@ -1533,7 +1530,6 @@ if Farseer-NMR can't do nothing with them? :-)".\
 "Y axis folder names are not coherent. \
 Names must be equal accross every Z axis datapoint folder."
             wet11 = fsw(msg_title='ERROR', msg=msg, wet_num=11)
-            self.log_r(wet11.wet)
             self.abort(wet11)
         
         if filetype == '.fasta':
@@ -1547,7 +1543,6 @@ Names must be equal accross every Z axis datapoint folder."
 Confirm there is only ONE {0} file for each Y datapoint folder.".\
                     format(filetype)
                 wet12 = fsw(msg_title='ERROR', msg=msg, wet_num=12)
-                self.log_r(wet12.wet)
                 self.abort(wet12)
         
         ### Checks coherency of x files
@@ -1559,7 +1554,6 @@ Confirm there is only ONE {0} file for each Y datapoint folder.".\
 Check for the missing ones!'.\
                     format(filetype)
                 wet8 = fsw(msg_title='ERROR', msg=msg, wet_num=8)
-                self.log_r(wet8.wet)
                 self.abort(wet8)
             
             x_files_names = set(
@@ -1600,7 +1594,6 @@ or is an <unassigned> or <missing> residue. \
 Correct the reference residue in the Settings Menu.'.\
                 format(ref_res)
             wet16 = fsw(msg_title='ERROR', msg=msg, wet_num=16)
-            self.log_r(wet16.wet)
             self.abort(wet16)
         
         return
@@ -1634,7 +1627,6 @@ Correct the reference residue in the Settings Menu.'.\
 when performing calculations along the Y axis. \
 Please correct your .fasta files.'
             wet21 = fsw(msg_title='ERROR', msg=msg, wet_num=21)
-            self.log_r(wet21.wet)
             self.abort(wet21)
         
         return
@@ -1685,7 +1677,6 @@ which will results in peaklist truncation. \
 You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
                 wet22 = fsw(msg_title='ERROR', msg=msg, wet_num=22)
-                self.log_r(wet22.wet)
                 self.abort(wet22)
             
             elif fasta_last_residue < peaklist_last_residue:
@@ -1696,13 +1687,11 @@ which will results in peaklist truncation. \
 You should verify that your start Fasta residue number is correct.".\
                     format(z, y, x, f)
                 wet22 = fsw(msg_title='ERROR', msg=msg, wet_num=22)
-                self.log_r(wet22.wet)
                 self.abort(wet22)
             
             else:
                 msg = 'Something is wrong in .checks_fasta_start_number()'
                 wet0 = fsw.gen_wet('DEVELOPER ISSUE', msg, -1)
-                self.log_r(wet0.wet)
                 self.abort(wet0)
             
         else:
@@ -1725,31 +1714,27 @@ You should verify that your start Fasta residue number is correct.".\
                 the peaklist information.
         """
         
-        def abort_cycle(wet):
-            self.log_r(wet.wet)
-            self.abort(wet)
-        
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             
             if not(0 < target[z][y][x].loc[:,'Position F1'].mean() < 20):
                 msg = 'Peaklist [{}][{}][{}] "Position F1" values do not \
 correspond to proton chemical shift values.'.format(z, y, x)
-                abort_cycle(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
             
             if not(target[z][y][x].ix[0,'Assign F1'].endswith('H')):
                 msg = 'Peaklist [{}][{}][{}] "Assign F1" values do not \
 correspond to proton assignment labels.'.format(z, y, x)
-                abort_cycle(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
             
             if not(80 < target[z][y][x].loc[:,'Position F2'].mean() < 150):
                 msg = 'Peaklist [{}][{}][{}] "Position F2" values do not \
 correspond to nitrogen chemical shift values.'.format(z, y, x)
-                abort_cycle(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
             
             if not(target[z][y][x].ix[0,'Assign F2'].endswith('N')):
                 msg = 'Peaklist [{}][{}][{}] "Assign F2" values do not \
 correspond to nitrogen assignment labels.'.format(z, y, x)
-                abort_cycle(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
         
         return
 
@@ -1779,7 +1764,6 @@ correspond to nitrogen assignment labels.'.format(z, y, x)
 different lengths.".\
                 format(dp2, dp1, axis[-1].upper())
             wet28 = fsw(msg_title="ERROR", msg=msg, wet_num=28)
-            self.log_r(wet28.wet)
             self.abort(wet28)
         
         return
@@ -1805,7 +1789,6 @@ information in lines {}. Please review that peaklist.".format(
                 [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
                 )
             wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-            self.log_r(wet29.wet)
             self.abort(wet29)
         
         ## misleading chars
@@ -1827,7 +1810,6 @@ charaters in Assignment columns in line {}.".format(
                 [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
                 )
             wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-            self.log_r(wet29.wet)
             self.abort(wet29)
         
         ## for other cols.
@@ -1857,7 +1839,6 @@ charaters in line {} of column [{}].".format(
                     col
                     )
                 wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-                self.log_r(wet29.wet)
                 self.abort(wet29)
         
         return
