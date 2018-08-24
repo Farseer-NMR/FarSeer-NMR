@@ -24,6 +24,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 
 from functools import reduce
 import os
+from core.fslibs.WetHandler import WetHandler as fsw
 
 aal3tol1 = {
     "Ala": "A",
@@ -142,8 +143,9 @@ mistakes resulting from wrong FASTA file. You may wish to abort \
 and correct the file. \
 If you choose continue, Farseer-NMR will parse out the digits.'.\
             format(fasta_path)
-        self.log_r(fsw.gen_wet('WARNING', msg, 22))
-        fsw.continue_abort()
+        wet22 = fsw(msg_title='WARNING', msg=msg, wet_num=22)
+        self.log_r(wet22.wet)
+        wet22.continue_abort()
         fasta = ''.join(c for c in fasta if not c.isdigit())
 
     return fasta
