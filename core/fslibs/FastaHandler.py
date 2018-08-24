@@ -45,15 +45,58 @@ class FastaHandler:
         self.logger.debug('FASTA file path read: OK')
         
     
-    def _check_presence_of_digits(self, fasta_string, fasta_path=''):
+    def _check_wrong_aminoacid_codes(self, fasta_string, fasta_path=''):
         """
-        Checks the presence of digits in the FASTA string.
+        Checks the presence of wrong a.a. codes in the FASTA string.
         
-        If digits are found user is prompt if to abort or parse them out.
+        If found user is prompt if to abort or parse them out.
+        
+        Parameters:
+            - fasta_string (str): the fasta string
+            - fasta_path (opt, str): path to fasta file, serves log purposes
         
         Returns:
             FASTA without digits (user choice)
         """
+        self.logger.debug('Entered check wrong a.a.')
+        
+        if ''.join(c for c in fasta_string if c not in aal1tol3.keys()):
+            msg = \
+'We found wrong aminoacids codes in your FASTA string coming from file {}. \
+Be aware of \
+mistakes resulting from wrong FASTA file. You may wish to abort \
+and correct the file. \
+If you choose continue, Farseer-NMR will parse out the wrong codes.'.\
+                format(self.fasta_path)
+            
+            wet22 = fsw(msg_title='WARNING', msg=msg, wet_num=22)
+            self.logger.info(wet22.wet)
+            wet22.continue_abort()
+            fasta_string_no_wrong_codes = \
+                ''.join(c for c in fasta_string if c in aal1tol3.keys())
+            
+            self.logger.debug('Wrong aa codes parsed out')
+            return fasta_string_no_wrong_codes
+        
+        else:
+            self.logger.debug('no digits found')
+            return fasta_string
+        
+    
+    def _check_presence_of_digits(self, fasta_string, fasta_path=''):
+        """
+        Checks the presence of digits in the FASTA string.
+        
+        If found user is prompt if to abort or parse them out.
+        
+        Parameters:
+            - fasta_string (str): the fasta string
+            - fasta_path (opt, str): path to fasta file, serves log purposes
+        
+        Returns:
+            FASTA without digits (user choice)
+        """
+        self.logger.debug('Entered check digits')
         
         if ''.join(c for c in fasta_string if c.isdigit()):
             msg = \
@@ -69,9 +112,11 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             fasta_string_no_digit = \
                 ''.join(c for c in fasta_string if not c.isdigit())
             
+            self.logger.debug('Digits parsed out')
             return fasta_string_no_digit
         
         else:
+            self.logger.debug('no digits found')
             return fasta_string
     
     def read_fasta_file(
@@ -117,6 +162,8 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         # performs checks on the fasta string
         fasta_string = \
             self._check_presence_of_digits(fasta_string, fasta_path=fasta_path)
+        fasta_string = \
+            self._check_wrong_aminoacid_codes(fasta_string, fasta_path=fasta_path)
         
         fasta_file.close()
         # Generates FASTA reference dataframe
@@ -160,7 +207,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
 if __name__ == "__main__":
     import os
     
-    
     # the following FASTA examples are the same fasta sequence in
     # different file formats or with wrong characters in between.
     fasta_clean = 'ASDFGHKLMMMQPPCVASDFGHKLMMMQPPCVASDFGHKLMMMQPPCV'
@@ -183,25 +229,29 @@ MQPPCV
 ASD1FGHKLMM
 MQPPCV5
 """
-    f1 = open('fasta_clean.fasta', 'w')
-    f2 = open('fasta_complex.fasta', 'w')
-    f3 = open('fasta_with_numbers.fasta', 'w')
+    fasta_wrong_codes = \
+"""
+> multiline FASTA header
+JASDFGHKLMM
+MQPPOCVASDFGHKLMM
+MQPPCXXV
+ASDFGHZKLMM
+MQPPCV
+"""
     
-    f1.write(fasta_clean)
-    f2.write(fasta_complex)
-    f3.write(fasta_with_numbers)
+    list_of_fastas = [
+        fasta_clean,
+        fasta_complex,
+        fasta_with_numbers,
+        fasta_wrong_codes
+        ]
     
-    f1.close()
-    f2.close()
-    f3.close()
-    
-    fh1 = FastaHandler('fasta_clean.fasta', 1)
-    fh2 = FastaHandler('fasta_complex.fasta', 1)
-    fh3 = FastaHandler('fasta_with_numbers.fasta', 1)
-    
-    fh1.read_fasta_file()
-    fh2.read_fasta_file()
-    fh3.read_fasta_file()
+    fasta_file_list = [
+        'fasta_clean.fasta',
+        'fasta_complex.fasta',
+        'fasta_with_numbers.fasta',
+        'fasta_wrong_codes.fasta'
+        ]
     
     # sets data frame for comparison
     dd = {}
@@ -223,20 +273,15 @@ MQPPCV5
             ]
         )
     
-    print('f1 correct: {}'.format(fh1.fasta_df.equals(fasta_df)))
-    print('f2 correct: {}'.format(fh2.fasta_df.equals(fasta_df)))
-    print('f3 correct: {}'.format(fh3.fasta_df.equals(fasta_df)))
     
-    # removing files
-    
-    fasta_file_list = [
-        'fasta_clean.fasta',
-        'fasta_complex.fasta',
-        'fasta_with_numbers.fasta'
-        ]
-    
-    for ffile in fasta_file_list:
-        if os.path.exists(ffile):
-            os.remove(ffile)
-            print("... removed {}".format(ffile))
+    for f_str, f_file in zip(list_of_fastas, fasta_file_list):
+        f = open(f_file, 'w')
+        f.write(f_str)
+        f.close()
+        fh = FastaHandler(f_file, 1)
+        fh.read_fasta_file()
+        print("{} correct: {}".format(f_file, fh.fasta_df.equals(fasta_df)))
+        if os.path.exists(f_file):
+            os.remove(f_file)
+            print("... removed {}".format(f_file))
     
