@@ -20,11 +20,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import logging.config
+#import logging
+#import logging.config
 import numpy as np
 import pandas as pd
-import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
 from core.fslibs.WetHandler import WetHandler as fsw
 
 class Comparisons:

@@ -23,9 +23,12 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import textwrap
 
-import logging
-import logging.config
-import core.fslibs.log_config as fslogconf
+#import logging
+#import logging.config
+#import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
+
+#from core.fslibs.Logger import FarseerLogger
 
 class WetHandler:
     """Handles Warning, Errors and Troubleshooting messages"""
@@ -48,8 +51,10 @@ class WetHandler:
         """
         
         # initiates log
-        self.logger = fslogconf.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        #self.logger = fslogconf.getLogger(__name__)
+        #logging.config.dictConfig(fslogconf.farseer_log_config)
+        #self.logger = FarseerLogger(__name__)
+        self.logger = Logger.getLogger(__name__)
         self.logger.debug('logger initiated')
         
         # sets variables
