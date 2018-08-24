@@ -99,7 +99,6 @@ class FarseerCube:
         
         Loading data:
             .load_experiments()
-            .read_FASTA()
             .init_coords_names()
         
         Data treatment:
@@ -343,7 +342,6 @@ FASTA starting residue: {}  """.\
                 #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
                 #self.log_r(fsw.gen_wet('ERROR', msg, 21))
                 #self.abort()
-            f = self.read_FASTA
             target = self.allfasta
             
         elif filetype == '.csv' and resonance_type == 'Sidechains':
@@ -395,89 +393,6 @@ the possible options.'
             self.init_coords_names()
         
         return
-    
-    def read_FASTA(self, FASTApath):
-        """
-        Reads a FASTA file to a pd.DataFrame.
-        
-        Parameters:
-            FASTApath (str): the FASTA file path.
-        
-        Reads the FASTA file and generates a 5 column DataFrame
-        with the information ready to be incorporated in the peaklists
-        dataframes.
-        
-        Returns:
-            pd.DataFrame
-        """
-        # Opens the FASTA file, which is a string of capital letters
-        # 1-letter residue code that can be split in several lines.
-        FASTAfile = open(FASTApath, 'r')
-        fl = FASTAfile.readlines()
-        
-        # Generates a single string from the FASTA file
-        FASTA = ''
-        
-        for i in fl:
-            if i.startswith('>'):
-                continue
-            
-            else:
-                FASTA += i.replace(' ', '').replace('\n', '').upper()
-        
-        if ''.join(c for c in FASTA if c.isdigit()):
-            msg = \
-'We found digits in your FASTA string coming from file {}. Be aware of \
-mistakes resulting from wrong FASTA file. You may wish to abort \
-and correct the file. \
-If you choose continue, Farseer-NMR will parse out the digits.'.\
-                format(FASTApath)
-            wet22 = fsw(msg_title='WARNING', msg=msg, wet_num=22)
-            self.log_r(wet22.wet)
-            wet22.continue_abort()
-            FASTA = ''.join(c for c in FASTA if not c.isdigit())
-        
-        FASTAfile.close()
-        # Generates FASTA reference dataframe
-        dd = {}
-        # ResNo is kept as str() to allow reindexing
-        # later on the finds_missing function.
-        dd["ResNo"] = \
-            [str(i) for i in range(
-                self.FASTAstart,
-                (self.FASTAstart + len(FASTA))
-                )
-            ]
-        dd["1-letter"] = list(FASTA)
-        dd["3-letter"] = [aal1tol3[i] for i in FASTA]
-        # Assign F1 is generated here because it will serve in future functions.
-        atomtype = \
-            self.allpeaklists[self.zzref][self.yyref][self.xxref].\
-                loc[0,'Assign F1'][-1]
-        dd["Assign F1"] = \
-            [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
-        atomtype = \
-            self.allpeaklists[self.zzref][self.yyref][self.xxref].\
-                        loc[0,'Assign F2'][-1]
-        dd["Assign F2"] = \
-            [str(i+j+atomtype) for i, j in zip(dd["ResNo"], dd["3-letter"])]
-        # Details set to 'None' as it is by default in CCPNMRv2 peaklists
-        dd['Details'] = ['None' for i in FASTA]
-        df = pd.DataFrame(
-            dd,
-            columns=[
-                'ResNo',
-                '3-letter',
-                '1-letter',
-                'Assign F1',
-                'Assign F2',
-                'Details'
-                ]
-            )
-        logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
-        self.log_r(logs)
-        
-        return df
     
     def init_coords_names(self):
         """
