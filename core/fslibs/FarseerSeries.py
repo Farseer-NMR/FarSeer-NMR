@@ -33,7 +33,7 @@ from matplotlib import pyplot as plt
 import datetime 
 
 import core.fslibs.log_config as fslogconf
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 class FarseerSeries(pd.Panel):
     """
@@ -310,11 +310,16 @@ class FarseerSeries(pd.Panel):
         
         return
     
-    def abort(self):
-        """Aborts run with message."""
+    def abort(self, wet):
+        """
+        Aborts run with message. Writes message to log.
         
-        self.log_r(fsw.abort_msg)
-        fsw.abort()
+        Parameters:
+            - wet (WetHandler)
+        """
+        self.log_r(wet.wet)
+        self.log_r(wet.abort_msg())
+        wet.abort()
         
         return
     
@@ -410,8 +415,7 @@ and stacked (compared) along "{}" axis'.format(
         # if clause not part of the original function, added for the Farseer-NMR Project.
         if not(hexx.startswith("#") and len(hexx) == 7):
             msg = "The input colour is not in HEX format."
-            self.log_r(fsw.gen_wet("ERROR", msg, 27))
-            self.abort()
+            self.abort(fsw(msg_title="ERROR", msg=msg, wet_num=27))
         # Pass 16 to the integer function for change of base
         return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
 
@@ -650,8 +654,11 @@ and stacked (compared) along "{}" axis'.format(
             self: added columns 'tag', 'Theo PRE'.
         """
         if not(self.para_name):
-            self.log_r(fsw.gen_wet("ERROR", "Paramagnetic Z axis name incorrect", 1))
-            self.abort()
+            self.abort(fsw(
+                msg_title="ERROR",
+                msg="Paramagnetic Z axis name incorrect",
+                wet_num=1
+                ))
             return
         self.PRE_loaded = True
         target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
@@ -690,8 +697,7 @@ and stacked (compared) along "{}" axis'.format(
         except ValueError:
             msg = \
 "Theoretical PRE file incomplete. Header with tag number is missing."
-            self.log_r(fsw.gen_wet('ERROR', msg, 15))
-            self.abort()
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=15))
         
         # check tag residue
         if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
@@ -703,8 +709,7 @@ is not part of the protein sequence ({}-{}).'.\
                     int(self.res_info.iloc[0,0,0]),
                     int(self.res_info.iloc[0,:,0].tail(n=1))
                     )
-            self.log_r(fsw.gen_wet('ERROR', msg, 17))
-            self.abort()
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=17))
         
         self.loc[self.para_name,:,'tag'] = ''
         tagmask = self.loc[self.para_name,:,'ResNo'] == tag
@@ -1901,8 +1906,7 @@ recipient: residues
 data points <along_x>, i.e. input peaklists. Please correct <fitting_x_values> \
 variable or confirm you have not forgot any peaklist [{}].".\
                     format(titration_x_values, self.items)
-                self.log_r(fsw.gen_wet('ERROR', msg, 5))
-                self.abort()
+                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=5))
             
             x = np.array(titration_x_values)
             xmin = titration_x_values[0]
@@ -3140,8 +3144,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         except TypeError:
             msg = "Chosen fitting function <{}> not an available option.".\
                 format(fit_function)
-            self.log_r(fsw.gen_wet('ERROR', msg, 23))
-            self.abort()
+            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=23))
         
         self.log_r("*** Performing fit using function: {}".format(fit_function))
         # logging ###
