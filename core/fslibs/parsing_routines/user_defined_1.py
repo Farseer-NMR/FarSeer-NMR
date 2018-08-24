@@ -25,7 +25,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from core.fslibs.Peak import Peak
 from core.utils import eval_str_to_float
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 def parse_user_peaklist_1(peaklist_file):
     """
@@ -76,8 +76,9 @@ def parse_user_peaklist_1(peaklist_file):
         else:
             msg = "The peaklist {} contains a wrong line format in line {}."\
                 .format(peaklist_file, counter)
-            print(fsw.gen_wet('ERROR', msg, 29))
-            fsw.abort()
+            wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
+            print(wet29.wet)
+            wet29.abort()
         
         if ls[3] not in ('N', 'H'):
             continue
