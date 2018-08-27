@@ -1083,6 +1083,101 @@ Nothing to calculate here.')
         
         return None
     
+    def export_series(self, farseer_series):
+        """
+        Exports FarseerSeries to tsv files.
+        
+        Uses FarseerSeries.export_seres_to_tsv()
+        
+        Parameters:
+            farseer_series (FarseerSeries instance)
+        """
+        
+        farseer_series.export_series_to_tsv()
+        
+        return None
+    
+    def export_chimera_att_files(self, farseer_series):
+        """
+        Exports formatted UCSF Chimera Attribute files for the
+        calculated restraints.
+        
+        http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
+        
+        Parameters:
+            farseer_series (FarseerSeries instance): contains all the
+                experiments of a Farseer-NMR Cube extracted series.
+        
+        Depends on:
+        fsuv.restraint_settings
+        fsuv.chimera_att_select_format
+        """
+        
+        for restraint in self.fsuv["restraint_settings"].index:
+            # if the user wants to plot this parameter
+            if self.fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
+                # do export chimera attribute files
+                farseer_series.write_Chimera_attributes(
+                        restraint,
+                        resformat=\
+                            self.fsuv["general_settings"]["chimera_att_select_format"]
+                        )
+        
+        return None
+    
+    def export_all_parameters(self, farseer_series, resonance_type='Backbone'):
+        """
+        Exports the evolution of all NMR calculated parameters
+        in separated tables.
+        
+        Table rows are residues and columns are series datapoints.
+        
+        Parameters:
+            farseer_series (FarseerSeries instance): contains all the
+                experiments of a Farseer-NMR Cube extracted series.
+        
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return
+        
+        # Exports calculated parameters
+        for restraint in self.fsuv["restraint_settings"].index:
+            if self.fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
+                farseer_series.write_table(
+                    restraint,
+                    restraint,
+                    resonance_type=resonance_type
+                    )
+        
+        # Exports all observables and user annotations
+        # experimental feature
+        list_of_observables = [
+            "Peak Status",
+            "Position F2",
+            "Position F1",
+            "Height",
+            "Volume",
+            "Line Width F1 (Hz)",
+            "Line Width F2 (Hz)",
+            "Merit",
+            "Details",
+            "Fit Method",
+            "Vol. Method"
+            ]
+        
+        for observable in list_of_observables:
+            farseer_series.write_table(
+                "observables/"+observable,
+                observable,
+                resonance_type=resonance_type
+                )
+        
+        return None
+    
     def eval_series(self, series_dct, resonance_type='Backbone'):
         """
         Executes the Farseer-NMR analysis routines over all the series of
@@ -1125,9 +1220,9 @@ Nothing to calculate here.')
                     # Analysis of PRE data - only in along_z
                     self.PRE_analysis(series_dct[cond][dim2_pt][dim1_pt])
                     # EXPORTS FULLY PARSED PEAKLISTS
-                    self.exports_series(series_dct[cond][dim2_pt][dim1_pt])
+                    self.export_series(series_dct[cond][dim2_pt][dim1_pt])
                     # EXPORTS CHIMERA FILES
-                    self.exports_chimera_att_files(
+                    self.export_chimera_att_files(
                         series_dct[cond][dim2_pt][dim1_pt]
                         )
                     #
@@ -1436,19 +1531,7 @@ def identify_residues(exp):
 
 
 
-def exports_series(farseer_series):
-    """
-    Exports FarseerSeries to tsv files.
-    
-    Uses FarseerSeries.export_seres_to_tsv()
-    
-    Parameters:
-        farseer_series (FarseerSeries instance)
-    """
-    
-    farseer_series.export_series_to_tsv()
-    
-    return
+
 
 def exports_chimera_att_files(farseer_series, fsuv):
     """
@@ -1481,51 +1564,7 @@ def exports_chimera_att_files(farseer_series, fsuv):
     
     return
 
-def exports_all_parameters(farseer_series, fsuv, resonance_type='Backbone'):
-    """
-    Exports the evolution of all parameters in separated tables.
-    
-    Table rows are residues and columns are series datapoints.
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    # Exports calculated parameters
-    for restraint in fsuv["restraint_settings"].index:
-        if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
-            farseer_series.write_table(
-                restraint,
-                restraint,
-                resonance_type=resonance_type
-                )
-    
-    # Exports all observables and user annotations
-    list_of_observables = [
-        "Peak Status",
-        "Position F2",
-        "Position F1",
-        "Height",
-        "Volume",
-        "Line Width F1 (Hz)",
-        "Line Width F2 (Hz)",
-        "Merit",
-        "Details",
-        "Fit Method",
-        "Vol. Method"
-        ]
-    
-    for observable in list_of_observables:
-        farseer_series.write_table(
-            "observables/"+observable,
-            observable,
-            resonance_type=resonance_type
-            )
-    
-    return
+
 
 def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
     """
