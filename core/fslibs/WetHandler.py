@@ -26,7 +26,7 @@ import textwrap
 #import logging
 #import logging.config
 #import core.fslibs.log_config as fslogconf
-import core.fslibs.Logger as Logger
+from core.fslibs.Logger import FarseerLogger
 
 #from core.fslibs.Logger import FarseerLogger
 
@@ -54,7 +54,7 @@ class WetHandler:
         #self.logger = fslogconf.getLogger(__name__)
         #logging.config.dictConfig(fslogconf.farseer_log_config)
         #self.logger = FarseerLogger(__name__)
-        self.logger = Logger.getLogger(__name__)
+        self.logger = FarseerLogger(__name__).setup_log()
         self.logger.debug('logger initiated')
         
         # sets variables
