@@ -66,8 +66,8 @@ Methods:
 """
 
 #  
-import logging
-import logging.config
+#import logging
+#import logging.config
 import sys
 import os
 import shutil
@@ -75,64 +75,91 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
-import core.fslibs.log_config as fslogconf
+#import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
 from core.fslibs import FarseerCube as fcube
 from core.fslibs import FarseerSeries as fss
 from core.fslibs import Comparisons as fsc
 from core.fslibs.WetHandler import WetHandler as fsw
 
-def changes_current_dir(path):
+class FarseerNMR():
     """
-    Changes running dir to path. Exists if path is not a valid directory.
-    
-    Parameters:
-        - path (str): target directory
-    
-    Returns:
-        - Absolute path for new running dir.
+    Handles Farseer-NMR interface
     """
-    how_to_run = \
-"""*** execute Farseer-NMR as
-*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
-    
-    try:
-        os.chdir(path)
-    except NotADirectoryError as notdirerr: 
-        msg = \
-"""
-***************************************
-*** A file was passed as argument instead of a directory path.
-*** {}
-***
-{}
-***************************************
-""".\
-            format(notdirerr, how_to_run)
-        sys.exit(msg)
-    
-    return os.path.abspath(path)
-
-def start_logger(target_path):
-    """
-    Initiates logger.
-    
-    Parameters:
-        - target_path (str): path to were logs are written.
+    def __init__(self, fsuv, path):
+        """
+        Initiates the Farseer-NMR interface.
         
-    Returns:
-        - logger instance
-    """
+        Parameters:
+            - fsuv (dict): dictionary containing all the user defined values
+        """
+        if isinstance(fsuv, dict):
+            self.fsuv = fsuv
+        else:
+            wet32 = fsw(gen=False)
+            msg = "FarseerNMR interface requires 'fsuv' parameter to be a \
+dictionary."
+            wet32.abort(msg)
+        
+        # self._changes_current_dir()
+        self._starts_logger()
+        b = fcube.FarseerCube("")
     
-    if os.getcwd() != os.path.abspath(target_path):
-        changes_current_dir(target_path)
+    # def _changes_current_dir(self):
+        # """
+        # Changes running dir to path. Exists if path is not a valid directory.
+        
+        # Parameters:
+            # - path (str): target directory
+        
+        # Returns:
+            # - Absolute path for new running dir.
+        # """
+        # how_to_run = \
+    # """*** execute Farseer-NMR as
+    # *** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+        
+        # try:
+            # os.chdir(self.fsuv["general_settings"]["output_path"])
+        # except NotADirectoryError as notdirerr: 
+            # msg = \
+    # """
+    # ***************************************
+    # *** A file was passed as argument instead of a directory path.
+    # *** {}
+    # ***
+    # {}
+    # ***************************************
+    # """.\
+                # format(notdirerr, how_to_run)
+            # sys.exit(msg)
+        
+        # return None
     
-    logger = fslogconf.getLogger(__name__)
-    logging.config.dictConfig(fslogconf.farseer_log_config)
-    
-    logger.debug('os.getcwd equals target_path:: %s', (os.getcwd() == os.path.abspath(target_path)))
-    logger.debug('logger initiated')
-    
-    return logger
+    def _starts_logger(self):
+        """
+        Initiates logger.
+        
+        Assigned self.logger
+        """
+        
+        #if self.fsuv["general_settings"]["output_path"]:
+        #    Logger.FarseerLogger.farseer_log_config["handlers"]["info_file_handler"]["filename"] = \
+        #        "{}/farseernmr.log".format(self.fsuv["general_settings"]["output_path"])
+        #    
+        #    Logger.FarseerLogger.farseer_log_config["handlers"]["debug_file_handler"]["filename"] = \
+        #        "{}/debug.log".format(self.fsuv["general_settings"]["output_path"])
+        
+        self.logger = Logger.FarseerLogger(__name__, self.fsuv["general_settings"]["output_path"]).setup_log()
+        self.logger.debug('logger initiated')
+        print('here')
+        return None
+
+
+
+
+
+
 
 def read_user_variables(runfolder_path, configjson_path, logger=None):
     """
@@ -150,7 +177,7 @@ def read_user_variables(runfolder_path, configjson_path, logger=None):
     Returns:
         fsuv (dictionary): contains the user preferences.
     """
-    logger = logger or start_logger(runfolder_path)
+    #logger = logger or start_logger(runfolder_path)
     
     how_to_run = \
 """*** execute Farseer-NMR as
@@ -192,7 +219,7 @@ def read_user_variables(runfolder_path, configjson_path, logger=None):
     # changes current directory to the run directory which is that where
     # spectra/ folder is.
     if os.getcwd() != os.path.abspath(runfolder_path):
-        logger.debug('cwd differs from runfolder_path')
+        #logger.debug('cwd differs from runfolder_path')
         changes_current_dir(runfolder_path)
     # stores path to spectra/ folder
     fsuv["general_settings"]["input_spectra_path"] = \
@@ -1936,8 +1963,16 @@ def run_farseer(fsuv, logger=None):
 
 if __name__ == '__main__':
     
-    logger = start_logger(sys.argv[1])
-    fsuv = read_user_variables(sys.argv[1], sys.argv[2], logger=logger)
+    
+    
+    
+    #logger = start_logger(sys.argv[1])
+    #fsuv = read_user_variables(sys.argv[1], sys.argv[2])
+    fsuv = json.load(open(sys.argv[2], 'r'))
+    a = FarseerNMR(fsuv, sys.argv[1])
+    a.logger.info('done')
+    a.logger.debug('closing')
+    
     # copy_Farseer_version(fsuv)
     
     # path evaluations now consider the absolute path, always.
@@ -1946,5 +1981,5 @@ if __name__ == '__main__':
     # path should be the folder where the 'spectra/' are stored and NOT the
     # path to the 'spectra/' folder.
     
-    run_farseer(fsuv, logger=logger)
-    logger.debug('Farseermain.py finished with __name__ == "__main__"')
+    #run_farseer(fsuv, logger=logger)
+    #logger.debug('Farseermain.py finished with __name__ == "__main__"')

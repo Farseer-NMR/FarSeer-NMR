@@ -140,7 +140,7 @@ class FarseerCube:
         
         FASTAstart (int): The first residue in the FASTA file.
         """
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         #logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
