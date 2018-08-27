@@ -737,6 +737,23 @@ Settings.'.\
         
         return None
     
+    def organize_columns(self, resonance_type='Backbone'):
+        """Uses FarseerSet.organize_cols()."""
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return None
+        
+        self.pkls.organize_cols(
+            performed_cs_correction=\
+                self.fsuv["cs_settings"]["perform_cs_correction"],
+            resonance_type=resonance_type
+            )
+        
+        return None
+    
     def run(self):
         """
         Runs the whole Farseer-NMR standard algorithm based on the
@@ -747,7 +764,7 @@ Settings.'.\
         fitting = self.fsuv["fitting_settings"]
         cs = self.fsuv["cs_settings"]
         # csp = self.fsuv["csp_settings"]
-        # fasta = self.fsuv["fasta_settings"]
+        fasta = self.fsuv["fasta_settings"]
         use_sidechains = self.general["use_sidechains"]
         
         # Initiates the run log
@@ -786,10 +803,10 @@ Settings.'.\
         
         # adds fasta
         if fasta["applyFASTA"]:
-            add_missing(exp, peak_status='unassigned')
+            self.finds_missing_residues(peak_status='unassigned')
         
         #organize peaklist columns
-        organize_columns(exp, fsuv)
+        self.organize_columns()
         
         if exp.has_sidechains and use_sidechains:
             organize_columns(exp, fsuv, resonance_type='Sidechains')
@@ -954,35 +971,7 @@ def identify_residues(exp):
 
 
 
-def organize_columns(exp, fsuv, resonance_type='Backbone'):
-    """
-    Uses FarseerSet.organize_cols().
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-        
-        resonance_type (str): {'Backbone','Sidechains'}, defaults to 
-            'Backbone'.
-    
-    Depends on:
-    fsuv.perform_cs_correction
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    exp.organize_cols(
-        performed_cs_correction=fsuv["cs_settings"]["perform_cs_correction"],
-        resonance_type=resonance_type
-        )
-    
-    return
+
 
 def init_fs_cube(exp, fsuv):
     """
