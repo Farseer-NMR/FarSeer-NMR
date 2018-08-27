@@ -540,6 +540,166 @@ Settings.'.\
         self._config_user_variables()
         
         return None
+    
+    def creates_pkls_dataset(
+            self,
+            peaklist_folder_path='',
+            has_sidechains=False,
+            fasta_start=0,
+            apply_fasta=False):
+        """
+        Creates the Farseer-NMR peaklist dataset (Farseer-NMR Cube)
+        from the peaklist hierarchycal folder 'spectra/' 
+        in self.fsuv["general_settings"]["input_spectra_path"]
+        
+        Parameters:
+            - peaklist_folder_path (str): path to hierarchycal folder
+                containing the peaklist files
+            - has_sidechains (opt, bool): whether peaklist data set contains
+                informations on sidechains
+            - fasta_start (opt, int): FASTA starting residue number
+            - apply_fasta (opt, bool): whether to incorporate FASTA data
+        
+        Assigns self.pkls
+        """
+        peaklist_folder_path = \
+            peaklist_folder_path \
+            or self.fsuv["general_settings"]["input_spectra_path"]
+        has_sidechains = \
+            has_sidechains or self.fsuv["general_settings"]["has_sidechains"]
+        fasta_start = fasta_start or self.fsuv["fasta_settings"]["FASTAstart"]
+        apply_fasta = apply_fasta or fsuv["fasta_settings"]["applyFASTA"]
+        
+        self.pkls = fcube.FarseerCube(
+            peaklist_folder_path,
+            has_sidechains,
+            FASTAstart=fasta_start,
+            applyFASTA=apply_fasta
+            )
+        # exp.log_export_onthefly = True
+        # exp.log_export_name = fsuv["general_settings"]["logfile_name"]
+        
+        self.logger.debug("Peaklist dataset created correctly")
+        
+        return None
+    
+    def run(self):
+        """
+        Runs the whole Farseer-NMR standard algorithm based on the
+        defined user variables.
+        """
+        
+        # general = self.fsuv["general_settings"]
+        # fitting = self.fsuv["fitting_settings"]
+        # cs = self.fsuv["cs_settings"]
+        # csp = self.fsuv["csp_settings"]
+        # fasta = self.fsuv["fasta_settings"]
+        # use_sidechains = self.general["use_sidechains"]
+        
+        # Initiates the run log
+        self.logger.info(self._log_state_stamp())
+        
+        # Initiates Farseer
+        self.creates_pkls_dataset()
+        
+        # reads input
+        reads_peaklists(exp, fsuv)
+        #inits_coords_names(exp)
+        # identify residues
+        identify_residues(exp)
+        
+        # corrects chemical shifts
+        if cs["perform_cs_correction"]:
+            correct_shifts(exp, fsuv, resonance_type='Backbone')
+            
+            if exp.has_sidechains and use_sidechains:
+                correct_shifts(exp, fsuv, resonance_type='Sidechains')
+        
+        # expands missing residues to other dimensions
+        if fitting["expand_missing_yy"]:
+            expand_missing(exp, dim='y')
+            
+            if exp.has_sidechains and use_sidechains:
+                expand_missing(exp, dim='y', resonance_type='Sidechains')
+        
+        if fitting["expand_missing_zz"]:
+            expand_missing(exp, dim='z')
+            
+            if exp.has_sidechains and use_sidechains:
+                expand_missing(exp, dim='z', resonance_type='Sidechains')
+        
+        ## identifies missing residues
+        add_missing(exp, peak_status='missing')
+        
+        if exp.has_sidechains and use_sidechains:
+            add_missing(exp, peak_status='missing', resonance_type='Sidechains')
+        
+        # adds fasta
+        if fasta["applyFASTA"]:
+            add_missing(exp, peak_status='unassigned')
+        
+        #organize peaklist columns
+        organize_columns(exp, fsuv)
+        
+        if exp.has_sidechains and use_sidechains:
+            organize_columns(exp, fsuv, resonance_type='Sidechains')
+        
+        init_fs_cube(exp, fsuv)
+        # initiates a dictionary that contains all the series to be evaluated
+        # along all the conditions.
+        farseer_series_dct = \
+            gen_series_dcts(
+                exp,
+                fss.FarseerSeries,
+                fsuv,
+                resonance_type='Backbone'
+                )
+        
+        if not(farseer_series_dct):
+            exp.exports_parsed_pkls()
+        
+        else:
+            # evaluates the series and plots the data
+            eval_series(farseer_series_dct, fsuv)
+        
+        if exp.has_sidechains and use_sidechains:
+            farseer_series_SD_dict = \
+                gen_series_dcts(
+                    exp,
+                    fss.FarseerSeries,
+                    fsuv,
+                    resonance_type='Sidechains'
+                    )
+            
+            if (farseer_series_SD_dict):
+                eval_series(
+                    farseer_series_SD_dict,
+                    fsuv,
+                    resonance_type='Sidechains'
+                    )
+        
+        # Representing the results comparisons
+        if fitting["perform_comparisons"] and (farseer_series_dct):
+            # analyses comparisons.
+            comparison_dict = \
+                analyse_comparisons(
+                    farseer_series_dct,
+                    fsuv,
+                    resonance_type='Backbone'
+                    )
+        
+        if (fitting["perform_comparisons"] and farseer_series_dct) \
+                and (exp.has_sidechains and use_sidechains):
+            comparison_dict_SD = \
+                analyse_comparisons(
+                    farseer_series_SD_dict,
+                    fsuv,
+                    resonance_type='Sidechains'
+                    )
+        
+        log_end(fsuv)
+        
+        return
 
     def copy_FarseerNMR_version(
             self,
@@ -637,34 +797,7 @@ def log_end(fsuv):
 
 
     
-def creates_farseer_dataset(fsuv):
-    """
-    Creates a Farseer-NMR dataset.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Returns:
-        exp (FarseerCube class instance): contains all peaklist data.
-    
-    Depends on:
-    fsuv["general_settings"]["input_spectra_path"]
-    fsuv.has_sidechains
-    fsuv.FASTAstart
-    fsuv["general_settings"]["logfile_name"]
-    """
-    
-    exp = fcube.FarseerCube(
-        fsuv["general_settings"]["input_spectra_path"],
-        has_sidechains=fsuv["general_settings"]["has_sidechains"],
-        FASTAstart=fsuv["fasta_settings"]["FASTAstart"],
-        applyFASTA=fsuv["fasta_settings"]["applyFASTA"]
-        )
-    exp.log_export_onthefly = True
-    exp.log_export_name = fsuv["general_settings"]["logfile_name"]
-    
-    return exp
+
 
 def reads_peaklists(exp, fsuv):
     """
@@ -1812,126 +1945,7 @@ def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     
     return comp_dct
 
-def run_farseer(fsuv, logger=None):
-    """
-    Runs the whole Farseer-NMR standard algorithm.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    """
-    logger = logger or start_logger(fsuv["general_settings"]["output_path"])
-    
-    general = fsuv["general_settings"]
-    fitting = fsuv["fitting_settings"]
-    cs = fsuv["cs_settings"]
-    csp = fsuv["csp_settings"]
-    fasta = fsuv["fasta_settings"]
-    use_sidechains = general["use_sidechains"]
-    # Initiates the log
-    log_init(fsuv)
-    # performs initial checks
-    initial_checks(fsuv)
-    # Initiates Farseer
-    exp = creates_farseer_dataset(fsuv)
-    # reads input
-    reads_peaklists(exp, fsuv)
-    #inits_coords_names(exp)
-    # identify residues
-    identify_residues(exp)
-    
-    # corrects chemical shifts
-    if cs["perform_cs_correction"]:
-        correct_shifts(exp, fsuv, resonance_type='Backbone')
-        
-        if exp.has_sidechains and use_sidechains:
-            correct_shifts(exp, fsuv, resonance_type='Sidechains')
-    
-    # expands missing residues to other dimensions
-    if fitting["expand_missing_yy"]:
-        expand_missing(exp, dim='y')
-        
-        if exp.has_sidechains and use_sidechains:
-            expand_missing(exp, dim='y', resonance_type='Sidechains')
-    
-    if fitting["expand_missing_zz"]:
-        expand_missing(exp, dim='z')
-        
-        if exp.has_sidechains and use_sidechains:
-            expand_missing(exp, dim='z', resonance_type='Sidechains')
-    
-    ## identifies missing residues
-    add_missing(exp, peak_status='missing')
-    
-    if exp.has_sidechains and use_sidechains:
-        add_missing(exp, peak_status='missing', resonance_type='Sidechains')
-    
-    # adds fasta
-    if fasta["applyFASTA"]:
-        add_missing(exp, peak_status='unassigned')
-    
-    #organize peaklist columns
-    organize_columns(exp, fsuv)
-    
-    if exp.has_sidechains and use_sidechains:
-        organize_columns(exp, fsuv, resonance_type='Sidechains')
-    
-    init_fs_cube(exp, fsuv)
-    # initiates a dictionary that contains all the series to be evaluated
-    # along all the conditions.
-    farseer_series_dct = \
-        gen_series_dcts(
-            exp,
-            fss.FarseerSeries,
-            fsuv,
-            resonance_type='Backbone'
-            )
-    
-    if not(farseer_series_dct):
-        exp.exports_parsed_pkls()
-    
-    else:
-        # evaluates the series and plots the data
-        eval_series(farseer_series_dct, fsuv)
-    
-    if exp.has_sidechains and use_sidechains:
-        farseer_series_SD_dict = \
-            gen_series_dcts(
-                exp,
-                fss.FarseerSeries,
-                fsuv,
-                resonance_type='Sidechains'
-                )
-        
-        if (farseer_series_SD_dict):
-            eval_series(
-                farseer_series_SD_dict,
-                fsuv,
-                resonance_type='Sidechains'
-                )
-    
-    # Representing the results comparisons
-    if fitting["perform_comparisons"] and (farseer_series_dct):
-        # analyses comparisons.
-        comparison_dict = \
-            analyse_comparisons(
-                farseer_series_dct,
-                fsuv,
-                resonance_type='Backbone'
-                )
-    
-    if (fitting["perform_comparisons"] and farseer_series_dct) \
-            and (exp.has_sidechains and use_sidechains):
-        comparison_dict_SD = \
-            analyse_comparisons(
-                farseer_series_SD_dict,
-                fsuv,
-                resonance_type='Sidechains'
-                )
-    
-    log_end(fsuv)
-    
-    return
+
 
 if __name__ == '__main__':
     
