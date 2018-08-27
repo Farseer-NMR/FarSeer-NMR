@@ -144,97 +144,6 @@ class FarseerNMR():
         
         return None
     
-    def change_current_dir(self, new_curr_dir, update_fsuv=False):
-        """
-        Changes running dir to path. Exists if path is not a valid directory.
-        
-        Parameters:
-            - new_curr_dir (str): target directory
-            - update_fsuv(opt, bool): updates self.fsuv "output_path" to
-                new_curr_dir
-            
-        Returns: None
-        """
-        
-        try:
-            os.chdir(new_curr_dir)
-        except NotADirectoryError as notdirerr: 
-            msg = \
-    """
-    ***************************************
-    *** The directory path does not exists
-    *** {}
-    ***
-    {}
-    ***************************************
-    """.\
-                format(notdirerr, how_to_run)
-            sys.exit(msg)
-        
-        if update_fsuv:
-            self.fsuv["general_settings"]["output_path"] = new_curr_dir
-        
-        
-        return None
-    
-    def read_fsuv_json(self, fsuv_json_path):
-        """
-        Reads a JSON file containing the Farseer-NMR's user defined variables.
-        
-        Can be used to updated an existing configuration.
-        
-        Parameters:
-            fsuv_json_path (str): path to the JSON file.
-        
-        Returns:
-            None
-        """
-        
-        how_to_run = """*** execute Farseer-NMR as
-*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
-        
-        # Reads json config absolute path
-        json_cwd = os.path.abspath(fsuv_json_path)
-        # loads and reads json config file
-        try:
-            self.fsuv = json.load(open(json_cwd, 'r'))
-        except json.decoder.JSONDecodeError as jsonerror:
-            msg = \
-"""
-***************************************
-*** Error loading JSON file:
-*** {}
-*** {}
-***************************************
-""".\
-                format(json_cwd, jsonerror)
-            sys.exit(msg)
-        except IsADirectoryError as direrr:
-            msg = \
-"""
-***************************************
-*** A directory was passed as argument instead of a json file.
-*** {}
-***
-{}
-***************************************
-    """.\
-                format(direrr, how_to_run)
-            sys.exit(msg)
-        
-        self._updates_output_dir()
-        
-        # stores path to spectra/ folder
-        self.fsuv["general_settings"]["input_spectra_path"] = \
-            '{}/spectra'.format(self.fsuv["general_settings"]["output_path"])
-        # stores path to json config file
-        self.fsuv["general_settings"]["config_path"] = json_cwd
-        # configs user variables necessary for Farseer-NMR
-        
-        self._config_user_variables()
-        
-        return None
-
     def _config_user_variables(self):
         """
         Performs additional operations on the user defined json dictionary
@@ -358,6 +267,97 @@ class FarseerNMR():
             self.fsuv["PosF2_settings"]["yy_scale_PosF2_delta"]
         
         return None
+    
+    def change_current_dir(self, new_curr_dir, update_fsuv=False):
+        """
+        Changes running dir to path. Exists if path is not a valid directory.
+        
+        Parameters:
+            - new_curr_dir (str): target directory
+            - update_fsuv(opt, bool): updates self.fsuv "output_path" to
+                new_curr_dir
+            
+        Returns: None
+        """
+        
+        try:
+            os.chdir(new_curr_dir)
+        except NotADirectoryError as notdirerr: 
+            msg = \
+    """
+    ***************************************
+    *** The directory path does not exists
+    *** {}
+    ***
+    {}
+    ***************************************
+    """.\
+                format(notdirerr, how_to_run)
+            sys.exit(msg)
+        
+        if update_fsuv:
+            self.fsuv["general_settings"]["output_path"] = new_curr_dir
+        
+        
+        return None
+    
+    def read_fsuv_json(self, fsuv_json_path):
+        """
+        Reads a JSON file containing the Farseer-NMR's user defined variables.
+        
+        Can be used to updated an existing configuration.
+        
+        Parameters:
+            fsuv_json_path (str): path to the JSON file.
+        
+        Returns:
+            None
+        """
+        
+        how_to_run = """*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+        
+        # Reads json config absolute path
+        json_cwd = os.path.abspath(fsuv_json_path)
+        # loads and reads json config file
+        try:
+            self.fsuv = json.load(open(json_cwd, 'r'))
+        except json.decoder.JSONDecodeError as jsonerror:
+            msg = \
+"""
+***************************************
+*** Error loading JSON file:
+*** {}
+*** {}
+***************************************
+""".\
+                format(json_cwd, jsonerror)
+            sys.exit(msg)
+        except IsADirectoryError as direrr:
+            msg = \
+"""
+***************************************
+*** A directory was passed as argument instead of a json file.
+*** {}
+***
+{}
+***************************************
+    """.\
+                format(direrr, how_to_run)
+            sys.exit(msg)
+        
+        self._updates_output_dir()
+        
+        # stores path to spectra/ folder
+        self.fsuv["general_settings"]["input_spectra_path"] = \
+            '{}/spectra'.format(self.fsuv["general_settings"]["output_path"])
+        # stores path to json config file
+        self.fsuv["general_settings"]["config_path"] = json_cwd
+        # configs user variables necessary for Farseer-NMR
+        
+        self._config_user_variables()
+        
+        return None
 
     def copy_FarseerNMR_version(
             self,
@@ -419,26 +419,6 @@ def log_time_stamp(
                 )
     
     logs(log_title, logfile_name, mod=mod)
-    
-    return
-
-def logs(s, logfile_name, mod='a', printit=True):
-    """
-    Prints <s> and writes it to log file.
-    
-    Parameters:
-        s (str): the string to write.
-        
-        logfile_name (str): the log file name.
-        
-        mod (str): python.open() arg mode.
-    """
-    
-    if printit:
-        print(s)
-    
-    with open(logfile_name, mod) as logfile:
-        logfile.write(s)
     
     return
 
