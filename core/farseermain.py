@@ -278,6 +278,8 @@ class FarseerNMR():
         Returns: None
         """
         
+        self._checks_calculation_flags()
+        
         # PRE routines take only place at advanced stages of the 
         # Farseer-NMR calculation.
         # It would be a waste of time to have an error after 2h...
@@ -355,6 +357,21 @@ NMR observables and user notes will be exported in nicely formatted tables ;-)"
             return False
         
         return True
+    
+    def _checks_calculation_flags(fsuv):
+        """
+        Checks if the user wants to calculate any parameters.
+        Informs the user via WET if no parameter calculation will be performed.
+        """
+        #WET#14
+        if not(fsuv["calc_flags"]):
+            msg = \
+    "All restraints calculation routines are deactivated. \
+    Nothing will be calculated."
+            wet14 = fsw(msg_title='NOTE', msg=msg, wet_num=14)
+            self.logger.info(wet14.wet)
+        
+        return None
     
     def _log_state_stamp(self, state='STARTED', width=79):
         """
@@ -559,23 +576,7 @@ def log_end(fsuv):
 
 
 
-def checks_calculation_flags(fsuv):
-    """
-    Checks if the user wants to calculate any restraints.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
-    """
-    #WET#14
-    if not(fsuv["calc_flags"]):
-        msg = \
-"All restraints calculation routines are deactivated. \
-Nothing will be calculated."
-        wet14 = fsw(msg_title='WARNING', msg=msg, wet_num=14)
-        logs(wet14.wet, fsuv["general_settings"]["logfile_name"])
-    
-    return
+
 
 def checks_fit_input(series, fsuv):
     """
@@ -1150,8 +1151,6 @@ def perform_calcs(farseer_series, fsuv):
     fsuv.calccol_name_Height_ratio
     fsuv.calccol_name_Volume_ratio
     """
-    
-    checks_calculation_flags(fsuv)
     
     # if the user wants to calculate combined Chemical Shift Perturbations
     if fsuv["csp_settings"]["calcs_CSP"]:
