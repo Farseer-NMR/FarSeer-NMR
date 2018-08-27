@@ -373,6 +373,61 @@ NMR observables and user notes will be exported in nicely formatted tables ;-)"
         
         return None
     
+    def _checks_fit_input(self):
+        """
+        Checks whether required fit data and settings are provided correctly.
+        """
+    
+        x_values = self.fsuv["revo_settings"]["titration_x_values"]
+        ######## WET#5, WET#6, WET#7
+        if not(all([True if x>=0 else False for x in x_values])):
+            msg = \
+'There are negative values in titration_x_values variable. \
+Fitting to the Hill Equation does not accept negative values. \
+Please revisit your input'
+            wet6 = fsw(msg_title='ERROR', msg=msg, wet_num=6)
+            self.logger.info(wet6.wet)
+            wet6.abort()
+        
+        elif len(x_values) != len(series.items):
+            msg = \
+"The number of coordinate values defined for fitting/data respresentation, \
+<fitting_x_values> variable [{}], do not match the number of data points \
+along_x ,i.e. input peaklists. Please correct <fitting_x_values> variable or \
+confirm you have not forgot any peaklist [{}].".\
+                format(x_values, series.items)
+            wet5 = fsw(msg_title='ERROR', msg=msg, wet_num=5)
+            self.logger.info(wet5.wet)
+            wet5.abort()
+        
+        else:
+            msg = \
+"The number of coordinate values for data fitting along X axis equals the \
+number of input peaklists, and no negative value was found. Data fit to the \
+Hill Equation will be performed with the following values: {}.".\
+                format(x_values)
+            wet7 = fsw(msg_title='NOTE', msg=msg, wet_num=7)
+            self.logger.info(wet7.wet)
+        
+        return None
+    
+    def _checks_axis_coherency(self):
+        """
+        Warns in case the axis the user activates for calculation actually
+        has no data points to create a series.
+        """
+        
+        msg = \
+'You have activated the analysis along dimension/axis {}. However, there are \
+no datapoints along this axis so that a series could not be created and \
+analysed. Confirm the axis analysis flags are correctly set in the Run \
+Settings.'.\
+            format(dim)    
+        wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
+        self.logger.info(wet20.wet)
+        
+        return None
+    
     def _log_state_stamp(self, state='STARTED', width=79):
         """
         Creates a time stamp for the log file.
@@ -578,75 +633,9 @@ def log_end(fsuv):
 
 
 
-def checks_fit_input(series, fsuv):
-    """
-    Checks whether required fit data and settings are provided correctly.
-    
-    Parameters:
-        series (FarseerSeries instance):
-        
-        fsuv (module): contains user defined variables (preferences) after
-            .read_user_variables().
-    """
 
-    x_values = fsuv["revo_settings"]["titration_x_values"]
-    ######## WET#5, WET#6, WET#7
-    if not(all([True if x>=0 else False for x in x_values])):
-        msg = \
-'There are negative values in titration_x_values variable. \
-Fitting to the Hill Equation does not accept negative values. \
-Please revisit your input'
-        wet6 = fsw(msg_title='ERROR', msg=msg, wet_num=6)
-        series.log_r(wet6.wet)
-        series.abort()
-    
-    elif len(x_values) != len(series.items):
-        msg = \
-"The number of coordinate values defined for fitting/data respresentation, \
-<fitting_x_values> variable [{}], do not match the number of data points \
-along_x ,i.e. input peaklists. Please correct <fitting_x_values> variable or \
-confirm you have not forgot any peaklist [{}].".\
-            format(x_values, series.items)
-        wet5 = fsw(msg_title='ERROR', msg=msg, wet_num=5)
-        series.log_r(wet5.wet)
-        series.abort()
-    
-    else:
-        msg = \
-"The number of coordinate values for data fitting along X axis equals the \
-number of input peaklists, and no negative value was found. Data fit to the \
-Hill Equation will be performed with the following values: {}.".\
-            format(x_values)
-        wet7 = fsw(msg_title='NOTE', msg=msg, wet_num=7)
-        series.log_r(wet7.wet)
-    
-    return
 
-def checks_axis_coherency(dim, fsuv):
-    """
-    Warns in case the axis the user activates for calculation actually
-    has no data points to create a series.
-    
-    Parameters:
-        dim (str): the dimension to warn about.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv["general_settings"]["logfile_name"]
-    """
-    
-    msg = \
-'You have activated the analysis along dimension/axis {}. However, there are \
-no datapoints along this axis so that a series could not be created and \
-analysed. Confirm the axis analysis flags are correctly set in the Run \
-Settings.'.\
-        format(dim)    
-    wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
-    logs(wet20.wet, fsuv["general_settings"]["logfile_name"])
-    
-    return
+
     
 def creates_farseer_dataset(fsuv):
     """
@@ -1225,7 +1214,7 @@ def perform_fits(farseer_series, fsuv):
             ):
         return
     
-    checks_fit_input(farseer_series, fsuv)
+    _checks_fit_input()
     
     for restraint in fsuv["restraint_settings"].index:
         if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
