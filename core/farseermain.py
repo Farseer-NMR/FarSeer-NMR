@@ -698,6 +698,45 @@ Settings.'.\
         
         return None
     
+    def finds_missing_residues(
+        self,
+        peak_status='missing',
+        resonance_type='Backbone'
+        ):
+        """
+        Identifies missing residues in peaklist dataset.
+        Uses FarseerCube.finds_missing().
+        
+        Parameters:
+            exp (FarseerCube class instance): contains all peaklist data.
+            
+            peak_status (str): {'missing', 'unassigned'}, defaults to 'missing'.
+                Peak status for the new generated entries for missing peaks. 
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
+                'Backbone'.
+        """
+        
+        if not(peak_status in ['missing', 'unassigned']):
+            input(
+                'Choose a valid <peak_status> argument. Press Enter to continue.'
+                )
+            return
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return
+        
+        self.pkls.finds_missing(
+            fill_na(peak_status),
+            missing=peak_status,
+            resonance_type=resonance_type
+            )
+        
+        return None
+    
     def run(self):
         """
         Runs the whole Farseer-NMR standard algorithm based on the
@@ -740,10 +779,10 @@ Settings.'.\
                 self.pklsexpand_missing(dim='z', resonance_type='Sidechains')
         
         ## identifies missing residues
-        add_missing(exp, peak_status='missing')
+        self.finds_missing_residues(peak_status='missing')
         
-        if exp.has_sidechains and use_sidechains:
-            add_missing(exp, peak_status='missing', resonance_type='Sidechains')
+        if analyses_sidechains:
+            self.finds_missing_residues(resonance_type='Sidechains')
         
         # adds fasta
         if fasta["applyFASTA"]:
@@ -913,40 +952,7 @@ def identify_residues(exp):
 
 
 
-def add_missing(exp, peak_status='missing', resonance_type='Backbone'):
-    """
-    Expands a <target> peaklist to the index of a <reference> peaklist.
-    Uses FarseerCube.finds_missing().
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        peak_status (str): {'missing', 'unassigned'}, defaults to 'missing'.
-            Peak status for the new generated entries for missing peaks. 
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
-            'Backbone'.
-    """
-    
-    if not(peak_status in ['missing', 'unassigned']):
-        input(
-            'Choose a valid <peak_status> argument. Press Enter to continue.'
-            )
-        return
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    exp.finds_missing(
-        fill_na(peak_status),
-        missing=peak_status,
-        resonance_type=resonance_type
-        )
-    
-    return
+
 
 def organize_columns(exp, fsuv, resonance_type='Backbone'):
     """
