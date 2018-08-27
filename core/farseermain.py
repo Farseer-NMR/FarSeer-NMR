@@ -310,6 +310,27 @@ All these variables should be set to True for PRE Analysis to be executed.".\
         
         return None
     
+    def _checks_cube_axes_flags(self):
+    """
+    Checks if the user wants to perform any analysis
+    on the Farseer-NMR Cube.
+    
+    Returns:
+        - True if any analysis flag (X, Y or Z) is activate
+        - False otherwise
+    """
+    
+    if not(fsuv["any_axis"]):
+        msg = \
+"Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
+There is nothing to calculate. Confirm this is actually what you want."
+        wet2 = fsw(msg_title='NOTE', msg=msg, wet_num=2)
+        self.logger.info(wet2.wet)
+        return False
+    
+    else:
+        return True
+    
     def _log_state_stamp(self, state='STARTED', width=79):
         """
         Creates a time stamp for the log file.
@@ -509,32 +530,7 @@ def log_end(fsuv):
 
 
 
-def checks_cube_axes_flags(fsuv):
-    """
-    Checks if the user wants to perform any analysis
-    on the Farseer-NMR Cube.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.any_axis
-    fsuv["general_settings"]["logfile_name"]
-    """
-    
-    if not(fsuv["any_axis"]):
-        msg = \
-"Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
-There is nothing to calculate. Confirm this is actually what you want."
-        wet2 = fsw(msg_title='NOTE', msg=msg, wet_num=2)
-        logs(wet2.wet, fsuv["general_settings"]["logfile_name"])
-        return False
-    
-    else:
-        return True
-    
-    return None
+
 
 def checks_plotting_flags(farseer_series, fsuv, resonance_type):
     """
@@ -1008,7 +1004,7 @@ def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
             )
         return None
     
-    if not(checks_cube_axes_flags(fsuv)):
+    if not(_checks_cube_axes_flags()):
         return None
     
     series_dct = {}
