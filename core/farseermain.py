@@ -548,8 +548,8 @@ Settings.'.\
             fasta_start=0,
             apply_fasta=False):
         """
-        Creates the Farseer-NMR peaklist dataset (Farseer-NMR Cube)
-        from the peaklist hierarchycal folder 'spectra/' 
+        Creates the Farseer-NMR peaklist dataset (instance of
+        Farseer-NMR Cube) from the peaklist hierarchycal folder 'spectra/' 
         in self.fsuv["general_settings"]["input_spectra_path"]
         
         Parameters:
@@ -560,7 +560,7 @@ Settings.'.\
             - fasta_start (opt, int): FASTA starting residue number
             - apply_fasta (opt, bool): whether to incorporate FASTA data
         
-        Assigns self.pkls
+        Assigns self.pkls, instance of FarseerCube
         """
         peaklist_folder_path = \
             peaklist_folder_path \
@@ -581,6 +581,52 @@ Settings.'.\
         
         self.logger.debug("Peaklist dataset created correctly")
         
+        self.pkls.load_experiments()
+    
+        if apply_fasta:
+            self.pkls.load_experiments(filetype='.fasta')
+        
+        # even if the user does not want to analyse sidechains, Farseer-NMR
+        # has to parse them out from the input peaklist if they exist
+        if has_sidechains:
+            self.pkls.load_experiments(resonance_type='Sidechains')
+        
+        self.pkls.split_res_info()
+        
+        self.logger.debug('OK')
+        
+        return None
+    
+    def normalize_chemical_shifts(self, resonance_type='Backbone'):
+        """
+        Corrects chemical shifts for all the peaklists to a reference peak
+        in the (0,0,0) Farseer-NMR Cube coordinate.
+        
+        Uses FarseerCube.correct_shifts_*
+        
+        Parameters:
+            exp (FarseerCube class instance): contains all peaklist data.
+        
+            fsuv (module): contains user defined variables (preferences)
+                after .read_user_variables().
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}
+        
+        Depends on:
+        fsuv.cs_correction_res_ref
+        """
+        
+        if resonance_type == 'Backbone':
+            self.pkls.correct_shifts_backbone(
+                fsuv["cs_settings"]["cs_correction_res_ref"]
+                )
+        
+        elif resonance_type=='Sidechains':
+            self.pkls.correct_shifts_sidechains()
+        
+        else:
+            self.logger.info('Choose a valid <resonance_type> argument.')
+        
         return None
     
     def run(self):
@@ -591,10 +637,10 @@ Settings.'.\
         
         # general = self.fsuv["general_settings"]
         # fitting = self.fsuv["fitting_settings"]
-        # cs = self.fsuv["cs_settings"]
+        cs = self.fsuv["cs_settings"]
         # csp = self.fsuv["csp_settings"]
         # fasta = self.fsuv["fasta_settings"]
-        # use_sidechains = self.general["use_sidechains"]
+        use_sidechains = self.general["use_sidechains"]
         
         # Initiates the run log
         self.logger.info(self._log_state_stamp())
@@ -602,18 +648,12 @@ Settings.'.\
         # Initiates Farseer
         self.creates_pkls_dataset()
         
-        # reads input
-        reads_peaklists(exp, fsuv)
-        #inits_coords_names(exp)
-        # identify residues
-        identify_residues(exp)
-        
         # corrects chemical shifts
         if cs["perform_cs_correction"]:
-            correct_shifts(exp, fsuv, resonance_type='Backbone')
+            self.normalize_chemical_shifts()
             
-            if exp.has_sidechains and use_sidechains:
-                correct_shifts(exp, fsuv, resonance_type='Sidechains')
+            if self.pkls.has_sidechains and use_sidechains:
+                correct_shifts(resonance_type='Sidechains')
         
         # expands missing residues to other dimensions
         if fitting["expand_missing_yy"]:
@@ -784,49 +824,6 @@ def log_end(fsuv):
     return
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-def reads_peaklists(exp, fsuv):
-    """
-    Loads Peaklist's Tree from spectra/ folder.
-    
-    Uses FarseerCube.load_experiments().
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.applyFASTA
-    """
-    
-    exp.load_experiments()
-    
-    if fsuv["fasta_settings"]["applyFASTA"]:
-        exp.load_experiments(filetype='.fasta')
-    
-    # even if the user does no want to analyse sidechains, Farseer-NMR
-    # has to parse them out from the input peaklist if they exist
-    if exp.has_sidechains:
-        # str() is passed as a dummy function
-        exp.load_experiments(resonance_type='Sidechains')
-    
-    return
     
 def identify_residues(exp):
     """
@@ -839,42 +836,7 @@ def identify_residues(exp):
     
     return
 
-def correct_shifts(
-        exp, fsuv,
-        resonance_type='Backbone'):
-    """
-    Corrects chemical shifts for all the peaklists to a reference peak
-    in the (0,0,0) Farseer-NMR Cube coordinate.
-    
-    Uses FarseerCube.correct_shifts_*
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-    
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}
-    
-    Depends on:
-    fsuv.cs_correction_res_ref
-    """
-    
-    if resonance_type == 'Backbone':
-        exp.correct_shifts_backbone(
-            fsuv["cs_settings"]["cs_correction_res_ref"]
-            )
-    
-    elif resonance_type=='Sidechains':
-        exp.correct_shifts_sidechains()
-    
-    else:
-        logs(
-            'Choose a valid <resonance_type> argument.',
-            fsuv["general_settings"]["logfile_name"]
-            )
-    
-    return
+
 
 def fill_na(peak_status, merit=0, details='None'):
     """
