@@ -114,6 +114,8 @@ class FarseerNMR():
             sys.exit(msg)
         
         self._starts_logger()
+        
+        self._fsuv_integrity_checks()
     
     
     def _updates_output_dir(self):
@@ -308,6 +310,27 @@ All these variables should be set to True for PRE Analysis to be executed.".\
         
         return None
     
+    def _log_state_stamp(self, state='STARTED', width=79):
+        """
+        Creates a time stamp for the log file.
+        
+        Parameters:
+            - state (opt, str): the printed state
+            - width (opt, int): the width of the stamp
+        
+        Returns: a state stamp
+        """
+        
+        state_stamp = \
+            '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
+                format(
+                    width*'*',
+                    datetime.datetime.now().strftime("%c"),
+                    state
+                    )
+        
+        return state_stamp
+    
     
     def change_current_dir(self, new_curr_dir, update_fsuv=False):
         """
@@ -444,24 +467,6 @@ All these variables should be set to True for PRE Analysis to be executed.".\
             )
         
         return None
-
-def log_time_stamp(
-        logfile_name,
-        mod='a',
-        state='STARTED'):
-    """Creates a time stamp for the log file."""
-    
-    log_title = \
-        '{0}  \n**LOG {2}:** {1} \n{0}  \n'.\
-            format(
-                79*'*',
-                datetime.datetime.now().strftime("%c"),
-                state
-                )
-    
-    logs(log_title, logfile_name, mod=mod)
-    
-    return
 
 def log_init(fsuv):
     """Operations performed when initializing the log file."""
