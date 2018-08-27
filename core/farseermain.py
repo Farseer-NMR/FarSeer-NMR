@@ -311,24 +311,49 @@ All these variables should be set to True for PRE Analysis to be executed.".\
         return None
     
     def _checks_cube_axes_flags(self):
-    """
-    Checks if the user wants to perform any analysis
-    on the Farseer-NMR Cube.
+        """
+        Checks if the user wants to perform any analysis
+        on the Farseer-NMR Cube.
+        
+        Returns:
+            - True if any analysis flag (X, Y or Z) is activate
+            - False otherwise
+        """
+        
+        if not(fsuv["any_axis"]):
+            msg = \
+    "Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
+    There is nothing to calculate. Confirm this is actually what you want."
+            wet2 = fsw(msg_title='NOTE', msg=msg, wet_num=2)
+            self.logger.info(wet2.wet)
+            return False
+        
+        else:
+            return True
     
-    Returns:
-        - True if any analysis flag (X, Y or Z) is activate
-        - False otherwise
-    """
-    
-    if not(fsuv["any_axis"]):
-        msg = \
-"Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
-There is nothing to calculate. Confirm this is actually what you want."
-        wet2 = fsw(msg_title='NOTE', msg=msg, wet_num=2)
-        self.logger.info(wet2.wet)
-        return False
-    
-    else:
+    def _checks_plotting_flags(self):
+        """
+        Checks whether any plotting flag is activated.
+         
+        Returns:
+            - True if any of the plotting flags is activated,
+            - False otherwise.
+        """
+        
+        plot_bool = \
+            pd.Series([v for k,v in self.fsuv["plotting_flags"].items()])
+        
+        # exports tables
+        if not(plot_bool.any()):
+            msg = \
+"All potting flags are turned off. No plots will be drawn. \
+Confirm in the Settings menu if this is the desired configuration. \
+I won't leave you with empty hands though, all calculated restraints, \
+NMR observables and user notes will be exported in nicely formatted tables ;-)"
+            wet3 = fsw(msg_title='NOTE', msg=msg, wet_num=3)
+            self.logger.info(wet3.wet)
+            return False
+        
         return True
     
     def _log_state_stamp(self, state='STARTED', width=79):
@@ -532,38 +557,7 @@ def log_end(fsuv):
 
 
 
-def checks_plotting_flags(farseer_series, fsuv, resonance_type):
-    """
-    Checks whether any plotting flag is activated.
-    
-    Parameters:
-        farseer_series (FarseerSeries instance): contains the
-            experiments of the series.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}
-     
-    Returns:
-        True if any plotting flag is activated,
-        False otherwise.
-    """
-    
-    plot_bool = pd.Series([v for k,v in fsuv["plotting_flags"].items()])
-    
-    # exports tables
-    if not(plot_bool.any()):
-        msg = \
-"All potting flags are turned off. No plots will be drawn. \
-Confirm in the Settings menu if this is the desired configuration. \
-I won't leave you with empty hands though, all calculated restraints, \
-NMR observables and user notes will be exported in nicely formatted tables ;-)"
-        wet3 = fsw(msg_title='NOTE', msg=msg, wet_num=3)
-        farseer_series.log_r(wet3.wet)
-        return False
-    
-    return True
+
 
 def checks_calculation_flags(fsuv):
     """
