@@ -807,7 +807,7 @@ Settings.'.\
         
         return None
     
-    def gen_series_dicts(self, resonance_type='Backbone'):
+    def gen_series_dict(self, resonance_type='Backbone'):
         """
         Generates a nested dictionary, <D>, containing all possible series
         over all the three Farseer-NMR Cube axis according to the user
@@ -924,6 +924,142 @@ no series set was created along an axis. Nothing will be calculated.'
         
         return None
     
+    def eval_series(self, series_dct, resonance_type='Backbone'):
+        """
+        Executes the Farseer-NMR analysis routines over all the series of
+        a Farseer Series dictionary according to the user variables.
+        
+        Parameters:
+            series_dct (dict): a nested dictionary containing the
+                FarseerSeries for every axis of the Farseer-NMR Cube.
+        
+            resonance_type (opt, str): {'Backbone', 'Sidechains'}
+                whether the data in <series_dct> corresponds to backbone or
+                sidechain resonances.
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+               'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return
+        
+        # for each kind of titration (cond{1,2,3})
+        for cond in sorted(series_dct.keys()):
+            # for each point in the corresponding second dimension/condition
+            for dim2_pt in sorted(series_dct[cond].keys()):
+                # for each point in the corresponding first dimension/condition
+                for dim1_pt in sorted(series_dct[cond][dim2_pt].keys()):
+                    series_dct[cond][dim2_pt][dim1_pt].\
+                        log_r(
+                            'ANALYZING... [{}] - [{}][{}]'.format(
+                                cond,
+                                dim2_pt,
+                                dim1_pt
+                                ),
+                            istitle=True)
+                    # flags and checks are under each function.
+                    # performs the calculations
+                    self.perform_calcs(series_dct[cond][dim2_pt][dim1_pt])
+                    # PERFORMS FITS
+                    self.perform_fits(series_dct[cond][dim2_pt][dim1_pt])
+                    # Analysis of PRE data - only in along_z
+                    self.PRE_analysis(series_dct[cond][dim2_pt][dim1_pt])
+                    # EXPORTS FULLY PARSED PEAKLISTS
+                    self.exports_series(series_dct[cond][dim2_pt][dim1_pt])
+                    # EXPORTS CHIMERA FILES
+                    self.exports_chimera_att_files(
+                        series_dct[cond][dim2_pt][dim1_pt]
+                        )
+                    #
+                    self.exports_all_parameters(
+                        series_dct[cond][dim2_pt][dim1_pt],
+                        resonance_type=resonance_type
+                        )
+                    # PLOTS DATA
+                    # plots data are exported together with the plots in
+                    # fsT.plot_base(), but can be used separatly with
+                    # fsT.write_table()
+                    self.plots_data(
+                        series_dct[cond][dim2_pt][dim1_pt],
+                        resonance_type=resonance_type
+                        )
+        
+        return None
+    
+    def perform_calcs(farseer_series, fsuv):
+        """
+        Calculates the NMR restraints according to the user specifications.
+        
+        Parameters:
+            farseer_series (FarseerSeries class): a FarseerSeries class
+                object containing all the experiments along a series
+                previously selected from the Farseer-NMR Cube.
+            
+            fsuv (module): contains user defined variables (preferences)
+                after .read_user_variables().
+        
+        Depends on:
+        fsuv["PosF1_settings"]["calcs_PosF1_delta"]
+        fsuv["PosF2_settings"]["calcs_PosF2_delta"]
+        fsuv.calcs_CSP
+        fsuv["Height_ratio_settings"]["calcs_Height_ratio"]
+        fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]
+        fsuv.calccol_name_PosF1_delta
+        fsuv.calccol_name_PosF2_delta
+        fsuv.calccol_name_CSP
+        fsuv.calccol_name_Height_ratio
+        fsuv.calccol_name_Volume_ratio
+        """
+        
+        # if the user wants to calculate combined Chemical Shift Perturbations
+        if fsuv["csp_settings"]["calcs_CSP"]:
+            # calculate differences in chemical shift for each dimension
+            farseer_series.calc_cs_diffs(
+                fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                'Position F1'
+                )
+            farseer_series.calc_cs_diffs(
+                fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                'Position F2'
+                )
+            # Calculates CSPs
+            farseer_series.calc_csp(
+                calccol=fsuv["csp_settings"]["calccol_name_CSP"],
+                pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
+                )
+        
+        # if the user only wants to calculate perturbation in single dimensions
+        else:
+            if fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
+                farseer_series.calc_cs_diffs(
+                    fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                    'Position F1'
+                    )
+            if fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
+                farseer_series.calc_cs_diffs(
+                    fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                    'Position F2'
+                    )
+        
+        # Calculates Ratios
+        if fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
+            farseer_series.calc_ratio(
+                fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
+                'Height'
+                )
+        
+        if fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
+            farseer_series.calc_ratio(
+                fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
+                'Volume'
+                )
+        
+        ### ADD ADDITIONAL CALCULATION HERE ###
+        
+        return
+    
     def run(self):
         """
         Runs the whole Farseer-NMR standard algorithm based on the
@@ -985,21 +1121,20 @@ no series set was created along an axis. Nothing will be calculated.'
         
         # initiates a dictionary that contains all the series to be evaluated
         # along all the conditions.
-        self.gen_series_dcts(resonance_type='Backbone')
+        self.gen_series_dict(resonance_type='Backbone')
         
         if self.farseer_series_dict:
             # evaluates the series and plots the data
-            self.eval_series()
+            self.eval_series(self.farseer_series_dict)
         else:
             self.pkls.exports_parsed_pkls()
         
         if analyses_sidechains:
-            self.gen_series_dcts(resonance_type='Sidechains')
+            self.gen_series_dict(resonance_type='Sidechains')
             
             if self.farseer_series_SD_dict:
-                eval_series(
+                self.eval_series(
                     farseer_series_SD_dict,
-                    fsuv,
                     resonance_type='Sidechains'
                     )
         
@@ -1137,144 +1272,9 @@ def identify_residues(exp):
 
 
 
-def eval_series(series_dct, fsuv, resonance_type='Backbone'):
-    """
-    Executes the Farseer-NMR Analysis Routines over all the series of
-    the activated Farseer-NMR Cube Axes.
-    
-    Parameters:
-        series_dct (dict): a nested dictionary containing the
-            FarseerSeries for every axis of the Farseer-NMR Cube.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-        resonance_type OPT (str): {'Backbone', 'Sidechains'}
-            whether the data in <series_dct> corresponds to backbone or
-            sidechain resonances.
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-           'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    # for each kind of titration (cond{1,2,3})
-    for cond in sorted(series_dct.keys()):
-        # for each point in the corresponding second dimension/condition
-        for dim2_pt in sorted(series_dct[cond].keys()):
-            # for each point in the corresponding first dimension/condition
-            for dim1_pt in sorted(series_dct[cond][dim2_pt].keys()):
-                series_dct[cond][dim2_pt][dim1_pt].\
-                    log_r(
-                        'ANALYZING... [{}] - [{}][{}]'.format(
-                            cond,
-                            dim2_pt,
-                            dim1_pt
-                            ),
-                        istitle=True)
-                # flags and checks are under each function.
-                # performs the calculations
-                perform_calcs(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                # PERFORMS FITS
-                perform_fits(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                # Analysis of PRE data - only in along_z
-                PRE_analysis(series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                # EXPORTS FULLY PARSED PEAKLISTS
-                exports_series(series_dct[cond][dim2_pt][dim1_pt])
-                # EXPORTS CHIMERA FILES
-                exports_chimera_att_files(\
-                    series_dct[cond][dim2_pt][dim1_pt], fsuv)
-                exports_all_parameters(
-                    series_dct[cond][dim2_pt][dim1_pt],
-                    fsuv,
-                    resonance_type=resonance_type
-                    )
-                # PLOTS DATA
-                # plots data are exported together with the plots in
-                # fsT.plot_base(), but can be used separatly with
-                # fsT.write_table()
-                plots_data(
-                    series_dct[cond][dim2_pt][dim1_pt],
-                    fsuv,
-                    resonance_type=resonance_type
-                    )
-    
-    return
 
-def perform_calcs(farseer_series, fsuv):
-    """
-    Calculates the NMR restraints according to the user specifications.
-    
-    Parameters:
-        farseer_series (FarseerSeries class): a FarseerSeries class
-            object containing all the experiments along a series
-            previously selected from the Farseer-NMR Cube.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv["PosF1_settings"]["calcs_PosF1_delta"]
-    fsuv["PosF2_settings"]["calcs_PosF2_delta"]
-    fsuv.calcs_CSP
-    fsuv["Height_ratio_settings"]["calcs_Height_ratio"]
-    fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]
-    fsuv.calccol_name_PosF1_delta
-    fsuv.calccol_name_PosF2_delta
-    fsuv.calccol_name_CSP
-    fsuv.calccol_name_Height_ratio
-    fsuv.calccol_name_Volume_ratio
-    """
-    
-    # if the user wants to calculate combined Chemical Shift Perturbations
-    if fsuv["csp_settings"]["calcs_CSP"]:
-        # calculate differences in chemical shift for each dimension
-        farseer_series.calc_cs_diffs(
-            fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-            'Position F1'
-            )
-        farseer_series.calc_cs_diffs(
-            fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-            'Position F2'
-            )
-        # Calculates CSPs
-        farseer_series.calc_csp(
-            calccol=fsuv["csp_settings"]["calccol_name_CSP"],
-            pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-            pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
-            )
-    
-    # if the user only wants to calculate perturbation in single dimensions
-    else:
-        if fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
-            farseer_series.calc_cs_diffs(
-                fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                'Position F1'
-                )
-        if fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
-            farseer_series.calc_cs_diffs(
-                fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-                'Position F2'
-                )
-    
-    # Calculates Ratios
-    if fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
-        farseer_series.calc_ratio(
-            fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
-            'Height'
-            )
-    
-    if fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
-        farseer_series.calc_ratio(
-            fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
-            'Volume'
-            )
-    
-    ### ADD ADDITIONAL CALCULATION HERE ###
-    
-    return
+
+
 
 def perform_fits(farseer_series, fsuv): 
     """
