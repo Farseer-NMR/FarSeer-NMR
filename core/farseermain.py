@@ -116,6 +116,8 @@ class FarseerNMR():
         # relevant variables
         self.farseer_series_dict = {}
         self.farseer_series_SD_dict = {}
+        self.comparisons_dict = {}
+        self.comparisons_SD_dict = {}
         
         # methods should be performed on initiation
         self._starts_logger()
@@ -863,6 +865,7 @@ Settings.'.\
         if not(_checks_cube_axes_flags()):
             return None
         
+        series_dict = {}
         xx = False
         yy = False
         zz = False
@@ -870,7 +873,7 @@ Settings.'.\
         # creates set of series for the first condition (1D)
         if self.pkls.hasxx and self.fsuv["fitting_settings"]["do_along_x"]:
             xx = True
-            self.farseer_series_dict['along_x'] = \
+            series_dict['along_x'] = \
                 self.pkls.export_series_dict_over_axis(
                     fss.FarseerSeries,
                     along_axis='x',
@@ -886,7 +889,7 @@ Settings.'.\
         # creates set of series for the second condition (2D)
         if self.pkls.hasyy and self.fsuv["fitting_settings"]["do_along_y"]:
             yy = True
-            self.farseer_series_dict['along_y'] = \
+            series_dict['along_y'] = \
                 self.pkls.export_series_dict_over_axis(
                     fss.FarseerSeries,
                     along_axis='y',
@@ -902,7 +905,7 @@ Settings.'.\
         # creates set of series for the third condition (3D)  
         if self.pkls.haszz and self.fsuv["fitting_settings"]["do_along_z"]:
             zz = True
-            self.farseer_series_dict['along_z'] = \
+            series_dict['along_z'] = \
                 self.pkls.export_series_dict_over_axis(
                     fss.FarseerSeries,
                     along_axis='z',
@@ -921,6 +924,11 @@ Settings.'.\
 no series set was created along an axis. Nothing will be calculated.'
             wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
             self.logger.info(wet20.wet)
+        
+        if resonance_type == 'Backbone':
+            self.farseer_series_dict = series_dict.copy()
+        elif resonance_type == 'Sidechains':
+            self.farseer_series_SD_dict = series_dict.copy()
         
         return None
     
@@ -1248,7 +1256,7 @@ Nothing to calculate here.')
         
         return None
     
-    def plots_data(self, farseer_series, resonance_type='Backbone'):
+    def plot_data(self, farseer_series, resonance_type='Backbone'):
         """
         Walks through the plotting routines and plots according to user
         preferences.
@@ -1538,10 +1546,149 @@ Nothing to calculate here.')
                     # plots data are exported together with the plots in
                     # fsT.plot_base(), but can be used separatly with
                     # fsT.write_table()
-                    self.plots_data(
+                    self.plot_data(
                         series_dct[cond][dim2_pt][dim1_pt],
                         resonance_type=resonance_type
                         )
+        
+        return None
+    
+    def comparison_analysis_routines(self, comp_panel, resonance_type):
+        """
+        The set of routines that are run for each comparative series.
+        
+        Parameters:
+            comp_panel (FarseerSeries instance generated from 
+                Comparisons.gen_next_dim or gen_prev_dim): contains all the 
+                experiments parsed along an axis and for a specific
+                Farseer-NMR Cube's coordinates.
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}, depending on
+                data type. Detaults to 'Backbone'.
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return None
+        
+        # EXPORTS FULLY PARSED PEAKLISTS
+        self.export_series(comp_panel)
+        # performs pre analysis
+        self.PRE_analysis(comp_panel)
+        self.export_chimera_att_files(comp_panel)
+        # plots data
+        self.plot_data(comp_panel, resonance_type=resonance_type)
+        # writes parameters to tables
+        self.export_all_parameters(comp_panel, resonance_type=resonance_type)
+        
+        return None
+    
+    def analyse_comparisons(self, series_dict, resonance_type='Backbone'):
+        """
+        Algorythm to perform data comparisons over analysed conditions.
+        
+        Parameters:
+            series_dct (dict): a nested dictionary containing the   
+                FarseerSeries for every axis of the Farseer-NMR Cube.
+            
+            fsuv (module): contains user defined variables (preferences)
+                after .read_user_variables().
+        
+        Returns:
+            comp_dct (dict): a dictionary containing all the comparison
+                objects created.
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return None
+        
+        # kwargs passed to the parsed series of class fss.FarseerSeries
+        comp_kwargs = self._series_kwargs(resonance_type=resonance_type)
+        # ORDERED relation between dimension names
+        # self: [next, prev]
+        series_dim_keys = {
+            'along_x':['along_y','along_z'],
+            'along_y':['along_z','along_x'],
+            'along_z':['along_x','along_y']
+            }
+        # stores all the comparison variables.
+        comp_dct = {}
+        
+        # creates a Comparison object for each dimension that was evaluated
+        # previously with fsuv.do_along_x, fsuv.do_along_y, fsuv.do_along_z
+        for dimension in sorted(series_dict.keys()):
+            # sends, along_x, along_y and along_z.
+            # creates comparison
+            c = fsc.Comparisons(
+                series_dict[dimension].copy(),
+                selfdim=dimension,
+                other_dim_keys=series_dim_keys[dimension]
+                )
+            c.log_export_onthefly = True
+            c.log_export_name = self.fsuv["general_settings"]["logfile_name"]
+            # stores comparison in a dictionary
+            comp_dct.setdefault(dimension, c)
+            # generates set of PARSED FarseerSeries along the
+            # next and previous dimensions
+            c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
+            
+            if c.has_points_next_dim:
+                for dp2 in sorted(c.all_next_dim.keys()):
+                    for dp1 in sorted(c.all_next_dim[dp2].keys()):
+                        if self.fsuv["pre_settings"]["apply_PRE_analysis"]:
+                            c.all_next_dim[dp2][dp1].PRE_loaded = True
+                        
+                        # writes log
+                        c.all_next_dim[dp2][dp1].log_r(
+                            'COMPARING... [{}][{}][{}] - [{}]'.\
+                                format(
+                                    dimension,
+                                    dp2,
+                                    dp1,
+                                    list(c.hyper_panel.labels)
+                                    ),
+                            istitle=True
+                            )
+                        # performs ploting routines
+                        self.comparison_analysis_routines(
+                            c.all_next_dim[dp2][dp1],
+                            self.fsuv,
+                            resonance_type
+                            )
+            
+            c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
+            
+            if c.has_points_prev_dim:
+                for dp2 in sorted(c.all_prev_dim.keys()):
+                    for dp1 in sorted(c.all_prev_dim[dp2].keys()):
+                        if self.fsuv["pre_settings"]["apply_PRE_analysis"]:
+                            c.all_prev_dim[dp2][dp1].PRE_loaded = True
+                        
+                        # writes log
+                        c.all_prev_dim[dp2][dp1].log_r(
+                            'COMPARING... [{}][{}][{}] - [{}]'.\
+                                format(
+                                    dimension,
+                                    dp2,
+                                    dp1,
+                                    list(c.hyper_panel.cool)
+                                    ),
+                            istitle=True)
+                        self.comparison_analysis_routines(
+                            c.all_prev_dim[dp2][dp1],
+                            self.fsuv,
+                            resonance_type
+                            )
+        
+        if resonance_type == 'Backbone':
+            self.comparions_dict = comp_dct.copy()
+        elif resonance_type == 'Sidechains':
+            self.comparisons_SD_dict = comp_dct.copy()
         
         return None
     
@@ -1624,21 +1771,16 @@ Nothing to calculate here.')
                     )
         
         # Representing the results comparisons
-        if fitting["perform_comparisons"] and (farseer_series_dct):
+        if fitting["perform_comparisons"] and self.farseer_series_dict:
             # analyses comparisons.
-            comparison_dict = \
-                analyse_comparisons(
-                    farseer_series_dct,
-                    fsuv,
-                    resonance_type='Backbone'
-                    )
+            self.analyse_comparisons(
+                self.farseer_series_dict,
+                resonance_type='Backbone'
+                )
         
-        if (fitting["perform_comparisons"] and farseer_series_dct) \
-                and (exp.has_sidechains and use_sidechains):
-            comparison_dict_SD = \
-                analyse_comparisons(
-                    farseer_series_SD_dict,
-                    fsuv,
+            if analyses_sidechains:
+                self.analyse_comparisons(
+                    self.farseer_series_SD_dict,
                     resonance_type='Sidechains'
                     )
         
@@ -1756,142 +1898,9 @@ def identify_residues(exp):
 
 
 
-def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
-    """
-    The set of routines that are run for each comparative series.
-    
-    Parameters:
-        comp_panel (FarseerSeries instance generated from 
-            Comparisons.gen_next_dim or gen_prev_dim): contains all the 
-            experiments parsed along an axis and for a specific
-            Farseer-NMR Cube's coordinates.
-        
-        fsuv (module): contains user defined variables (preferences) after
-        .read_user_variables().
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}, depending on
-            data type. Detaults to 'Backbone'.
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    # EXPORTS FULLY PARSED PEAKLISTS
-    exports_series(comp_panel)
-    # performs pre analysis
-    PRE_analysis(comp_panel, fsuv)
-    exports_chimera_att_files(comp_panel, fsuv)
-    # plots data
-    plots_data(comp_panel, fsuv, resonance_type=resonance_type)
-    # writes parameters to tables
-    exports_all_parameters(comp_panel, fsuv, resonance_type=resonance_type)
-    
-    return
 
-def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
-    """
-    Algorythm to perform data comparisons over analysed conditions.
-    
-    Parameters:
-        series_dct (dict): a nested dictionary containing the   
-            FarseerSeries for every axis of the Farseer-NMR Cube.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Returns:
-        comp_dct (dict): a dictionary containing all the comparison
-            objects created.
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return None
-    
-    # kwargs passed to the parsed series of class fss.FarseerSeries
-    comp_kwargs = series_kwargs(fsuv, resonance_type=resonance_type)
-    # ORDERED relation between dimension names
-    # self: [next, prev]
-    series_dim_keys = {
-        'along_x':['along_y','along_z'],
-        'along_y':['along_z','along_x'],
-        'along_z':['along_x','along_y']
-        }
-    # stores all the comparison variables.
-    comp_dct = {}
-    
-    # creates a Comparison object for each dimension that was evaluated
-    # previously with fsuv.do_along_x, fsuv.do_along_y, fsuv.do_along_z
-    for dimension in sorted(series_dct.keys()):
-        # sends, along_x, along_y and along_z.
-        # creates comparison
-        c = fsc.Comparisons(
-            series_dct[dimension].copy(),
-            selfdim=dimension,
-            other_dim_keys=series_dim_keys[dimension]
-            )
-        c.log_export_onthefly = True
-        c.log_export_name = fsuv["general_settings"]["logfile_name"]
-        # stores comparison in a dictionary
-        comp_dct.setdefault(dimension, c)
-        # generates set of PARSED FarseerSeries along the
-        # next and previous dimensions
-        c.gen_next_dim(fss.FarseerSeries, comp_kwargs)
-        
-        if c.has_points_next_dim:
-            for dp2 in sorted(c.all_next_dim.keys()):
-                for dp1 in sorted(c.all_next_dim[dp2].keys()):
-                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
-                        c.all_next_dim[dp2][dp1].PRE_loaded = True
-                    
-                    # writes log
-                    c.all_next_dim[dp2][dp1].log_r(
-                        'COMPARING... [{}][{}][{}] - [{}]'.\
-                            format(
-                                dimension,
-                                dp2,
-                                dp1,
-                                list(c.hyper_panel.labels)
-                                ),
-                        istitle=True
-                        )
-                    # performs ploting routines
-                    comparison_analysis_routines(
-                        c.all_next_dim[dp2][dp1],
-                        fsuv,
-                        resonance_type
-                        )
-        
-        c.gen_prev_dim(fss.FarseerSeries, comp_kwargs)
-        
-        if c.has_points_prev_dim:
-            for dp2 in sorted(c.all_prev_dim.keys()):
-                for dp1 in sorted(c.all_prev_dim[dp2].keys()):
-                    if fsuv["pre_settings"]["apply_PRE_analysis"]:
-                        c.all_prev_dim[dp2][dp1].PRE_loaded = True
-                    
-                    # writes log
-                    c.all_prev_dim[dp2][dp1].log_r(
-                        'COMPARING... [{}][{}][{}] - [{}]'.\
-                            format(
-                                dimension,
-                                dp2,
-                                dp1,
-                                list(c.hyper_panel.cool)
-                                ),
-                        istitle=True)
-                    comparison_analysis_routines(
-                        c.all_prev_dim[dp2][dp1],
-                        fsuv,
-                        resonance_type
-                        )
-    
-    return comp_dct
+
+
 
 
 
