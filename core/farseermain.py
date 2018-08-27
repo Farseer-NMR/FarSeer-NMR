@@ -113,10 +113,13 @@ class FarseerNMR():
             msg = "fsuv argument should be a dict or string path"
             sys.exit(msg)
         
-        self._starts_logger()
+        # relevant variables
+        self.farseer_series_dict = {}
+        self.farseer_series_SD_dict = {}
         
+        # methods should be performed on initiation
+        self._starts_logger()
         self._fsuv_integrity_checks()
-    
     
     def _updates_output_dir(self):
         """
@@ -411,10 +414,15 @@ Hill Equation will be performed with the following values: {}.".\
         
         return None
     
-    def _checks_axis_coherency(self):
+    def _informs_empty_axis(self, empty_axis):
         """
-        Warns in case the axis the user activates for calculation actually
-        has no data points to create a series.
+        Informs the user if a axis has only 1 data point.
+        
+        If an FarseerNMR Cube axis has only one data point, a series (vector)
+        along this axis cannot be created.
+        
+        Parameters:
+            - empty_axis (str): identifies the axis
         """
         
         msg = \
@@ -422,7 +430,7 @@ Hill Equation will be performed with the following values: {}.".\
 no datapoints along this axis so that a series could not be created and \
 analysed. Confirm the axis analysis flags are correctly set in the Run \
 Settings.'.\
-            format(dim)    
+            format(empty_axis)    
         wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
         self.logger.info(wet20.wet)
         
@@ -479,6 +487,39 @@ Settings.'.\
             }
         
         return d
+    
+    def _series_kwargs(self, resonance_type='Backbone'):
+        """
+        Kwargs dictionry to instantiate FarseerSeriers.
+        
+        Defines the kwargs dictionary that will be used to generate
+        the FarseerSeries object based on the user defined preferences.
+        
+        Parameters:
+            resonance_type (str): {'Backbone', 'Sidechains'}, whether data 
+                corresponds to one or another.
+        
+        Returns:
+            - dictionary of kwargs
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return None
+        
+        dd = {
+            'resonance_type':resonance_type,
+            'csp_alpha4res':self.fsuv["csp_settings"]["csp_res4alpha"],
+            'csp_res_exceptions':self.fsuv["csp_settings"]["csp_res_exceptions"],
+            'cs_missing':self.fsuv["csp_settings"]["cs_missing"],
+            'restraint_list':self.fsuv["restraint_names"],
+            'log_export_onthefly':True,
+            'log_export_name':self.fsuv["general_settings"]["logfile_name"]
+            }
+        
+        return dd
     
     def change_current_dir(self, new_curr_dir, update_fsuv=False):
         """
@@ -579,7 +620,7 @@ Settings.'.\
             apply_fasta=False):
         """
         Creates the Farseer-NMR peaklist dataset (instance of
-        Farseer-NMR Cube) from the peaklist hierarchycal folder 'spectra/' 
+        FarseerCube class) from the peaklist hierarchycal folder 'spectra/' 
         in self.fsuv["general_settings"]["input_spectra_path"]
         
         Parameters:
@@ -754,6 +795,135 @@ Settings.'.\
         
         return None
     
+    def init_farseer_cube(self):
+        """
+        Inits Farseer-NMR Cube.
+        Uses FarseerCube.init_Farseer_cube()
+        """
+        
+        self.pkls.init_Farseer_cube(
+            use_sidechains=fsuv["general_settings"]["use_sidechains"]
+            )
+        
+        return None
+    
+    def gen_series_dicts(self, resonance_type='Backbone'):
+        """
+        Generates a nested dictionary, <D>, containing all possible series
+        over all the three Farseer-NMR Cube axis according to the user
+        defined variables.
+        
+        Parameters:
+            series_class (FarseerSeries class): The class that will 
+                initiate the series, normally fslibs/FarseerSeries.py
+            
+            resonance_type (opt, str): {'Backbone', 'Sidechains'} depending
+                on data in <exp>.
+        
+        
+        <D> contains a first level key for each Farseer-NMR Cube's axis.
+        Each of these keys contains a second nested dictionary enclosing
+        all the experimental series along that axis as extracted from
+        the Farseer-NMR Cube.
+        
+        Creates series only for user activated axis.
+        
+        The first level keys of the experimental series are the "next axis"
+        datapoints, second level keys are the "previous axis" datapoints.
+        
+        Example:
+            for X axis series, keys are:
+                Y1
+                    Z1
+                    Z2
+                Y2
+                    Z1
+                    Z2
+            
+            for Z axis series:
+                X1
+                    Y1
+                    Y2
+                X2
+                    Y1
+                    Y2
+        
+        Depends on:
+        fsuv.do_along_x
+        fsuv.do_along_y
+        fsuv.do_along_z
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return None
+        
+        if not(_checks_cube_axes_flags()):
+            return None
+        
+        xx = False
+        yy = False
+        zz = False
+        
+        # creates set of series for the first condition (1D)
+        if self.pkls.hasxx and self.fsuv["fitting_settings"]["do_along_x"]:
+            xx = True
+            self.farseer_series_dict['along_x'] = \
+                self.pkls.export_series_dict_over_axis(
+                    fss.FarseerSeries,
+                    along_axis='x',
+                    resonance_type=resonance_type,
+                    series_kwargs=\
+                        self._series_kwargs(resonance_type=resonance_type)
+                    )
+        
+        elif not(self.pkls.hasxx) \
+                and self.fsuv["fitting_settings"]["do_along_x"]:
+            self._informs_empty_axis('x')
+        
+        # creates set of series for the second condition (2D)
+        if self.pkls.hasyy and self.fsuv["fitting_settings"]["do_along_y"]:
+            yy = True
+            self.farseer_series_dict['along_y'] = \
+                self.pkls.export_series_dict_over_axis(
+                    fss.FarseerSeries,
+                    along_axis='y',
+                    resonance_type=resonance_type,
+                    series_kwargs=\
+                        self._series_kwargs(resonance_type=resonance_type)
+                    )
+        
+        elif not(self.pkls.hasyy) \
+                and self.fsuv["fitting_settings"]["do_along_y"]:
+            self._informs_empty_axis('y')
+    
+        # creates set of series for the third condition (3D)  
+        if self.pkls.haszz and self.fsuv["fitting_settings"]["do_along_z"]:
+            zz = True
+            self.farseer_series_dict['along_z'] = \
+                self.pkls.export_series_dict_over_axis(
+                    fss.FarseerSeries,
+                    along_axis='z',
+                    resonance_type=resonance_type,
+                    series_kwargs=\
+                        self._series_kwargs(resonance_type=resonance_type)
+                    )
+        
+        elif not(self.pkls.haszz) \
+                and self.fsuv["fitting_settings"]["do_along_z"]:
+            self._informs_empty_axis('z')
+        
+        if not(any([xx, yy, zz])):
+            msg = \
+'The overall combination of data and calculation flags is not consistent and \
+no series set was created along an axis. Nothing will be calculated.'
+            wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
+            self.logger.info(wet20.wet)
+        
+        return None
+    
     def run(self):
         """
         Runs the whole Farseer-NMR standard algorithm based on the
@@ -808,37 +978,25 @@ Settings.'.\
         #organize peaklist columns
         self.organize_columns()
         
-        if exp.has_sidechains and use_sidechains:
-            organize_columns(exp, fsuv, resonance_type='Sidechains')
+        if analyses_sidechains:
+            self.organize_columns(resonance_type='Sidechains')
         
-        init_fs_cube(exp, fsuv)
+        self.init_farseer_cube()
+        
         # initiates a dictionary that contains all the series to be evaluated
         # along all the conditions.
-        farseer_series_dct = \
-            gen_series_dcts(
-                exp,
-                fss.FarseerSeries,
-                fsuv,
-                resonance_type='Backbone'
-                )
+        self.gen_series_dcts(resonance_type='Backbone')
         
-        if not(farseer_series_dct):
-            exp.exports_parsed_pkls()
-        
-        else:
+        if self.farseer_series_dict:
             # evaluates the series and plots the data
-            eval_series(farseer_series_dct, fsuv)
+            self.eval_series()
+        else:
+            self.pkls.exports_parsed_pkls()
         
-        if exp.has_sidechains and use_sidechains:
-            farseer_series_SD_dict = \
-                gen_series_dcts(
-                    exp,
-                    fss.FarseerSeries,
-                    fsuv,
-                    resonance_type='Sidechains'
-                    )
+        if analyses_sidechains:
+            self.gen_series_dcts(resonance_type='Sidechains')
             
-            if (farseer_series_SD_dict):
+            if self.farseer_series_SD_dict:
                 eval_series(
                     farseer_series_SD_dict,
                     fsuv,
@@ -973,182 +1131,11 @@ def identify_residues(exp):
 
 
 
-def init_fs_cube(exp, fsuv):
-    """
-    Inits Farseer-NMR Cube.
-    The Cube is stored as an attribute of the FarseerCube instance.
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.use_sidechains
-    """
-    
-    exp.init_Farseer_cube(
-        use_sidechains=fsuv["general_settings"]["use_sidechains"]
-        )
-    
-    return
 
-def series_kwargs(fsuv, resonance_type='Backbone'):
-    """
-    Defines the kwargs dictionary that will be used to generate
-    the FarseerSeries object based on the user defined preferences.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}, whether data 
-            corresponds to one or another.
-    
-    Depends on:
-    fsuv.csp_alpha4res
-    fsuv.csp_res_exceptions
-    fsuv.cs_missing
-    fsuv.restraint_names
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return None
-    
-    dd = {
-        'resonance_type':resonance_type,
-        'csp_alpha4res':fsuv["csp_settings"]["csp_res4alpha"],
-        'csp_res_exceptions':fsuv["csp_settings"]["csp_res_exceptions"],
-        'cs_missing':fsuv["csp_settings"]["cs_missing"],
-        'restraint_list':fsuv["restraint_names"],
-        'log_export_onthefly':True,
-        'log_export_name':fsuv["general_settings"]["logfile_name"]
-        }
-    
-    return dd
 
-def gen_series_dcts(exp, series_class, fsuv, resonance_type='Backbone'):
-    """
-    Generates a nested dictionary, <D>, containing all possible series
-    over all the three Farseer-NMR Cube axis.
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        series_class (FarseerSeries class): The class that will 
-            initiate the series, normally fslibs/FarseerSeries.py
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-        
-        resonance_type OPT (stg): {'Backbone', 'Sidechains'} depending
-            on data in <exp>.
-    
-    
-    <D> contains a first level key for each Farseer-NMR Cube's axis.
-    Each of these keys contains a second nested dictionary enclosing
-    all the experimental series along that axis as extracted from
-    the Farseer-NMR Cube.
-    
-    Creates series only for user activated axis.
-    
-    The first level keys of the experimental series are the "next axis"
-    datapoints, second level keys are the "previous axis" datapoints.
-    
-    Example:
-        for X axis series, keys are:
-            Y1
-                Z1
-                Z2
-            Y2
-                Z1
-                Z2
-        
-        for Z axis series:
-            X1
-                Y1
-                Y2
-            X2
-                Y1
-                Y2
-    
-    Depends on:
-    fsuv.do_along_x
-    fsuv.do_along_y
-    fsuv.do_along_z
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return None
-    
-    if not(_checks_cube_axes_flags()):
-        return None
-    
-    series_dct = {}
-    xx = False
-    yy = False
-    zz = False
-    
-    # creates set of series for the first condition (1D)
-    if exp.hasxx and fsuv["fitting_settings"]["do_along_x"]:
-        xx = True
-        series_dct['along_x'] = \
-            exp.export_series_dict_over_axis(
-                series_class,
-                along_axis='x',
-                resonance_type=resonance_type,
-                series_kwargs=\
-                    series_kwargs(fsuv, resonance_type=resonance_type)
-                )
-    
-    elif not(exp.hasxx) and fsuv["fitting_settings"]["do_along_x"]:
-        checks_axis_coherency('x', fsuv)
-    
-    # creates set of series for the second condition (2D)
-    if exp.hasyy and fsuv["fitting_settings"]["do_along_y"]:
-        yy = True
-        series_dct['along_y'] = \
-            exp.export_series_dict_over_axis(
-                series_class,
-                along_axis='y',
-                resonance_type=resonance_type,
-                series_kwargs=\
-                    series_kwargs(fsuv, resonance_type=resonance_type)
-                )
-    
-    elif not(exp.hasyy) and fsuv["fitting_settings"]["do_along_y"]:
-        checks_axis_coherency('y', fsuv)
 
-    # creates set of series for the third condition (3D)  
-    if exp.haszz and fsuv["fitting_settings"]["do_along_z"]:
-        zz = True
-        series_dct['along_z'] = \
-            exp.export_series_dict_over_axis(
-                series_class,
-                along_axis='z',
-                resonance_type=resonance_type,
-                series_kwargs=\
-                    series_kwargs(fsuv, resonance_type=resonance_type)
-                )
-    
-    elif not(exp.haszz) and fsuv["fitting_settings"]["do_along_z"]:
-        checks_axis_coherency('z', fsuv)
-    
-    if not(any([xx, yy, zz])):
-        msg = \
-'The overall combination of data and calculation flags is not consistent and \
-any series set was created along an axis. Nothing will be calculated.'
-        wet20 = fsw(msg_title='WARNING', msg=msg, wet_num=20)
-        logs(wet20.wet, fsuv["general_settings"]["logfile_name"])
-    
-    return series_dct
+
+
 
 def eval_series(series_dct, fsuv, resonance_type='Backbone'):
     """
