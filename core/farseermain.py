@@ -359,29 +359,50 @@ class FarseerNMR():
         
         return None
 
-def copy_Farseer_version(
-        fsuv,
-        file_name='farseer_version',
-        compress_type='zip'):
-    """
-    Makes a copy of the running version.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.cwd
-    """
-    
-    script_wd = os.path.dirname(os.path.realpath(__file__))
-    shutil.make_archive(
-        '{}/{}'.format(fsuv.cwd, file_name),
-        compress_type,
-        script_wd
-        )
-    
-    return 
+    def copy_FarseerNMR_version(
+            self,
+            file_name='farseer_version',
+            compress_type='zip'
+            ):
+        """
+        Makes a copy of the running version.
+        
+        Parameters:
+            file_name (str, opt): name of the compressed file
+            compress_type (opt, str): extention of the compression file
+                compatible with Python shutil.make_archive
+                https://docs.python.org/3.6/library/shutil.html#shutil.make_archive
+        
+        Returns: None
+        """
+        
+        script_wd = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            os.pardir
+            )
+        
+        file_path = '{}/{}'.format(
+            self.fsuv["general_settings"]["output_path"],
+            file_name
+            )
+        
+        try:
+            shutil.make_archive(file_path, compress_type, script_wd)
+        except ValueError as verror:
+            msg = "Error while trying to export the Farseer-NMR version: {}".format(verror)
+            wet36 = fsw(msg_title='WARNING', msg=msg, wet_num=36)
+            self.logger.warning(wet36.wet)
+            
+            return None
+        
+        self.logger.info(
+            'Farseer-NMR version exported correctly to {}.{}'.format(
+                file_path,
+                compress_type
+                )
+            )
+        
+        return None
 
 def log_time_stamp(
         logfile_name,
@@ -1969,7 +1990,6 @@ if __name__ == '__main__':
     fsuv = json.load(open(sys.argv[1], 'r'))
     a = FarseerNMR(fsuv)
     a.logger.debug('done reading from json dict')
-    
     
     
     # copy_Farseer_version(fsuv)
