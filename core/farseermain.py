@@ -268,6 +268,47 @@ class FarseerNMR():
         
         return None
     
+    def _fsuv_integrity_checks(self):
+        """
+        Performs integrity checks to confirm integrity between user defined
+        variables. Warns the user with WETs if necessary.
+        
+        Returns: None
+        """
+        
+        # PRE routines take only place at advanced stages of the 
+        # Farseer-NMR calculation.
+        # It would be a waste of time to have an error after 2h...
+        if fsuv["pre_settings"]["apply_PRE_analysis"]:
+            _checks_PRE_analysis_flags()
+        
+        return None
+    
+    def _checks_PRE_analysis_flags(self):
+        """Checks flag compatibility in PRE Analysis routines."""
+        
+        # if all the flags upon which aplly_PRE_analysis depends on are
+        # turned off:
+        if not(self.fsuv["PRE_analysis_flags"]):
+            msg = \
+"PRE Analysis is set to <{}> and depends on the following variables: \
+do_along_z :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
+perform_comparisons :: <{}>. \
+All these variables should be set to True for PRE Analysis to be executed.".\
+                format(
+                    self.fsuv["pre_settings"]["apply_PRE_analysis"],
+                    self.fsuv["fitting_settings"]["do_along_z"],
+                    self.fsuv["Height_ratio_settings"]["calcs_Height_ratio"] \
+                        or self.fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
+                    self.fsuv["fitting_settings"]["perform_comparisons"]
+                    )
+            wet1 = fsw(msg_title='ERROR', msg=msg, wet_num=1)
+            self.logger.info(wet1.wet)
+            wet1.abort()
+        
+        return None
+    
+    
     def change_current_dir(self, new_curr_dir, update_fsuv=False):
         """
         Changes running dir to path. Exists if path is not a valid directory.
@@ -459,60 +500,9 @@ def log_end(fsuv):
     
     return
 
-def initial_checks(fsuv):
-    """
-    Performs checks that are useful to be executed at the beginning
-    of the Farseer-NMR calculation run.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.apply_PRE_analysis
-    """
-    
-    # PRE routines take only place at advanced stages of the 
-    # Farseer-NMR calculation. It would be a waste to have an error after 2h...
-    if fsuv["pre_settings"]["apply_PRE_analysis"]:
-        checks_PRE_analysis_flags(fsuv)
-    
-    return
 
-def checks_PRE_analysis_flags(fsuv):
-    """
-    Checks flag compatibility in PRE Analysis routines.
-    
-    Parameters:
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.PRE_analysis_flags
-    fsuv["general_settings"]["logfile_name"]
-    """
-    # if all the flags upon which aplly_PRE_analysis depends on are
-    # turned off:
-    
-    if not(fsuv["PRE_analysis_flags"]):
-        msg = \
-"PRE Analysis is set to <{}> and depends on the following variables: \
-do_along_z :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
-perform_comparisons :: <{}>. \
-All these variables should be set to True for PRE Analysis to be executed.".\
-            format(
-                fsuv["pre_settings"]["apply_PRE_analysis"],
-                fsuv["fitting_settings"]["do_along_z"],
-                fsuv["Height_ratio_settings"]["calcs_Height_ratio"] \
-                    or fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"],
-                fsuv["fitting_settings"]["perform_comparisons"]
-                )
-        wet1 = fsw(msg_title='ERROR', msg=msg, wet_num=1)
-        logs(wet1.wet, fsuv["general_settings"]["logfile_name"])
-        logs(wet.abort_msg(), fsuv["general_settings"]["logfile_name"])
-        wet.abort()
-    
-    return
+
+
 
 def checks_cube_axes_flags(fsuv):
     """
