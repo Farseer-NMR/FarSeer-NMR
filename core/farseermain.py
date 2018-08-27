@@ -108,7 +108,7 @@ class FarseerNMR():
         elif isinstance(fsuv, dict):
             self.fsuv = fsuv
             self._updates_output_dir()
-            #self._configure_fsuv()
+            self._config_user_variables()
         else:
             msg = "fsuv argument should be a dict or string path"
             sys.exit(msg)
@@ -156,8 +156,6 @@ class FarseerNMR():
         Returns: None
         """
         
-        old_dir = os.getcwd()
-        
         try:
             os.chdir(new_curr_dir)
         except NotADirectoryError as notdirerr: 
@@ -181,65 +179,51 @@ class FarseerNMR():
     
     def read_fsuv_json(self, fsuv_json_path):
         """
-        Sets calculation folder to the folder where spectra/ is.
-        Reads user definitions from config.json file to a dictionary.
+        Reads a JSON file containing the Farseer-NMR's user defined variables.
         
-        Changes RUN directory to run_path.
+        Can be used to updated an existing configuration.
         
         Parameters:
-            runfolder_path (str): Calculation run folder. Parent path of
-                spectra/ folder.
-            configjson_path (str) path to config.json file.
-            logger (logger obj): (optional) logger object
+            fsuv_json_path (str): path to the JSON file.
         
         Returns:
-            fsuv (dictionary): contains the user preferences.
+            None
         """
-        #logger = logger or start_logger(runfolder_path)
         
-        how_to_run = \
-    """*** execute Farseer-NMR as
-    *** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+        how_to_run = """*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
         
-        # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-        # Reads Run calculation folder absolut path
-        #cwd =  os.path.abspath(os.getcwd())
-        # Reads json config absolut path
+        # Reads json config absolute path
         json_cwd = os.path.abspath(fsuv_json_path)
         # loads and reads json config file
         try:
             self.fsuv = json.load(open(json_cwd, 'r'))
         except json.decoder.JSONDecodeError as jsonerror:
             msg = \
-    """
-    ***************************************
-    *** Error loading JSON file:
-    *** {}
-    *** {}
-    ***************************************
-    """.\
+"""
+***************************************
+*** Error loading JSON file:
+*** {}
+*** {}
+***************************************
+""".\
                 format(json_cwd, jsonerror)
             sys.exit(msg)
         except IsADirectoryError as direrr:
             msg = \
-    """
-    ***************************************
-    *** A directory was passed as argument instead of a json file.
-    *** {}
-    ***
-    {}
-    ***************************************
+"""
+***************************************
+*** A directory was passed as argument instead of a json file.
+*** {}
+***
+{}
+***************************************
     """.\
                 format(direrr, how_to_run)
             sys.exit(msg)
         
         self._updates_output_dir()
         
-        # changes current directory to the run directory which is that where
-        # spectra/ folder is.
-        # if os.getcwd() != os.path.abspath(runfolder_path):
-            # #logger.debug('cwd differs from runfolder_path')
-            # changes_current_dir(runfolder_path)
         # stores path to spectra/ folder
         self.fsuv["general_settings"]["input_spectra_path"] = \
             '{}/spectra'.format(self.fsuv["general_settings"]["output_path"])
@@ -247,144 +231,133 @@ class FarseerNMR():
         self.fsuv["general_settings"]["config_path"] = json_cwd
         # configs user variables necessary for Farseer-NMR
         
+        self._config_user_variables()
         
-        
-        #fsuv = config_user_variables(fsuv)
         return None
 
-
-
-
-
-
-
-def config_user_variables(self):
-    """
-    Reads user defined variables and converts them to 
-    organized dicitonaries or DataFrames.
-    
-    Prepares helper variables for checking routines.
-    
-    Stores everything under fsuv module.
-    
-    Returns:
-        fsuv
-    """
-    
-    # alias .conf json file
-    general = fsuv["general_settings"]
-    fitting = fsuv["fitting_settings"]
-    cs = fsuv["cs_settings"]
-    csp = fsuv["csp_settings"]
-    fasta = fsuv["fasta_settings"]
-    plots_f1 = fsuv["PosF1_settings"]
-    plots_f2 = fsuv["PosF2_settings"]
-    plots_csp = fsuv["csp_settings"]
-    plots_height = fsuv["Height_ratio_settings"]
-    plots_volume = fsuv["Volume_ratio_settings"]
-
-    # does the user want to perform any analysis on the Farseer-NMR cube?
-    fsuv["any_axis"] = any([
-        fitting["do_along_x"],
-        fitting["do_along_y"],
-        fitting["do_along_z"]
-        ])
-    
-    # sorted values to be used as x coordinates in the fitting routine
-    # fsuv.txv = sorted(fsuv.titration_x_values)
-    
-    # ORDERED names of the restraints that can be calculated
-    fsuv["restraint_names"] = [
-        plots_f1["calccol_name_PosF1_delta"],
-        plots_f2["calccol_name_PosF2_delta"],
-        plots_csp["calccol_name_CSP"],
-        plots_height["calccol_name_Height_ratio"],
-        plots_volume["calccol_name_Volume_ratio"]
-        ]
-    
-    # ORDERED calculation restraints flags
-    fsuv["restraint_flags"] = [
-        plots_f1["calcs_PosF1_delta"],
-        plots_f2["calcs_PosF2_delta"],
-        plots_csp["calcs_CSP"],
-        plots_height["calcs_Height_ratio"],
-        plots_volume["calcs_Volume_ratio"]
-        ]
-    
-    restraint_settings_dct = {
-        'calcs_restraint_flg': fsuv["restraint_flags"],
+    def _config_user_variables(self):
+        """
+        Performs additional operations on the user defined json dictionary
+        containing the FarseerNMR variables so it can be used properly.
         
-        'plt_y_axis_lbl': [
-            plots_f1["yy_label_PosF1_delta"],
-            plots_f2["yy_label_PosF2_delta"],
-            plots_csp["yy_label_CSP"],
-            plots_height["yy_label_Height_ratio"],
-            plots_volume["yy_label_Volume_ratio"]
-            ],
+        Returns:
+            None
+        """
         
-        'plt_y_axis_scl': [
-            (
-                -plots_f1["yy_scale_PosF1_delta"],
-                plots_f1["yy_scale_PosF1_delta"]
-                ),
-            (
-                -plots_f2["yy_scale_PosF2_delta"],
-                plots_f2["yy_scale_PosF2_delta"]
-                ),
-            (0, plots_csp["yy_scale_CSP"]),
-            (0, plots_height["yy_scale_Height_ratio"]),
-            (0, plots_volume["yy_scale_Volume_ratio"])
+        # alias .conf json file
+        general = self.fsuv["general_settings"]
+        fitting = self.fsuv["fitting_settings"]
+        cs = self.fsuv["cs_settings"]
+        csp = self.fsuv["csp_settings"]
+        fasta = self.fsuv["fasta_settings"]
+        plots_f1 = self.fsuv["PosF1_settings"]
+        plots_f2 = self.fsuv["PosF2_settings"]
+        plots_csp = self.fsuv["csp_settings"]
+        plots_height = self.fsuv["Height_ratio_settings"]
+        plots_volume = self.fsuv["Volume_ratio_settings"]
+    
+        # does the user want to perform any analysis on the Farseer-NMR cube?
+        self.fsuv["any_axis"] = any([
+            fitting["do_along_x"],
+            fitting["do_along_y"],
+            fitting["do_along_z"]
+            ])
+        
+        # sorted values to be used as x coordinates in the fitting routine
+        # self.fsuv.txv = sorted(self.fsuv.titration_x_values)
+        
+        # ORDERED names of the restraints that can be calculated
+        self.fsuv["restraint_names"] = [
+            plots_f1["calccol_name_PosF1_delta"],
+            plots_f2["calccol_name_PosF2_delta"],
+            plots_csp["calccol_name_CSP"],
+            plots_height["calccol_name_Height_ratio"],
+            plots_volume["calccol_name_Volume_ratio"]
             ]
-        }
-    
-    # A pd.DataFrame that organizes settings for each calculated restraint.
-    # Index are the calculated params labels
-    fsuv["restraint_settings"] = \
-        pd.DataFrame(restraint_settings_dct, index=fsuv["restraint_names"])
-    
-    # does the user want to calculate any restraint?
-    fsuv["calc_flags"] = any(fsuv["restraint_flags"])
-    
-    # does the user want to draw any plot?
-    # fsuv.plotting_flags = any(
-    
-    # flags which fsuv.apply_PRE_analysis deppends on
-    fsuv["PRE_analysis_flags"] = \
-        fitting["do_along_z"] \
-        and (plots_height["calcs_Height_ratio"] \
-            or plots_volume["calcs_Volume_ratio"]) \
-        and fitting["perform_comparisons"]
-    
-    ### configures flags for observables:
-    #### provisional ****
-    fsuv["obs_names"] = ['Position F1', 'Position F2', 'Height']
-    observables_stngs_dict = {
-        "obs_flags" : [
-            fsuv["observables"]["plots_posf1"],
-            fsuv["observables"]["plots_posf2"],
-            fsuv["observables"]["plots_height"]
-            ],
         
-        "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)", "Height"],
-        
-        "obs_yaxis_scl" : [
-            fsuv["observables"]["posf1_scale"],
-            fsuv["observables"]["posf2_scale"],
-            fsuv["observables"]["height_scale"]
+        # ORDERED calculation restraints flags
+        self.fsuv["restraint_flags"] = [
+            plots_f1["calcs_PosF1_delta"],
+            plots_f2["calcs_PosF2_delta"],
+            plots_csp["calcs_CSP"],
+            plots_height["calcs_Height_ratio"],
+            plots_volume["calcs_Volume_ratio"]
             ]
-        }
-    
-    fsuv["observables_settings"] = \
-        pd.DataFrame(observables_stngs_dict, index=fsuv["obs_names"])
-    
-    # adds nuclei Y axis limits for plots to the scatter flower
-    # configuration dictionary
-    fsuv["cs_scatter_flower_settings"]["xlim"] = \
-        fsuv["PosF1_settings"]["yy_scale_PosF1_delta"]
-    fsuv["cs_scatter_flower_settings"]["ylim"] = \
-        fsuv["PosF2_settings"]["yy_scale_PosF2_delta"]
-    
-    return fsuv
+        
+        restraint_settings_dct = {
+            'calcs_restraint_flg': self.fsuv["restraint_flags"],
+            
+            'plt_y_axis_lbl': [
+                plots_f1["yy_label_PosF1_delta"],
+                plots_f2["yy_label_PosF2_delta"],
+                plots_csp["yy_label_CSP"],
+                plots_height["yy_label_Height_ratio"],
+                plots_volume["yy_label_Volume_ratio"]
+                ],
+            
+            'plt_y_axis_scl': [
+                (
+                    -plots_f1["yy_scale_PosF1_delta"],
+                    plots_f1["yy_scale_PosF1_delta"]
+                    ),
+                (
+                    -plots_f2["yy_scale_PosF2_delta"],
+                    plots_f2["yy_scale_PosF2_delta"]
+                    ),
+                (0, plots_csp["yy_scale_CSP"]),
+                (0, plots_height["yy_scale_Height_ratio"]),
+                (0, plots_volume["yy_scale_Volume_ratio"])
+                ]
+            }
+        
+        # A pd.DataFrame that organizes settings for each calculated restraint.
+        # Index are the calculated params labels
+        self.fsuv["restraint_settings"] = \
+            pd.DataFrame(restraint_settings_dct, index=self.fsuv["restraint_names"])
+        
+        # does the user want to calculate any restraint?
+        self.fsuv["calc_flags"] = any(self.fsuv["restraint_flags"])
+        
+        # does the user want to draw any plot?
+        # self.fsuv.plotting_flags = any(
+        
+        # flags which self.fsuv.apply_PRE_analysis deppends on
+        self.fsuv["PRE_analysis_flags"] = \
+            fitting["do_along_z"] \
+            and (plots_height["calcs_Height_ratio"] \
+                or plots_volume["calcs_Volume_ratio"]) \
+            and fitting["perform_comparisons"]
+        
+        ### configures flags for observables:
+        #### provisional ****
+        self.fsuv["obs_names"] = ['Position F1', 'Position F2', 'Height']
+        observables_stngs_dict = {
+            "obs_flags" : [
+                self.fsuv["observables"]["plots_posf1"],
+                self.fsuv["observables"]["plots_posf2"],
+                self.fsuv["observables"]["plots_height"]
+                ],
+            
+            "obs_yaxis_lbl" : ["1H (ppm)", "15N (ppm)", "Height"],
+            
+            "obs_yaxis_scl" : [
+                self.fsuv["observables"]["posf1_scale"],
+                self.fsuv["observables"]["posf2_scale"],
+                self.fsuv["observables"]["height_scale"]
+                ]
+            }
+        
+        self.fsuv["observables_settings"] = \
+            pd.DataFrame(observables_stngs_dict, index=self.fsuv["obs_names"])
+        
+        # adds nuclei Y axis limits for plots to the scatter flower
+        # configuration dictionary
+        self.fsuv["cs_scatter_flower_settings"]["xlim"] = \
+            self.fsuv["PosF1_settings"]["yy_scale_PosF1_delta"]
+        self.fsuv["cs_scatter_flower_settings"]["ylim"] = \
+            self.fsuv["PosF2_settings"]["yy_scale_PosF2_delta"]
+        
+        return None
 
 def copy_Farseer_version(
         fsuv,
@@ -1996,7 +1969,6 @@ if __name__ == '__main__':
     fsuv = json.load(open(sys.argv[1], 'r'))
     a = FarseerNMR(fsuv)
     a.logger.debug('done reading from json dict')
-    
     
     
     
