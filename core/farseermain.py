@@ -924,6 +924,165 @@ no series set was created along an axis. Nothing will be calculated.'
         
         return None
     
+    def perform_fits(self, farseer_series): 
+        """
+        Performs fits for 1H, 15N and CSPs data along the X axis series.
+        
+        Parameters:
+            farseer_series (FarseerSeries instance): a FarseerSeries class
+                object containing all the experiments along a series
+                previously selected from the Farseer-NMR Cube.
+        
+        Depends on:
+        fsuv.perform_resevo_fit
+        fsuv.restraint_settings
+        fsuv["revo_settings"]["titration_x_values"]
+        fsuv["fitting_parameters"]
+        """
+        # fits are allowed only for X axis series
+        if not(
+                self.fsuv["revo_settings"]["perform_resevo_fitting"] \
+                    and farseer_series.series_axis == 'along_x'
+                ):
+            self.logger.info('Fitting flag is dehactivated and there is no\
+data along the X axis. There is nothing to fit.')
+            return None
+        
+        self._checks_fit_input()
+        
+        for restraint in self.fsuv["restraint_settings"].index:
+            if self.fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
+                farseer_series.perform_fit(
+                    restraint,
+                    self.fsuv["revo_settings"]["titration_x_values"],
+                    self.fsuv["fitting_parameters"]["mininum_datapoints"],
+                    self.fsuv["fitting_parameters"]["fitting_function"]
+                    )
+        
+        for obs in self.fsuv["observables_settings"].index:
+            if self.fsuv["observables_settings"].loc[obs, 'obs_flags']:
+                farseer_series.perform_fit(
+                    obs,
+                    self.fsuv["revo_settings"]["titration_x_values"],
+                    self.fsuv["fitting_parameters"]["mininum_datapoints"],
+                    self.fsuv["fitting_parameters"]["fitting_function"]
+                    )
+        
+        return None
+    
+    def PRE_analysis(self, farseer_series):
+        """
+        Optimized algorythm that performs all possible PRE analysis.
+        
+        Parameters:
+            farseer_series (FarseerSeries class): a FarseerSeries class
+                object containing all the experiments along a series
+                previously selected from the Farseer-NMR Cube.
+        
+        Depends on:
+        fsuv.apply_PRE_analysis
+        fsuv.restraint_settings
+        fsuv.gaussian_stddev
+        fsuv.gauss_x_size
+        fsuv.restraint_settings
+        fsuv.heat_map_rows
+        fsuv.fig_height
+        fsuv.fig_width
+        fsuv.DPRE_plot_width
+        fsuv.fig_file_type
+        fsuv.fig_dpi
+        """
+        
+        # if user do not wants PRE analysis, do nothing
+        if not(self.fsuv["pre_settings"]["apply_PRE_analysis"]):
+            self.logger.info('PRE analysis flag is dehactivated. \
+Nothing to calculate here.')
+            return None
+        
+        isalong_z = farseer_series.series_axis == 'along_z'
+        iscz = farseer_series.series_axis == 'Cz'
+        isprev_para = farseer_series.prev_dim in farseer_series.paramagnetic_names
+        isnext_para = farseer_series.next_dim in farseer_series.paramagnetic_names
+        do_heatmap = self.fsuv['plotting_flags']['do_heat_map']
+        
+        # if analysing along_z: performs calculations.
+        if isalong_z:
+            farseer_series.load_theoretical_PRE(
+                self.fsuv["general_settings"]["input_spectra_path"],
+                farseer_series.prev_dim
+                )
+            
+            for sourcecol, targetcol in zip(
+                    self.fsuv["restraint_settings"].index[3:],
+                    ['Hgt_DPRE', 'Vol_DPRE']
+                    ):
+                # only in the parameters allowed by the user
+                if self.fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
+                    farseer_series.calc_Delta_PRE(
+                        sourcecol,
+                        targetcol,
+                        gaussian_stddev=self.fsuv["pre_settings"]["gaussian_stdev"],
+                        guass_x_size=self.fsuv["pre_settings"]["gauss_x_size"]
+                        )
+        
+        # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
+        # for along_z and for comparison Cz.
+        if (isalong_z or (iscz and (isprev_para or isnext_para))) and do_heatmap:
+            for sourcecol, targetcol in zip(
+                    list(self.fsuv["restraint_settings"].index[3:])*2,
+                    ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
+                    ):
+                # only for the parameters allowed by the user
+                if self.fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
+                    farseer_series.plot_base(
+                        targetcol, 
+                        'exp', 
+                        'heat_map',
+                        self.fsuv["heat_map_settings"],
+                        par_ylims=\
+                            self.fsuv["restraint_settings"].\
+                                loc[sourcecol,'plt_y_axis_scl'],
+                        ylabel=\
+                            self.fsuv["restraint_settings"].\
+                                loc[sourcecol,'plt_y_axis_lbl'],
+                        cols_per_page=1,
+                        rows_per_page=\
+                            self.fsuv["heat_map_settings"]["rows"],
+                        fig_height=self.fsuv["general_settings"]["fig_height"],
+                        fig_width=self.fsuv["general_settings"]["fig_width"],
+                        fig_file_type=self.fsuv["general_settings"]["fig_file_type"],
+                        fig_dpi=self.fsuv["general_settings"]["fig_dpi"]
+                        )
+        
+        # plots the DeltaPRE analysis only for <Cz> comparison.
+        # because DeltaPRE represents the results obtained only
+        # for paramagnetic data.
+        if (iscz and (isprev_para or isnext_para)) \
+                and self.fsuv['plotting_flags']['do_DPRE_plot']:
+            for sourcecol, targetcols in zip(
+                    self.fsuv["restraint_settings"].index[3:],
+                    ['Hgt_DPRE', 'Vol_DPRE']
+                    ):
+                if self.fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
+                    farseer_series.plot_base(
+                        targetcols,
+                        'exp',
+                        'DPRE_plot',
+                        {
+                            **fsuv["series_plot_settings"], 
+                            **fsuv["DPRE_plot_settings"]
+                            },
+                        cols_per_page=1,
+                        rows_per_page=self.fsuv["DPRE_plot_settings"]["rows"],
+                        fig_height=self.fsuv["general_settings"]["fig_height"],
+                        fig_width=\
+                            self.fsuv["general_settings"]["fig_width"]/\
+                            self.fsuv["DPRE_plot_settings"]["width"],
+                        fig_file_type=self.fsuv["general_settings"]["fig_file_type"],
+                        fig_dpi=self.fsuv["general_settings"]["fig_dpi"])
+        
+        return None
+    
     def eval_series(self, series_dct, resonance_type='Backbone'):
         """
         Executes the Farseer-NMR analysis routines over all the series of
@@ -987,17 +1146,14 @@ no series set was created along an axis. Nothing will be calculated.'
         
         return None
     
-    def perform_calcs(farseer_series, fsuv):
+    def perform_calcs(self, farseer_series):
         """
-        Calculates the NMR restraints according to the user specifications.
+        Calculates the NMR parameters according to the user specifications.
         
         Parameters:
             farseer_series (FarseerSeries class): a FarseerSeries class
                 object containing all the experiments along a series
                 previously selected from the Farseer-NMR Cube.
-            
-            fsuv (module): contains user defined variables (preferences)
-                after .read_user_variables().
         
         Depends on:
         fsuv["PosF1_settings"]["calcs_PosF1_delta"]
@@ -1013,14 +1169,14 @@ no series set was created along an axis. Nothing will be calculated.'
         """
         
         # if the user wants to calculate combined Chemical Shift Perturbations
-        if fsuv["csp_settings"]["calcs_CSP"]:
+        if self.fsuv["csp_settings"]["calcs_CSP"]:
             # calculate differences in chemical shift for each dimension
             farseer_series.calc_cs_diffs(
-                fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
                 'Position F1'
                 )
             farseer_series.calc_cs_diffs(
-                fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
                 'Position F2'
                 )
             # Calculates CSPs
@@ -1032,33 +1188,33 @@ no series set was created along an axis. Nothing will be calculated.'
         
         # if the user only wants to calculate perturbation in single dimensions
         else:
-            if fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
+            if self.fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
                 farseer_series.calc_cs_diffs(
-                    fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                    self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
                     'Position F1'
                     )
-            if fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
+            if self.fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
                 farseer_series.calc_cs_diffs(
-                    fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                    self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
                     'Position F2'
                     )
         
         # Calculates Ratios
-        if fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
+        if self.fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
             farseer_series.calc_ratio(
-                fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
+                self.fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
                 'Height'
                 )
         
-        if fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
+        if self.fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
             farseer_series.calc_ratio(
-                fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
+                self.fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
                 'Volume'
                 )
         
         ### ADD ADDITIONAL CALCULATION HERE ###
         
-        return
+        return None
     
     def run(self):
         """
@@ -1276,166 +1432,9 @@ def identify_residues(exp):
 
 
 
-def perform_fits(farseer_series, fsuv): 
-    """
-    Performs fits for 1H, 15N and CSPs data along the X axis series.
-    
-    Parameters:
-        farseer_series (FarseerSeries class): a FarseerSeries class
-            object containing all the experiments along a series
-            previously selected from the Farseer-NMR Cube.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.perform_resevo_fit
-    fsuv.restraint_settings
-    fsuv["revo_settings"]["titration_x_values"]
-    fsuv["fitting_parameters"]
-    """
-    # fits are allowed only for X axis series
-    if not(
-            fsuv["revo_settings"]["perform_resevo_fitting"] \
-                and farseer_series.series_axis == 'along_x'
-            ):
-        return
-    
-    _checks_fit_input()
-    
-    for restraint in fsuv["restraint_settings"].index:
-        if fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
-            farseer_series.perform_fit(
-                restraint,
-                fsuv["revo_settings"]["titration_x_values"],
-                fsuv["fitting_parameters"]["mininum_datapoints"],
-                fsuv["fitting_parameters"]["fitting_function"]
-                )
-    
-    for obs in fsuv["observables_settings"].index:
-        if fsuv["observables_settings"].loc[obs, 'obs_flags']:
-            farseer_series.perform_fit(
-                obs,
-                fsuv["revo_settings"]["titration_x_values"],
-                fsuv["fitting_parameters"]["mininum_datapoints"],
-                fsuv["fitting_parameters"]["fitting_function"]
-                )
-    
-    return
 
-def PRE_analysis(farseer_series, fsuv):
-    """
-    Optimized algorythm that performs all possible PRE analysis.
-    
-    Parameters:
-        farseer_series (FarseerSeries class): a FarseerSeries class
-            object containing all the experiments along a series
-            previously selected from the Farseer-NMR Cube.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.apply_PRE_analysis
-    fsuv.restraint_settings
-    fsuv.gaussian_stddev
-    fsuv.gauss_x_size
-    fsuv.restraint_settings
-    fsuv.heat_map_rows
-    fsuv.fig_height
-    fsuv.fig_width
-    fsuv.DPRE_plot_width
-    fsuv.fig_file_type
-    fsuv.fig_dpi
-    """
-    
-    # if user do not wants PRE analysis, do nothing
-    if not(fsuv["pre_settings"]["apply_PRE_analysis"]):
-        return
-    
-    isalong_z = farseer_series.series_axis == 'along_z'
-    iscz = farseer_series.series_axis == 'Cz'
-    isprev_para = farseer_series.prev_dim in farseer_series.paramagnetic_names
-    isnext_para = farseer_series.next_dim in farseer_series.paramagnetic_names
-    do_heatmap = fsuv['plotting_flags']['do_heat_map']
-    
-    # if analysing along_z: performs calculations.
-    if isalong_z:
-        farseer_series.load_theoretical_PRE(
-            fsuv["general_settings"]["input_spectra_path"],
-            farseer_series.prev_dim
-            )
-        
-        for sourcecol, targetcol in zip(
-                fsuv["restraint_settings"].index[3:],
-                ['Hgt_DPRE', 'Vol_DPRE']
-                ):
-            # only in the parameters allowed by the user
-            if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
-                farseer_series.calc_Delta_PRE(
-                    sourcecol,
-                    targetcol,
-                    gaussian_stddev=fsuv["pre_settings"]["gaussian_stdev"],
-                    guass_x_size=fsuv["pre_settings"]["gauss_x_size"]
-                    )
-    
-    # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
-    # for along_z and for comparison Cz.
-    if (isalong_z or (iscz and (isprev_para or isnext_para))) and do_heatmap:
-        for sourcecol, targetcol in zip(
-                list(fsuv["restraint_settings"].index[3:])*2,
-                ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
-                ):
-            # only for the parameters allowed by the user
-            if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
-                farseer_series.plot_base(
-                    targetcol, 
-                    'exp', 
-                    'heat_map',
-                    fsuv["heat_map_settings"],
-                    par_ylims=\
-                        fsuv["restraint_settings"].\
-                            loc[sourcecol,'plt_y_axis_scl'],
-                    ylabel=\
-                        fsuv["restraint_settings"].\
-                            loc[sourcecol,'plt_y_axis_lbl'],
-                    cols_per_page=1,
-                    rows_per_page=\
-                        fsuv["heat_map_settings"]["rows"],
-                    fig_height=fsuv["general_settings"]["fig_height"],
-                    fig_width=fsuv["general_settings"]["fig_width"],
-                    fig_file_type=fsuv["general_settings"]["fig_file_type"],
-                    fig_dpi=fsuv["general_settings"]["fig_dpi"]
-                    )
-    
-    # plots the DeltaPRE analysis only for <Cz> comparison.
-    # because DeltaPRE represents the results obtained only
-    # for paramagnetic data.
-    if (iscz and (isprev_para or isnext_para)) \
-            and fsuv['plotting_flags']['do_DPRE_plot']:
-        for sourcecol, targetcols in zip(
-                fsuv["restraint_settings"].index[3:],
-                ['Hgt_DPRE', 'Vol_DPRE']
-                ):
-            if fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
-                farseer_series.plot_base(
-                    targetcols,
-                    'exp',
-                    'DPRE_plot',
-                    {
-                        **fsuv["series_plot_settings"], 
-                        **fsuv["DPRE_plot_settings"]
-                        },
-                    cols_per_page=1,
-                    rows_per_page=fsuv["DPRE_plot_settings"]["rows"],
-                    fig_height=fsuv["general_settings"]["fig_height"],
-                    fig_width=\
-                        fsuv["general_settings"]["fig_width"]/\
-                        fsuv["DPRE_plot_settings"]["width"],
-                    fig_file_type=fsuv["general_settings"]["fig_file_type"],
-                    fig_dpi=fsuv["general_settings"]["fig_dpi"])
-    
-    return
+
+
 
 def exports_series(farseer_series):
     """
