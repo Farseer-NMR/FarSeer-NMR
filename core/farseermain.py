@@ -924,6 +924,76 @@ no series set was created along an axis. Nothing will be calculated.'
         
         return None
     
+    def perform_calcs(self, farseer_series):
+        """
+        Calculates the NMR parameters according to the user specifications.
+        
+        Parameters:
+            farseer_series (FarseerSeries class): a FarseerSeries class
+                object containing all the experiments along a series
+                previously selected from the Farseer-NMR Cube.
+        
+        Depends on:
+        fsuv["PosF1_settings"]["calcs_PosF1_delta"]
+        fsuv["PosF2_settings"]["calcs_PosF2_delta"]
+        fsuv.calcs_CSP
+        fsuv["Height_ratio_settings"]["calcs_Height_ratio"]
+        fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]
+        fsuv.calccol_name_PosF1_delta
+        fsuv.calccol_name_PosF2_delta
+        fsuv.calccol_name_CSP
+        fsuv.calccol_name_Height_ratio
+        fsuv.calccol_name_Volume_ratio
+        """
+        
+        # if the user wants to calculate combined Chemical Shift Perturbations
+        if self.fsuv["csp_settings"]["calcs_CSP"]:
+            # calculate differences in chemical shift for each dimension
+            farseer_series.calc_cs_diffs(
+                self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                'Position F1'
+                )
+            farseer_series.calc_cs_diffs(
+                self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                'Position F2'
+                )
+            # Calculates CSPs
+            farseer_series.calc_csp(
+                calccol=fsuv["csp_settings"]["calccol_name_CSP"],
+                pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
+                )
+        
+        # if the user only wants to calculate perturbation in single dimensions
+        else:
+            if self.fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
+                farseer_series.calc_cs_diffs(
+                    self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                    'Position F1'
+                    )
+            if self.fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
+                farseer_series.calc_cs_diffs(
+                    self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
+                    'Position F2'
+                    )
+        
+        # Calculates Ratios
+        if self.fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
+            farseer_series.calc_ratio(
+                self.fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
+                'Height'
+                )
+        
+        if self.fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
+            farseer_series.calc_ratio(
+                self.fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
+                'Volume'
+                )
+        
+        ### ADD ADDITIONAL CALCULATION HERE ###
+        
+        return None
+    
     def perform_fits(self, farseer_series): 
         """
         Performs fits for 1H, 15N and CSPs data along the X axis series.
@@ -1475,76 +1545,6 @@ Nothing to calculate here.')
         
         return None
     
-    def perform_calcs(self, farseer_series):
-        """
-        Calculates the NMR parameters according to the user specifications.
-        
-        Parameters:
-            farseer_series (FarseerSeries class): a FarseerSeries class
-                object containing all the experiments along a series
-                previously selected from the Farseer-NMR Cube.
-        
-        Depends on:
-        fsuv["PosF1_settings"]["calcs_PosF1_delta"]
-        fsuv["PosF2_settings"]["calcs_PosF2_delta"]
-        fsuv.calcs_CSP
-        fsuv["Height_ratio_settings"]["calcs_Height_ratio"]
-        fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]
-        fsuv.calccol_name_PosF1_delta
-        fsuv.calccol_name_PosF2_delta
-        fsuv.calccol_name_CSP
-        fsuv.calccol_name_Height_ratio
-        fsuv.calccol_name_Volume_ratio
-        """
-        
-        # if the user wants to calculate combined Chemical Shift Perturbations
-        if self.fsuv["csp_settings"]["calcs_CSP"]:
-            # calculate differences in chemical shift for each dimension
-            farseer_series.calc_cs_diffs(
-                self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                'Position F1'
-                )
-            farseer_series.calc_cs_diffs(
-                self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-                'Position F2'
-                )
-            # Calculates CSPs
-            farseer_series.calc_csp(
-                calccol=fsuv["csp_settings"]["calccol_name_CSP"],
-                pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
-                )
-        
-        # if the user only wants to calculate perturbation in single dimensions
-        else:
-            if self.fsuv["PosF1_settings"]["calcs_PosF1_delta"]:
-                farseer_series.calc_cs_diffs(
-                    self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                    'Position F1'
-                    )
-            if self.fsuv["PosF2_settings"]["calcs_PosF2_delta"]:
-                farseer_series.calc_cs_diffs(
-                    self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"],
-                    'Position F2'
-                    )
-        
-        # Calculates Ratios
-        if self.fsuv["Height_ratio_settings"]["calcs_Height_ratio"]:
-            farseer_series.calc_ratio(
-                self.fsuv["Height_ratio_settings"]["calccol_name_Height_ratio"],
-                'Height'
-                )
-        
-        if self.fsuv["Volume_ratio_settings"]["calcs_Volume_ratio"]:
-            farseer_series.calc_ratio(
-                self.fsuv["Volume_ratio_settings"]["calccol_name_Volume_ratio"],
-                'Volume'
-                )
-        
-        ### ADD ADDITIONAL CALCULATION HERE ###
-        
-        return None
-    
     def run(self):
         """
         Runs the whole Farseer-NMR standard algorithm based on the
@@ -1619,7 +1619,7 @@ Nothing to calculate here.')
             
             if self.farseer_series_SD_dict:
                 self.eval_series(
-                    farseer_series_SD_dict,
+                    self.farseer_series_SD_dict,
                     resonance_type='Sidechains'
                     )
         
