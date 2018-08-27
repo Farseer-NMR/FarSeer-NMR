@@ -449,6 +449,36 @@ Settings.'.\
         
         return state_stamp
     
+    def _fill_na(self, peak_status, merit=0, details='None'):
+        """
+        A dictionary that configures how the fields of the added rows for 
+        missing residues are fill.
+        
+        Parameters:
+            peak_status (str): {'missing', 'unassigned'},
+                how to fill 'Peak Status' column.
+            
+            merit (opt, int/str): how to fill the 'Merit' column.
+            
+            details (opt, str): how to fill the details column.
+            
+        Return:
+            Dictionary of kwargs.
+        """
+        
+        if not(peak_status in ['missing', 'unassigned']):
+            input(
+                'Choose a valid <peak_status> argument. Press Enter to continue.'
+                )
+            return None
+        
+        d = {
+            'Peak Status': peak_status,
+            'Merit': merit,
+            'Details': details
+            }
+        
+        return d
     
     def change_current_dir(self, new_curr_dir, update_fsuv=False):
         """
@@ -597,6 +627,45 @@ Settings.'.\
         
         return None
     
+    def expand_missing(
+            self,
+            peak_status='missing',
+            dim='z',
+            resonance_type='Backbone'
+            ):
+        """
+        Checks for 'missing' residues accross the reference experiments
+        for Y and Z axes.
+        
+        Uses FarseerCube.compares_references().
+        
+        Compares reference peaklists along Y and Z axis of the Farseer-NMR
+        Cube and generates the corresponding 'missing' residues.
+        This function is useful when analysing dia/ and paramagnetic/ series
+        along the Z axis.
+        
+        Parameters:
+            exp (FarseerCube class instance): contains all peaklist data.
+            
+            dim (str): {'y', 'z'}, defaults to 'z'.
+                The dimension along which references will be compared.
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
+                'Backbone'.
+        """
+        
+        if not(dim in ['y', 'z']):
+            input('Choose a valid <dim> argument. Press Enter to continue.')
+            return None
+        
+        self.pkls.compares_references(
+            self._fill_na(peak_status),
+            along_axis=dim,
+            resonance_type=resonance_type
+            )
+        
+        return None
+    
     def normalize_chemical_shifts(self, resonance_type='Backbone'):
         """
         Corrects chemical shifts for all the peaklists to a reference peak
@@ -636,7 +705,7 @@ Settings.'.\
         """
         
         # general = self.fsuv["general_settings"]
-        # fitting = self.fsuv["fitting_settings"]
+        fitting = self.fsuv["fitting_settings"]
         cs = self.fsuv["cs_settings"]
         # csp = self.fsuv["csp_settings"]
         # fasta = self.fsuv["fasta_settings"]
@@ -648,25 +717,27 @@ Settings.'.\
         # Initiates Farseer
         self.creates_pkls_dataset()
         
+        analyses_sidechains = self.pkls.has_sidechains and use_sidechains
+        
         # corrects chemical shifts
         if cs["perform_cs_correction"]:
             self.normalize_chemical_shifts()
             
-            if self.pkls.has_sidechains and use_sidechains:
-                correct_shifts(resonance_type='Sidechains')
+            if analyses_sidechains:
+                self.normalize_chemical_shifts(resonance_type='Sidechains')
         
         # expands missing residues to other dimensions
         if fitting["expand_missing_yy"]:
-            expand_missing(exp, dim='y')
+            self.expand_missing(dim='y')
             
-            if exp.has_sidechains and use_sidechains:
-                expand_missing(exp, dim='y', resonance_type='Sidechains')
+            if analyses_sidechains:
+                self.expand_missing(dim='y', resonance_type='Sidechains')
         
         if fitting["expand_missing_zz"]:
-            expand_missing(exp, dim='z')
+            self.pkls.expand_missing(dim='z')
             
-            if exp.has_sidechains and use_sidechains:
-                expand_missing(exp, dim='z', resonance_type='Sidechains')
+            if analyses_sidechains:
+                self.pklsexpand_missing(dim='z', resonance_type='Sidechains')
         
         ## identifies missing residues
         add_missing(exp, peak_status='missing')
@@ -838,70 +909,9 @@ def identify_residues(exp):
 
 
 
-def fill_na(peak_status, merit=0, details='None'):
-    """
-    A dictionary that configures how the fields of the added rows for 
-    missing residues are fill.
-    
-    Parameters:
-        peak_status (str): {'missing', 'unassigned'},
-            how to fill 'Peak Status' column.
-        
-        merit (int/str): how to fill the 'Merit' column.
-        
-        details (str): how to fill the details column.
-        
-    Return:
-        Dictionary of kwargs.
-    """
-    
-    if not(peak_status in ['missing', 'unassigned']):
-        input(
-            'Choose a valid <peak_status> argument. Press Enter to continue.'
-            )
-        return None
-    
-    d = {
-        'Peak Status': peak_status,
-        'Merit': merit,
-        'Details': details
-        }
-    
-    return d
 
-def expand_missing(exp, resonance_type='Backbone', dim='z'):
-    """
-    Checks for 'missing' residues accross the reference experiments
-    for Y and Z axes.
-    
-    Uses FarseerCube.finds_missing().
-    
-    Compares reference peaklists along Y and Z axis of the Farseer-NMR
-    Cube and generates the corresponding 'missing' residues.
-    This function is useful when analysing dia/ and paramagnetic/ series
-    along the Z axis.
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-        
-        dim (str): {'y', 'z'}, defaults to 'z'.
-            The dimension along which references will be compared.
-        
-        resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
-            'Backbone'.
-    """
-    
-    if not(dim in ['y', 'z']):
-        input('Choose a valid <dim> argument. Press Enter to continue.')
-        return
-    
-    exp.compares_references(
-        fill_na('missing'),
-        along_axis=dim,
-        resonance_type=resonance_type
-        )
-    
-    return
+
+
 
 def add_missing(exp, peak_status='missing', resonance_type='Backbone'):
     """
