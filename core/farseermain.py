@@ -1178,6 +1178,240 @@ Nothing to calculate here.')
         
         return None
     
+    def plots_data(self, farseer_series, resonance_type='Backbone'):
+        """
+        Walks through the plotting routines and plots according to user
+        preferences.
+        
+        Parameters:
+            - farseer_series (FarseerSeries class): contains all the
+                experiments of a Farseer-NMR Cube extracted series.
+            
+            - resonance_type (opt, str): ['Backbone', 'Sidechains'],
+                whether plot for BB or SD.
+        
+        Depends on:
+        self.fsuv["plotting_flags"]["do_ext_bar"]
+        self.fsuv["plotting_flags"]["do_comp_bar"]
+        self.fsuv["plotting_flags"]["do_vert_bar"]
+        self.fsuv["plotting_flags"]["do_res_evo"]
+        self.fsuv["plotting_flags"]["do_cs_scatter"]
+        self.fsuv["plotting_flags"]["do_cs_scatter_flower"]
+        self.fsuv.restraint_settings
+        self.fsuv["series_plot_settings"]
+        self.fsuv["bar_plot_settings"]
+        self.fsuv["extended_bar_settings"]
+        self.fsuv["compact_bar_settings"]
+        self.fsuv["revo_settings"]
+        self.fsuv.res_evo_par_dict
+        self.fsuv.cs_scatter_par_dict
+        self.fsuv.cs_scatter_flower_dict
+        """
+        
+        if not(resonance_type in ['Backbone', 'Sidechains']):
+            input(
+                'Choose a valid <resonance_type> argument. Press Enter to continue.'
+                )
+            return
+        
+        are_plots = self._checks_plotting_flags()
+        
+        if not(are_plots):
+            return
+        
+        fig_height = self.fsuv["general_settings"]["fig_height"]
+        fig_width = self.fsuv["general_settings"]["fig_width"]
+        fig_dpi = self.fsuv["general_settings"]["fig_dpi"]
+        fig_file_type = self.fsuv["general_settings"]["fig_file_type"]
+        
+        for restraint in self.fsuv["restraint_settings"].index:
+            # if the user has calculated this restraint
+            if self.fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
+                if farseer_series.resonance_type == 'Backbone':
+                    # Plot Extended Bar Plot
+                    if self.fsuv["plotting_flags"]["do_ext_bar"]:
+                        farseer_series.plot_base(
+                            restraint,
+                            'exp',
+                            'bar_extended',
+                            {
+                                **self.fsuv["series_plot_settings"],
+                                **self.fsuv["bar_plot_settings"],
+                                **self.fsuv["extended_bar_settings"]
+                                },
+                            par_ylims=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_scl'],
+                            ylabel=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_lbl'],
+                            hspace=self.fsuv["series_plot_settings"]["vspace"],
+                            cols_per_page=\
+                                self.fsuv["extended_bar_settings"]["cols_page"],
+                            rows_per_page=\
+                                self.fsuv["extended_bar_settings"]["rows_page"],
+                            fig_height=fig_height,
+                            fig_width=fig_width,
+                            fig_file_type=fig_file_type,
+                            fig_dpi=fig_dpi
+                            )
+                    
+                    # Plot Compacted Bar Plot
+                    if self.fsuv["plotting_flags"]["do_comp_bar"]:
+                        farseer_series.plot_base(
+                            restraint,
+                            'exp',
+                            'bar_compacted',
+                            {
+                                **self.fsuv["series_plot_settings"],
+                                **self.fsuv["bar_plot_settings"],
+                                **self.fsuv["compact_bar_settings"]
+                                },
+                            par_ylims=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_scl'],
+                            ylabel=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_lbl'],
+                            hspace=self.fsuv["series_plot_settings"]["vspace"],
+                            cols_per_page=\
+                                self.fsuv["compact_bar_settings"]["cols_page"],
+                            rows_per_page=\
+                                self.fsuv["compact_bar_settings"]["rows_page"],
+                            fig_height=fig_height,
+                            fig_width=fig_width,
+                            fig_file_type=fig_file_type,
+                            fig_dpi=fig_dpi
+                            )
+                
+                    # Plot Vertical Bar Plot
+                    if self.fsuv["plotting_flags"]["do_vert_bar"]:
+                        farseer_series.plot_base(
+                            restraint,
+                            'exp',
+                            'bar_vertical',
+                            {
+                                **self.fsuv["series_plot_settings"],
+                                **self.fsuv["bar_plot_settings"],
+                                **self.fsuv["extended_bar_settings"]
+                                },
+                            par_ylims=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_scl'],
+                            ylabel=\
+                                self.fsuv["restraint_settings"].\
+                                    loc[restraint,'plt_y_axis_lbl'],
+                            cols_per_page=self.fsuv["vert_bar_settings"]["cols_page"],
+                            rows_per_page=self.fsuv["vert_bar_settings"]["rows_page"],
+                            fig_height=fig_height,
+                            fig_width=fig_width,
+                            fig_file_type=fig_file_type,
+                            fig_dpi=fig_dpi
+                            )
+                
+                # Sidechain data is represented in a different bar plot
+                elif farseer_series.resonance_type == 'Sidechains'\
+                        and (self.fsuv["plotting_flags"]["do_ext_bar"] \
+                        or self.fsuv["plotting_flags"]["do_comp_bar"]):
+                    farseer_series.plot_base(
+                        restraint,
+                        'exp',
+                        'bar_extended',
+                        {
+                            **self.fsuv["series_plot_settings"],
+                            **self.fsuv["bar_plot_settings"],
+                            **self.fsuv["extended_bar_settings"]
+                            },
+                        par_ylims=\
+                            self.fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_scl'],
+                        ylabel=\
+                            self.fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_lbl'],
+                        hspace=self.fsuv["series_plot_settings"]["vspace"],
+                        cols_per_page=self.fsuv["extended_bar_settings"]["cols_page"],
+                        rows_per_page=self.fsuv["extended_bar_settings"]["rows_page"],
+                        resonance_type='Sidechains',
+                        fig_height=fig_height,
+                        fig_width=fig_width/2,
+                        fig_file_type=fig_file_type,
+                        fig_dpi=fig_dpi
+                        )
+                
+                # Plots Parameter Evolution Plot
+                if self.fsuv["plotting_flags"]["do_res_evo"]:
+                    farseer_series.plot_base(
+                        restraint,
+                        'res',
+                        'res_evo',
+                        {**self.fsuv["revo_settings"], **self.fsuv["res_evo_settings"]},
+                        par_ylims=\
+                            self.fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_scl'],
+                        ylabel=\
+                            self.fsuv["restraint_settings"].\
+                                loc[restraint,'plt_y_axis_lbl'],
+                        cols_per_page=self.fsuv["res_evo_settings"]["cols_page"],
+                        rows_per_page=self.fsuv["res_evo_settings"]["rows_page"],
+                        fig_height=fig_height,
+                        fig_width=fig_width,
+                        fig_file_type=fig_file_type,
+                        fig_dpi=fig_dpi
+                        )
+        
+        if self.fsuv["plotting_flags"]["do_cs_scatter"] \
+                and ((self.fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
+                    and self.fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
+                or self.fsuv["csp_settings"]["calcs_CSP"]):
+            farseer_series.plot_base(
+                '15N_vs_1H',
+                'res',
+                'cs_scatter',
+                {**self.fsuv["revo_settings"], **self.fsuv["cs_scatter_settings"]},
+                cols_per_page=self.fsuv["cs_scatter_settings"]["cols_page"],
+                rows_per_page=self.fsuv["cs_scatter_settings"]["rows_page"],
+                fig_height=fig_height,
+                fig_width=fig_width,
+                fig_file_type=fig_file_type,
+                fig_dpi=fig_dpi
+                )
+        
+        if self.fsuv["plotting_flags"]["do_cs_scatter_flower"] \
+                and ((self.fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
+                    and self.fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
+                or self.fsuv["csp_settings"]["calcs_CSP"]):
+            farseer_series.plot_base(
+                '15N_vs_1H',
+                'single',
+                'cs_scatter_flower',
+                {**self.fsuv["revo_settings"], **self.fsuv["cs_scatter_flower_settings"]},
+                cols_per_page=2,
+                rows_per_page=3,
+                fig_height=fig_height,
+                fig_width=fig_width,
+                fig_file_type=fig_file_type,
+                fig_dpi=fig_dpi
+                )
+        
+        for obs in self.fsuv["observables_settings"].index:
+            if self.fsuv["observables_settings"].loc[obs,"obs_flags"]:
+                farseer_series.plot_base(
+                obs,
+                'res',
+                'res_evo',
+                {**self.fsuv["revo_settings"], **self.fsuv["res_evo_settings"]},
+                par_ylims=self.fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
+                ylabel=self.fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
+                cols_per_page=self.fsuv["res_evo_settings"]["cols_page"],
+                rows_per_page=self.fsuv["res_evo_settings"]["rows_page"],
+                fig_height=fig_height,
+                fig_width=fig_width,
+                fig_file_type=fig_file_type,
+                fig_dpi=fig_dpi
+                )
+        
+        return None
+    
     def eval_series(self, series_dct, resonance_type='Backbone'):
         """
         Executes the Farseer-NMR analysis routines over all the series of
@@ -1521,284 +1755,6 @@ def identify_residues(exp):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-def exports_chimera_att_files(farseer_series, fsuv):
-    """
-    Exports formatted UCSF Chimera Attribute files for the
-    calculated restraints.
-    
-    http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
-    
-    Parameters:
-        farseer_series (FarseerSeries instance): contains all the
-            experiments of a Farseer-NMR Cube extracted series.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv.restraint_settings
-    fsuv.chimera_att_select_format
-    """
-    
-    for restraint in fsuv["restraint_settings"].index:
-        # if the user wants to plot this parameter
-        if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
-            # do export chimera attribute files
-            farseer_series.write_Chimera_attributes(
-                    restraint,
-                    resformat=\
-                        fsuv["general_settings"]["chimera_att_select_format"]
-                    )
-    
-    return
-
-
-
-def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
-    """
-    Walks through the plotting routines and plots according to user
-    preferences.
-    
-    Parameters:
-        farseer_series (FarseerSeries class): contains all the
-            experiments of a Farseer-NMR Cube extracted series.
-        
-        fsuv (module): contains user defined variables (preferences)
-            after .read_user_variables().
-    
-    Depends on:
-    fsuv["plotting_flags"]["do_ext_bar"]
-    fsuv["plotting_flags"]["do_comp_bar"]
-    fsuv["plotting_flags"]["do_vert_bar"]
-    fsuv["plotting_flags"]["do_res_evo"]
-    fsuv["plotting_flags"]["do_cs_scatter"]
-    fsuv["plotting_flags"]["do_cs_scatter_flower"]
-    fsuv.restraint_settings
-    fsuv["series_plot_settings"]
-    fsuv["bar_plot_settings"]
-    fsuv["extended_bar_settings"]
-    fsuv["compact_bar_settings"]
-    fsuv["revo_settings"]
-    fsuv.res_evo_par_dict
-    fsuv.cs_scatter_par_dict
-    fsuv.cs_scatter_flower_dict
-    """
-    
-    if not(resonance_type in ['Backbone', 'Sidechains']):
-        input(
-            'Choose a valid <resonance_type> argument. Press Enter to continue.'
-            )
-        return
-    
-    are_plots = _checks_plotting_flags()
-    
-    if not(are_plots):
-        return
-    
-    fig_height = fsuv["general_settings"]["fig_height"]
-    fig_width = fsuv["general_settings"]["fig_width"]
-    fig_dpi = fsuv["general_settings"]["fig_dpi"]
-    fig_file_type = fsuv["general_settings"]["fig_file_type"]
-    
-    for restraint in fsuv["restraint_settings"].index:
-        # if the user has calculated this restraint
-        if fsuv["restraint_settings"].loc[restraint,'calcs_restraint_flg']:
-            if farseer_series.resonance_type == 'Backbone':
-                # Plot Extended Bar Plot
-                if fsuv["plotting_flags"]["do_ext_bar"]:
-                    farseer_series.plot_base(
-                        restraint,
-                        'exp',
-                        'bar_extended',
-                        {
-                            **fsuv["series_plot_settings"],
-                            **fsuv["bar_plot_settings"],
-                            **fsuv["extended_bar_settings"]
-                            },
-                        par_ylims=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_scl'],
-                        ylabel=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_lbl'],
-                        hspace=fsuv["series_plot_settings"]["vspace"],
-                        cols_per_page=\
-                            fsuv["extended_bar_settings"]["cols_page"],
-                        rows_per_page=\
-                            fsuv["extended_bar_settings"]["rows_page"],
-                        fig_height=fig_height,
-                        fig_width=fig_width,
-                        fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi
-                        )
-                
-                # Plot Compacted Bar Plot
-                if fsuv["plotting_flags"]["do_comp_bar"]:
-                    farseer_series.plot_base(\
-                        restraint,
-                        'exp',
-                        'bar_compacted',
-                        {
-                            **fsuv["series_plot_settings"],
-                            **fsuv["bar_plot_settings"],
-                            **fsuv["compact_bar_settings"]
-                            },
-                        par_ylims=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_scl'],
-                        ylabel=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_lbl'],
-                        hspace=fsuv["series_plot_settings"]["vspace"],
-                        cols_per_page=\
-                            fsuv["compact_bar_settings"]["cols_page"],
-                        rows_per_page=\
-                            fsuv["compact_bar_settings"]["rows_page"],
-                        fig_height=fig_height,
-                        fig_width=fig_width,
-                        fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi
-                        )
-            
-                # Plot Vertical Bar Plot
-                if fsuv["plotting_flags"]["do_vert_bar"]:
-                    farseer_series.plot_base(
-                        restraint,
-                        'exp',
-                        'bar_vertical',
-                        {
-                            **fsuv["series_plot_settings"],
-                            **fsuv["bar_plot_settings"],
-                            **fsuv["extended_bar_settings"]
-                            },
-                        par_ylims=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_scl'],
-                        ylabel=\
-                            fsuv["restraint_settings"].\
-                                loc[restraint,'plt_y_axis_lbl'],
-                        cols_per_page=fsuv["vert_bar_settings"]["cols_page"],
-                        rows_per_page=fsuv["vert_bar_settings"]["rows_page"],
-                        fig_height=fig_height,
-                        fig_width=fig_width,
-                        fig_file_type=fig_file_type,
-                        fig_dpi=fig_dpi
-                        )
-            
-            # Sidechain data is represented in a different bar plot
-            elif farseer_series.resonance_type == 'Sidechains'\
-                    and (fsuv["plotting_flags"]["do_ext_bar"] \
-                    or fsuv["plotting_flags"]["do_comp_bar"]):
-                farseer_series.plot_base(
-                    restraint,
-                    'exp',
-                    'bar_extended',
-                    {
-                        **fsuv["series_plot_settings"],
-                        **fsuv["bar_plot_settings"],
-                        **fsuv["extended_bar_settings"]
-                        },
-                    par_ylims=\
-                        fsuv["restraint_settings"].\
-                            loc[restraint,'plt_y_axis_scl'],
-                    ylabel=\
-                        fsuv["restraint_settings"].\
-                            loc[restraint,'plt_y_axis_lbl'],
-                    hspace=fsuv["series_plot_settings"]["vspace"],
-                    cols_per_page=fsuv["extended_bar_settings"]["cols_page"],
-                    rows_per_page=fsuv["extended_bar_settings"]["rows_page"],
-                    resonance_type='Sidechains',
-                    fig_height=fig_height,
-                    fig_width=fig_width/2,
-                    fig_file_type=fig_file_type,
-                    fig_dpi=fig_dpi
-                    )
-            
-            # Plots Parameter Evolution Plot
-            if fsuv["plotting_flags"]["do_res_evo"]:
-                farseer_series.plot_base(
-                    restraint,
-                    'res',
-                    'res_evo',
-                    {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
-                    par_ylims=\
-                        fsuv["restraint_settings"].\
-                            loc[restraint,'plt_y_axis_scl'],
-                    ylabel=\
-                        fsuv["restraint_settings"].\
-                            loc[restraint,'plt_y_axis_lbl'],
-                    cols_per_page=fsuv["res_evo_settings"]["cols_page"],
-                    rows_per_page=fsuv["res_evo_settings"]["rows_page"],
-                    fig_height=fig_height,
-                    fig_width=fig_width,
-                    fig_file_type=fig_file_type,
-                    fig_dpi=fig_dpi
-                    )
-    
-    if fsuv["plotting_flags"]["do_cs_scatter"] \
-            and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
-                and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
-            or fsuv["csp_settings"]["calcs_CSP"]):
-        farseer_series.plot_base(
-            '15N_vs_1H',
-            'res',
-            'cs_scatter',
-            {**fsuv["revo_settings"], **fsuv["cs_scatter_settings"]},
-            cols_per_page=fsuv["cs_scatter_settings"]["cols_page"],
-            rows_per_page=fsuv["cs_scatter_settings"]["rows_page"],
-            fig_height=fig_height,
-            fig_width=fig_width,
-            fig_file_type=fig_file_type,
-            fig_dpi=fig_dpi
-            )
-    
-    if fsuv["plotting_flags"]["do_cs_scatter_flower"] \
-            and ((fsuv["PosF1_settings"]["calcs_PosF1_delta"] \
-                and fsuv["PosF2_settings"]["calcs_PosF2_delta"])\
-            or fsuv["csp_settings"]["calcs_CSP"]):
-        farseer_series.plot_base(
-            '15N_vs_1H',
-            'single',
-            'cs_scatter_flower',
-            {**fsuv["revo_settings"], **fsuv["cs_scatter_flower_settings"]},
-            cols_per_page=2,
-            rows_per_page=3,
-            fig_height=fig_height,
-            fig_width=fig_width,
-            fig_file_type=fig_file_type,
-            fig_dpi=fig_dpi
-            )
-    
-    for obs in fsuv["observables_settings"].index:
-        if fsuv["observables_settings"].loc[obs,"obs_flags"]:
-            farseer_series.plot_base(
-            obs,
-            'res',
-            'res_evo',
-            {**fsuv["revo_settings"], **fsuv["res_evo_settings"]},
-            par_ylims=fsuv["observables_settings"].loc[obs,"obs_yaxis_scl"],
-            ylabel=fsuv["observables_settings"].loc[obs,"obs_yaxis_lbl"],
-            cols_per_page=fsuv["res_evo_settings"]["cols_page"],
-            rows_per_page=fsuv["res_evo_settings"]["rows_page"],
-            fig_height=fig_height,
-            fig_width=fig_width,
-            fig_file_type=fig_file_type,
-            fig_dpi=fig_dpi
-            )
-    
-    return
 
 def comparison_analysis_routines(comp_panel, fsuv, resonance_type):
     """
