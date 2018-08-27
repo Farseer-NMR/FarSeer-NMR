@@ -1489,7 +1489,7 @@ def plots_data(farseer_series, fsuv, resonance_type='Backbone'):
             )
         return
     
-    are_plots = checks_plotting_flags(farseer_series, fsuv, resonance_type)
+    are_plots = _checks_plotting_flags()
     
     if not(are_plots):
         return
