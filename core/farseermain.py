@@ -1086,7 +1086,7 @@ data along the X axis. There is nothing to fit.')
         
         return None
     
-    def PRE_analysis(self, farseer_series):
+    def delta_pre_analysis(self, farseer_series):
         """
         Optimized algorythm that performs all possible PRE analysis.
         
@@ -1572,7 +1572,7 @@ Nothing to calculate here.')
                     # PERFORMS FITS
                     self.perform_fits(series_dct[cond][dim2_pt][dim1_pt])
                     # Analysis of PRE data - only in along_z
-                    self.PRE_analysis(series_dct[cond][dim2_pt][dim1_pt])
+                    self.delta_pre_analysis(series_dct[cond][dim2_pt][dim1_pt])
                     # EXPORTS FULLY PARSED PEAKLISTS
                     self.export_series(series_dct[cond][dim2_pt][dim1_pt])
                     # EXPORTS CHIMERA FILES
@@ -1622,7 +1622,7 @@ Nothing to calculate here.')
         # EXPORTS FULLY PARSED PEAKLISTS
         self.export_series(comp_panel)
         # performs pre analysis
-        self.PRE_analysis(comp_panel)
+        self.delta_pre_analysis(comp_panel)
         self.export_chimera_att_files(comp_panel)
         # plots data
         self.plot_data(comp_panel, resonance_type=resonance_type)
