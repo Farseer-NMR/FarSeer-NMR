@@ -22,10 +22,11 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import pandas as pd
 
-import logging
-import logging.config
-import core.fslibs.log_config as fslogconf
+#import logging
+#import logging.config
+#import core.fslibs.log_config as fslogconf
 from core.fslibs.WetHandler import WetHandler as fsw
+import core.fslibs.Logger as Logger
 from core.utils import aal1tol3, aal3tol1
 
 class FastaHandler:
@@ -35,9 +36,9 @@ class FastaHandler:
     def __init__(self, fasta_file_path, fasta_start_num):
         
         # activates logging
-        self.logger = fslogconf.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('FastaHandler initiated')
+        
         
         # FASTA file path
         self.fasta_path = fasta_file_path

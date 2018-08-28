@@ -20,8 +20,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import logging.config
+#import logging
+#import logging.config
 import glob
 import os
 import numpy as np
@@ -32,7 +32,7 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
-import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
 from core.fslibs.WetHandler import WetHandler as fsw
 
 class FarseerSeries(pd.Panel):
@@ -173,8 +173,8 @@ class FarseerSeries(pd.Panel):
             log_export_name='FarseerSet_log.md'):
         """Creates the instance attributes."""
         
-        self.logger = fslogconf.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
+        #logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
         self.cs_missing = cs_missing
@@ -283,16 +283,18 @@ class FarseerSeries(pd.Panel):
 {0}  
 """.format('*'*79, logstr)
         
-        else:
-            logstr += '  \n'
+        #else:
+        #    logstr += '  \n'
         
-        print(logstr)
-        self.log += logstr
+        # print(logstr)
+        # self.log += logstr
+        
+        self.logger.info(logstr)
         
         # appends log to external file on the fly
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
+        # if self.log_export_onthefly:
+            # with open(self.log_export_name, 'a') as logfile:
+                # logfile.write(logstr)
         
         return
     

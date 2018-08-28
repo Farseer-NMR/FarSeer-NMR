@@ -20,11 +20,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import logging.config
+#import logging
+#import logging.config
 import numpy as np
 import pandas as pd
-import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
 from core.fslibs.WetHandler import WetHandler as fsw
 
 class Comparisons:
@@ -86,8 +86,7 @@ class Comparisons:
             dimension_dict (dict): is a dictionary containing all the
             series for the main dimension.
         """
-        self.logger = logging.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('logger initiated')
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
@@ -142,16 +141,7 @@ class Comparisons:
 """.\
                 format('*'*79, logstr)
         
-        else:
-            logstr += '  \n'
-        
-        print(logstr)
-        self.log += logstr
-        # appends log to external file on the fly
-        
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
+        self.logger.info(logstr)
         
         return
     
