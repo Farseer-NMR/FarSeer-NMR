@@ -131,27 +131,51 @@ class FarseerNMR():
         """
         Updates the path to the spectra/ folder containing the peaklist
         dataset.
-        
-        If path to spectra/ folder not defined assign that of
-        the <output path>.
         """
+        
+        # this code is synchronized with the one of the GUI
+        # in the GUI spectra_path refers to the folder where all the original
+        # non parsed peaklist are stored. While in the core spectra_path
+        # relates to the parent folder of spectra/ where the parsed peaklists
+        # are stored.
+        #
+        # In future versions this can be corrected to better descriminate the
+        # names.
+        #
+        # spectra_folder_path can only be specified if running as __main__
+        # in this situation spectra_folder_path takes priority
+        #
+        # if spectra_folder_path is False, means that the user wants to run
+        # run from a configuration previously prepared by the GUI os mannually
+        # if the output_path is configured, most likely it was a config
+        # prepared by the GUI and this takes the preference
+        # 
+        # if spectra_folder_path is not given and output_path is not configured
+        # assumes the current working directory
+        
         if self.spectra_folder_path:
             
             spectra_path = self.spectra_folder_path
         
-        else:
-            if self.fsuv["general_settings"]["spectra_path"]:
-                
-                spectra_path = self.fsuv["general_settings"]["spectra_path"]
-                
-            elif not self.fsuv["general_settings"]["spectra_path"] \
-                    and self.fsuv["general_settings"]["output_path"]:
-                
-                spectra_path = self.fsuv["general_settings"]["output_path"]
+        elif self.fsuv["general_settings"]["output_path"]:
             
-            else:
+            spectra_path = self.fsuv["general_settings"]["output_path"]
+            
+            # this code can be reactivated in future versions when addressing
+            # the issue commented above
+            
+            # if self.fsuv["general_settings"]["spectra_path"]:
                 
-                spectra_path = os.path.abspath(os.getcwd())
+                # spectra_path = self.fsuv["general_settings"]["spectra_path"]
+                
+            # elif not self.fsuv["general_settings"]["spectra_path"] \
+                    # and self.fsuv["general_settings"]["output_path"]:
+                
+                # spectra_path = self.fsuv["general_settings"]["output_path"]
+            
+        else:
+            
+            spectra_path = os.path.abspath(os.getcwd())
             
         self.fsuv["general_settings"]["input_spectra_path"] = \
             os.path.join(spectra_path, 'spectra')
