@@ -24,50 +24,10 @@ Optimal algorithm to run the Farseer-NMR method.
 
 Usage as main script:
 
-    python <path-to>/farseermain.py <path-to>/farseer-user-variables.py
-
-Can be used as imported module. Contains several functions that aid in
-managing the Farseer-NMR analysis routines.
-
-Methods:
-    .read_user_variables()
-        .config_user_variables()
-    .copy_Farseer_version()
-    .log_time_stamp()
-    .logs()
-    .initial_checks()
-    .checks_PRE_analysis_flags()
-    .checks_cube_axes_flags()
-    .checks_plotting_flags()
-    .checks_calculation_flags()
-    .checks_fit_input()
-    .creates_farseer_dataset()
-    .reads_peaklists()
-    .inits_coords_names()
-    .identify_residues()
-    .correct_shifts()
-    .fill_na()
-    .expand_missing()
-    .add_missing()
-    .organize_columns()
-    .init_fs_cube()
-    .series_kwargs()
-    .gen_series_dcts()
-    .eval_series()
-    .perform_calcs()
-    .perform_fits()
-    .PRE_analysis()
-    .exports_series()
-    .exports_chimera_att_files()
-    .plots_data()
-    .comparison_analysis_routines()
-    .analyse_comparisons()
-    .run_farseer()
+    python <path-to>/farseermain.py <path-to>/<user_variables>.json
 """
 
 #  
-#import logging
-#import logging.config
 import sys
 import os
 import shutil
@@ -75,7 +35,6 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
-#import core.fslibs.log_config as fslogconf
 from core.fslibs.Logger import FarseerLogger
 from core.fslibs import FarseerCube as fcube
 from core.fslibs import FarseerSeries as fss
