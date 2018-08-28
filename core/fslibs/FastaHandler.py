@@ -36,9 +36,7 @@ class FastaHandler:
     def __init__(self, fasta_file_path, fasta_start_num):
         
         # activates logging
-        self.logger = Logger.getLogger(__name__)
-        #logging.config.dictConfig(fslogconf.farseer_log_config)
-        #self.logger = FarseerLogger(__name__)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('FastaHandler initiated')
         
         

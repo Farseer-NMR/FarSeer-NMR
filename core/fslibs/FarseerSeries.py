@@ -283,16 +283,18 @@ class FarseerSeries(pd.Panel):
 {0}  
 """.format('*'*79, logstr)
         
-        else:
-            logstr += '  \n'
+        #else:
+        #    logstr += '  \n'
         
-        print(logstr)
-        self.log += logstr
+        # print(logstr)
+        # self.log += logstr
+        
+        self.logger.info(logstr)
         
         # appends log to external file on the fly
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
+        # if self.log_export_onthefly:
+            # with open(self.log_export_name, 'a') as logfile:
+                # logfile.write(logstr)
         
         return
     

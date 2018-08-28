@@ -1,10 +1,10 @@
 import logging
 import logging.config
 
-# Farseer-NMR logging configuration
-
-
 class FarseerLogger:
+    """
+    Farseer-NMR logger configuration
+    """
     farseer_log_config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -67,10 +67,6 @@ class FarseerLogger:
         return logging.getLogger(self.name)
 
 if __name__ == "__main__":
-    
-    #loggy = logging.getLogger(__name__)
-    #loggy.debug('llala')
-    #loggy.info('lele')
     
     loggy = FarseerLogger(__name__, new_dir='/home/joao/Programming/Farseer_testing').setup_log()
     #logger = loggy.setup_log()

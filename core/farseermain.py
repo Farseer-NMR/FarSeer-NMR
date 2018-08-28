@@ -338,7 +338,7 @@ NMR observables and user notes will be exported in nicely formatted tables ;-)"
         
         return None
     
-    def _checks_fit_input(self):
+    def _checks_fit_input(self, series):
         """
         Checks whether required fit data and settings are provided correctly.
         """
@@ -1014,7 +1014,7 @@ no series set was created along an axis. Nothing will be calculated.'
 data along the X axis. There is nothing to fit.')
             return None
         
-        self._checks_fit_input()
+        self._checks_fit_input(farseer_series)
         
         for restraint in self.fsuv["restraint_settings"].index:
             if self.fsuv["restraint_settings"].loc[restraint, 'calcs_restraint_flg']:
