@@ -136,8 +136,8 @@ class FarseerCube:
         # writes to log
         self.logs('Initiates Farseer Set', istitle=True)
         input_log = \
-"""path: {}  
-side chains: {}  
+"""Path to peaklists dataset: {}  
+User states peaklists contain sidechain information: {}  
 FASTA starting residue: {}  """.\
             format(
                 spectra_path,

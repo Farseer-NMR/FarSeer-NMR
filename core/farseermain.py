@@ -483,11 +483,11 @@ Settings.'.\
         """Operations performed when initializing the log file."""
         self._log_state_stamp()
         self.logger.info(
-            "*** Run Calculation folder: {}\n".\
+            "*** Output folder for calculation run: {}\n".\
                 format(self.fsuv["general_settings"]["output_path"])
             )
         self.logger.info(
-            "*** Config file: {}\n".\
+            "*** Config file used: {}\n".\
                 format(self.fsuv["general_settings"]["config_path"])
             )
         
@@ -1889,7 +1889,7 @@ Nothing to calculate here.')
             if isinstance(fsuv_tmp[key], pd.DataFrame):
                 fsuv_tmp.pop(key, None)
         
-        self.logger.info(json.dumps(fsuv_tmp, sort_keys=True, indent=4))
+        self.logger.debug(json.dumps(fsuv_tmp, sort_keys=True, indent=4))
         
         if to_file:
             with open('FarseerNMR_config.json', 'w') as jsonfile:
