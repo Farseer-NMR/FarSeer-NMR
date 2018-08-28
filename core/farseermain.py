@@ -1621,7 +1621,6 @@ Nothing to calculate here.')
                 selfdim=dimension,
                 other_dim_keys=series_dim_keys[dimension]
                 )
-            c.log_export_name = self.fsuv["general_settings"]["logfile_name"]
             # stores comparison in a dictionary
             comp_dct.setdefault(dimension, c)
             # generates set of PARSED FarseerSeries along the

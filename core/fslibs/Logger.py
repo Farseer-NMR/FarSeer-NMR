@@ -50,16 +50,20 @@ class FarseerLogger:
         }
     }
     
-    
-    
     def __init__(self, name, new_dir=''):
+        """
+        Parameters:
+            - name (str): name of the logger, use __name__ variable
+            - new_dir (opt, str): the new directory to store the log files
+        """
         
         if new_dir:
-            self.farseer_log_config["handlers"]["info_file_handler"]["filename"] = "{}/farseernmr.log".format(new_dir)
-            self.farseer_log_config["handlers"]["debug_file_handler"]["filename"] = "{}/debug.log".format(new_dir)
+            self.farseer_log_config["handlers"]["info_file_handler"]["filename"] = \
+                "{}/farseernmr.log".format(new_dir)
+            self.farseer_log_config["handlers"]["debug_file_handler"]["filename"] = \
+                "{}/debug.log".format(new_dir)
         
         self.name = name
-        #self.setup_log()
     
     def setup_log(self):
         

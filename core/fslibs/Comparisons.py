@@ -29,7 +29,7 @@ from core.fslibs.WetHandler import WetHandler as fsw
 
 class Comparisons:
     """
-    Prepares parsed data along next and previous axis of the calculation.
+    Prepares parsed data along next and previous axes of the calculation.
     
     Given a dictionary containing all the series (FarseerSeries) along
     a given axis of the Farseer-NMR Cube, the Comparisons class stores
@@ -39,7 +39,7 @@ class Comparisons:
     
     Different dictionaries are stored for next and previous parsed axes.
     
-    Parameters:
+    Attributes:
         dimension (str): identifies the main dimension axis of the class
             where X = along_x, Y = along_y, Z = along_z
         
@@ -60,13 +60,6 @@ class Comparisons:
         has_points_prev_dim (bool): True if points are found along the
             previous dimension. False by default.
     
-    Methods:
-        .log_r()
-        .exports_log()
-        .abort()
-        .gen_next_dim()
-        .gen_prev_dim()
-        .transfer_log()
     """
     def __init__(
             self,
@@ -111,6 +104,19 @@ class Comparisons:
         self.has_points_next_dim = False
         self.has_points_prev_dim = False
     
+    def _abort(self, wet):
+        """
+        Aborts run with message. Writes message to log.
+        
+        Parameters:
+            - wet (WetHandler)
+        """
+        self.logs(wet.wet)
+        self.logs(wet.abort_msg())
+        wet.abort()
+        
+        return None
+    
     def logs(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
@@ -132,28 +138,7 @@ class Comparisons:
         
         self.logger.info(logstr)
         
-        return
-    
-    def exports_log(self, mod='w', logfile_name='Comparison_log.md'):
-        """ Exports log to external file. """
-        
-        with open(logfile_name, mod) as logfile:
-            logfile.write(self.log)
-        
-        return
-    
-    def abort(self, wet):
-        """
-        Aborts run with message. Writes message to log.
-        
-        Parameters:
-            - wet (WetHandler)
-        """
-        self.logs(wet.wet)
-        self.logs(wet.abort_msg())
-        wet.abort()
-        
-        return
+        return None
         
     def gen_next_dim(self, series_class, comp_kwargs):
         """
@@ -208,7 +193,7 @@ class Comparisons:
             self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[0]))
         
-        return
+        return None
     
     def gen_prev_dim(self, series_class, comp_kwargs):
         """
@@ -263,24 +248,4 @@ class Comparisons:
             self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[1]))
         
-        return
-    
-    def transfer_log(self):
-        """
-        Transfers logs from the Series objects in self.all_prev_dim
-        and self.all_next_dim to the main class object.
-        """
-        
-        if self.has_points_next_dim:
-            for dim2_pt in sorted(self.all_next_dim.keys()):
-                for dim1_pt in sorted(self.all_next_dim[dim2_pt].keys()):
-                    self.log += self.all_next_dim[dim2_pt][dim1_pt].log
-        
-        if self.has_points_prev_dim:
-            for dim2_pt in sorted(self.all_prev_dim.keys()):
-                for dim1_pt in sorted(self.all_prev_dim[dim2_pt].keys()):
-                    self.log += self.all_prev_dim[dim2_pt][dim1_pt].log
-        
-        return
-
-
+        return None
