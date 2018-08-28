@@ -1505,7 +1505,7 @@ Nothing to calculate here.')
                 # for each point in the corresponding first dimension/condition
                 for dim1_pt in sorted(series_dct[cond][dim2_pt].keys()):
                     series_dct[cond][dim2_pt][dim1_pt].\
-                        log_r(
+                        logs(
                             'ANALYZING... [{}] - [{}][{}]'.format(
                                 cond,
                                 dim2_pt,
@@ -1635,7 +1635,7 @@ Nothing to calculate here.')
                             c.all_next_dim[dp2][dp1].PRE_loaded = True
                         
                         # writes log
-                        c.all_next_dim[dp2][dp1].log_r(
+                        c.all_next_dim[dp2][dp1].logs(
                             'COMPARING... [{}][{}][{}] - [{}]'.\
                                 format(
                                     dimension,
@@ -1660,7 +1660,7 @@ Nothing to calculate here.')
                             c.all_prev_dim[dp2][dp1].PRE_loaded = True
                         
                         # writes log
-                        c.all_prev_dim[dp2][dp1].log_r(
+                        c.all_prev_dim[dp2][dp1].logs(
                             'COMPARING... [{}][{}][{}] - [{}]'.\
                                 format(
                                     dimension,

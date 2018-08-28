@@ -134,7 +134,7 @@ class FarseerCube:
         self.hasyy = False
         self.hasxx = False
         # writes to log
-        self._logs('Initiates Farseer Set', istitle=True)
+        self.logs('Initiates Farseer Set', istitle=True)
         input_log = \
 """path: {}  
 side chains: {}  
@@ -144,7 +144,7 @@ FASTA starting residue: {}  """.\
                 self.has_sidechains,
                 self.FASTAstart
                 )
-        self._logs(input_log)
+        self.logs(input_log)
         # initiates panel 5D object to initiate Farseer-NMR Cube
         # in .init_Farseer_cube()
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
@@ -160,27 +160,7 @@ FASTA starting residue: {}  """.\
             aliases={'major': 'index', 'minor': 'minor_axis'},
             stat_axis=2
             )
-       
-    def _logs(self, logstr, istitle=False):
-        """
-        Registers activity to the log string and prints it.
         
-        logstr (str): the string to be registered in the log.
-        istitle (bool): flag to format logstr as a title.
-        """
-        # formats logstr
-        if istitle:
-            logstr = \
-"""
-{0}  
-{1}  
-{0}  
-""".\
-                format('*'*79, logstr.upper())
-        
-        self.logger.info(logstr)
-        
-        return None
     
     def _abort(self, wet):
         """
@@ -189,8 +169,8 @@ FASTA starting residue: {}  """.\
         Parameters:
             - wet (WetHandler)
         """
-        self._logs(wet.wet)
-        self._logs(wet.abort_msg())
+        self.logs(wet.wet)
+        self.logs(wet.abort_msg())
         wet.abort()
         
         return None
@@ -357,7 +337,7 @@ Names must be equal accross every Y axis datapoint folder.".\
                 self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=10))
         
         # writes confirmation message
-        self._logs('> All <{}> files found and correct - OK!'.format(filetype))
+        self.logs('> All <{}> files found and correct - OK!'.format(filetype))
         
         return None
     
@@ -423,7 +403,7 @@ You should verify that your start Fasta residue number is correct.".\
             
         else:
             msg = "> FASTA files starting number is consistent with peaklists"
-            self._logs(msg)
+            self.logs(msg)
         
         return None
     
@@ -582,6 +562,27 @@ different lengths.".\
         
         return None
     
+    def logs(self, logstr, istitle=False):
+        """
+        Registers activity to the log string and prints it.
+        
+        logstr (str): the string to be registered in the log.
+        istitle (bool): flag to format logstr as a title.
+        """
+        # formats logstr
+        if istitle:
+            logstr = \
+"""
+{0}  
+{1}  
+{0}  
+""".\
+                format('*'*79, logstr.upper())
+        
+        self.logger.info(logstr)
+        
+        return None
+    
     def init_coords_names(self):
         """
         Identifies coordinate names (conditions measured) for the
@@ -596,7 +597,7 @@ different lengths.".\
             self.zzref (str): idem
         """
         
-        self._logs('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
+        self.logs('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
         self.zzref = self.zzcoords[0]
@@ -627,7 +628,7 @@ different lengths.".\
 * Farseer Cube Z axis variables (along_z): {}
 """.\
             format(self.xxcoords, self.yycoords, self.zzcoords)
-        self._logs(logs)
+        self.logs(logs)
         
         return None
     
@@ -678,7 +679,7 @@ different lengths.".\
         """
         
         title = 'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN'
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             
@@ -802,7 +803,7 @@ different lengths.".\
                     sd_count[True]
                     )
             
-            self._logs(logs)
+            self.logs(logs)
             
         # confirms F1 and F2 coherency with nuclei
         self._checks_posf1_posf2_nuclei(self.allpeaklists)
@@ -828,7 +829,7 @@ different lengths.".\
         else:
             msg = \
 'Argument ref_res for method .correct_shifts_backbone() must be of type <int>.'
-            self._logs(msg)
+            self.logs(msg)
             
             return
         
@@ -839,7 +840,7 @@ different lengths.".\
             )
         title = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A RESIDUE {}'.\
             format(ref_res)
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         ref_data = {}
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
@@ -886,7 +887,7 @@ different lengths.".\
                     float(dp_F1_cs), float(ref_data['F1_cs']), F1_cs_diff, 
                     float(dp_F2_cs), float(ref_data['F2_cs']), F2_cs_diff
                     )
-            self._logs(logs)
+            self.logs(logs)
         
         return None
     
@@ -902,7 +903,7 @@ different lengths.".\
         
         title = \
 'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON Previous backbone correction'
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             self.allsidechains[z][y][x].loc[:,'Position F1'] = \
@@ -914,7 +915,7 @@ different lengths.".\
             s2w = \
 '**[{}][{}][{}]** Corrected chemical shift fot sidechain residues.'.\
                 format(z, y, x)
-            self._logs(s2w)
+            self.logs(s2w)
         
         return None
     
@@ -1023,7 +1024,7 @@ more details."
             The values in self.allpeaklists or self.allsidechains.
         """
         title = 'adds missing residues along axis {}'.format(along_axis)
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
@@ -1033,12 +1034,12 @@ more details."
         
         else:
             msg = 'Argument <resonance_type> is not valid.'
-            self._logs(msg)
+            self.logs(msg)
             return
         
         if not(along_axis in ['y', 'z']):
             msg = 'Argument <along_axis> is not valid.'
-            self._logs(msg)
+            self.logs(msg)
             return
         
         elif (along_axis == 'y' and not(self.hasyy)) \
@@ -1048,7 +1049,7 @@ more details."
 'There are no data points along dimension {}. This function has no effect.'.\
                 format(along_axis.upper())
             wet19 = fsw(msg_title='NOTE', msg=msg, wet_num=19)
-            self._logs(wet19.wet)
+            self.logs(wet19.wet)
             return
             
         elif along_axis == 'z':
@@ -1081,7 +1082,7 @@ more details."
                         popi[1],
                         popi[2]
                         )
-                self._logs(logs)
+                self.logs(logs)
         
         elif along_axis == 'y':
             for z, y in it.product(self.zzcoords, self.yycoords):
@@ -1113,7 +1114,7 @@ more details."
                         popi[1],
                         popi[2]
                         )
-                self._logs(logs)
+                self.logs(logs)
         
         return None
     
@@ -1148,11 +1149,11 @@ more details."
         """
         
         title = 'Searches for {} residues'.format(missing)
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         if not(missing in ['missing', 'unassigned']):
             msg = "<missing> argument must be 'missing' or 'unassigned'."
-            self._logs(msg)
+            self.logs(msg)
             return
         
         # before expanding the peaklists to the fasta file to identify the 
@@ -1170,7 +1171,7 @@ more details."
         else:
             msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
-            self._logs(msg)
+            self.logs(msg)
             return
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
@@ -1212,7 +1213,7 @@ more details."
                     popi[1],
                     popi[2]
                     )
-            self._logs(logs)
+            self.logs(logs)
             
         return None
     
@@ -1240,7 +1241,7 @@ more details."
         else:
             msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
-            self._logs(msg)
+            self.logs(msg)
             return
         
         if performed_cs_correction and resonance_type=='Backbone':
@@ -1347,13 +1348,13 @@ more details."
         
         title = "ORGANIZING PEAKLIST COLUMNS' ORDER for {}".\
             format(resonance_type)
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # arranges cols
             target[z][y][x] = target[z][y][x][col_order]
             #logs
-            self._logs(
+            self.logs(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
                 )
         
@@ -1376,14 +1377,14 @@ more details."
             - self.sidechains_p5d
         """
         
-        self._logs('INITIATING FARSEER CUBE', istitle=True)
+        self.logs('INITIATING FARSEER CUBE', istitle=True)
         ## .copy() is used to solve issue_86
         self.peaklists_p5d = self.p5d(self.allpeaklists.copy())
-        self._logs('> Created cube for all the backbone peaklists - OK!')
+        self.logs('> Created cube for all the backbone peaklists - OK!')
         
         if use_sidechains:
             self.sidechains_p5d = self.p5d(self.allsidechains.copy())
-            self._logs('> Created cube for all the sidechains peaklists - OK!')
+            self.logs('> Created cube for all the sidechains peaklists - OK!')
         
         return None
     
@@ -1455,7 +1456,7 @@ more details."
         else:
             raise ValueError('Not a valid <along_axis> option.')
         
-        self._logs(
+        self.logs(
             'GENERATING DICTIONARY OF SERIES FOR {}'.format(series_type), 
             istitle=True
             )
@@ -1495,7 +1496,7 @@ more details."
                     series_kwargs
                     )
             # writes to log
-            self._logs(
+            self.logs(
                 '**Experimental Series [{}][{}] ** with data points {}'.\
                     format(dp2, dp1, list(series_dct[dp2][dp1].items))
                 )
@@ -1537,7 +1538,7 @@ more details."
         """Exports the parsed peaklists of the whole dataset."""
         
         title = 'EXPORTS PARSED PEAKLISTS FROM FARSEER-NMR CUBE'
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             folder = 'spectra_parsed/{}/{}'.format(z,y)
@@ -1556,7 +1557,7 @@ more details."
                 )
             fileout.close()
             msg = "**Saved:** {}".format(fpath)
-            self._logs(msg)
+            self.logs(msg)
         
             if self.has_sidechains:
                 folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
@@ -1575,7 +1576,7 @@ more details."
                     )
                 fileout.close()
                 msg = "**Saved:** {}".format(fpath)
-                self._logs(msg)
+                self.logs(msg)
         
         return None
     
@@ -1644,7 +1645,7 @@ more details."
         # writes title to log
         title = \
             'READING INPUT FILES ({}) for {}'.format(filetype, resonance_type)
-        self._logs(title, istitle=True)
+        self.logs(title, istitle=True)
         self._checks_filetype(filetype)
         main_peaklists=False
         
@@ -1657,7 +1658,7 @@ more details."
         elif filetype == '.fasta' and resonance_type == 'Backbone':
             #if not(any([self.hasxx, self.hasyy, self.haszz])):
                 #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
-                #self._logs(fsw.gen_wet('ERROR', msg, 21))
+                #self.logs(fsw.gen_wet('ERROR', msg, 21))
                 #self._abort()
             target = self.allfasta
             
@@ -1666,7 +1667,7 @@ more details."
             target = self.allsidechains
             
         else:
-            self._logs(
+            self.logs(
 'Arguments passed for <filetype> and/or <resonance_type> do not match \
 the possible options.'
                 )
@@ -1684,7 +1685,7 @@ the possible options.'
             # reads the .csv file to a pd.DataFrame removes
             # the '.csv' from the key name to increase asthetics in output
             if parts[-1].lower().endswith(filetype):
-                self._logs('* {}'.format(p))
+                self.logs('* {}'.format(p))
                 lessparts = parts[-1].split('.')[0]
                 
                 try:

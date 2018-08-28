@@ -111,7 +111,7 @@ class Comparisons:
         self.has_points_next_dim = False
         self.has_points_prev_dim = False
     
-    def log_r(self, logstr, istitle=False):
+    def logs(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
         
@@ -149,8 +149,8 @@ class Comparisons:
         Parameters:
             - wet (WetHandler)
         """
-        self.log_r(wet.wet)
-        self.log_r(wet.abort_msg())
+        self.logs(wet.wet)
+        self.logs(wet.abort_msg())
         wet.abort()
         
         return
@@ -171,7 +171,7 @@ class Comparisons:
             all_next_dim (dict)
         """
         
-        self.log_r(
+        self.logs(
             'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(
                     self.dimension,
                     self.other_dim_keys[0],
@@ -201,11 +201,11 @@ class Comparisons:
                         )
                     self.all_next_dim[dp2].setdefault(dp1, comparison)
             
-            self.log_r('** Generated comparison dictionary')
+            self.logs('** Generated comparison dictionary')
             self.has_points_next_dim = True
         
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare along {}'.\
+            self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[0]))
         
         return
@@ -226,7 +226,7 @@ class Comparisons:
             all_prev_dim (dict)
         """
         
-        self.log_r(
+        self.logs(
             'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(
                     self.dimension,
                     self.other_dim_keys[1],
@@ -256,11 +256,11 @@ class Comparisons:
                         )
                     self.all_prev_dim[dp2].setdefault(dp1, comparison)
             
-            self.log_r('** Generated comparison dictionary')
+            self.logs('** Generated comparison dictionary')
             self.has_points_prev_dim = True
             
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare along {}'.\
+            self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[1]))
         
         return
