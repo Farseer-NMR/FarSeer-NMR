@@ -107,7 +107,7 @@ class FarseerNMR():
                 sys.exit(msg)
         elif isinstance(fsuv, dict):
             self.fsuv = fsuv
-            self._updates_output_dir()
+            self._update_output_dir()
             self._config_user_variables()
         else:
             msg = "fsuv argument should be a dict or string path"
@@ -123,7 +123,7 @@ class FarseerNMR():
         self._starts_logger()
         self._fsuv_integrity_checks()
     
-    def _updates_output_dir(self):
+    def _update_output_dir(self):
         """
         Updates output path in fsuv dictionary.
         
@@ -288,8 +288,8 @@ class FarseerNMR():
         # PRE routines take only place at advanced stages of the 
         # Farseer-NMR calculation.
         # It would be a waste of time to have an error after 2h...
-        if fsuv["pre_settings"]["apply_PRE_analysis"]:
-            _checks_PRE_analysis_flags()
+        if self.fsuv["pre_settings"]["apply_PRE_analysis"]:
+            self._checks_PRE_analysis_flags()
         
         return None
     
@@ -298,7 +298,8 @@ class FarseerNMR():
         
         # if all the flags upon which aplly_PRE_analysis depends on are
         # turned off:
-        if not(self.fsuv["PRE_analysis_flags"]):
+        if self.fsuv["pre_settings"]["apply_PRE_analysis"] \
+                and not(self.fsuv["PRE_analysis_flags"]):
             msg = \
 "PRE Analysis is set to <{}> and depends on the following variables: \
 do_along_z :: <{}> || calcs_Height_ratio OR calcs_Volume_ratio :: <{}> || \
@@ -327,7 +328,7 @@ All these variables should be set to True for PRE Analysis to be executed.".\
             - False otherwise
         """
         
-        if not(fsuv["any_axis"]):
+        if not(self.fsuv["any_axis"]):
             msg = \
     "Analysis over X, Y or Z Farseer-NMR Cube's axes are all deactivated. \
     There is nothing to calculate. Confirm this is actually what you want."
@@ -363,13 +364,13 @@ NMR observables and user notes will be exported in nicely formatted tables ;-)"
         
         return True
     
-    def _checks_calculation_flags(fsuv):
+    def _checks_calculation_flags(self):
         """
         Checks if the user wants to calculate any parameters.
         Informs the user via WET if no parameter calculation will be performed.
         """
         #WET#14
-        if not(fsuv["calc_flags"]):
+        if not(self.fsuv["calc_flags"]):
             msg = \
     "All restraints calculation routines are deactivated. \
     Nothing will be calculated."
@@ -629,7 +630,7 @@ Settings.'.\
                 format(direrr, how_to_run)
             sys.exit(msg)
         
-        self._updates_output_dir()
+        self._update_output_dir()
         
         # stores path to spectra/ folder
         self.fsuv["general_settings"]["input_spectra_path"] = \
@@ -669,7 +670,7 @@ Settings.'.\
         has_sidechains = \
             has_sidechains or self.fsuv["general_settings"]["has_sidechains"]
         fasta_start = fasta_start or self.fsuv["fasta_settings"]["FASTAstart"]
-        apply_fasta = apply_fasta or fsuv["fasta_settings"]["applyFASTA"]
+        apply_fasta = apply_fasta or self.fsuv["fasta_settings"]["applyFASTA"]
         
         self.pkls = fcube.FarseerCube(
             peaklist_folder_path,
@@ -758,7 +759,7 @@ Settings.'.\
         
         if resonance_type == 'Backbone':
             self.pkls.correct_shifts_backbone(
-                fsuv["cs_settings"]["cs_correction_res_ref"]
+                self.fsuv["cs_settings"]["cs_correction_res_ref"]
                 )
         
         elif resonance_type=='Sidechains':
@@ -801,7 +802,7 @@ Settings.'.\
             return
         
         self.pkls.finds_missing(
-            fill_na(peak_status),
+            self._fill_na(peak_status),
             missing=peak_status,
             resonance_type=resonance_type
             )
@@ -832,7 +833,7 @@ Settings.'.\
         """
         
         self.pkls.init_Farseer_cube(
-            use_sidechains=fsuv["general_settings"]["use_sidechains"]
+            use_sidechains=self.fsuv["general_settings"]["use_sidechains"]
             )
         
         return None
@@ -890,7 +891,7 @@ Settings.'.\
                 )
             return None
         
-        if not(_checks_cube_axes_flags()):
+        if not(self._checks_cube_axes_flags()):
             return None
         
         series_dict = {}
@@ -995,9 +996,9 @@ no series set was created along an axis. Nothing will be calculated.'
                 )
             # Calculates CSPs
             farseer_series.calc_csp(
-                calccol=fsuv["csp_settings"]["calccol_name_CSP"],
-                pos1=fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
-                pos2=fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
+                calccol=self.fsuv["csp_settings"]["calccol_name_CSP"],
+                pos1=self.fsuv["PosF1_settings"]["calccol_name_PosF1_delta"],
+                pos2=self.fsuv["PosF2_settings"]["calccol_name_PosF2_delta"]
                 )
         
         # if the user only wants to calculate perturbation in single dimensions
@@ -1566,7 +1567,7 @@ Nothing to calculate here.')
                         series_dct[cond][dim2_pt][dim1_pt]
                         )
                     #
-                    self.exports_all_parameters(
+                    self.export_all_parameters(
                         series_dct[cond][dim2_pt][dim1_pt],
                         resonance_type=resonance_type
                         )
@@ -1689,7 +1690,6 @@ Nothing to calculate here.')
                         # performs ploting routines
                         self.comparison_analysis_routines(
                             c.all_next_dim[dp2][dp1],
-                            self.fsuv,
                             resonance_type
                             )
             
@@ -1713,7 +1713,6 @@ Nothing to calculate here.')
                             istitle=True)
                         self.comparison_analysis_routines(
                             c.all_prev_dim[dp2][dp1],
-                            self.fsuv,
                             resonance_type
                             )
         
@@ -1729,11 +1728,12 @@ Nothing to calculate here.')
         Runs the whole Farseer-NMR standard algorithm based on the
         defined user variables.
         """
-
+        
+        general = self.fsuv["general_settings"]
         fitting = self.fsuv["fitting_settings"]
         cs = self.fsuv["cs_settings"]
         fasta = self.fsuv["fasta_settings"]
-        use_sidechains = self.general["use_sidechains"]
+        use_sidechains = general["use_sidechains"]
         
         # Initiates the run log
         self.logger.info(self._log_state_stamp())
@@ -1759,10 +1759,10 @@ Nothing to calculate here.')
                 self.expand_missing(dim='y', resonance_type='Sidechains')
         
         if fitting["expand_missing_zz"]:
-            self.pkls.expand_missing(dim='z')
+            self.expand_missing(dim='z')
             
             if analyses_sidechains:
-                self.pklsexpand_missing(dim='z', resonance_type='Sidechains')
+                self.expand_missing(dim='z', resonance_type='Sidechains')
         
         ## identifies missing residues
         self.finds_missing_residues(peak_status='missing')
@@ -1874,11 +1874,11 @@ Nothing to calculate here.')
         """
         fsuv_tmp = self.fsuv.copy()
     
-        for key in fsuv.keys():
+        for key in self.fsuv.keys():
             if isinstance(fsuv_tmp[key], pd.DataFrame):
                 fsuv_tmp.pop(key, None)
         
-        self.logger.info(json.dump(fsuv_tmp, sort_keys=True, indent=4))
+        self.logger.info(json.dumps(fsuv_tmp, sort_keys=True, indent=4))
         
         if to_file:
             with open('FarseerNMR_config.json', 'w') as jsonfile:
@@ -1888,23 +1888,7 @@ Nothing to calculate here.')
 
 if __name__ == '__main__':
     
-    b = FarseerNMR(sys.argv[1])
-    b.logger.debug('done reading from json path')
     
-    #logger = start_logger(sys.argv[1])
-    #fsuv = read_user_variables(sys.argv[1], sys.argv[2])
-    fsuv = json.load(open(sys.argv[1], 'r'))
-    a = FarseerNMR(fsuv)
-    a.logger.debug('done reading from json dict')
-    
-    
-    # copy_Farseer_version(fsuv)
-    
-    # path evaluations now consider the absolute path, always.
-    # in this way the user can run farseer from any folder taking the
-    # input from any other folder.
-    # path should be the folder where the 'spectra/' are stored and NOT the
-    # path to the 'spectra/' folder.
-    
-    #run_farseer(fsuv, logger=logger)
-    #logger.debug('Farseermain.py finished with __name__ == "__main__"')
+    farseer = FarseerNMR(sys.argv[1])
+    farseer.run()
+    farseer.logger.info('Farseermain.py finished with __name__ == "__main__"')
