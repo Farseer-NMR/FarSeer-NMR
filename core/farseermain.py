@@ -505,8 +505,6 @@ Settings.'.\
             'csp_res_exceptions':self.fsuv["csp_settings"]["csp_res_exceptions"],
             'cs_missing':self.fsuv["csp_settings"]["cs_missing"],
             'restraint_list':self.fsuv["restraint_names"],
-            'log_export_onthefly':True,
-            'log_export_name':self.fsuv["general_settings"]["logfile_name"]
             }
         
         return dd
@@ -637,8 +635,6 @@ Settings.'.\
             FASTAstart=fasta_start,
             applyFASTA=apply_fasta
             )
-        # exp.log_export_onthefly = True
-        # exp.log_export_name = fsuv["general_settings"]["logfile_name"]
         
         self.logger.debug("Peaklist dataset created correctly")
         
@@ -1625,7 +1621,6 @@ Nothing to calculate here.')
                 selfdim=dimension,
                 other_dim_keys=series_dim_keys[dimension]
                 )
-            c.log_export_onthefly = True
             c.log_export_name = self.fsuv["general_settings"]["logfile_name"]
             # stores comparison in a dictionary
             comp_dct.setdefault(dimension, c)

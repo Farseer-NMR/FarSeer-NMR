@@ -59,14 +59,6 @@ class Comparisons:
         
         has_points_prev_dim (bool): True if points are found along the
             previous dimension. False by default.
-        
-        log (str): stores the whole log.
-        
-        log_export_onthefly (bool): Flag that activates on-the-fly log
-            on an external file.
-        
-        log_export_name (str): the name of the external log file that is
-            written on-the-fly.
     
     Methods:
         .log_r()
@@ -118,9 +110,6 @@ class Comparisons:
         # becomes true after gen_comparison_*()
         self.has_points_next_dim = False
         self.has_points_prev_dim = False
-        self.log = ''  # all log goes here
-        self.log_export_onthefly = False
-        self.log_export_name = 'Comparison_log.md'
     
     def log_r(self, logstr, istitle=False):
         """

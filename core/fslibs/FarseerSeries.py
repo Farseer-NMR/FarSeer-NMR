@@ -168,13 +168,11 @@ class FarseerSeries(pd.Panel):
                 'CSP',
                 'Height_ratio',
                 'Vol_ratio'
-                ],
-            log_export_onthefly=False,
-            log_export_name='FarseerSet_log.md'):
+                ]
+            ):
         """Creates the instance attributes."""
         
         self.logger = Logger.FarseerLogger(__name__).setup_log()
-        #logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
         self.cs_missing = cs_missing
@@ -208,10 +206,6 @@ class FarseerSeries(pd.Panel):
         # affects plot_res_evo()
         self.fit_performed = False 
         self.PRE_loaded = False  # True after .load_theoretical_PRE
-        # log related variables
-        self.log = ''
-        self.log_export_onthefly = log_export_onthefly
-        self.log_export_name = log_export_name
         
         # defines the path to store the calculations
         # if stores the result of a calculation
@@ -265,7 +259,7 @@ class FarseerSeries(pd.Panel):
         # because Titration inherits a pd.Panel.
         return FarseerSeries
         
-    def log_r(self, logstr, istitle=False):
+    def _logs(self, logstr, istitle=False):
         """
         Registers the log string and prints it.
         
@@ -283,47 +277,22 @@ class FarseerSeries(pd.Panel):
 {0}  
 """.format('*'*79, logstr)
         
-        #else:
-        #    logstr += '  \n'
-        
-        # print(logstr)
-        # self.log += logstr
-        
         self.logger.info(logstr)
         
-        # appends log to external file on the fly
-        # if self.log_export_onthefly:
-            # with open(self.log_export_name, 'a') as logfile:
-                # logfile.write(logstr)
-        
-        return
+        return None
     
-    def exports_log( self, mod='a', path='farseer.log'):
-        """Exports log to external file.
-        
-        Parameters:
-            mod (str): python.open() arg mode.
-            
-            logfile_name (str): the external log file name.
-        """
-        
-        with open(path, mod) as logfile:
-            logfile.write(self.log)
-        
-        return
-    
-    def abort(self, wet):
+    def _abort(self, wet):
         """
         Aborts run with message. Writes message to log.
         
         Parameters:
             - wet (WetHandler)
         """
-        self.log_r(wet.wet)
-        self.log_r(wet.abort_msg())
+        self._logs(wet.wet)
+        self._logs(wet.abort_msg())
         wet.abort()
         
-        return
+        return None
     
     def create_header(self, extra_info="", file_path=""):
         """
@@ -417,7 +386,7 @@ and stacked (compared) along "{}" axis'.format(
         # if clause not part of the original function, added for the Farseer-NMR Project.
         if not(hexx.startswith("#") and len(hexx) == 7):
             msg = "The input colour is not in HEX format."
-            self.abort(fsw(msg_title="ERROR", msg=msg, wet_num=27))
+            self._abort(fsw(msg_title="ERROR", msg=msg, wet_num=27))
         # Pass 16 to the integer function for change of base
         return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
 
@@ -581,7 +550,7 @@ and stacked (compared) along "{}" axis'.format(
                 mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
                 self.ix[iitem,mask_missing,calccol] = 0
         
-        self.log_r('**Calculated** {}'.format(calccol))
+        self._logs('**Calculated** {}'.format(calccol))
         
         return
     
@@ -596,7 +565,7 @@ and stacked (compared) along "{}" axis'.format(
         
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
-        self.log_r('**Calculated** {}'.format(calccol))
+        self._logs('**Calculated** {}'.format(calccol))
         
         return
     
@@ -633,7 +602,7 @@ and stacked (compared) along "{}" axis'.format(
         self.loc[:,:,calccol] = \
             self.loc[:,:,['1-letter',pos1,pos2]].\
                 apply(lambda x: self.csp_willi(x), axis=2)
-        self.log_r('**Calculated** {}'.format(calccol))
+        self._logs('**Calculated** {}'.format(calccol))
         
         return
     
@@ -656,7 +625,7 @@ and stacked (compared) along "{}" axis'.format(
             self: added columns 'tag', 'Theo PRE'.
         """
         if not(self.para_name):
-            self.abort(fsw(
+            self._abort(fsw(
                 msg_title="ERROR",
                 msg="Paramagnetic Z axis name incorrect",
                 wet_num=1
@@ -685,8 +654,8 @@ and stacked (compared) along "{}" axis'.format(
             names=['Theo PRE'],
             comment='#'
             )
-        self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
-        self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
+        self._logs('**Added Theoretical PRE file** {}'.format(pre_file[0]))
+        self._logs('*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
         self.loc[self.para_name,:,'Theo PRE'] = predf.loc[:,'Theo PRE']
         # reads information on the tag position.
@@ -699,7 +668,7 @@ and stacked (compared) along "{}" axis'.format(
         except ValueError:
             msg = \
 "Theoretical PRE file incomplete. Header with tag number is missing."
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=15))
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=15))
         
         # check tag residue
         if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
@@ -711,13 +680,13 @@ is not part of the protein sequence ({}-{}).'.\
                     int(self.res_info.iloc[0,0,0]),
                     int(self.res_info.iloc[0,:,0].tail(n=1))
                     )
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=17))
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=17))
         
         self.loc[self.para_name,:,'tag'] = ''
         tagmask = self.loc[self.para_name,:,'ResNo'] == tag
         self.loc[self.para_name,tagmask,'tag'] = '*'
         tagf.close()
-        self.log_r('**Tag position found** at residue {}'.format(tag_num))
+        self._logs('**Tag position found** at residue {}'.format(tag_num))
         
         return
         
@@ -748,7 +717,7 @@ is not part of the protein sequence ({}-{}).'.\
         gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
         self.loc[:,:,targetcol] = \
             self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
-        self.log_r('**Calculated DELTA PRE** for source {} in target {}'.\
+        self._logs('**Calculated DELTA PRE** for source {} in target {}'.\
                 format(sourcecol, targetcol))
         
         for exp in self.items:
@@ -763,7 +732,7 @@ is not part of the protein sequence ({}-{}).'.\
                 boundary='extend',
                 normalize_kernel=True
                 )
-        self.log_r(\
+        self._logs(\
 '**Calculated DELTA PRE Smoothed** for source {} in target {} \
 with window size {} and stdev {}'.\
             format(sourcecol, smooth_col, guass_x_size, gaussian_stddev))
@@ -848,7 +817,7 @@ with window size {} and stdev {}'.\
                 )
         
         fileout.close()
-        self.log_r('**Exported data table:** {}'.format(file_path))
+        self._logs('**Exported data table:** {}'.format(file_path))
         
         return
     
@@ -920,7 +889,7 @@ recipient: residues
                     ).replace(' ', '')
             fileout.write(to_write)
             fileout.close()
-            self.log_r('**Exported Chimera Att** {}'.format(file_name))
+            self._logs('**Exported Chimera Att** {}'.format(file_name))
         
         return
     
@@ -947,7 +916,7 @@ recipient: residues
                     float_format='%.4f'
                     )
                 )
-            self.log_r('**Exported parsed peaklist** {}'.format(file_path))
+            self._logs('**Exported parsed peaklist** {}'.format(file_path))
             fileout.close()
         
         return
@@ -1908,7 +1877,7 @@ recipient: residues
 data points <along_x>, i.e. input peaklists. Please correct <fitting_x_values> \
 variable or confirm you have not forgot any peaklist [{}].".\
                     format(titration_x_values, self.items)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=5))
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=5))
             
             x = np.array(titration_x_values)
             xmin = titration_x_values[0]
@@ -2934,7 +2903,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 function.
         """
         
-        self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
+        self._logs('**Plotting** {} for {}...'.format(plot_style, calccol))
         # this to allow folder change in PRE_analysis
         folder = calccol
         
@@ -3115,7 +3084,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         header = self.create_header(file_path=file_path)
         fig.text(0.01, 0.01, header, fontsize=header_fontsize)
         fig.savefig(file_path, dpi=fig_dpi)
-        self.log_r('**Plot Saved** {}'.format(file_path))
+        self._logs('**Plot Saved** {}'.format(file_path))
         
         return
     
@@ -3146,9 +3115,9 @@ variable or confirm you have not forgot any peaklist [{}].".\
         except TypeError:
             msg = "Chosen fitting function <{}> not an available option.".\
                 format(fit_function)
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=23))
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=23))
         
-        self.log_r("*** Performing fit using function: {}".format(fit_function))
+        self._logs("*** Performing fit using function: {}".format(fit_function))
         # logging ###
         not_enough_data = to_fit.not_enough_data
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
@@ -3168,7 +3137,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         logftable = open(logftable_name, 'w')
         logftable.write(to_fit.results_header())
-        self.log_r('** Performing fitting for {}...'.format(col))
+        self._logs('** Performing fitting for {}...'.format(col))
         measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
         
@@ -3204,9 +3173,9 @@ variable or confirm you have not forgot any peaklist [{}].".\
             self.fit_plot_ydata[col_res] = e
         
         logfreport.close()
-        self.log_r("*** Fit report log file written: {}".format(logfrep_name))
+        self._logs("*** Fit report log file written: {}".format(logfrep_name))
         logftable.close()
-        self.log_r("*** Fit table log file written: {}".format(logftable_name))
+        self._logs("*** Fit table log file written: {}".format(logftable_name))
         
         return
     

@@ -77,17 +77,8 @@ class FarseerCube:
         hasxx, hasyy, haszz (bool): True if there are more than one data
             point along that dimension. False otherwise (default).
         
-        log (str): stores the whole log.
-        
-        log_export_onthefly (bool): Flag that activates on-the-fly log
-            on an external file.
-        
-        log_export_name (str): the name of the external log file that is
-            written on-the-fly.
-        
         p5d (pandas.Panel): a 5-dimension pandas.Panel.
     
-        
         tmp_vars (dict): stored temporary variables for functions.
     """
     def __init__(
@@ -187,21 +178,9 @@ FASTA starting residue: {}  """.\
 """.\
                 format('*'*79, logstr.upper())
         
-        #else:
-        #    logstr += '  \n'
-        
-        # prints and registers
-        #print(logstr)
-        #self.log += logstr
-        
-        # appends log to external file on the fly
-        #if self.log_export_onthefly:
-        #    with open(self.log_export_name, 'a') as logfile:
-        #        logfile.write(logstr)
-        
         self.logger.info(logstr)
         
-        return
+        return None
     
     def _abort(self, wet):
         """
