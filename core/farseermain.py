@@ -1845,6 +1845,19 @@ Nothing to calculate here.')
         
         return None
 
+def run_farseer(config_path):
+    """
+    Function that executes FarseerNMR from GUI.
+    
+    Parameters:
+        - config_path (str): path to JSON config file.
+    """
+    
+    a = FarseerNMR(config_path)
+    a.run()
+    
+    return None
+
 if __name__ == '__main__':
     
     
