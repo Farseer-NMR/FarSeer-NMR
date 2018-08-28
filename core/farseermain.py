@@ -1099,6 +1099,10 @@ Nothing to calculate here.')
                     ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
                     ):
                 # only for the parameters allowed by the user
+                self.logger.debug("Dict instance sefl.fsuv: {}".format(
+                    isinstance(self.fsuv, dict))
+                    )
+                
                 if self.fsuv["restraint_settings"].loc[sourcecol,'calcs_restraint_flg']:
                     farseer_series.plot_base(
                         targetcol, 
@@ -1135,8 +1139,8 @@ Nothing to calculate here.')
                         'exp',
                         'DPRE_plot',
                         {
-                            **fsuv["series_plot_settings"], 
-                            **fsuv["DPRE_plot_settings"]
+                            **self.fsuv["series_plot_settings"], 
+                            **self.fsuv["DPRE_plot_settings"]
                             },
                         cols_per_page=1,
                         rows_per_page=self.fsuv["DPRE_plot_settings"]["rows"],
