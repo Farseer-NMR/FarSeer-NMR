@@ -182,8 +182,35 @@ class FarseerNMR():
         
         return None
     
+    def _removes_old_log_files(self):
+        """
+        Removes previously existing log files.
+        
+        log file names are configured according to Logger.FarseerLogger
+        """
+        
+        fslog = os.path.join(
+            self.fsuv["general_settings"]["output_path"],
+            'farseernmr.log'
+            )
+        
+        debuglog = os.path.join(
+            self.fsuv["general_settings"]["output_path"],
+            'debug.log'
+            ) 
+        
+        if os.path.exists(fslog):
+            os.remove(fslog)
+        
+        if os.path.exists(debuglog):
+            os.remove(debuglog)
+        
+        return None
+    
     def _starts_logger(self):
         """Initiates and assigns self.logger."""
+        
+        self._removes_old_log_files()
         
         self.logger = FarseerLogger(
             __name__,
