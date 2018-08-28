@@ -759,6 +759,7 @@ and stacked (compared) along "{}" axis'.format(
             plot_name,
             fig_file_type
             )
+        
         header = self._create_header(file_path=file_path)
         fig.text(0.01, 0.01, header, fontsize=header_fontsize)
         fig.savefig(file_path, dpi=fig_dpi)
@@ -2382,13 +2383,28 @@ variable or confirm you have not forgot any peaklist [{}].".\
         # otherwise the user has input a list of colors
         else: 
             mk_color = color_list
-        
+                
         for i, residue in enumerate(self.major_axis):
             
             if self.ix[0,residue,'Peak Status'] in ('unassigned','missing'):
                 continue
             
             mesmask = self.loc[:,residue,'Peak Status'] == 'measured'
+            
+            if self.loc[mesmask,residue,['H1_delta','N15_delta']].\
+                    isnull().values.any():
+                
+                msg = "Information for residue {} was kept out of this plot.\
+This is because a NaN value was identified in the chemical shift information.\
+This can be explained if this residues was missing in the reference peaklist \
+but measured in a subsequent peaklist".\
+                    format(self.loc[mesmask,residue,'ResNo'].\
+                        to_string(index=False))
+                
+                wet36 = fsw(msg_title='NOTE', msg=msg, wet_num=36)
+                self.logs(wet36.wet)
+                continue
+            
             axs[0].scatter(
                 self.loc[mesmask,residue,'H1_delta'],
                 self.loc[mesmask,residue,'N15_delta'],
