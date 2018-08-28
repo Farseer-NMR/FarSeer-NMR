@@ -459,6 +459,20 @@ Settings.'.\
         
         return state_stamp
     
+    def _log_header(self):
+        """Operations performed when initializing the log file."""
+        self._log_state_stamp()
+        self.logger.info(
+            "*** Run Calculation folder: {}\n".\
+                format(self.fsuv["general_settings"]["output_path"])
+            )
+        self.logger.info(
+            "*** Config file: {}\n".\
+                format(self.fsuv["general_settings"]["config_path"])
+            )
+        
+        return None
+    
     def _fill_na(self, peak_status, merit=0, details='None'):
         """
         A dictionary that configures how the fields of the added rows for 
@@ -489,6 +503,20 @@ Settings.'.\
             }
         
         return d
+    
+    def _log_tail(self):
+        """Operations performed when finalizing the log file."""
+        
+        self.logger.info(
+            "*** Used JSON config file will be copied to the end of MD log file"
+            )
+        
+        self.logger.info(fsw(gen=False).end_well())
+        self._log_state_stamp(state='ENDED')
+        self.logger.info("*** USED CONFIG FILE ***\n")
+        self.export_user_variables()
+        
+        return None
     
     def _series_kwargs(self, resonance_type='Backbone'):
         """
@@ -1707,6 +1735,7 @@ Nothing to calculate here.')
         
         # Initiates the run log
         self.logger.info(self._log_state_stamp())
+        self._log_header()
         
         # Initiates Farseer
         self.creates_pkls_dataset()
@@ -1784,11 +1813,11 @@ Nothing to calculate here.')
                     resonance_type='Sidechains'
                     )
         
-        log_end(fsuv)
+        self._log_tail()
         
-        return
+        return None
 
-    def copy_FarseerNMR_version(
+    def copy_farseernmr_version(
             self,
             file_name='farseer_version',
             compress_type='zip'
@@ -1832,43 +1861,32 @@ Nothing to calculate here.')
             )
         
         return None
+    
+    def export_user_variables(self, to_file=False):
+        """
+        Exports loaded user variables to FarseerNMR log and (opt)
+        to a JSON file.
+        
+        Parameters;
+            - to_file (opt, bool): writes config to JSON. Defs: False.
+        """
+        fsuv_tmp = self.fsuv.copy()
+    
+        for key in fsuv.keys():
+            if isinstance(fsuv_tmp[key], pd.DataFrame):
+                fsuv_tmp.pop(key, None)
+        
+        self.logger.info(json.dump(fsuv_tmp, sort_keys=True, indent=4))
+        
+        if to_file:
+            with open('FarseerNMR_config.json', 'w') as jsonfile:
+                json.dump(fsuv_tmp, jsonfile, sort_keys=True, indent=4)
+        
+        return None
 
-def log_init(fsuv):
-    """Operations performed when initializing the log file."""
-    
-    fout = fsuv["general_settings"]["logfile_name"]
-    log_time_stamp(fout, mod='w')
-    logs(
-        "*** Run Calculation folder: {}\n".\
-            format(fsuv["general_settings"]["output_path"]),
-        fout
-        )
-    logs(
-        "*** Config file: {}\n".\
-            format(fsuv["general_settings"]["config_path"]),
-        fout
-        )
-    
-    return
 
-def log_end(fsuv):
-    """Operations performed when finalizing the log file."""
-    
-    print("*** Used JSON config file will be copied to the end of MD log file")
-    fout = fsuv["general_settings"]["logfile_name"]
-    logs(fsw(gen=False).end_well(), fout)
-    log_time_stamp(fout, state='ENDED')
-    logs("*** USED CONFIG FILE ***\n", fout, printit=False)
-    fsuv_tmp = fsuv.copy()
-    
-    for key in fsuv.keys():
-        if isinstance(fsuv_tmp[key], pd.DataFrame):
-            fsuv_tmp.pop(key, None)
-    
-    with open(fsuv["general_settings"]["logfile_name"], 'a') as f:
-        json.dump(fsuv_tmp, f, indent=4)
-    
-    return
+
+
 
 
     
