@@ -59,7 +59,7 @@ class FarseerLogger:
             self.farseer_log_config["handlers"]["debug_file_handler"]["filename"] = "{}/debug.log".format(new_dir)
         
         self.name = name
-        self.setup_log()
+        #self.setup_log()
     
     def setup_log(self):
         
