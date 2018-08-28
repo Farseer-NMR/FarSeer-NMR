@@ -89,37 +89,6 @@ class FarseerCube:
     
         
         tmp_vars (dict): stored temporary variables for functions.
-        
-    Methods:
-    
-        Initiates:
-            .log_r()
-            .exports_log()
-            .abort()
-        
-        Loading data:
-            .load_experiments()
-            .init_coords_names()
-        
-        Data treatment:
-            .split_res_info()
-            .correct_shifts_backbone()
-            .correct_shifts_sidechains()
-            .finds_missing()
-            .organize_cols()
-        
-        Explore the Farseer-NMR Cube:
-            .init_Farseer_cube()
-            .export_series_dict_over_axis()
-            .gen_series()
-        
-        Exporting:
-            .exports_parsed_pkls()
-        
-        Checking Routines:
-            .checks_filetype()
-            .checks_xy_datapoints_coherency()
-            .check_ref_res()
     """
     def __init__(
             self, spectra_path,
@@ -226,26 +195,15 @@ FASTA starting residue: {}  """.\
             logstr += '  \n'
         
         # prints and registers
-        print(logstr)
-        self.log += logstr
+        #print(logstr)
+        #self.log += logstr
         
         # appends log to external file on the fly
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
+        #if self.log_export_onthefly:
+        #    with open(self.log_export_name, 'a') as logfile:
+        #        logfile.write(logstr)
         
-        return
-    
-    def exports_log(self, mod='w', logfile_name='FarseerSet_log.md'):
-        """
-        Exports log to external file.
-        
-        mod (str): python.open() arg mode.
-        logfile_name (str): the external log file name.
-        """
-        
-        with open(logfile_name, mod) as logfile:
-            logfile.write(self.log)
+        self.logger.info(logstr)
         
         return
     
