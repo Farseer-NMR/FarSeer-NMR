@@ -86,8 +86,7 @@ class Comparisons:
             dimension_dict (dict): is a dictionary containing all the
             series for the main dimension.
         """
-        self.logger = logging.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('logger initiated')
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(

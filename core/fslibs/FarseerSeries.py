@@ -173,7 +173,7 @@ class FarseerSeries(pd.Panel):
             log_export_name='FarseerSet_log.md'):
         """Creates the instance attributes."""
         
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         #logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
