@@ -45,7 +45,7 @@ class FarseerNMR():
     """
     Handles the Farseer-NMR interface
     """
-    def __init__(self, fsuv):
+    def __init__(self, fsuv, spectra_folder_path=''):
         """
         Initiates the Farseer-NMR interface.
         
@@ -55,9 +55,13 @@ class FarseerNMR():
                             all the user defined variables.
                     - (dict) Python dictionary containing all user defined
                             variables.
+            - spectra_folder_path (opt, str): path to the parent folder
+                of the spectra/ folder where the peaklist dataset is stored.
         """
         # reads user variables
         # this has to be done before starting logging system
+        self.spectra_folder_path = spectra_folder_path
+        
         if isinstance(fsuv, str):
             if os.path.exists(fsuv):
                 self.read_fsuv_json(fsuv)
@@ -66,8 +70,7 @@ class FarseerNMR():
                 sys.exit(msg)
         elif isinstance(fsuv, dict):
             self.fsuv = fsuv
-            self._update_output_dir()
-            self._config_user_variables()
+            self._prepares_config()
         else:
             msg = "fsuv argument should be a dict or string path"
             sys.exit(msg)
@@ -82,6 +85,17 @@ class FarseerNMR():
         self._starts_logger()
         self._fsuv_integrity_checks()
     
+    def _prepares_config(self):
+        """
+        Steps to prepare the config file (fsuv) that are common
+        weither the config was given as a path of a json file or a 
+        dictionary.
+        """
+        self._update_spectra_dir()
+        self._update_output_dir()
+        self._config_user_variables()
+        return None
+    
     def _update_output_dir(self):
         """
         Updates output path in fsuv dictionary.
@@ -90,13 +104,59 @@ class FarseerNMR():
         If not: updates output_path to os.getcwd()
         """
         
-        if not self.fsuv["general_settings"]["output_path"]:
+        if not self.fsuv["general_settings"]["output_path"] \
+                and self.fsuv["general_settings"]["spectra_path"]:
+            
+            self.fsuv["general_settings"]["output_path"] = \
+                self.fsuv["general_settings"]["spectra_path"]
+        
+        # will only enter this condition if _update_output_dir() is
+        # called externally
+        elif not self.fsuv["general_settings"]["output_path"] \
+                and not self.fsuv["general_settings"]["spectra_path"]:
+        
             self.change_current_dir(
                 os.path.abspath(os.getcwd()),
                 update_fsuv=True
                 )
+        
         else:
-            self.change_current_dir(self.fsuv["general_settings"]["output_path"])
+            self.change_current_dir(
+                self.fsuv["general_settings"]["output_path"]
+                )
+        
+        return None
+    
+    def _update_spectra_dir(self):
+        """
+        Updates the path to the spectra/ folder containing the peaklist
+        dataset.
+        
+        If path to spectra/ folder not defined assign that of
+        the <output path>.
+        """
+        if self.spectra_folder_path:
+            
+            spectra_path = self.spectra_folder_path
+        
+        else:
+            if self.fsuv["general_settings"]["spectra_path"]:
+                
+                spectra_path = self.fsuv["general_settings"]["spectra_path"]
+                
+            elif not self.fsuv["general_settings"]["spectra_path"] \
+                    and self.fsuv["general_settings"]["output_path"]:
+                
+                spectra_path = self.fsuv["general_settings"]["output_path"]
+            
+            else:
+                
+                spectra_path = os.path.abspath(os.getcwd())
+            
+        self.fsuv["general_settings"]["input_spectra_path"] = \
+            os.path.join(spectra_path, 'spectra')
+        
+        return None
     
     def _starts_logger(self):
         """Initiates and assigns self.logger."""
@@ -587,16 +647,10 @@ Settings.'.\
                 format(direrr, how_to_run)
             sys.exit(msg)
         
-        self._update_output_dir()
-        
-        # stores path to spectra/ folder
-        self.fsuv["general_settings"]["input_spectra_path"] = \
-            '{}/spectra'.format(self.fsuv["general_settings"]["output_path"])
         # stores path to json config file
         self.fsuv["general_settings"]["config_path"] = json_cwd
-        # configs user variables necessary for Farseer-NMR
         
-        self._config_user_variables()
+        self._prepares_config()
         
         return None
     
@@ -1858,7 +1912,10 @@ def run_farseer(config_path):
 
 if __name__ == '__main__':
     
+    if len(sys.argv) == 2:
+        farseer = FarseerNMR(sys.argv[1])
+    elif len(sys.argv) == 3:
+        farseer = FarseerNMR(sys.argv[1], spectra_folder_path=sys.argv[2])
     
-    farseer = FarseerNMR(sys.argv[1])
     farseer.run()
     farseer.logger.info('Farseermain.py finished with __name__ == "__main__"')
