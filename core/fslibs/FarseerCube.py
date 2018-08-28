@@ -142,12 +142,8 @@ class FarseerCube:
         self.haszz = False
         self.hasyy = False
         self.hasxx = False
-        # Log related variables
-        self.log = ''  # stores the whole log
-        self.log_export_onthefly = False  # export log on the fly?
-        self.log_export_name = 'FarseerNMR_Cube_log.md'
         # writes to log
-        self.log_r('Initiates Farseer Set', istitle=True)
+        self._logs('Initiates Farseer Set', istitle=True)
         input_log = \
 """path: {}  
 side chains: {}  
@@ -157,7 +153,7 @@ FASTA starting residue: {}  """.\
                 self.has_sidechains,
                 self.FASTAstart
                 )
-        self.log_r(input_log)
+        self._logs(input_log)
         # initiates panel 5D object to initiate Farseer-NMR Cube
         # in .init_Farseer_cube()
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
@@ -174,7 +170,7 @@ FASTA starting residue: {}  """.\
             stat_axis=2
             )
        
-    def log_r(self, logstr, istitle=False):
+    def _logs(self, logstr, istitle=False):
         """
         Registers activity to the log string and prints it.
         
@@ -191,8 +187,8 @@ FASTA starting residue: {}  """.\
 """.\
                 format('*'*79, logstr.upper())
         
-        else:
-            logstr += '  \n'
+        #else:
+        #    logstr += '  \n'
         
         # prints and registers
         #print(logstr)
@@ -207,150 +203,405 @@ FASTA starting residue: {}  """.\
         
         return
     
-    def abort(self, wet):
+    def _abort(self, wet):
         """
         Aborts run with message. Writes message to log.
         
         Parameters:
             - wet (WetHandler)
         """
-        self.log_r(wet.wet)
-        self.log_r(wet.abort_msg())
+        self._logs(wet.wet)
+        self._logs(wet.abort_msg())
         wet.abort()
         
-        return
+        return None
     
-    def load_experiments(self, filetype='.csv', resonance_type='Backbone'):
+    def _check_ref_res(self, series, ref_res):
         """
-        Loads the <filetype> files in self.paths into nested
-        dictionaries as pd.DataFrames.
-        
-        Datapoint names should be singular for each dimension.
+        Checks if the reference residue is part of the protein sequence.
         
         Parameters:
-            filetype (str): {'.csv', '.fasta'}
+            series (pd.Series): the protein primary sequence.
             
-            resonance_type (str): {'Backbone', 'Sidechains'}.
-                'Sidechains' only available for '.csv' <filetype>.
-        
-        If filetype='.csv' and resonance_type='Backbone' executes
-        self.init_coords_names()
-        
-        Example of a mandatory hierarchy folder:
-        
-        :3rd dimension: para/ and dia/ 
-        :2nd dimension: 278/, 285/ and 298/
-        :1st dimension: l1.csv, l2.csv, ..., seq.fasta
-        
-        para/
-        -> 278/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
-        -> 285/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
-        -> 298/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
-        
-        dia/
-        -> 278/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
-        -> 285/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
-        -> 298/
-        ---> l1.csv
-        ---> l2.csv
-        ---> l3.csv
-        ---> l4.csv
-        ---> seq.fasta
+            ref_res (int): the residue number.
         """
-        # writes title to log
-        title = \
-            'READING INPUT FILES ({}) for {}'.format(filetype, resonance_type)
-        self.log_r(title, istitle=True)
-        self.checks_filetype(filetype)
-        main_peaklists=False
         
-        # defines functions to use and target storage dictionaries
-        if filetype == '.csv' and resonance_type == 'Backbone':
-            f = pd.read_csv
-            target = self.allpeaklists
-            main_peaklists=True
+        if any(series.isin([ref_res])):
+            return None
+        
+        else:
+            msg = \
+'The reference residue you selected, {}, is not part of the protein sequence \
+or is an <unassigned> or <missing> residue. \
+Correct the reference residue in the Settings Menu.'.\
+                format(ref_res)
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=16))
+        
+        return None
+    
+    def _checks_posf1_posf2_nuclei(self, target):
+        """
+        Confirms coherency between Columns label and nuclei type.
+        
+        Demmands that cols "Position F1" and "Assign F1" refer to 1H
+        and "Position F2" and "Assign F2" to 15N.
+        
+        Must be called after self.init_coord_names()
+        
+        Parameters:
+            target: Nested Dictionary of pd.DatFrame containing
+                the peaklist information.
+        """
+        
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             
-        elif filetype == '.fasta' and resonance_type == 'Backbone':
-            #if not(any([self.hasxx, self.hasyy, self.haszz])):
-                #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
-                #self.log_r(fsw.gen_wet('ERROR', msg, 21))
-                #self.abort()
-            target = self.allfasta
+            if not(0 < target[z][y][x].loc[:,'Position F1'].mean() < 20):
+                msg = 'Peaklist [{}][{}][{}] "Position F1" values do not \
+correspond to proton chemical shift values.'.format(z, y, x)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
             
-        elif filetype == '.csv' and resonance_type == 'Sidechains':
-            f = str  # dummy function
-            target = self.allsidechains
+            if not(target[z][y][x].ix[0,'Assign F1'].endswith('H')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F1" values do not \
+correspond to proton assignment labels.'.format(z, y, x)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+            
+            if not(80 < target[z][y][x].loc[:,'Position F2'].mean() < 150):
+                msg = 'Peaklist [{}][{}][{}] "Position F2" values do not \
+correspond to nitrogen chemical shift values.'.format(z, y, x)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+            
+            if not(target[z][y][x].ix[0,'Assign F2'].endswith('N')):
+                msg = 'Peaklist [{}][{}][{}] "Assign F2" values do not \
+correspond to nitrogen assignment labels.'.format(z, y, x)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
+        
+        return None
+    
+    def _checks_filetype(self, filetype):
+        """
+        Confirms that file type exists in spectra/ before loading.
+        
+        If not, call WET#9.
+        
+        If file not .csv or .fasta, call WET#13.
+        
+        Parameters:
+            filytype (str): {'.csv', '.fasta'}
+        """
+        
+        # check filetype fits usable formats
+        if not(filetype in ['.csv', '.fasta']):
+            msg = \
+"File type {} not recognized. Why you want to read these files \
+if Farseer-NMR can't do nothing with them? :-)".\
+                format(filetype)
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=13))
+        
+        # checks if files exists
+        if not(any([p.endswith(filetype) for p in self.paths])):
+            msg = "There are no files in spectra/ with extension {}".\
+                format(filetype)
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=9))
+            
+        return None
+    
+    def _checks_xy_datapoints_coherency(self, target, filetype):
+        """
+        Confirms axis names along Y folders and X files.
+        
+        Confirms Y folder names are equal accross every Z folder.
+        Raises WET#11 otherwise.
+        
+        Confirms each Y folder has one and ONLY on .fasta file.
+        Raises WET#12 otherwise.
+        
+        Confirms wether the number of files of <filetype> is the same
+        in every subdirectory of spectra/.
+        Raises WET#8 otherwise.
+        
+        Confirms that the files of <filetype> have the same names in all
+        the Y datapoints subfolders.
+        Raises names mismatches with WET#10.
+        
+        Parameters:
+            target (dict): nested dictionary representing the
+                folder tree in spectra/
+            
+            filetype (str): {'.csv', '.fasta'}
+        """
+        
+        zkeys = list(target.keys())
+        ykeys = list(target[zkeys[0]].keys())
+        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
+        key_len = len(zkeys) * len(ykeys) * len(xkeys)
+        ### Checks coherency of y folders
+        all_y_folders = \
+            set([y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
+        
+        if len(set(all_y_folders)) > len(ykeys):
+            msg = \
+"Y axis folder names are not coherent. \
+Names must be equal accross every Z axis datapoint folder."
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=11))
+        
+        if filetype == '.fasta':
+            all_fasta_files = \
+                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+            
+            
+            if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
+                msg = \
+"There are too many or missing {0} files. \
+Confirm there is only ONE {0} file for each Y datapoint folder.".\
+                    format(filetype)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=12))
+        
+        ### Checks coherency of x files
+        elif filetype == '.csv':
+            if key_len \
+                    != len([x for x in self.paths if x.endswith(filetype)]):
+                msg =  \
+'The no. of files of type {} is not the same for every series folder. \
+Check for the missing ones!'.\
+                    format(filetype)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=8))
+            
+            x_files_names = set(
+                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+                )
+            
+            if (len(x_files_names) > len(xkeys)):
+                msg = \
+"X axis datapoints file names are not coherent. \
+Names must be equal accross every Y axis datapoint folder.".\
+                    format(filetype)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=10))
+        
+        # writes confirmation message
+        self._logs('> All <{}> files found and correct - OK!'.format(filetype))
+        
+        return None
+    
+    def _checks_fasta_start_number(self):
+        """
+        Confirms if the start or end number of the fasta file 
+        won't result in protein truncation in the peaklist.
+        
+        This occurs when first fasta residue is > first protein residue.
+        This occurs when last fasta residue is < last protein residue.
+        
+        Raises WET#22 otherwise.
+        """
+        
+        if not(self.applyFASTA):
+            return None
+        
+        if not(self.zzcoords and self.allfasta):
+            msg = \
+"Operation cannot complete because Cube coordinates have not been set \
+or fasta files have not yet been read."
+            print(msg)
+            
+            return None
+        
+        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            # name of the fasta file being read
+            f = list(self.allfasta[z][y].keys())[0]
+            peaklist_first_residue = \
+                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].head(n=1))
+            peaklist_last_residue = \
+                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].tail(n=1))
+            fasta_first_residue = \
+                int(self.allfasta[z][y][f].loc[:,'ResNo'].head(n=1))
+            fasta_last_residue = \
+                int(self.allfasta[z][y][f].loc[:,'ResNo'].tail(n=1))
+            
+            if fasta_first_residue <= peaklist_first_residue \
+                    and fasta_last_residue >= peaklist_last_residue:
+                continue
+            
+            elif fasta_first_residue > peaklist_first_residue:
+                msg = \
+"The first residue of your fasta file is greater than your protein first \
+residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
+which will results in peaklist truncation. \
+You should verify that your start Fasta residue number is correct.".\
+                    format(z, y, x, f)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
+            
+            elif fasta_last_residue < peaklist_last_residue:
+                msg = \
+"The last residue of your fasta file is minor than your protein \
+last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
+which will results in peaklist truncation. \
+You should verify that your start Fasta residue number is correct.".\
+                    format(z, y, x, f)
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
+            
+            else:
+                msg = 'Something is wrong in ._checks_fasta_start_number()'
+                self._abort(fsw.gen_wet('DEVELOPER ISSUE', msg, -1))
             
         else:
-            self.log_r(
-'Arguments passed for <filetype> and/or <resonance_type> do not match \
-the possible options.'
+            msg = "> FASTA files starting number is consistent with peaklists"
+            self._logs(msg)
+        
+        return None
+    
+    def _check_res_duplicates(self, df, z, y, x):
+        """
+        Checks if there are duplicated residue entries in peaklists.
+        
+        Parameters:
+            - df (pd.DataFrame): the peaklist dataframe to investigate
+        """
+        where_duplicates = df[z][y][x].loc[:,'ResNo'].duplicated(keep=False)
+        
+        if where_duplicates.any():
+            msg = "The peaklist [{}][{}][{}] contains repeated residue entries \
+in lines: {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in \
+                    where_duplicates.index[where_duplicates].tolist()]
                 )
-            return
+            self._abort(wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24))
         
-        # loads files in nested dictionaries
-        # piece of code found in stackoverflow, reference missing
-        for p in self.paths:
-            parts = p.split('spectra')[-1].split('/')
-            branch = target
+        return None
+    
+    def _checks_misleading_chars(self, z, y, x):
+        """
+        Checks for the presence misleading characters in the DataFrame.
+        This may come from entries of unassigned residues
+        that were not removed.
+        """
+        # for assignment cols
+        ## empty
+        empty_cells_f1 = self.allpeaklists[z][y][x].loc[:,'Assign F1'].isnull()
+        empty_cells_f2 = self.allpeaklists[z][y][x].loc[:,'Assign F2'].isnull()
+        
+        if empty_cells_f1.values.any() or empty_cells_f2.values.any():
+            rows_bool = empty_cells_f1 | empty_cells_f2
+            msg = "The peaklist [{}][{}][{}] contains no assignment \
+information in lines {}. Please review that peaklist.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
+        
+        ## misleading chars
+        non_digit_f1 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        non_digit_f2 = \
+            self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
+                str.strip().str.contains('\W', regex=True)
+        
+        if  non_digit_f1.any() or non_digit_f2.any():
+            rows_bool = non_digit_f1 | non_digit_f2
+            msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in Assignment columns in line {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
+        
+        ## for other cols.
+        cols = [
+            'Position F1',
+            'Position F2',
+            'Height',
+            'Volume',
+            'Line Width F1 (Hz)',
+            'Line Width F2 (Hz)',
+            'Merit'
+            ]
+        
+        for col in cols:
+            non_digit = self.allpeaklists[z][y][x].loc[:,col].\
+                astype(str).str.strip().str.contains(
+                    '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
+                    regex=True
+                    )
+            if non_digit.any():
+                msg = "The peaklist [{}][{}][{}] contains misleading \
+charaters in line {} of column [{}].".format(
+                    z,
+                    y,
+                    x,
+                    [2+int(i) for i in non_digit.index[non_digit].tolist()],
+                    col
+                    )
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
+        
+        return None
+    
+    def _compare_fastas(self):
+        """
+        Compares all .fasta files to confirm they have the same size.
+        Farseer cannot operate FASTA of different lengths if analysing
+        on the y dimension.
+        """
+        
+        if not(self.applyFASTA):
+            return None
+        
+        l = []
+        is_bigger = False
+
+        for z in self.zzcoords:
+            for y in self.yycoords:
+                key = list(self.allfasta[z][y].keys())[0]
+                l.append(self.allfasta[z][y][key].shape[0])
             
-            for part in parts[1:-1]:
-                branch = branch.setdefault(part, {})
+            if len(set(l)) > 1:
+                is_bigger = True
             
-            # reads the .csv file to a pd.DataFrame removes
-            # the '.csv' from the key name to increase asthetics in output
-            if parts[-1].lower().endswith(filetype):
-                self.log_r('* {}'.format(p))
-                lessparts = parts[-1].split('.')[0]
-                
-                try:
-                    if filetype == '.csv':
-                        branch[lessparts] = branch.get(parts[-1], f(p))
-                    elif filetype == '.fasta':
-                        fh = FastaHandler(
-                                fasta_file_path=p,
-                                fasta_start_num=self.FASTAstart
-                                )
-                        fh.reads_fasta_to_dataframe(reads_from_file=True)
-                        branch[lessparts] = branch.get(parts[-1], fh.fasta_df)
-                
-                except pd.errors.EmptyDataError:
-                    msg = \
-"The file {} is empty. To introduce an empty data point, add the header.".\
-                        format(filetype)
-                    self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=14))
+            l = []
         
-        self.checks_xy_datapoints_coherency(target, filetype)
+        if is_bigger:
+            msg = \
+'.fasta files have not the same size and they should have the same size \
+when performing calculations along the Y axis. \
+Please correct your .fasta files.'
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=21))
         
-        if main_peaklists:
-            self.init_coords_names()
+        return None
+    
+    def _compare_peaklists_length(self, dp1, dp2, axis, df_dict):
+        """
+        Verifies if all peaklists in a series have the same number of 
+        residues before a FarseerSeries object is created.
         
-        return
+        Parameters:
+            - dp1 (str): datapoint name on the next dimension.
+            
+            - dp2 (str): datapoint name on the previous dimension.
+            
+            - axis (str): the axis long which the series will be generated.
+            
+            - df_dict (dict:pd.DataFrame): A dictionary containing
+                pd.DataFrames corresponding to peaklists.
+        """
+        
+        pkl_lengths = []
+        
+        for key, peaklist in df_dict.items():
+            pkl_lengths.append(peaklist.shape[0])
+        
+        if not(len(set(pkl_lengths))) == 1:
+            msg = "Peaklists proposed for series [{}][{}] along {} axis have \
+different lengths.".\
+                format(dp2, dp1, axis[-1].upper())
+            self._abort(fsw(msg_title="ERROR", msg=msg, wet_num=28))
+        
+        return None
     
     def init_coords_names(self):
         """
@@ -366,7 +617,7 @@ the possible options.'
             self.zzref (str): idem
         """
         
-        self.log_r('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
+        self._logs('IDENTIFIED FARSEER CUBE VARIABLES', istitle=True)
         # keys for all the conditions in the 3rd dimension - higher level
         self.zzcoords = sorted(self.allpeaklists)
         self.zzref = self.zzcoords[0]
@@ -397,10 +648,10 @@ the possible options.'
 * Farseer Cube Z axis variables (along_z): {}
 """.\
             format(self.xxcoords, self.yycoords, self.zzcoords)
-        self.log_r(logs)
+        self._logs(logs)
         
-        return
-
+        return None
+    
     def split_res_info(self):
         """
         Splits assignment information.
@@ -448,12 +699,12 @@ the possible options.'
         """
         
         title = 'IDENTIFIES RESIDUE INFORMATION FROM ASSIGNMENT COLUMN'
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             
             # checks misleading chars
-            self.checks_misleading_chars(z, y, x)
+            self._checks_misleading_chars(z, y, x)
             
             # Step 1
             resInfo = \
@@ -542,7 +793,7 @@ the possible options.'
                     self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
             
             # Step 4
-            self.check_res_duplicates(self.allpeaklists, z, y, x)
+            self._check_res_duplicates(self.allpeaklists, z, y, x)
             self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
                 self.allpeaklists[z][y][x]['ResNo'].astype(int)
             self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
@@ -572,13 +823,13 @@ the possible options.'
                     sd_count[True]
                     )
             
-            self.log_r(logs)
+            self._logs(logs)
             
         # confirms F1 and F2 coherency with nuclei
-        self.checks_posf1_posf2_nuclei(self.allpeaklists)
+        self._checks_posf1_posf2_nuclei(self.allpeaklists)
         
-        return
-
+        return None
+    
     def correct_shifts_backbone(self, ref_res):
         """
         Corrects Chemical Shifts in a peaklist according to an internal 
@@ -598,18 +849,18 @@ the possible options.'
         else:
             msg = \
 'Argument ref_res for method .correct_shifts_backbone() must be of type <int>.'
-            self.log_r(msg)
+            self._logs(msg)
             
             return
         
-        self.check_ref_res(
+        self._check_ref_res(
             self.allpeaklists[self.zzref][self.yyref][self.xxref].\
                 loc[:,'ResNo'],
             ref_res
             )
         title = 'CORRECTS BACKBONE CHEMICAL SHIFTS BASED ON A RESIDUE {}'.\
             format(ref_res)
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         ref_data = {}
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
@@ -656,9 +907,9 @@ the possible options.'
                     float(dp_F1_cs), float(ref_data['F1_cs']), F1_cs_diff, 
                     float(dp_F2_cs), float(ref_data['F2_cs']), F2_cs_diff
                     )
-            self.log_r(logs)
+            self._logs(logs)
         
-        return
+        return None
     
     def correct_shifts_sidechains(self):
         """
@@ -672,7 +923,7 @@ the possible options.'
         
         title = \
 'CORRECTS SIDECHAINS CHEMICAL SHIFTS BASED ON Previous backbone correction'
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             self.allsidechains[z][y][x].loc[:,'Position F1'] = \
@@ -684,9 +935,9 @@ the possible options.'
             s2w = \
 '**[{}][{}][{}]** Corrected chemical shift fot sidechain residues.'.\
                 format(z, y, x)
-            self.log_r(s2w)
+            self._logs(s2w)
         
-        return
+        return None
     
     def seq_expand(self, ref_pkl, target_pkl, resonance_type, fillna):
         """
@@ -736,7 +987,7 @@ the possible options.'
             msg = "Farseer-NMR could not reindex this peaklist. There are \
 several input errors that may occur in this case. Read the Documentation for \
 more details." 
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=24))
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=24))
         
         # reads length of the expanded peaklist
         target_ind_final_len = target_pkl.shape[0]
@@ -753,18 +1004,20 @@ more details."
             target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
             ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
         
-        return \
-            target_pkl, \
-            [
+        tmp_list = [
                 target_ind_init_len, 
                 length_ind, 
                 target_ind_final_len
                 ]
+        
+        return target_pkl, tmp_list
     
     def compares_references(
-            self, fillna_dict,
+            self,
+            fillna_dict,
             along_axis='z',
-            resonance_type='Backbone'):
+            resonance_type='Backbone'
+            ):
         """
         Assigns missing residues for reference of Y and Z based on X.
         
@@ -791,7 +1044,7 @@ more details."
             The values in self.allpeaklists or self.allsidechains.
         """
         title = 'adds missing residues along axis {}'.format(along_axis)
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
@@ -801,12 +1054,12 @@ more details."
         
         else:
             msg = 'Argument <resonance_type> is not valid.'
-            self.log_r(msg)
+            self._logs(msg)
             return
         
         if not(along_axis in ['y', 'z']):
             msg = 'Argument <along_axis> is not valid.'
-            self.log_r(msg)
+            self._logs(msg)
             return
         
         elif (along_axis == 'y' and not(self.hasyy)) \
@@ -816,7 +1069,7 @@ more details."
 'There are no data points along dimension {}. This function has no effect.'.\
                 format(along_axis.upper())
             wet19 = fsw(msg_title='NOTE', msg=msg, wet_num=19)
-            self.log_r(wet19.wet)
+            self._logs(wet19.wet)
             return
             
         elif along_axis == 'z':
@@ -849,7 +1102,7 @@ more details."
                         popi[1],
                         popi[2]
                         )
-                self.log_r(logs)
+                self._logs(logs)
         
         elif along_axis == 'y':
             for z, y in it.product(self.zzcoords, self.yycoords):
@@ -881,14 +1134,16 @@ more details."
                         popi[1],
                         popi[2]
                         )
-                self.log_r(logs)
+                self._logs(logs)
         
-        return
+        return None
     
     def finds_missing(
-            self, fillna_dict, 
+            self,
+            fillna_dict, 
             missing='missing',
-            resonance_type='Backbone'):
+            resonance_type='Backbone'
+            ):
         """
         Finds missing residues.
         
@@ -914,18 +1169,18 @@ more details."
         """
         
         title = 'Searches for {} residues'.format(missing)
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         if not(missing in ['missing', 'unassigned']):
             msg = "<missing> argument must be 'missing' or 'unassigned'."
-            self.log_r(msg)
+            self._logs(msg)
             return
         
         # before expanding the peaklists to the fasta file to identify the 
         # unassigned residues, it confirms the integrity of the fasta Starting
         # number.
         if missing == 'unassigned':
-            self.checks_fasta_start_number()
+            self._checks_fasta_start_number()
         
         if resonance_type == 'Backbone':
             target = self.allpeaklists
@@ -936,7 +1191,7 @@ more details."
         else:
             msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
-            self.log_r(msg)
+            self._logs(msg)
             return
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
@@ -978,14 +1233,15 @@ more details."
                     popi[1],
                     popi[2]
                     )
-            self.log_r(logs)
+            self._logs(logs)
             
-        return
-        
+        return None
+    
     def organize_cols(
             self,
             performed_cs_correction=False,
-            resonance_type='Backbone'):
+            resonance_type='Backbone'
+            ):
         """
         Orders columns in DataFrames for better visualization.
         
@@ -1005,7 +1261,7 @@ more details."
         else:
             msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
-            self.log_r(msg)
+            self._logs(msg)
             return
         
         if performed_cs_correction and resonance_type=='Backbone':
@@ -1112,17 +1368,17 @@ more details."
         
         title = "ORGANIZING PEAKLIST COLUMNS' ORDER for {}".\
             format(resonance_type)
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # arranges cols
             target[z][y][x] = target[z][y][x][col_order]
             #logs
-            self.log_r(
+            self._logs(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
                 )
         
-        return
+        return None
     
     def init_Farseer_cube(self, use_sidechains=False):
         """
@@ -1141,22 +1397,23 @@ more details."
             - self.sidechains_p5d
         """
         
-        self.log_r('INITIATING FARSEER CUBE', istitle=True)
+        self._logs('INITIATING FARSEER CUBE', istitle=True)
         ## .copy() is used to solve issue_86
         self.peaklists_p5d = self.p5d(self.allpeaklists.copy())
-        self.log_r('> Created cube for all the backbone peaklists - OK!')
+        self._logs('> Created cube for all the backbone peaklists - OK!')
         
         if use_sidechains:
             self.sidechains_p5d = self.p5d(self.allsidechains.copy())
-            self.log_r('> Created cube for all the sidechains peaklists - OK!')
+            self._logs('> Created cube for all the sidechains peaklists - OK!')
         
-        return
+        return None
     
     def export_series_dict_over_axis(
             self, series_class,
             along_axis='x',
             resonance_type='Backbone',
-            series_kwargs={}):
+            series_kwargs={}
+            ):
         """
         Creates a nested dictionary containing all the experimental
         series along a given Farseer-NMR Cube axis.
@@ -1202,7 +1459,7 @@ more details."
             next_axis_2 = self.zzcoords
         
         elif along_axis=='y':
-            self.compare_fastas()
+            self._compare_fastas()
             series_type='along_y'
             fscube = fscube.transpose(2,0,1,3,4, copy=True)
             owndim_pts=self.yycoords
@@ -1219,7 +1476,7 @@ more details."
         else:
             raise ValueError('Not a valid <along_axis> option.')
         
-        self.log_r(
+        self._logs(
             'GENERATING DICTIONARY OF SERIES FOR {}'.format(series_type), 
             istitle=True
             )
@@ -1249,7 +1506,7 @@ more details."
                 df.dropna(axis=0, how='any', subset=['ResNo'], inplace=True)
                 dfdict[item] = df
             
-            self.compare_peaklists_length(dp1, dp2, series_type, dfdict)
+            self._compare_peaklists_length(dp1, dp2, series_type, dfdict)
             
             series_panel_NaN_filtered = pd.Panel.from_dict(dfdict)
             series_dct[dp2][dp1] = \
@@ -1259,7 +1516,7 @@ more details."
                     series_kwargs
                     )
             # writes to log
-            self.log_r(
+            self._logs(
                 '**Experimental Series [{}][{}] ** with data points {}'.\
                     format(dp2, dp1, list(series_dct[dp2][dp1].items))
                 )
@@ -1301,7 +1558,7 @@ more details."
         """Exports the parsed peaklists of the whole dataset."""
         
         title = 'EXPORTS PARSED PEAKLISTS FROM FARSEER-NMR CUBE'
-        self.log_r(title, istitle=True)
+        self._logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             folder = 'spectra_parsed/{}/{}'.format(z,y)
@@ -1320,7 +1577,7 @@ more details."
                 )
             fileout.close()
             msg = "**Saved:** {}".format(fpath)
-            self.log_r(msg)
+            self._logs(msg)
         
             if self.has_sidechains:
                 folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
@@ -1339,390 +1596,138 @@ more details."
                     )
                 fileout.close()
                 msg = "**Saved:** {}".format(fpath)
-                self.log_r(msg)
-        return
+                self._logs(msg)
+        
+        return None
     
-    def checks_filetype(self, filetype):
+    def load_experiments(self, filetype='.csv', resonance_type='Backbone'):
         """
-        Confirms that file type exists in spectra/ before loading.
+        Loads the <filetype> files in self.paths into nested
+        dictionaries as pd.DataFrames.
         
-        If not, call WET#9.
-        
-        If file not .csv or .fasta, call WET#13.
+        Datapoint names should be singular for each dimension.
         
         Parameters:
-            filytype (str): {'.csv', '.fasta'}
-        """
-        
-        # check filetype fits usable formats
-        if not(filetype in ['.csv', '.fasta']):
-            msg = \
-"File type {} not recognized. Why you want to read these files \
-if Farseer-NMR can't do nothing with them? :-)".\
-                format(filetype)
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=13))
-        
-        # checks if files exists
-        if not(any([p.endswith(filetype) for p in self.paths])):
-            msg = "There are no files in spectra/ with extension {}".\
-                format(filetype)
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=9))
-            
-        return
-    
-    def checks_xy_datapoints_coherency(self, target, filetype):
-        """
-        Confirms axis names along Y folders and X files.
-        
-        Confirms Y folder names are equal accross every Z folder.
-        Raises WET#11 otherwise.
-        
-        Confirms each Y folder has one and ONLY on .fasta file.
-        Raises WET#12 otherwise.
-        
-        Confirms wether the number of files of <filetype> is the same
-        in every subdirectory of spectra/.
-        Raises WET#8 otherwise.
-        
-        Confirms that the files of <filetype> have the same names in all
-        the Y datapoints subfolders.
-        Raises names mismatches with WET#10.
-        
-        Parameters:
-            target (dict): nested dictionary representing the
-                folder tree in spectra/
-            
             filetype (str): {'.csv', '.fasta'}
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}.
+                'Sidechains' only available for '.csv' <filetype>.
+        
+        If filetype='.csv' and resonance_type='Backbone' executes
+        self.init_coords_names()
+        
+        Example of a mandatory hierarchy folder:
+        
+        :3rd dimension: para/ and dia/ 
+        :2nd dimension: 278/, 285/ and 298/
+        :1st dimension: l1.csv, l2.csv, ..., seq.fasta
+        
+        para/
+        -> 278/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
+        -> 285/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
+        -> 298/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
+        
+        dia/
+        -> 278/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
+        -> 285/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
+        -> 298/
+        ---> l1.csv
+        ---> l2.csv
+        ---> l3.csv
+        ---> l4.csv
+        ---> seq.fasta
         """
+        # writes title to log
+        title = \
+            'READING INPUT FILES ({}) for {}'.format(filetype, resonance_type)
+        self._logs(title, istitle=True)
+        self._checks_filetype(filetype)
+        main_peaklists=False
         
-        zkeys = list(target.keys())
-        ykeys = list(target[zkeys[0]].keys())
-        xkeys = list(target[zkeys[0]][ykeys[0]].keys())
-        key_len = len(zkeys) * len(ykeys) * len(xkeys)
-        ### Checks coherency of y folders
-        all_y_folders = \
-            set([y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
-        
-        if len(set(all_y_folders)) > len(ykeys):
-            msg = \
-"Y axis folder names are not coherent. \
-Names must be equal accross every Z axis datapoint folder."
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=11))
-        
-        if filetype == '.fasta':
-            all_fasta_files = \
-                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+        # defines functions to use and target storage dictionaries
+        if filetype == '.csv' and resonance_type == 'Backbone':
+            f = pd.read_csv
+            target = self.allpeaklists
+            main_peaklists=True
             
+        elif filetype == '.fasta' and resonance_type == 'Backbone':
+            #if not(any([self.hasxx, self.hasyy, self.haszz])):
+                #msg = 'Do not attempt to load the .fasta files prior to the peaklist .csv files, please :-)'
+                #self._logs(fsw.gen_wet('ERROR', msg, 21))
+                #self._abort()
+            target = self.allfasta
             
-            if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
-                msg = \
-"There are too many or missing {0} files. \
-Confirm there is only ONE {0} file for each Y datapoint folder.".\
-                    format(filetype)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=12))
-        
-        ### Checks coherency of x files
-        elif filetype == '.csv':
-            if key_len \
-                    != len([x for x in self.paths if x.endswith(filetype)]):
-                msg =  \
-'The no. of files of type {} is not the same for every series folder. \
-Check for the missing ones!'.\
-                    format(filetype)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=8))
-            
-            x_files_names = set(
-                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
-                )
-            
-            if (len(x_files_names) > len(xkeys)):
-                msg = \
-"X axis datapoints file names are not coherent. \
-Names must be equal accross every Y axis datapoint folder.".\
-                    format(filetype)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=10))
-        
-        # writes confirmation message
-        self.log_r('> All <{}> files found and correct - OK!'.format(filetype))
-        
-        return
-    
-    def check_ref_res(self, series, ref_res):
-        """
-        Checks if the reference residue is part of the protein sequence.
-        
-        Parameters:
-            series (pd.Series): the protein primary sequence.
-            
-            ref_res (int): the residue number.
-        """
-        
-        if any(series.isin([ref_res])):
-            return
-        
-        else:
-            msg = \
-'The reference residue you selected, {}, is not part of the protein sequence \
-or is an <unassigned> or <missing> residue. \
-Correct the reference residue in the Settings Menu.'.\
-                format(ref_res)
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=16))
-        
-        return
-    
-    def compare_fastas(self):
-        """
-        Compares all .fasta files to confirm they have the same size.
-        Farseer cannot operate FASTA of different lengths if analysing
-        on the y dimension.
-        """
-        
-        if not(self.applyFASTA):
-            return
-        
-        l = []
-        is_bigger = False
-
-        for z in self.zzcoords:
-            for y in self.yycoords:
-                key = list(self.allfasta[z][y].keys())[0]
-                l.append(self.allfasta[z][y][key].shape[0])
-            
-            if len(set(l)) > 1:
-                is_bigger = True
-            
-            l = []
-        
-        if is_bigger:
-            msg = \
-'.fasta files have not the same size and they should have the same size \
-when performing calculations along the Y axis. \
-Please correct your .fasta files.'
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=21))
-        
-        return
-        
-    def checks_fasta_start_number(self):
-        """
-        Confirms if the start or end number of the fasta file 
-        won't result in protein truncation in the peaklist.
-        
-        This occurs when first fasta residue is > first protein residue.
-        This occurs when last fasta residue is < last protein residue.
-        
-        Raises WET#22 otherwise.
-        """
-        
-        if not(self.applyFASTA):
-            return
-        
-        if not(self.zzcoords and self.allfasta):
-            msg = \
-"Operation cannot complete because Cube coordinates have not been set \
-or fasta files have not yet been read."
-            print(msg)
-            
-            return
-        
-        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
-            # name of the fasta file being read
-            f = list(self.allfasta[z][y].keys())[0]
-            peaklist_first_residue = \
-                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].head(n=1))
-            peaklist_last_residue = \
-                int(self.allpeaklists[z][y][x].loc[:,'ResNo'].tail(n=1))
-            fasta_first_residue = \
-                int(self.allfasta[z][y][f].loc[:,'ResNo'].head(n=1))
-            fasta_last_residue = \
-                int(self.allfasta[z][y][f].loc[:,'ResNo'].tail(n=1))
-            
-            if fasta_first_residue <= peaklist_first_residue \
-                    and fasta_last_residue >= peaklist_last_residue:
-                continue
-            
-            elif fasta_first_residue > peaklist_first_residue:
-                msg = \
-"The first residue of your fasta file is greater than your protein first \
-residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
-which will results in peaklist truncation. \
-You should verify that your start Fasta residue number is correct.".\
-                    format(z, y, x, f)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
-            
-            elif fasta_last_residue < peaklist_last_residue:
-                msg = \
-"The last residue of your fasta file is minor than your protein \
-last residue for FASTA file [{0}][{1}][{3}] and peaklist [{0}][{1}][{2}], \
-which will results in peaklist truncation. \
-You should verify that your start Fasta residue number is correct.".\
-                    format(z, y, x, f)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=22))
-            
-            else:
-                msg = 'Something is wrong in .checks_fasta_start_number()'
-                self.abort(fsw.gen_wet('DEVELOPER ISSUE', msg, -1))
+        elif filetype == '.csv' and resonance_type == 'Sidechains':
+            f = str  # dummy function
+            target = self.allsidechains
             
         else:
-            msg = "> FASTA files starting number is consistent with peaklists"
-            self.log_r(msg)
-        
-        return
-
-    def checks_posf1_posf2_nuclei(self, target):
-        """
-        Confirms coherency between Columns label and nuclei type.
-        
-        Demmands that cols "Position F1" and "Assign F1" refer to 1H
-        and "Position F2" and "Assign F2" to 15N.
-        
-        Must be called after self.init_coord_names()
-        
-        Parameters:
-            target: Nested Dictionary of pd.DatFrame containing
-                the peaklist information.
-        """
-        
-        for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
-            
-            if not(0 < target[z][y][x].loc[:,'Position F1'].mean() < 20):
-                msg = 'Peaklist [{}][{}][{}] "Position F1" values do not \
-correspond to proton chemical shift values.'.format(z, y, x)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
-            
-            if not(target[z][y][x].ix[0,'Assign F1'].endswith('H')):
-                msg = 'Peaklist [{}][{}][{}] "Assign F1" values do not \
-correspond to proton assignment labels.'.format(z, y, x)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
-            
-            if not(80 < target[z][y][x].loc[:,'Position F2'].mean() < 150):
-                msg = 'Peaklist [{}][{}][{}] "Position F2" values do not \
-correspond to nitrogen chemical shift values.'.format(z, y, x)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
-            
-            if not(target[z][y][x].ix[0,'Assign F2'].endswith('N')):
-                msg = 'Peaklist [{}][{}][{}] "Assign F2" values do not \
-correspond to nitrogen assignment labels.'.format(z, y, x)
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=25))
-        
-        return
-
-    def compare_peaklists_length(self, dp1, dp2, axis, df_dict):
-        """
-        Verifies if all peaklists in a series have the same number of 
-        residues before a FarseerSeries object is created.
-        
-        Parameters:
-            - dp1 (str): datapoint name on the next dimension.
-            
-            - dp2 (str): datapoint name on the previous dimension.
-            
-            - axis (str): the axis long which the series will be generated.
-            
-            - df_dict (dict:pd.DataFrame): A dictionary containing
-                pd.DataFrames corresponding to peaklists.
-        """
-        
-        pkl_lengths = []
-        
-        for key, peaklist in df_dict.items():
-            pkl_lengths.append(peaklist.shape[0])
-        
-        if not(len(set(pkl_lengths))) == 1:
-            msg = "Peaklists proposed for series [{}][{}] along {} axis have \
-different lengths.".\
-                format(dp2, dp1, axis[-1].upper())
-            self.abort(fsw(msg_title="ERROR", msg=msg, wet_num=28))
-        
-        return
-    
-    def checks_misleading_chars(self, z, y, x):
-        """
-        Checks for the presence misleading characters in the DataFrame.
-        This may come from entries of unassigned residues
-        that were not removed.
-        """
-        # for assignment cols
-        ## empty
-        empty_cells_f1 = self.allpeaklists[z][y][x].loc[:,'Assign F1'].isnull()
-        empty_cells_f2 = self.allpeaklists[z][y][x].loc[:,'Assign F2'].isnull()
-        
-        if empty_cells_f1.values.any() or empty_cells_f2.values.any():
-            rows_bool = empty_cells_f1 | empty_cells_f2
-            msg = "The peaklist [{}][{}][{}] contains no assignment \
-information in lines {}. Please review that peaklist.".format(
-                z,
-                y,
-                x,
-                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+            self._logs(
+'Arguments passed for <filetype> and/or <resonance_type> do not match \
+the possible options.'
                 )
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
+            return None
         
-        ## misleading chars
-        non_digit_f1 = \
-            self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
-                str.strip().str.contains('\W', regex=True)
+        # loads files in nested dictionaries
+        # piece of code found in stackoverflow, reference missing
+        for p in self.paths:
+            parts = p.split('spectra')[-1].split('/')
+            branch = target
+            
+            for part in parts[1:-1]:
+                branch = branch.setdefault(part, {})
+            
+            # reads the .csv file to a pd.DataFrame removes
+            # the '.csv' from the key name to increase asthetics in output
+            if parts[-1].lower().endswith(filetype):
+                self._logs('* {}'.format(p))
+                lessparts = parts[-1].split('.')[0]
+                
+                try:
+                    if filetype == '.csv':
+                        branch[lessparts] = branch.get(parts[-1], f(p))
+                    elif filetype == '.fasta':
+                        fh = FastaHandler(
+                                fasta_file_path=p,
+                                fasta_start_num=self.FASTAstart
+                                )
+                        fh.reads_fasta_to_dataframe(reads_from_file=True)
+                        branch[lessparts] = branch.get(parts[-1], fh.fasta_df)
+                
+                except pd.errors.EmptyDataError:
+                    msg = \
+"The file {} is empty. To introduce an empty data point, add the header.".\
+                        format(filetype)
+                    self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=14))
         
-        non_digit_f2 = \
-            self.allpeaklists[z][y][x].loc[:,'Assign F2'].\
-                str.strip().str.contains('\W', regex=True)
+        self._checks_xy_datapoints_coherency(target, filetype)
         
-        if  non_digit_f1.any() or non_digit_f2.any():
-            rows_bool = non_digit_f1 | non_digit_f2
-            msg = "The peaklist [{}][{}][{}] contains misleading \
-charaters in Assignment columns in line {}.".format(
-                z,
-                y,
-                x,
-                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
-                )
-            self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
+        if main_peaklists:
+            self.init_coords_names()
         
-        ## for other cols.
-        cols = [
-            'Position F1',
-            'Position F2',
-            'Height',
-            'Volume',
-            'Line Width F1 (Hz)',
-            'Line Width F2 (Hz)',
-            'Merit'
-            ]
-        
-        for col in cols:
-            non_digit = self.allpeaklists[z][y][x].loc[:,col].\
-                astype(str).str.strip().str.contains(
-                    '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
-                    regex=True
-                    )
-            if non_digit.any():
-                msg = "The peaklist [{}][{}][{}] contains misleading \
-charaters in line {} of column [{}].".format(
-                    z,
-                    y,
-                    x,
-                    [2+int(i) for i in non_digit.index[non_digit].tolist()],
-                    col
-                    )
-                self.abort(fsw(msg_title='ERROR', msg=msg, wet_num=29))
-        
-        return
-
-    def check_res_duplicates(self, df, z, y, x):
-        """
-        Checks if there are duplicated residue entries in peaklists.
-        
-        Parameters:
-            - df (pd.DataFrame): the peaklist dataframe to investigate
-        """
-        where_duplicates = df[z][y][x].loc[:,'ResNo'].duplicated(keep=False)
-        
-        if where_duplicates.any():
-            msg = "The peaklist [{}][{}][{}] contains repeated residue entries \
-in lines: {}.".format(
-                z,
-                y,
-                x,
-                [2+int(i) for i in \
-                    where_duplicates.index[where_duplicates].tolist()]
-                )
-            self.abort(wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24))
+        return None
