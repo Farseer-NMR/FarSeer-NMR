@@ -84,7 +84,7 @@ from core.fslibs.WetHandler import WetHandler as fsw
 
 class FarseerNMR():
     """
-    Handles Farseer-NMR interface
+    Handles the Farseer-NMR interface
     """
     def __init__(self, fsuv):
         """
@@ -1581,7 +1581,11 @@ Nothing to calculate here.')
         
         return None
     
-    def comparison_analysis_routines(self, comp_panel, resonance_type):
+    def comparison_analysis_routines(
+            self,
+            comp_panel,
+            resonance_type='Backbone'
+            ):
         """
         The set of routines that are run for each comparative series.
         
@@ -1591,8 +1595,8 @@ Nothing to calculate here.')
                 experiments parsed along an axis and for a specific
                 Farseer-NMR Cube's coordinates.
             
-            resonance_type (str): {'Backbone', 'Sidechains'}, depending on
-                data type. Detaults to 'Backbone'.
+            resonance_type (opt, str): {'Backbone', 'Sidechains'},
+                depending on data type. Detaults to 'Backbone'.
         """
         
         if not(resonance_type in ['Backbone', 'Sidechains']):
@@ -1618,12 +1622,12 @@ Nothing to calculate here.')
         Algorythm to perform data comparisons over analysed conditions.
         
         Parameters:
-            series_dct (dict): a nested dictionary containing the   
+            - series_dct (dict): a nested dictionary containing the   
                 FarseerSeries for every axis of the Farseer-NMR Cube.
             
-            fsuv (module): contains user defined variables (preferences)
-                after .read_user_variables().
-        
+            - resonance_type (opt, str): {'Backbone', 'Sidechains'},
+                    depending on data type. Detaults to 'Backbone'.
+       
         Returns:
             comp_dct (dict): a dictionary containing all the comparison
                 objects created.
@@ -1725,11 +1729,9 @@ Nothing to calculate here.')
         Runs the whole Farseer-NMR standard algorithm based on the
         defined user variables.
         """
-        
-        # general = self.fsuv["general_settings"]
+
         fitting = self.fsuv["fitting_settings"]
         cs = self.fsuv["cs_settings"]
-        # csp = self.fsuv["csp_settings"]
         fasta = self.fsuv["fasta_settings"]
         use_sidechains = self.general["use_sidechains"]
         
@@ -1883,44 +1885,6 @@ Nothing to calculate here.')
                 json.dump(fsuv_tmp, jsonfile, sort_keys=True, indent=4)
         
         return None
-
-
-
-
-
-
-    
-def identify_residues(exp):
-    """
-    Reads Assignment information using FarseerCube.split_res_info().
-    
-    Parameters:
-        exp (FarseerCube class instance): contains all peaklist data.
-    """
-    exp.split_res_info()
-    
-    return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     
