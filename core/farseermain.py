@@ -41,7 +41,7 @@ from core.fslibs import FarseerSeries as fss
 from core.fslibs import Comparisons as fsc
 from core.fslibs.WetHandler import WetHandler as fsw
 
-class FarseerNMR():
+class FarseerNMR:
     """
     Handles the Farseer-NMR interface
     """
