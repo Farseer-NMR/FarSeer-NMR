@@ -26,16 +26,16 @@
         "y_grid_linewidth": 0.2,
         "y_grid_alpha": 0.8,
         "vspace": 0.5,
-        "theo_pre_color": "black",
+        "theo_pre_color": "red",
         "theo_pre_lw": 1.0,
-        "tag_cartoon_color": "green",
+        "tag_cartoon_color": "black",
         "tag_cartoon_lw": 1.0,
-        "tag_cartoon_ls": ":"
+        "tag_cartoon_ls": "-"
     },
     "bar_plot_settings": {
         "measured_color": "black",
         "status_color_flag": true,
-        "lost_color": "red",
+        "missing_color": "red",
         "unassigned_color": "lightgrey",
         "bar_width": 0.8,
         "bar_alpha": 1,
@@ -63,7 +63,7 @@
         "do_res_evo": false,
         "do_cs_scatter": false,
         "do_cs_scatter_flower": false,
-        "do_dpre_osci": false,
+        "do_DPRE_plot": false,
         "do_heat_map": false
     },
     "extended_bar_settings": {
@@ -89,10 +89,10 @@
         "cols_page": 5,
         "rows_page": 2
     },
-    "dpre_osci_settings": {
+    "DPRE_plot_settings": {
         "rows": 10,
         "width": 3,
-        "y_label": "r'$\\Delta$PRE$_(rc-exp)$",
+        "y_label": "$\\Delta$PRE$_(rc-exp)$",
         "y_label_fs": 5,
         "ymax": 1.0,
         "dpre_ms": 2,
@@ -202,8 +202,8 @@
         "mk_edgecolors": [
             "black"
         ],
-        "mk_lost_color": "red",
-        "hide_lost": false
+        "mk_missing_color": "red",
+        "hide_missing": false
     },
     "cs_scatter_flower_settings": {
         "x_label": "1H (ppm)",
@@ -249,7 +249,7 @@
         "right_margin": 0.22,
         "bottom_margin": 0.6,
         "cbar_font_size": 4,
-        "tag_line_color": "black",
+        "tag_line_color": "red",
         "tag_line_ls": "-",
         "tag_line_lw": 0.8
     },
@@ -258,7 +258,7 @@
         "perform_cs_correction": false
     },
     "csp_settings": {
-        "cs_lost": "prev",
+        "cs_missing": "prev",
         "csp_res4alpha": 0.14,
         "csp_res_exceptions": {
             "G": 0.2
@@ -276,8 +276,8 @@
         "do_along_x": true,
         "do_along_y": false,
         "do_along_z": false,
-        "expand_lost_yy": false,
-        "expand_lost_zz": false,
+        "expand_missing_yy": false,
+        "expand_missing_zz": false,
         "perform_comparisons": false
     },
 
@@ -327,6 +327,8 @@
         "gauss_x_size": 7,
         "gaussian_stdev": 1
     },
+    "pre_files": {
+    },
     "observables": {
         "plots_posf1":false,
         "plots_posf2":false,
@@ -335,28 +337,26 @@
         "plots_height":false,
         "height_scale":[0,100000]
     },
-
     "experimental_dataset": {
-
     },
     "peaklists": {
     },
     "conditions": {
         "x": [
+            ""
         ],
         "z": [
+            ""
         ],
         "y": [
+            ""
         ]
     },
     "fasta_files": {
-
     },
-
     "paraset": {
         "pcs": {},
         "rdc": {},
         "pre": {}
-
     }
 }

@@ -123,7 +123,7 @@ class Test_SeriesPlotPopup(unittest.TestCase):
         self.popup.theo_pre_lw.setValue(0.8)
         self.popup.tag_cartoon_color.select("bisque")
         self.popup.tag_cartoon_lw.setValue(0.8)
-        self.popup.tag_cartoon_ls.select("-")
+        self.popup.tag_cartoon_ls.select(":")
 
         self.popup.set_values()
 
@@ -170,7 +170,7 @@ class Test_SeriesPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.tag_cartoon_color.fields.currentText(),
                          "bisque")
         self.assertEqual(self.popup.tag_cartoon_lw.field.value(), 0.8)
-        self.assertEqual(self.popup.tag_cartoon_ls.fields.currentText(), "-")
+        self.assertEqual(self.popup.tag_cartoon_ls.fields.currentText(), ":")
 
         self.assertEqual(self.popup.series_subtitle_fn.fields.currentText(),
                          self.popup.variables["series_plot_settings"][
@@ -302,7 +302,7 @@ class Test_SeriesPlotPopup(unittest.TestCase):
         self.popup.theo_pre_lw.setValue(0.8)
         self.popup.tag_cartoon_color.select("bisque")
         self.popup.tag_cartoon_lw.setValue(0.8)
-        self.popup.tag_cartoon_ls.select("-")
+        self.popup.tag_cartoon_ls.select(":")
 
         self.assertEqual(self.popup.series_subtitle_fn.fields.currentText(),
                          "Verdana")
@@ -347,7 +347,7 @@ class Test_SeriesPlotPopup(unittest.TestCase):
         self.assertEqual(self.popup.tag_cartoon_color.fields.currentText(),
                          "bisque")
         self.assertEqual(self.popup.tag_cartoon_lw.field.value(), 0.8)
-        self.assertEqual(self.popup.tag_cartoon_ls.fields.currentText(), "-")
+        self.assertEqual(self.popup.tag_cartoon_ls.fields.currentText(), ":")
 
         self.assertNotEqual(self.popup.series_subtitle_fn.fields.currentText(),
                             self.popup.variables["series_plot_settings"][

@@ -42,5 +42,5 @@ class Threading(object):
 
     def run(self, function, args):
         """ Method that runs forever """
-        function(args)
+        function(*args)
 

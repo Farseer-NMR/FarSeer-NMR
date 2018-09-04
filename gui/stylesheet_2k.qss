@@ -20,6 +20,7 @@ height: 51px;
 margin-bottom: 1px;
 margin-left: 16px;
 margin-right: 16px;
+margin-right: 16px;
 margin-top: 10px;
 }
 
@@ -42,7 +43,7 @@ width: 150px;
 }
 
 QTabBar::tab::hover {
-border-bottom: 4px solid #08F2EE;
+border-bottom: 4px solid #05A7BE;
 color: #B6FEED;
 }
 
@@ -135,7 +136,7 @@ border: 2px solid #FFAF02;
 QTreeWidget {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 margin-right: 16px;
 border: 8px solid #FAFAF7;
 
@@ -173,7 +174,7 @@ color: #FAFAF7;
 QGraphicsView {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 border: 8px solid #FAFAF7;
 font-size: 10pt;
 font-weight: 400;
@@ -186,7 +187,7 @@ margin-bottom: 8px;
 }
 
 #SettingsWidget  {
-background-color: #08F2EE;
+background-color: #05A7BE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 border: 8px solid #FAFAF7
@@ -195,7 +196,7 @@ border: 8px solid #FAFAF7
 #InterfaceTop {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 border: 8px solid #FAFAF7;
 margin-left: 1px;
 margin-top: 1px;
@@ -247,7 +248,7 @@ margin-left: 18px;
 QDialog {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 }
 
 
@@ -259,3 +260,21 @@ QCheckBox::indicator::checked {
     background-color: #000000;
 }
 
+QMenu {
+background-color: #07AFF8;
+color: #001450;
+font-size: 12pt;
+font-weight: 400;
+}
+
+QMenu::hover {
+background-color: #FBFB04;
+}
+
+QMenu::item {
+background-color: #07AFF8;
+
+}
+QMenu::item::selected {
+background-color: #FBFB04;
+}

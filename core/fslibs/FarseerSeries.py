@@ -20,6 +20,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
+import logging.config
 import glob
 import os
 import numpy as np
@@ -30,7 +32,8 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
-import core.fslibs.wet as fsw
+import core.fslibs.log_config as fslogconf
+from core.fslibs import wet as fsw
 
 class FarseerSeries(pd.Panel):
     """
@@ -78,8 +81,8 @@ class FarseerSeries(pd.Panel):
         restraint_list (list): ORDERED names of the restraints that can
             be calculated.
         
-        cs_lost (str): {'prev', 'full', 'zero'}, how to represent bars
-            for lost residues.
+        cs_missing (str): {'prev', 'full', 'zero'}, how to represent bars
+            for missing residues.
             
         csp_alpha4res (dict): a dictionary containing the alpha values
             to be used for each residue in the CSP calculation formula.
@@ -114,7 +117,7 @@ class FarseerSeries(pd.Panel):
                 .plot_cs_scatter()
                 .plot_cs_scatter_flower()
                 .plot_DPRE_heatmap()
-                .plot_delta_osci()
+                .plot_DPRE_plot()
             
             Subplot add-ons:
                 .set_item_colors()
@@ -145,6 +148,8 @@ class FarseerSeries(pd.Panel):
     chimera_att_folder = 'ChimeraAttributeFiles'
     export_series_folder = 'FullPeaklists'
     axis_list = ['x','y','z']
+    # allowed folder names for paramagnetic series
+    paramagnetic_names = ['para', '01_para']
     
     def create_attributes(
             self,
@@ -156,7 +161,7 @@ class FarseerSeries(pd.Panel):
             resonance_type='Backbone',
             csp_alpha4res=0.14,
             csp_res_exceptions={'G':0.2},
-            cs_lost='prev',
+            cs_missing='prev',
             restraint_list=[
                 'H1_delta',
                 'N15_delta',
@@ -168,7 +173,11 @@ class FarseerSeries(pd.Panel):
             log_export_name='FarseerSet_log.md'):
         """Creates the instance attributes."""
         
-        self.cs_lost = cs_lost
+        self.logger = fslogconf.getLogger(__name__)
+        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger.debug('logger initiated')
+        
+        self.cs_missing = cs_missing
         # normalization value for F2 dimension.
         self.csp_alpha4res = \
             {key:csp_alpha4res for key in 'ARNDCEQGHILKMFPSTWYV'}
@@ -182,6 +191,11 @@ class FarseerSeries(pd.Panel):
         self.next_dim = next_dim
         self.prev_dim = prev_dim
         self.dim_comparison = dim_comparison
+        if self.series_axis.startswith('along') \
+                and self.series_datapoints[-1] in self.paramagnetic_names:
+            self.para_name = self.series_datapoints[-1]
+        else:
+            self.para_name = False
         self.resonance_type = resonance_type
         self.res_info = \
             self.loc[:,:,['ResNo','1-letter','3-letter','Peak Status']]
@@ -544,22 +558,22 @@ and stacked (compared) along "{}" axis'.format(
         self.loc[:,:,calccol] = \
             self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
         
-        # sets lost peaks results according to the self.cs_lost
-        if self.cs_lost == 'full':
+        # sets missing peaks results according to the self.cs_missing
+        if self.cs_missing == 'full':
             for item in self.items:
-                mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
-                self.loc[item,mask_lost,calccol] = 1.
+                mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
+                self.loc[item,mask_missing,calccol] = 1.
         
-        elif self.cs_lost == 'prev':
+        elif self.cs_missing == 'prev':
             for iitem in range(1, len(self.items)):
-                mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = \
-                    self.ix[iitem-1,mask_lost,calccol]
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = \
+                    self.ix[iitem-1,mask_missing,calccol]
         
-        elif self.cs_lost == 'zero':
+        elif self.cs_missing == 'zero':
             for iitem in range(1, len(self.items)):
-                mask_lost = self.ix[iitem,:,'Peak Status'] == 'lost'
-                self.ix[iitem,mask_lost,calccol] = 0
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = 0
         
         self.log_r('**Calculated** {}'.format(calccol))
         
@@ -621,8 +635,8 @@ and stacked (compared) along "{}" axis'.format(
         """
         Loads theoretical PRE values to represent in bar plots.
         
-        Theorital PRE files (*.pre) should be stored in a 'para' folder
-        at the along_z hierarchy level.
+        Theorital PRE files (*.pre) should be stored in a '01_para' 
+        or 'para' folder at the along_z hierarchy level.
         
         Reads information on the tag position stored in the
         *.pre file as an header comment, for example, '#40'.
@@ -635,9 +649,12 @@ and stacked (compared) along "{}" axis'.format(
         Modifies: 
             self: added columns 'tag', 'Theo PRE'.
         """
-        
+        if not(self.para_name):
+            self.log_r(fsw.gen_wet("ERROR", "Paramagnetic Z axis name incorrect", 1))
+            self.abort()
+            return
         self.PRE_loaded = True
-        target_folder = '{}/para/{}/'.format(spectra_path, datapoint)
+        target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
         pre_file = glob.glob('{}*.pre'.format(target_folder))
         
         if len(pre_file) > 1:
@@ -662,7 +679,7 @@ and stacked (compared) along "{}" axis'.format(
         self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
         self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
         self.loc[:,:,'Theo PRE'] = 1
-        self.loc['para',:,'Theo PRE'] = predf.loc[:,'Theo PRE']
+        self.loc[self.para_name,:,'Theo PRE'] = predf.loc[:,'Theo PRE']
         # reads information on the tag position.
         tagf = open(pre_file[0], 'r')
         tag = tagf.readline().strip().strip('#')
@@ -677,7 +694,7 @@ and stacked (compared) along "{}" axis'.format(
             self.abort()
         
         # check tag residue
-        if not(any(self.loc['para',:,'ResNo'].isin([tag]))):
+        if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
             msg = \
 'The residue number where the tag is placed according to the \*.pre file ({}) \
 is not part of the protein sequence ({}-{}).'.\
@@ -689,9 +706,9 @@ is not part of the protein sequence ({}-{}).'.\
             self.log_r(fsw.gen_wet('ERROR', msg, 17))
             self.abort()
         
-        self.loc['para',:,'tag'] = ''
-        tagmask = self.loc['para',:,'ResNo'] == tag
-        self.loc['para',tagmask,'tag'] = '*'
+        self.loc[self.para_name,:,'tag'] = ''
+        tagmask = self.loc[self.para_name,:,'ResNo'] == tag
+        self.loc[self.para_name,tagmask,'tag'] = '*'
         tagf.close()
         self.log_r('**Tag position found** at residue {}'.format(tag_num))
         
@@ -770,10 +787,19 @@ with window size {} and stdev {}'.\
             data_table = self.loc[:,:,tablecol]
             is_float = False
             
-        table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
+        if resonance_type == 'Backbone':
+            table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
         
         if resonance_type == 'Sidechains':
-            table.loc[:,'ResNo'] = table.loc[:,'ResNo'] + self.ix[0,:,'ATOM']
+            table = pd.concat(
+                [
+                    self.res_info.iloc[0,:,0],
+                    self.ix[0,:,'ATOM'],
+                    self.res_info.iloc[0,:,1:3],
+                    data_table
+                    ],
+                axis=1
+                )
         
         tablefolder = '{}/{}'.format(
             self.tables_and_plots_folder, 
@@ -845,7 +871,7 @@ with window size {} and stdev {}'.\
         formatting = {'ResNo': resform}
         
         for item in self.items:
-            mask_lost = self.loc[item,:,'Peak Status'] == 'lost'
+            mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
             mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
             mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
             file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
@@ -859,7 +885,7 @@ with window size {} and stdev {}'.\
             attheader = \
 """#
 #
-# lost peaks {}
+# missing peaks {}
 #
 # unassigned peaks {}
 #
@@ -868,7 +894,7 @@ match mode: 1-to-1
 recipient: residues
 \t""".\
                 format(
-                    resformat+self.loc[item,mask_lost,'ResNo'].\
+                    resformat+self.loc[item,mask_missing,'ResNo'].\
                         to_string(header=False, index=False).\
                             replace(' ', '').replace('\n', ','),
                     resformat+self.loc[item,mask_unassigned,'ResNo'].\
@@ -935,8 +961,8 @@ recipient: residues
         """
         
         for i, it in zip(series.index, items):
-            if series[i] in d.keys():
-                it.set_color(d[series[i]])
+            if str(series[i]) in d.keys():
+                it.set_color(d[str(series[i])])
             
             else:
                 continue
@@ -983,7 +1009,7 @@ recipient: residues
                 return (x*-1)-(yy_scale/20)
         
         for i, bar in zip(series.index, axbar):
-            if series[i] in d.keys():
+            if str(series[i]) in d.keys():
                 x0, y0 = bar.xy
                 if orientation == 'vertical':
                     hpos = hpos_sign(bar.get_width(), x0)
@@ -998,7 +1024,7 @@ recipient: residues
                 ax.text(
                     hpos,
                     vpos,
-                    d[series[i]],
+                    d[str(series[i])],
                     ha='center',
                     va=vaa,
                     fontsize=fs
@@ -1095,8 +1121,8 @@ recipient: residues
             
             y (float): plot's y axis limit
             
-            bartype (str): {'h', 'v', 'osci}, whether plot of type 
-                horizontal, vertical or oscilantion.
+            bartype (str): {'h', 'v', 'hm'}, whether plot of type 
+                horizontal, vertical or Heat Map.
             
             pre_color (str): the colour of plot line
             
@@ -1109,14 +1135,21 @@ recipient: residues
             tag_lw (float): tag tick line width.
         """
         
-        if (self.series_axis == 'along_z' and exp == 'para') \
-                or (self.series_axis == 'C3' \
-                    and ( self.next_dim == 'para' or self.prev_dim == 'para')):
+        if (self.series_axis == 'along_z' and exp == self.para_name) \
+                or (self.series_axis == 'Cz' \
+                    and (self.next_dim in self.paramagnetic_names or self.prev_dim in self.paramagnetic_names)):
             # plot theoretical PRE
+            
+            x_axis_values = np.arange(
+                float(self.loc[exp,:,'ResNo'].head(n=1))-1,
+                float(self.loc[exp,:,'ResNo'].tail(n=1)),
+                1,
+                )
+            
             if bartype == 'v':
                 axs.plot(
                     self.loc[exp,:,'Theo PRE'],
-                    self.loc[exp,::-1,'ResNo'].astype(float),
+                    x_axis_values,
                     zorder=9,
                     color=pre_color,
                     lw=pre_lw
@@ -1124,7 +1157,7 @@ recipient: residues
             
             elif bartype == 'h':
                 axs.plot(
-                    self.loc[exp,:,'ResNo'].astype(float),
+                    x_axis_values,
                     self.loc[exp,:,'Theo PRE'],
                     zorder=9,
                     color=pre_color,
@@ -1133,9 +1166,9 @@ recipient: residues
             
             # plot tag position
             xtagm = self.loc[exp,:,'tag']=='*'
-            xtag = self.loc[exp,xtagm,'ResNo'].astype(float)
+            xtag = float(self.loc[exp,xtagm,'ResNo'])-1
             
-            if bartype in ['h', 'osci']:
+            if bartype in ['h', 'DPRE_plot']:
                 axs.vlines(
                     xtag,
                     0,
@@ -1155,7 +1188,6 @@ recipient: residues
                     )
             
             elif bartype == 'v':
-                xtag = self.shape[1]-xtag+1
                 axs.hlines(
                     xtag,
                     0,
@@ -1176,7 +1208,7 @@ recipient: residues
             
             elif bartype == 'hm':
                 axs.vlines(
-                    xtag-0.5,
+                    xtag,
                     0,
                     y,
                     colors=tag_color,
@@ -1196,7 +1228,7 @@ recipient: residues
         ylabel='ppm or ratio',
         measured_color='black',
         status_color_flag=True,
-        lost_color='red',
+        missing_color='red',
         unassigned_color='grey',
         bar_width=0.7,
         bar_alpha=1,
@@ -1315,7 +1347,7 @@ recipient: residues
                     self.loc[experiment,0::xtick_spacing,'Peak Status'],
                     {
                         'measured':measured_color,
-                        'lost':lost_color,
+                        'missing':missing_color,
                         'unassigned':unassigned_color
                         }
                     )
@@ -1335,9 +1367,8 @@ recipient: residues
             # Configure XX ticks and Label
             axs[i].set_xticks(self.major_axis)
             ## https://github.com/matplotlib/matplotlib/issues/6266
-            print(self.loc[experiment,:,'ResNo'])
             axs[i].set_xticklabels(
-                self.loc[experiment,:,['ResNo','1-letter', 'ATOM']].\
+                self.loc[experiment,:,['ResNo', '1-letter', 'ATOM']].\
                     apply(lambda x: ''.join(x), axis=1),
                 fontname=x_ticks_fn,
                 fontsize=x_ticks_fs,
@@ -1352,7 +1383,7 @@ recipient: residues
                     self.loc[experiment, :, 'Peak Status'],
                     {
                         'measured':measured_color,
-                        'lost':lost_color,
+                        'missing':missing_color,
                         'unassigned':unassigned_color
                         }
                     )
@@ -1417,7 +1448,7 @@ recipient: residues
             self.loc[experiment,:,'Peak Status'],
             {
                 'measured':measured_color,
-                'lost':lost_color,
+                'missing':missing_color,
                 'unassigned':unassigned_color
                 }
             )
@@ -1535,7 +1566,7 @@ recipient: residues
             ylabel='ppm or ratio',
             measured_color='black',
             status_color_flag=True,
-            lost_color='red',
+            missing_color='red',
             unassigned_color='grey',
             bar_width=0.7,
             bar_alpha=1,
@@ -1657,7 +1688,7 @@ recipient: residues
             self.loc[experiment,:,'Peak Status'],
             {
                 'measured':measured_color,
-                'lost':lost_color,
+                'missing':missing_color,
                 'unassigned':unassigned_color
                 }
             )
@@ -1668,7 +1699,7 @@ recipient: residues
                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
                 {
                     'measured':measured_color,
-                    'lost':lost_color,
+                    'missing':missing_color,
                     'unassigned':unassigned_color
                     }
                 )
@@ -1874,12 +1905,14 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 self.abort()
             
             x = np.array(titration_x_values)
+            xmin = titration_x_values[0]
             xmax = titration_x_values[-1]
             
         # for 2D and 3D analysis this option is not available
         elif (self.series_axis in ['along_y', 'along_z']) \
                 or (self.dim_comparison in ['along_y', 'along_z']):
             x = np.arange(0, len(y))
+            xmin = 0
             xmax = len(y)-1
             axs[i].set_xticks(x)
             xlabels = self.items
@@ -1890,11 +1923,12 @@ variable or confirm you have not forgot any peaklist [{}].".\
         else:
             x = np.arange(0, len(y))
             axs[i].set_xticks(x)
+            xmin = 0
             xmax = len(y)-1
             xlabels = x
         
         # Configure Axis Ticks
-        axs[i].set_xlim(0, xmax)
+        axs[i].set_xlim(xmin, xmax)
         axs[i].set_ylim(y_lims[0], y_lims[1])
         
         if set_x_values \
@@ -1976,8 +2010,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             
             return
         
-        # do not represent the lost peaks.
-        mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'lost')
+        # do not represent the missing peaks.
+        mes_mask = np.array(self.loc[:,row_number,'Peak Status'] != 'missing')
         y = y[mes_mask]
         x = x[mes_mask]
         # Plots data
@@ -2079,8 +2113,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             markers=['^','>','v','<','s','p','h','8','*','D'],
             mk_color=['none'],
             mk_edgecolors='black',
-            mk_lost_color='red',
-            hide_lost=False,
+            mk_missing_color='red',
+            hide_missing=False,
             titration_x_values='',
             rows_page='',
             cols_page='',
@@ -2174,6 +2208,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
+            axs[i].invert_xaxis()
+            axs[i].invert_yaxis()
             return
         
         elif not(self.ix[:,i,'H1_delta'].any()) \
@@ -2190,6 +2226,8 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i].set_xlim(-1,1)
             axs[i].set_ylim(-1,1)
             set_tick_labels()
+            axs[i].invert_xaxis()
+            axs[i].invert_yaxis()
             return
         
         # Plots data
@@ -2200,20 +2238,20 @@ variable or confirm you have not forgot any peaklist [{}].".\
             cedge = it.cycle(mk_edgecolors)
             
             for k, j in enumerate(self.items):
-                if self.ix[j,i,'Peak Status'] in ['lost', 'unassigned'] \
-                        and hide_lost:
+                if self.ix[j,i,'Peak Status'] in ['missing', 'unassigned'] \
+                        and hide_missing:
                     next(mcycle)
                     next(ccycle)
                     next(cedge)
                 
-                elif self.ix[j,i,'Peak Status'] == 'lost':
+                elif self.ix[j,i,'Peak Status'] == 'missing':
                     axs[i].scatter(
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker=next(mcycle),
                         s=mksize,
                         c=next(ccycle),
-                        edgecolors=mk_lost_color
+                        edgecolors=mk_missing_color
                         )
                     next(cedge)
                 
@@ -2235,17 +2273,17 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 n=self.shape[0]
                 )
             # this is used instead of passing a list to .scatter because
-            # of colouring in red the lost peaks.
+            # of colouring in red the missing peaks.
             mccycle = it.cycle(mk_color['hex'])
             
             for j in self.items:
-                if self.ix[j,i,'Peak Status'] == 'lost':
+                if self.ix[j,i,'Peak Status'] == 'missing':
                     axs[i].scatter(
                         self.ix[j,i,'H1_delta'],
                         self.ix[j,i,'N15_delta'],
                         marker='o',
                         s=mksize,
-                        c=mk_lost_color,
+                        c=mk_missing_color,
                         edgecolors='none'
                         )
                 
@@ -2396,7 +2434,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 float(self.loc[mesmask,residue,'N15_delta'].tail(n=1))*1.05,
                 self.ix[0,residue,'ResNo'],
                 fontsize=4,
-                color='#c99543',
+                color=res_label_color,
                 zorder=10
                 )
         
@@ -2546,6 +2584,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         
         if i == len(self.items)-1:
+            
             cbar = plt.colorbar(
                 cleg,
                 ticks=[vmin, vmax/4, vmax/4*2, vmax/4*3, vmax],
@@ -2593,7 +2632,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         
         return
     
-    def plot_delta_osci(
+    def plot_DPRE_plot(
             self, calccol,
             axs, i,
             experiment,
@@ -2828,7 +2867,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             axs[i],
             experiment,
             y_lims[1]*0.1,
-            bartype = 'osci',
+            bartype = 'DPRE_plot',
             tag_color=tag_cartoon_color,
             tag_ls=tag_cartoon_ls,
             tag_lw=tag_cartoon_lw
@@ -2851,6 +2890,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 labelleft='off',
                 labelbottom='off'
                 )
+            axs[i].patch.set_alpha(0)
         
         return
     
@@ -2882,7 +2922,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             
             plot_style (str): {'bar_extended', 'bar_compacted',
                 'bar_vertical', 'res_evo', 'cs_scatter',
-                'cs_scatter_flower', 'heat_map', 'delta_osci'}
+                'cs_scatter_flower', 'heat_map', 'DPRE_plot'}
             
             param_dict (dict): kwargs to be passed to each plotting
                 function.
@@ -2989,11 +3029,13 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     ylabel=ylabel,
                     **param_dict
                     )
+            else:
+                self.clean_subplots(axs, num_subplots, len(axs))
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             
-        elif plot_style == 'delta_osci':
+        elif plot_style == 'DPRE_plot':
             dp_colors = self.linear_gradient(
                 param_dict['color_init'],
                 param_dict['color_end'],
@@ -3002,7 +3044,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             dp_color = it.cycle(dp_colors['hex'])
             
             for i, experiment in enumerate(self):
-                self.plot_delta_osci(
+                self.plot_DPRE_plot(
                     calccol,
                     axs,
                     i,

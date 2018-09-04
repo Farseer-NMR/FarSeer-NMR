@@ -25,9 +25,8 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
 
 from core.parsing import read_peaklist
-
 from core.fslibs.Variables import Variables
-
+from core.utils import peaklist_format_requires_fasta
 
 class SideBar(QTreeWidget):
     """
@@ -55,7 +54,7 @@ class SideBar(QTreeWidget):
         ._raise_context_menu(str)
         """
     variables = Variables()._vars
-
+    
     def __init__(self, parent=None, gui_settings=None):
         QTreeWidget.__init__(self, parent)
         self.header().hide()
@@ -75,31 +74,33 @@ class SideBar(QTreeWidget):
         self.clear()
         used_peaklists = []
         self.peakLists = self.variables["peaklists"]
-
-        if not all(
-                x for v in self.variables["conditions"].values() for x in v):
+        
+        if not all(x for v in self.variables["conditions"].values() for x in v):
             self.refresh_sidebar()
-
+        
         else:
             for z in self.variables["conditions"]["z"]:
                 for y in self.variables["conditions"]["y"]:
                     for x in self.variables["conditions"]["x"]:
-                        used_peaklists.append(
-                            self.variables["experimental_dataset"][z][y][x])
-
-            unused_peaklists = [x for x, pl in self.variables[
-                "peaklists"].items() if x not in used_peaklists]
+                        used_peaklists.append(self.variables["experimental_dataset"][z][y][x])
+            
+            unused_peaklists = \
+                [x for x, pl in self.variables["peaklists"].items() if x not in used_peaklists]
+            
             for peaklist in unused_peaklists:
                 self.add_item(peaklist)
 
     def dragEnterEvent(self, event):
         """Re-implemenation for drag-and-drop behaviour."""
         event.accept()
+        
         if not event.mimeData().hasUrls():
-
+            
             item = self.itemAt(event.pos())
+            
             if not item:
                 return
+            
             text = item.text(0)
             event.mimeData().setText(text)
 
@@ -108,46 +109,55 @@ class SideBar(QTreeWidget):
         if event.mimeData().hasUrls():
             event.accept()
             file_paths = [url.path() for url in event.mimeData().urls()]
+            
             for file_path in file_paths:
                 self.load_from_path(file_path)
 
     def load_from_path(self, file_path):
         """load a peaklists from a directory path."""
         name = None
+        
         if os.path.isdir(file_path):
             for root, dirs, filenames in os.walk(file_path):
                 for filename in filenames:
                     try:
                         path = os.path.join(root, filename)
                         name, path = self.load_peaklist(path)
+                    
                     except IOError:
                         pass
+        
         else:
             name, path = self.load_peaklist(file_path)
+        
         if name:
             return name, path
 
     def refresh_sidebar(self):
         """ clear the sidebar and refresh the peaklist names."""
         self.clear()
+        
         for peaklist in self.peakLists.keys():
             self.add_item(peaklist)
 
     def load_peaklist(self, file_path):
         """load individual peaklist from a file path."""
+        
         if os.path.isdir(file_path):
             return
-
+        
         name = file_path.split('/')[-1].split('.')[0]
-
+        
         if name not in self.peakLists.keys():
             peaklist = read_peaklist(file_path)
+            
             if peaklist:
                 pl_name = name
-                if peaklist[0].format in ['nmrdraw', 'nmrview']:
+                
+                if peaklist[0].format_ in peaklist_format_requires_fasta:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Warning)
-                    msg.setText("NmrView/NmrDraw Peaklist")
+                    msg.setText("Peaklist with no residue type information")
                     msg.setInformativeText(
 """This peaklist doesn't contain information residue types.
 
@@ -159,17 +169,17 @@ Refer to WET#26 for more details."""
                     msg.setWindowTitle("Duplicate conditions")
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.exec_()
-                    self.variables['fasta_settings']['applyFASTA'] = True
-
-
+                
                 item = self.add_item(pl_name)
                 self.peakLists[item.text(0)] = peaklist
                 self.peakLists[pl_name] = file_path
-
+                
                 return pl_name, file_path
+            
             else:
-                print("Invalid peak list file: %s" % file_path)
+                #print("*** File not loaded into SideBar\n***")
                 return None, None
+        
         else:
             print('Peaklist with name %s already exists.' % name)
             return None, None
@@ -180,11 +190,13 @@ Refer to WET#26 for more details."""
         newItem.setFlags(newItem.flags() & ~QtCore.Qt.ItemIsDropEnabled)
         newItem.setText(0, name)
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        
         return newItem
 
     def _raise_context_menu(self, item_name):
         """raise a context menu to enabled deletion of objects."""
         import sip
         result = self.findItems(item_name, QtCore.Qt.MatchRecursive, 0)
+        
         if result:
             sip.delete(result[0])

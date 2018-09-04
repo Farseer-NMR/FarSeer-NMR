@@ -14,7 +14,7 @@ border: 0;
 
 
 QWidget#BaseWidget {
-background-color: #08F2EE;
+background-color: #05A7BE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 border: 6px solid #FAFAF7
@@ -51,7 +51,7 @@ width: 150px;
 }
 
 QTabBar::tab::hover {
-border-bottom: 4px solid #08F2EE;
+border-bottom: 4px solid #05A7BE;
 color: #B6FEED;
 }
 
@@ -111,7 +111,7 @@ width: 80px;
 }
 
 QAbstractSpinBox::hover {
-background-color: #FBFB04;
+background-color: #08F2EE;
 border: 2px solid #FFAF02;
 }
 
@@ -146,7 +146,7 @@ border: 2px solid #FFAF02;
 QTreeWidget {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 border: 6px solid #FAFAF7;
 margin-right: 16px;
 }
@@ -181,7 +181,7 @@ color: #FAFAF7;
 QGraphicsView {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 border: 6px solid #FAFAF7;
 font-size: 10pt;
 font-weight: 400;
@@ -194,21 +194,21 @@ margin-bottom: 2px;
 }
 
 #SettingsWidget  {
-background-color: #08F2EE;
+background-color: #05A7BE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 border: 6px solid #FAFAF7
 }
 
 #ParaSetWidget  {
-background-color: #08F2EE;
+background-color: #05A7BE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 border: 6px solid #FAFAF7
 }
 
 BaseWidget  {
-background-color: #08F2EE;
+background-color: #05A7BE;
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
 border: 6px solid #FAFAF7
@@ -217,7 +217,7 @@ border: 6px solid #FAFAF7
 #InterfaceTop {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 border: 6px solid #FAFAF7;
 margin-top: 6px;
 margin-left: 5px;
@@ -251,7 +251,7 @@ background-color: #001450;
 QDialog {
 background-image: url(:/gradient-box-bg);
 background-repeat: repeat-x;
-background-color: #08F2EE;
+background-color: #05A7BE;
 }
 
 SideBar {
@@ -266,7 +266,7 @@ padding-left: 5px;
 QMenu {
 background-color: #07AFF8;
 color: #001450;
-font-size: 20pt;
+font-size: 12pt;
 font-weight: 400;
 }
 

@@ -47,7 +47,7 @@ Methods:
     .identify_residues()
     .correct_shifts()
     .fill_na()
-    .expand_lost()
+    .expand_missing()
     .add_missing()
     .organize_columns()
     .init_fs_cube()
@@ -66,7 +66,8 @@ Methods:
 """
 
 #  
-import importlib.util
+import logging
+import logging.config
 import sys
 import os
 import shutil
@@ -74,12 +75,66 @@ import json
 import datetime  # used to write the log file
 import pandas as pd
 
-import core.fslibs.FarseerCube as fcube
-import core.fslibs.FarseerSeries as fss
-import core.fslibs.Comparisons as fsc
-import core.fslibs.wet as fsw
+import core.fslibs.log_config as fslogconf
+from core.fslibs import FarseerCube as fcube
+from core.fslibs import FarseerSeries as fss
+from core.fslibs import Comparisons as fsc
+from core.fslibs import wet as fsw
 
-def read_user_variables(runfolder_path, configjson_path):
+def changes_current_dir(path):
+    """
+    Changes running dir to path. Exists if path is not a valid directory.
+    
+    Parameters:
+        - path (str): target directory
+    
+    Returns:
+        - Absolute path for new running dir.
+    """
+    how_to_run = \
+"""*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+    
+    try:
+        os.chdir(path)
+    except NotADirectoryError as notdirerr: 
+        msg = \
+"""
+***************************************
+*** A file was passed as argument instead of a directory path.
+*** {}
+***
+{}
+***************************************
+""".\
+            format(notdirerr, how_to_run)
+        sys.exit(msg)
+    
+    return os.path.abspath(path)
+
+def start_logger(target_path):
+    """
+    Initiates logger.
+    
+    Parameters:
+        - target_path (str): path to were logs are written.
+        
+    Returns:
+        - logger instance
+    """
+    
+    if os.getcwd() != os.path.abspath(target_path):
+        changes_current_dir(target_path)
+    
+    logger = fslogconf.getLogger(__name__)
+    logging.config.dictConfig(fslogconf.farseer_log_config)
+    
+    logger.debug('os.getcwd equals target_path:: %s', (os.getcwd() == os.path.abspath(target_path)))
+    logger.debug('logger initiated')
+    
+    return logger
+
+def read_user_variables(runfolder_path, configjson_path, logger=None):
     """
     Sets calculation folder to the folder where spectra/ is.
     Reads user definitions from config.json file to a dictionary.
@@ -90,20 +145,55 @@ def read_user_variables(runfolder_path, configjson_path):
         runfolder_path (str): Calculation run folder. Parent path of
             spectra/ folder.
         configjson_path (str) path to config.json file.
+        logger (logger obj): (optional) logger object
     
     Returns:
         fsuv (dictionary): contains the user preferences.
     """
+    logger = logger or start_logger(runfolder_path)
+    
+    how_to_run = \
+"""*** execute Farseer-NMR as
+*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+    
     # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # Reads Run calculation folder absolut path
     run_cwd =  os.path.abspath(runfolder_path)
     # Reads json config absolut path
     json_cwd = os.path.abspath(configjson_path)
     # loads and reads json config file
-    fsuv = json.load(open(json_cwd, 'r'))
+    try:
+        fsuv = json.load(open(json_cwd, 'r'))
+    except json.decoder.JSONDecodeError as jsonerror:
+        msg = \
+"""
+***************************************
+*** Error loading JSON file:
+*** {}
+*** {}
+***************************************
+""".\
+            format(json_cwd, jsonerror)
+        logger.error(msg)
+        sys.exit()
+    except IsADirectoryError as direrr:
+        msg = \
+"""
+***************************************
+*** A directory was passed as argument instead of a json file.
+*** {}
+***
+{}
+***************************************
+""".\
+            format(direrr, how_to_run)
+        logger.error(msg)
+        sys.exit()
     # changes current directory to the run directory which is that where
     # spectra/ folder is.
-    os.chdir(run_cwd)
+    if os.getcwd() != os.path.abspath(runfolder_path):
+        logger.debug('cwd differs from runfolder_path')
+        changes_current_dir(runfolder_path)
     # stores path to spectra/ folder
     fsuv["general_settings"]["input_spectra_path"] = \
         '{}/spectra'.format(run_cwd)
@@ -327,10 +417,10 @@ def log_init(fsuv):
 def log_end(fsuv):
     """Operations performed when finalizing the log file."""
     
+    print("*** Used JSON config file will be copied to the end of MD log file")
     fout = fsuv["general_settings"]["logfile_name"]
     logs(fsw.end_good(), fout)
     log_time_stamp(fout, state='ENDED')
-    print("*** Used JSON config file will be copied to the end of MD log file")
     logs("*** USED CONFIG FILE ***\n", fout, printit=False)
     fsuv_tmp = fsuv.copy()
     
@@ -662,7 +752,7 @@ def fill_na(peak_status, merit=0, details='None'):
     missing residues are fill.
     
     Parameters:
-        peak_status (str): {'lost', 'unassigned'},
+        peak_status (str): {'missing', 'unassigned'},
             how to fill 'Peak Status' column.
         
         merit (int/str): how to fill the 'Merit' column.
@@ -673,7 +763,7 @@ def fill_na(peak_status, merit=0, details='None'):
         Dictionary of kwargs.
     """
     
-    if not(peak_status in ['lost', 'unassigned']):
+    if not(peak_status in ['missing', 'unassigned']):
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
             )
@@ -687,15 +777,15 @@ def fill_na(peak_status, merit=0, details='None'):
     
     return d
 
-def expand_lost(exp, resonance_type='Backbone', dim='z'):
+def expand_missing(exp, resonance_type='Backbone', dim='z'):
     """
-    Checks for 'lost' residues accross the reference experiments
+    Checks for 'missing' residues accross the reference experiments
     for Y and Z axes.
     
     Uses FarseerCube.finds_missing().
     
     Compares reference peaklists along Y and Z axis of the Farseer-NMR
-    Cube and generates the corresponding 'lost' residues.
+    Cube and generates the corresponding 'missing' residues.
     This function is useful when analysing dia/ and paramagnetic/ series
     along the Z axis.
     
@@ -714,14 +804,14 @@ def expand_lost(exp, resonance_type='Backbone', dim='z'):
         return
     
     exp.compares_references(
-        fill_na('lost'),
+        fill_na('missing'),
         along_axis=dim,
         resonance_type=resonance_type
         )
     
     return
 
-def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
+def add_missing(exp, peak_status='missing', resonance_type='Backbone'):
     """
     Expands a <target> peaklist to the index of a <reference> peaklist.
     Uses FarseerCube.finds_missing().
@@ -729,14 +819,14 @@ def add_missing(exp, peak_status='lost', resonance_type='Backbone'):
     Parameters:
         exp (FarseerCube class instance): contains all peaklist data.
         
-        peak_status (str): {'lost', 'unassigned'}, defaults to 'lost'.
+        peak_status (str): {'missing', 'unassigned'}, defaults to 'missing'.
             Peak status for the new generated entries for missing peaks. 
         
         resonance_type (str): {'Backbone', 'Sidechains'}, defaults to 
             'Backbone'.
     """
     
-    if not(peak_status in ['lost', 'unassigned']):
+    if not(peak_status in ['missing', 'unassigned']):
         input(
             'Choose a valid <peak_status> argument. Press Enter to continue.'
             )
@@ -822,7 +912,7 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
     Depends on:
     fsuv.csp_alpha4res
     fsuv.csp_res_exceptions
-    fsuv.cs_lost
+    fsuv.cs_missing
     fsuv.restraint_names
     """
     
@@ -836,7 +926,7 @@ def series_kwargs(fsuv, resonance_type='Backbone'):
         'resonance_type':resonance_type,
         'csp_alpha4res':fsuv["csp_settings"]["csp_res4alpha"],
         'csp_res_exceptions':fsuv["csp_settings"]["csp_res_exceptions"],
-        'cs_lost':fsuv["csp_settings"]["cs_lost"],
+        'cs_missing':fsuv["csp_settings"]["cs_missing"],
         'restraint_list':fsuv["restraint_names"],
         'log_export_onthefly':True,
         'log_export_name':fsuv["general_settings"]["logfile_name"]
@@ -1174,7 +1264,7 @@ def PRE_analysis(farseer_series, fsuv):
     fsuv.heat_map_rows
     fsuv.fig_height
     fsuv.fig_width
-    fsuv.dpre_osci_width
+    fsuv.DPRE_plot_width
     fsuv.fig_file_type
     fsuv.fig_dpi
     """
@@ -1184,9 +1274,9 @@ def PRE_analysis(farseer_series, fsuv):
         return
     
     isalong_z = farseer_series.series_axis == 'along_z'
-    isc3 = farseer_series.series_axis == 'C3'
-    isprev_para = farseer_series.prev_dim == 'para'
-    isnext_para = farseer_series.next_dim == 'para'
+    iscz = farseer_series.series_axis == 'Cz'
+    isprev_para = farseer_series.prev_dim in farseer_series.paramagnetic_names
+    isnext_para = farseer_series.next_dim in farseer_series.paramagnetic_names
     do_heatmap = fsuv['plotting_flags']['do_heat_map']
     
     # if analysing along_z: performs calculations.
@@ -1210,8 +1300,8 @@ def PRE_analysis(farseer_series, fsuv):
                     )
     
     # plots the calculated Delta_PRE and Delta_PRE_smoothed analsysis
-    # for along_z and for comparison C3.
-    if (isalong_z or (isc3 and (isprev_para or isnext_para))) and do_heatmap:
+    # for along_z and for comparison Cz.
+    if (isalong_z or (iscz and (isprev_para or isnext_para))) and do_heatmap:
         for sourcecol, targetcol in zip(
                 list(fsuv["restraint_settings"].index[3:])*2,
                 ['Hgt_DPRE','Vol_DPRE','Hgt_DPRE_smooth','Vol_DPRE_smooth']
@@ -1238,11 +1328,11 @@ def PRE_analysis(farseer_series, fsuv):
                     fig_dpi=fsuv["general_settings"]["fig_dpi"]
                     )
     
-    # plots the DeltaPRE oscilation analysis only for <C3> comparison.
-    # because DeltaPRE oscilation represents the results obtained only
-    # for paramagnetic ('para') data.
-    if (isc3 and (isprev_para or isnext_para)) \
-            and fsuv['plotting_flags']['do_dpre_osci']:
+    # plots the DeltaPRE analysis only for <Cz> comparison.
+    # because DeltaPRE represents the results obtained only
+    # for paramagnetic data.
+    if (iscz and (isprev_para or isnext_para)) \
+            and fsuv['plotting_flags']['do_DPRE_plot']:
         for sourcecol, targetcols in zip(
                 fsuv["restraint_settings"].index[3:],
                 ['Hgt_DPRE', 'Vol_DPRE']
@@ -1251,17 +1341,17 @@ def PRE_analysis(farseer_series, fsuv):
                 farseer_series.plot_base(
                     targetcols,
                     'exp',
-                    'delta_osci',
+                    'DPRE_plot',
                     {
                         **fsuv["series_plot_settings"], 
-                        **fsuv["dpre_osci_settings"]
+                        **fsuv["DPRE_plot_settings"]
                         },
                     cols_per_page=1,
-                    rows_per_page=fsuv["dpre_osci_settings"]["rows"],
+                    rows_per_page=fsuv["DPRE_plot_settings"]["rows"],
                     fig_height=fsuv["general_settings"]["fig_height"],
                     fig_width=\
                         fsuv["general_settings"]["fig_width"]/\
-                        fsuv["dpre_osci_settings"]["width"],
+                        fsuv["DPRE_plot_settings"]["width"],
                     fig_file_type=fsuv["general_settings"]["fig_file_type"],
                     fig_dpi=fsuv["general_settings"]["fig_dpi"])
     
@@ -1729,7 +1819,7 @@ def analyse_comparisons(series_dct, fsuv, resonance_type='Backbone'):
     
     return comp_dct
 
-def run_farseer(fsuv):
+def run_farseer(fsuv, logger=None):
     """
     Runs the whole Farseer-NMR standard algorithm.
     
@@ -1737,6 +1827,7 @@ def run_farseer(fsuv):
         fsuv (module): contains user defined variables (preferences)
             after .read_user_variables().
     """
+    logger = logger or start_logger(fsuv["general_settings"]["output_path"])
     
     general = fsuv["general_settings"]
     fitting = fsuv["fitting_settings"]
@@ -1763,24 +1854,24 @@ def run_farseer(fsuv):
         if exp.has_sidechains and use_sidechains:
             correct_shifts(exp, fsuv, resonance_type='Sidechains')
     
-    # expands lost residues to other dimensions
-    if fitting["expand_lost_yy"]:
-        expand_lost(exp, dim='y')
+    # expands missing residues to other dimensions
+    if fitting["expand_missing_yy"]:
+        expand_missing(exp, dim='y')
         
         if exp.has_sidechains and use_sidechains:
-            expand_lost(exp, dim='y', resonance_type='Sidechains')
+            expand_missing(exp, dim='y', resonance_type='Sidechains')
     
-    if fitting["expand_lost_zz"]:
-        expand_lost(exp, dim='z')
+    if fitting["expand_missing_zz"]:
+        expand_missing(exp, dim='z')
         
         if exp.has_sidechains and use_sidechains:
-            expand_lost(exp, dim='z', resonance_type='Sidechains')
+            expand_missing(exp, dim='z', resonance_type='Sidechains')
     
-    ## identifies lost residues
-    add_missing(exp, peak_status='lost')
+    ## identifies missing residues
+    add_missing(exp, peak_status='missing')
     
     if exp.has_sidechains and use_sidechains:
-        add_missing(exp, peak_status='lost', resonance_type='Sidechains')
+        add_missing(exp, peak_status='missing', resonance_type='Sidechains')
     
     # adds fasta
     if fasta["applyFASTA"]:
@@ -1851,7 +1942,8 @@ def run_farseer(fsuv):
 
 if __name__ == '__main__':
     
-    fsuv = read_user_variables(sys.argv[1], sys.argv[2])
+    logger = start_logger(sys.argv[1])
+    fsuv = read_user_variables(sys.argv[1], sys.argv[2], logger=logger)
     # copy_Farseer_version(fsuv)
     
     # path evaluations now consider the absolute path, always.
@@ -1859,7 +1951,6 @@ if __name__ == '__main__':
     # input from any other folder.
     # path should be the folder where the 'spectra/' are stored and NOT the
     # path to the 'spectra/' folder.
-    # if running from the actual folder, use:
-    # $ python farseer_main.py .
-    run_farseer(fsuv)
-    print('Farseermain.py finished with __name__ == "__main__"')
+    
+    run_farseer(fsuv, logger=logger)
+    logger.debug('Farseermain.py finished with __name__ == "__main__"')

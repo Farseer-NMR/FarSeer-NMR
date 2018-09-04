@@ -1,0 +1,34 @@
+   loop_
+      _Atom_shift_assign_ID
+      _Residue_seq_code
+      _Residue_label
+      _Atom_name
+      _Atom_type
+      _Chem_shift_value
+      _Chem_shift_value_error
+      _Chem_shift_ambiguity_code
+
+         1  181   CYS  C     C 174.365 0.3     1  
+         2  181   CYS  CA    C  57.746 0.3     1  
+         3  181   CYS  CB    C  43.369 0.3     1  
+         4  181   CYS  H     H   9.977 0.020   1  
+         5  181   CYS  N     N 121.339 0.3     1  
+         6  183   VAL  C     C 177.016 0.3     1  
+         7  183   VAL  CA    C  65.287 0.3     1  
+         8  183   VAL  CB    C  31.942 0.3     1  
+         9  183   VAL  H     H   8.155 0.020   1  
+        10  183   VAL  N     N 121.041 0.3     1  
+        11  184   ASN  CA    C  57.382 0.3     1  
+        12  184   ASN  H     H   8.944 0.020   1  
+        13  184   ASN  N     N 116.914 0.3     1  
+        14  185   TRP  C     C 176.036 0.3     1  
+        15  185   TRP  CA    C  57.791 0.3     1  
+        16  185   TRP  CB    C  29.590 0.3     1  
+        17  185   TRP  H     H   8.641 0.020   1  
+        18  185   TRP  N     N 121.241 0.3     1  
+        19  186   VAL  C     C 174.765 0.3     1  
+        20  186   VAL  CA    C  61.880 0.3     1  
+        21  186   VAL  CB    C  35.364 0.3     1  
+        22  186   VAL  H     H   9.920 0.020   1  
+        23  186   VAL  N     N 120.580 0.3     1  
+stop_

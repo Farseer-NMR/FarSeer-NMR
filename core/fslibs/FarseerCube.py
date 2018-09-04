@@ -20,13 +20,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
+import logging.config
 import os
 import numpy as np
 import pandas as pd
 import itertools as it
 
+import core.fslibs.log_config as fslogconf
 from core.utils import aal1tol3, aal3tol1
-import core.fslibs.wet as fsw
+from core.fslibs import wet as fsw
 
 class FarseerCube:
     """
@@ -137,6 +140,9 @@ class FarseerCube:
         
         FASTAstart (int): The first residue in the FASTA file.
         """
+        self.logger = fslogconf.getLogger(__name__)
+        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger.debug('logger initiated')
         
         # Decomposing the spectra/ path
         # self.paths will be used in load_experiments()
@@ -346,7 +352,7 @@ the possible options.'
             return
         
         # loads files in nested dictionaries
-        # piece of code found in stackoverflow, reference lost
+        # piece of code found in stackoverflow, reference missing
         for p in self.paths:
             parts = p.split('spectra')[-1].split('/')
             branch = target
@@ -369,13 +375,6 @@ the possible options.'
                         format(filetype)
                     self.log_r(fsw.gen_wet('ERROR', msg, 14))
                     self.abort()
-                
-                if filetype == '.fasta' and resonance_type == 'Backbone':
-                    self.check_fasta(
-                        target[parts[1]][parts[2]][lessparts],
-                        parts[2],
-                        p
-                        )
         
         self.checks_xy_datapoints_coherency(target, filetype)
         
@@ -463,7 +462,6 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             )
         logs = '  * {}-{}-{}'.format(self.FASTAstart, FASTA, dd['ResNo'][-1])
         self.log_r(logs)
-        #self.check_fasta(df, FASTApath)
         
         return df
     
@@ -550,7 +548,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         peaklist pd.Dataframe. And adds column 'Peak Status' with value
         'measured'.
         
-            3.1 if peaklist is empty adds all dummy rows of type <lost>.
+            3.1 if peaklist is empty adds all dummy rows of type <missing>.
         
         4. Sorts the peaklist according to 'ResNo' just in case the
         original .CSV file was not sorted. For correct sorting 'ResNo'
@@ -589,7 +587,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             # identified in the NMR spectrum. Therefore all the peaks here
             # are labeled as 'measured'. On later stages of the script
             # peaks not identified will be added to the peaklist, and those
-            # peaks will be label as 'lost' or 'unassigned'.
+            # peaks will be label as 'missing' or 'unassigned'.
             try:
                 self.allpeaklists[z][y][x].loc[:,'Peak Status'] = 'measured'
             
@@ -609,7 +607,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                         'Line Width F2 (Hz)'
                         ]
                     ] = [
-                            'lost',
+                            'missing',
                             np.nan,
                             np.nan,
                             np.nan,
@@ -619,19 +617,12 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                             np.nan
                             ]
             
-            # Step 4
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x]['ResNo'].astype(int)
-            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
-            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
-                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
-            self.allpeaklists[z][y][x].reset_index(inplace=True)
             # sidechains entries always end with an 'a' or 'b' in the AssignF1
             # use of regex: http://www.regular-expressions.info/tutorial.html
             # identify the sidechain rows
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
-                    loc[:,'Assign F1'].str.match('\w+[ab]$')
+                    loc[:,'Assign F1'].str.contains('[^HN]$')
             # initiates SD counter
             sd_count = {True:0}
             
@@ -644,9 +635,10 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # DataFrame with side chains
                 self.allsidechains[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[sidechains_bool,:]
-                # adds 'a' or 'b'
+                # adds sidechain nomenclature
                 self.allsidechains[z][y][x].loc[:,'ATOM'] = \
-                    self.allsidechains[z][y][x].loc[:,'Assign F1'].str[-1]
+                    self.allsidechains[z][y][x].loc[:,'Assign F1'].\
+                        str.split('[HN]', expand=True).loc[:,1]
                 # resets index
                 self.allsidechains[z][y][x].reset_index(inplace=True)
                 # ResNo column to int preparing for reindex
@@ -661,6 +653,15 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
                 # creates backbone peaklist without sidechains
                 self.allpeaklists[z][y][x] = \
                     self.allpeaklists[z][y][x].loc[-sidechains_bool,:]
+            
+            # Step 4
+            self.check_res_duplicates(self.allpeaklists, z, y, x)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x]['ResNo'].astype(int)
+            self.allpeaklists[z][y][x].sort_values(by='ResNo', inplace=True)
+            self.allpeaklists[z][y][x].loc[:,'ResNo'] = \
+                self.allpeaklists[z][y][x].loc[:,'ResNo'].astype(str)
+            self.allpeaklists[z][y][x].reset_index(inplace=True)
             
             # Writes sanity check
             if {'1-letter', 'ResNo', '3-letter', 'Peak Status'}.\
@@ -863,8 +864,8 @@ more details."
         # reverts previous merge
         if resonance_type=='Sidechains':
             target_pkl.loc[:,'ATOM'] = ref_pkl.loc[:,'ATOM']
-            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
-            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str[:-1]
+            target_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
+            ref_pkl.loc[:,'ResNo'] = ref_pkl.loc[:,'ResNo'].str.extract('(\d+)', expand=False)
         
         return \
             target_pkl, \
@@ -903,7 +904,7 @@ more details."
         Modifies:
             The values in self.allpeaklists or self.allsidechains.
         """
-        title = 'adds lost residues along axis {}'.format(along_axis)
+        title = 'adds missing residues along axis {}'.format(along_axis)
         self.log_r(title, istitle=True)
         
         if resonance_type == 'Backbone':
@@ -940,8 +941,8 @@ more details."
                 
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl, 
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(), 
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
@@ -972,8 +973,8 @@ more details."
         
                 target[z][y][self.xxref], popi = \
                     self.seq_expand(
-                        ref_pkl,
-                        target[z][y][self.xxref],
+                        ref_pkl.copy(),
+                        target[z][y][self.xxref].copy(),
                         resonance_type,
                         fillna_dict
                         )
@@ -999,7 +1000,7 @@ more details."
     
     def finds_missing(
             self, fillna_dict, 
-            missing='lost',
+            missing='missing',
             resonance_type='Backbone'):
         """
         Finds missing residues.
@@ -1008,7 +1009,7 @@ more details."
         comparing each data point to the reference experiment on that
         series.
         
-        Missing residues can be of type 'lost' or 'unassigned'.
+        Missing residues can be of type 'missing' or 'unassigned'.
         
         Parameters:
             fillna_dict (dict): a dictionary of kwargs that define
@@ -1017,7 +1018,7 @@ more details."
                      'Merit': 0.0,
                      'Details': 'None'}
             
-            missing (str): {'lost', 'unassigned'}
+            missing (str): {'missing', 'unassigned'}
             
             resonance_type (str): {'Backbone', 'Sidechains'}
         
@@ -1028,8 +1029,8 @@ more details."
         title = 'Searches for {} residues'.format(missing)
         self.log_r(title, istitle=True)
         
-        if not(missing in ['lost', 'unassigned']):
-            msg = "<missing> argument must be 'lost' or 'unassigned'."
+        if not(missing in ['missing', 'unassigned']):
+            msg = "<missing> argument must be 'missing' or 'unassigned'."
             self.log_r(msg)
             return
         
@@ -1053,7 +1054,7 @@ more details."
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
             # sets the reference peaklist
-            if x == self.xxref and missing == 'lost':
+            if x == self.xxref and missing == 'missing':
                 ref_pkl = target[z][y][x]
                 refz = z
                 refy = y
@@ -1068,8 +1069,8 @@ more details."
             
             target[z][y][x], popi = \
                 self.seq_expand(
-                    ref_pkl,
-                    target[z][y][x],
+                    ref_pkl.copy(),
+                    target[z][y][x].copy(),
                     resonance_type,
                     fillna_dict
                     )
@@ -1227,7 +1228,9 @@ more details."
         self.log_r(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
+            # arranges cols
             target[z][y][x] = target[z][y][x][col_order]
+            #logs
             self.log_r(
                 '**[{}][{}][{}]** Columns organized :: OK'.format(z,y,x)
                 )
@@ -1579,43 +1582,14 @@ Names must be equal accross every Y axis datapoint folder.".\
         else:
             msg = \
 'The reference residue you selected, {}, is not part of the protein sequence \
-or is an <unassigned> or <lost> residue. \
+or is an <unassigned> or <missing> residue. \
 Correct the reference residue in the Settings Menu.'.\
                 format(ref_res)
             self.log_r(fsw.gen_wet('ERROR', msg, 16))
             self.abort()
         
         return
-
-    def check_fasta(self, df, yy, fasta_path):
-        """
-        Checks if loaded FASTA file has more residues than the reference
-        experiment.
-        
-        FASTA cannot has less rows than the reference experiment.
-        WET#18
-        
-        Parameters:
-            df (pd.DataFrame): contains the FASTA loaded data in
-                DataFrame format as prepared by .read_FASTA().
-            
-            yy (str): the current YY data point name.
-            
-            fasta_path (srt): the .fasta file path.
-        """
-        
-        if df.shape[0] \
-                < self.allpeaklists[self.zzref][yy][self.xxref].\
-                    shape[0]:
-            msg = \
-'The .fasta file in {} has less residue entries than the protein sequence \
-of the reference experiment [{}][{}][{}]'.\
-                format(fasta_path, self.zzref, yy, self.xxref)
-            self.log_r(fsw.gen_wet('ERROR', msg, 18))
-            self.abort()
-        
-        return
-
+    
     def compare_fastas(self):
         """
         Compares all .fasta files to confirm they have the same size.
@@ -1797,6 +1771,23 @@ different lengths.".\
         that were not removed.
         """
         # for assignment cols
+        ## empty
+        empty_cells_f1 = self.allpeaklists[z][y][x].loc[:,'Assign F1'].isnull()
+        empty_cells_f2 = self.allpeaklists[z][y][x].loc[:,'Assign F2'].isnull()
+        
+        if empty_cells_f1.values.any() or empty_cells_f2.values.any():
+            rows_bool = empty_cells_f1 | empty_cells_f2
+            msg = "The peaklist [{}][{}][{}] contains no assignment \
+information in lines {}. Please review that peaklist.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 29))
+            self.abort()
+        
+        ## misleading chars
         non_digit_f1 = \
             self.allpeaklists[z][y][x].loc[:,'Assign F1'].\
                 str.strip().str.contains('\W', regex=True)
@@ -1817,7 +1808,7 @@ charaters in Assignment columns in line {}.".format(
             self.log_r(fsw.gen_wet('ERROR', msg, 29))
             self.abort()
         
-        # for other cols.
+        ## for other cols.
         cols = [
             'Position F1',
             'Position F2',
@@ -1847,3 +1838,24 @@ charaters in line {} of column [{}].".format(
                 self.abort()
         
         return
+
+    def check_res_duplicates(self, df, z, y, x):
+        """
+        Checks if there are duplicated residue entries in peaklists.
+        
+        Parameters:
+            - df (pd.DataFrame): the peaklist dataframe to investigate
+        """
+        where_duplicates = df[z][y][x].loc[:,'ResNo'].duplicated(keep=False)
+        
+        if where_duplicates.any():
+            msg = "The peaklist [{}][{}][{}] contains repeated residue entries \
+in lines: {}.".format(
+                z,
+                y,
+                x,
+                [2+int(i) for i in \
+                    where_duplicates.index[where_duplicates].tolist()]
+                )
+            self.log_r(fsw.gen_wet('ERROR', msg, 24))
+            self.abort()

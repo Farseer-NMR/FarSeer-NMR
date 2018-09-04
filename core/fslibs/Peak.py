@@ -21,25 +21,36 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 class Peak(object):
+    """
+    Contains information about a Peak.
+    """
 
     def __init__(self,
-                 peak_number,
-                 positions,
-                 assignments,
-                 linewidths,
-                 height,
-                 volume,
-                 atoms,
-                 format,
-                 fit_method=None,
-                 merit=None,
-                 volume_method=None,
-                 details=None):
-
+        peak_number,
+        positions,
+        atoms,
+        residue_type,
+        residue_number,
+        linewidths,
+        height,
+        volume,
+        format_,
+        fit_method=None,
+        merit=None,
+        volume_method=None,
+        details=None
+        ):
+        
+        # a counter for the peak
         self.peak_number = peak_number
-        self.positions = positions
-        self.assignments = assignments
-        self.atoms = atoms
+        # chemical shift positions
+        self.positions = positions  # list
+        # atoms type (H, N, C, ...)
+        # atoms and positions must match.
+        self.atoms = atoms  #list
+        # residue type: Cys, Ala, Met, ...
+        self.residue_type = residue_type
+        self.residue_number = residue_number
         self.linewidths = linewidths
         self.height = height
         self.volume = volume
@@ -47,6 +58,7 @@ class Peak(object):
         self.merit = merit
         self.volume_method = volume_method
         self.details = details
-        self.format = format
+        # the original format of the input peaklist
+        self.format_ = format_
         
 

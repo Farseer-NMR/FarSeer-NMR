@@ -71,6 +71,8 @@ aal1tol3 = {
     "V": "Val"
 }
 
+# peaklists that require FASTA files to complete information on residue type
+peaklist_format_requires_fasta = ['nmrdraw', 'nmrview', 'user_pkl_1']
 
 def combine_dicts(dictionaries):
     tmp_dict = {}
@@ -103,3 +105,45 @@ def get_default_config_path():
     core_path = os.path.dirname(__file__)
     default_path = os.path.join(core_path, 'default_config.json')
     return default_path
+
+def eval_str_to_float(string):
+    try:
+        float(string)
+    except ValueError:
+        return False
+    return True
+
+
+def read_fasta_file(fasta_path):
+    """
+    Reads FASTA file.
+
+    Parameters:
+        - fasta_path: path to the FASTA file.
+
+    Returns:
+        - fasta: string containing the fasta sequence.
+    """
+    fasta_file = open(fasta_path, 'r')
+    fl = fasta_file.readlines()
+    fasta = ''
+
+    for i in fl:
+        if i.startswith('>'):
+            continue
+
+        else:
+            fasta += i.replace(' ', '').replace('\n', '').upper()
+
+    if ''.join(c for c in fasta if c.isdigit()):
+        msg = \
+'We found digits in your FASTA string coming from file {}. Be aware of \
+mistakes resulting from wrong FASTA file. You may wish to abort \
+and correct the file. \
+If you choose continue, Farseer-NMR will parse out the digits.'.\
+            format(fasta_path)
+        self.log_r(fsw.gen_wet('WARNING', msg, 22))
+        fsw.continue_abort()
+        fasta = ''.join(c for c in fasta if not c.isdigit())
+
+    return fasta

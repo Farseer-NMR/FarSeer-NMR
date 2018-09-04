@@ -86,10 +86,10 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.figure_format.fields.currentText(),
                          general["fig_file_type"])
 
-        self.assertEqual(self.widget.expand_lost_yy.isChecked(),
-                         fitting["expand_lost_yy"])
-        self.assertEqual(self.widget.expand_lost_zz.isChecked(),
-                         fitting["expand_lost_zz"])
+        self.assertEqual(self.widget.expand_missing_yy.isChecked(),
+                         fitting["expand_missing_yy"])
+        self.assertEqual(self.widget.expand_missing_zz.isChecked(),
+                         fitting["expand_missing_zz"])
         self.assertEqual(self.widget.perform_comparisons_checkbox.isChecked(),
                          fitting["perform_comparisons"])
         self.assertEqual(self.widget.x_checkbox.isChecked(),
@@ -106,8 +106,8 @@ class Test_Case(unittest.TestCase):
 
         self.assertEqual(self.widget.csp_alpha.field.value(),
                          csp["csp_res4alpha"])
-        self.assertEqual(self.widget.csp_lost.fields.currentText(),
-                         csp["cs_lost"])
+        self.assertEqual(self.widget.csp_missing.fields.currentText(),
+                         csp["cs_missing"])
 
         self.assertEqual(self.widget.fasta_start.field.value(),
                          fasta["FASTAstart"])
@@ -171,7 +171,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 
@@ -189,8 +189,8 @@ class Test_Case(unittest.TestCase):
         self.widget.figure_dpi.setValue(1200)
         self.widget.figure_format.select('ps')
 
-        self.widget.expand_lost_yy.setChecked(True)
-        self.widget.expand_lost_zz.setChecked(True)
+        self.widget.expand_missing_yy.setChecked(True)
+        self.widget.expand_missing_zz.setChecked(True)
         self.widget.perform_comparisons_checkbox.setChecked(True)
         self.widget.x_checkbox.setChecked(False)
         self.widget.y_checkbox.setChecked(True)
@@ -200,7 +200,7 @@ class Test_Case(unittest.TestCase):
         self.widget.cs_correction_res_ref.setValue(15)
 
         self.widget.csp_alpha.setValue(0.54)
-        self.widget.csp_lost.select('zero')
+        self.widget.csp_missing.select('zero')
 
         self.widget.fasta_start.setValue(81)
         self.widget.apply_fasta_checkbox.setChecked(True)
@@ -263,8 +263,8 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.figure_dpi.field.value(), 1200)
         self.assertEqual(self.widget.figure_format.fields.currentText(), 'ps')
 
-        self.assertEqual(self.widget.expand_lost_yy.isChecked(), True)
-        self.assertEqual(self.widget.expand_lost_zz.isChecked(), True)
+        self.assertEqual(self.widget.expand_missing_yy.isChecked(), True)
+        self.assertEqual(self.widget.expand_missing_zz.isChecked(), True)
         self.assertEqual(self.widget.perform_comparisons_checkbox.
                          isChecked(), True)
         self.assertEqual(self.widget.x_checkbox.isChecked(), False)
@@ -275,7 +275,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.cs_correction_res_ref.field.value(), 15)
 
         self.assertEqual(self.widget.csp_alpha.field.value(), 0.54)
-        self.assertEqual(self.widget.csp_lost.fields.currentText(), "zero")
+        self.assertEqual(self.widget.csp_missing.fields.currentText(), "zero")
 
         self.assertEqual(self.widget.fasta_start.field.value(), 81)
         self.assertEqual(self.widget.apply_fasta_checkbox.isChecked(), True)
@@ -332,8 +332,8 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(general["fig_dpi"], 1200)
         self.assertEqual(general["fig_file_type"], 'ps')
 
-        self.assertEqual(fitting["expand_lost_yy"], True)
-        self.assertEqual(fitting["expand_lost_zz"], True)
+        self.assertEqual(fitting["expand_missing_yy"], True)
+        self.assertEqual(fitting["expand_missing_zz"], True)
         self.assertEqual(fitting["perform_comparisons"], True)
         self.assertEqual(fitting["do_along_x"], False)
         self.assertEqual(fitting["do_along_y"], True)
@@ -343,7 +343,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(cs["cs_correction_res_ref"], 15)
 
         self.assertEqual(csp["csp_res4alpha"], 0.54)
-        self.assertEqual(csp["cs_lost"], "zero")
+        self.assertEqual(csp["cs_missing"], "zero")
 
         self.assertEqual(fasta["applyFASTA"], True)
         self.assertEqual(fasta["FASTAstart"], 81)
@@ -388,7 +388,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 
@@ -407,8 +407,8 @@ class Test_Case(unittest.TestCase):
         self.widget.figure_dpi.setValue(1200)
         self.widget.figure_format.select('ps')
 
-        self.widget.expand_lost_yy.setChecked(True)
-        self.widget.expand_lost_zz.setChecked(True)
+        self.widget.expand_missing_yy.setChecked(True)
+        self.widget.expand_missing_zz.setChecked(True)
         self.widget.perform_comparisons_checkbox.setChecked(True)
         self.widget.x_checkbox.setChecked(False)
         self.widget.y_checkbox.setChecked(True)
@@ -418,7 +418,7 @@ class Test_Case(unittest.TestCase):
         self.widget.cs_correction_res_ref.setValue(15)
 
         self.widget.csp_alpha.setValue(0.54)
-        self.widget.csp_lost.select('zero')
+        self.widget.csp_missing.select('zero')
 
         self.widget.fasta_start.setValue(81)
         self.widget.apply_fasta_checkbox.setChecked(True)
@@ -481,8 +481,8 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.figure_dpi.field.value(), 1200)
         self.assertEqual(self.widget.figure_format.fields.currentText(), 'ps')
 
-        self.assertEqual(self.widget.expand_lost_yy.isChecked(), True)
-        self.assertEqual(self.widget.expand_lost_zz.isChecked(), True)
+        self.assertEqual(self.widget.expand_missing_yy.isChecked(), True)
+        self.assertEqual(self.widget.expand_missing_zz.isChecked(), True)
         self.assertEqual(self.widget.perform_comparisons_checkbox.
                          isChecked(), True)
         self.assertEqual(self.widget.x_checkbox.isChecked(), False)
@@ -493,7 +493,7 @@ class Test_Case(unittest.TestCase):
         self.assertEqual(self.widget.cs_correction_res_ref.field.value(), 15)
 
         self.assertEqual(self.widget.csp_alpha.field.value(), 0.54)
-        self.assertEqual(self.widget.csp_lost.fields.currentText(), "zero")
+        self.assertEqual(self.widget.csp_missing.fields.currentText(), "zero")
 
         self.assertEqual(self.widget.fasta_start.field.value(), 81)
         self.assertEqual(self.widget.apply_fasta_checkbox.isChecked(), True)
@@ -553,8 +553,8 @@ class Test_Case(unittest.TestCase):
         self.assertNotEqual(general["fig_dpi"], 1200)
         self.assertNotEqual(general["fig_file_type"], 'ps')
 
-        self.assertNotEqual(fitting["expand_lost_yy"], True)
-        self.assertNotEqual(fitting["expand_lost_zz"], True)
+        self.assertNotEqual(fitting["expand_missing_yy"], True)
+        self.assertNotEqual(fitting["expand_missing_zz"], True)
         self.assertNotEqual(fitting["perform_comparisons"], True)
         self.assertNotEqual(fitting["do_along_x"], False)
         self.assertNotEqual(fitting["do_along_y"], True)
@@ -564,7 +564,7 @@ class Test_Case(unittest.TestCase):
         self.assertNotEqual(cs["cs_correction_res_ref"], 15)
 
         self.assertNotEqual(csp["csp_res4alpha"], 0.54)
-        self.assertNotEqual(csp["cs_lost"], "zero")
+        self.assertNotEqual(csp["cs_missing"], "zero")
 
         self.assertNotEqual(fasta["applyFASTA"], True)
         self.assertNotEqual(fasta["FASTAstart"], 81)
@@ -609,7 +609,7 @@ class Test_Case(unittest.TestCase):
         self.assertNotEqual(self.widget.scatter_flower_checkbox.isChecked(),
                          plotting_flags["do_cs_scatter_flower"])
         self.assertNotEqual(self.widget.dpre_checkbox.isChecked(),
-                         plotting_flags["do_dpre_osci"])
+                         plotting_flags["do_DPRE_plot"])
         self.assertNotEqual(self.widget.heat_map_checkbox.isChecked(),
                          plotting_flags["do_heat_map"])
 

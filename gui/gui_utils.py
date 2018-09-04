@@ -24,10 +24,13 @@ from collections import OrderedDict
 import os
 import json
 from matplotlib import colors as mcolors
+
 GUI_DIR = os.path.dirname(__file__)
 
-defaults = json.load(open(os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '../' 'core', 'default_config.json'), 'r'))
+defaults = json.load(open(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '../' 'core', 'default_config.json'),
+    'r'
+    ))
 
 line_styles = ['-', '--', '-.', ':', 'o']
 
@@ -36,12 +39,15 @@ matplt_colours_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
 colours = OrderedDict(sorted(
     matplt_colours_dict.items(),
-    key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))))
+    key=lambda x: tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(x[1])[:3]))
+    ))
 
 keylist = list(colours.keys())
+
 for key in keylist:
     if len(key) == 1:
         colours.pop(key, None)
+
 hex_to_colour_dict = {value: key for key, value in colours.items()}
 
 single_char_color = {
@@ -56,7 +62,6 @@ single_char_color = {
     }
 
 colours.update(single_char_color)
-
 
 settings_1280x800 = {
     'peaklistarea_height': 350,
@@ -121,22 +126,18 @@ def deliver_settings(resolution):
 
     if (resolution.height(), resolution.width()) == (1440, 2560):
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_2k.qss')).read()
-        print('2k')
         return settings_2k, stylesheet
     elif (resolution.height(), resolution.width()) == (1080, 1920) or \
             1040 < resolution.height() < 1440:
-        print('1k')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_1k.qss')).read()
         return settings_1k, stylesheet
     elif (resolution.height(), resolution.width()) == (800, 1280):
-        print('1280x800')
         msg = " @@@@@@@@@@@@@@@@@@@@@@ \nATTENTION YOU WILL BE USING A PROTOTYPE GUI DEVELOPED ONLY TO BE FUNCTIONAL IN 1280X800 SCREENS. IT IS NOT SUPPOSED TO HAVE A GOOD LOOK.\n@@@@@@@@@@@@@@@@@@@@@@"
         print(msg)
         stylesheet = open(os.path.join(GUI_DIR,
                                        'stylesheet_1280x800.qss')).read()
         return settings_1280x800, stylesheet
     else:
-        print('720p')
         stylesheet = open(os.path.join(GUI_DIR, 'stylesheet_720p.qss')).read()
         return settings_720p, stylesheet
 

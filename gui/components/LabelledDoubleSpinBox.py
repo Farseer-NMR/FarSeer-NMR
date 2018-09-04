@@ -22,7 +22,6 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QWidget, QDoubleSpinBox, QLabel, QHBoxLayout
 
-
 class LabelledDoubleSpinBox(QWidget):
     """
     A combination of a QLabel and a QDoubleSpinBox in a single QWidget.
@@ -45,38 +44,44 @@ class LabelledDoubleSpinBox(QWidget):
         .setValue(float)
         .set_callback(function)
         """
-    def __init__(self, parent, text, callback=None, minimum=None,
-                 maximum=None, step=None, unit=None):
-
+    def __init__(
+            self, parent,
+            text,
+            callback=None,
+            minimum=-100000,
+            maximum=100000,
+            step=0.1,
+            unit=None
+            ):
         QWidget.__init__(self, parent)
-
         layout = QHBoxLayout()
         self.setLayout(layout)
         label = QLabel(text)
         self.field = QDoubleSpinBox()
-
         self.layout().addWidget(label)
         self.layout().addWidget(self.field)
-
+        
         if callback:
             self.set_callback(callback)
-
+        
         if minimum:
             self.field.setMinimum(minimum)
+        
         if maximum:
             self.field.setMaximum(maximum)
+        
         if step:
             self.field.setSingleStep(step)
-
+        
         if unit:
             self.unit_label = QLabel(unit)
             self.layout().addWidget(self.unit_label)
-
+    
     def setValue(self, value):
         if value:
             self.field.setValue(value)
         else:
             self.field.setValue(0)
-
+    
     def set_callback(self, callback):
         self.field.valueChanged.connect(callback)
