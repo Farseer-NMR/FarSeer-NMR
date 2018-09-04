@@ -1,3 +1,4 @@
+=======
 # GitHub .gitignore boilerplate from https://github.com/github/gitignore/blob/master/Python.gitignore
 
 # Ignore the local run_farseer*.sh files
@@ -108,3 +109,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# repo
+examples/
+.idea/*
+gui/*zip
