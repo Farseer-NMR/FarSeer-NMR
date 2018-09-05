@@ -579,12 +579,12 @@ Settings.'.\
         """Operations performed when finalizing the log file."""
         
         self.logger.info(
-            "*** Used JSON config file will be copied to the end of MD log file"
+            "*** Used JSON config file will be written in the debug.log file."
             )
         
         self.logger.info(fsw(gen=False).end_well())
         self._log_state_stamp(state='ENDED')
-        self.logger.info("*** USED CONFIG FILE ***\n")
+        self.logger.debug("*** USED CONFIG FILE ***\n")
         self.export_user_variables()
         
         return None
