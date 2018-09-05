@@ -21,10 +21,8 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import pandas as pd
+import os
 
-#import logging
-#import logging.config
-#import core.fslibs.log_config as fslogconf
 from core.fslibs.WetHandler import WetHandler as fsw
 import core.fslibs.Logger as Logger
 from core.utils import aal1tol3, aal3tol1
@@ -39,13 +37,23 @@ class FastaHandler:
         self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('FastaHandler initiated')
         
-        
         # FASTA file path
-        self.fasta_path = fasta_file_path
+        if os.path.exists(fasta_file_path):
+            self.fasta_path = fasta_file_path
+            self.logger.debug("FASTA file path OK: {}".format(self.fasta_path))
+        else:
+            msg = "The path provided for the FASTA file does not exist.\
+None assigned"
+            wet37 = fsw(msg_title='ERROR', msg=msg, wet_num=37)
+            self.logger.info(wet37.wet)
+            self.fasta_path = None
+            
         self.fasta_start_num = fasta_start_num
-        self.logger.debug('FASTA file path read: OK')
+        self.logger.debug('FASTA start number: {}'.format(self.fasta_start_num))
         
-    
+        self.fasta_string = None
+        self.fasta_df = None
+        
     def _check_wrong_aminoacid_codes(self, fasta_string, fasta_path=''):
         """
         Checks the presence of wrong a.a. codes in the FASTA string.
@@ -122,14 +130,13 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
     
     def reads_fasta_from_file(self, fasta_path=''):
         """
-        Reads FASTA string from FASTA file.
+        Reads FASTA string from FASTA file. Assigns self.fasta_string attribute.
         
         Parameters:
             - fasta_path (opt, str): the path to the fasta file
             
         Returns:
-            - fasta_string (str): the FASTA string in capital letters.
-            - Assigns self.fasta_string attribute
+            - None
         """
         self.logger.debug('fasta_path parameter set to {}'.format(fasta_path))
         fasta_path = fasta_path or self.fasta_path
@@ -160,7 +167,7 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
         
         self.fasta_string = fasta_string
         
-        return self.fasta_string
+        return None
     
     def reads_fasta_to_dataframe(
             self,
@@ -172,31 +179,59 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             fasta_path=''
             ):
         """
-        Reads a FASTA string to a structured pd.DataFrame.
+        Reads a FASTA string or a FASTA file to a structured pd.DataFrame.
         
         Parameters:
-            - fasta_string (opt, str): the FASTA string
+            - fasta_string (opt, str): the FASTA string, if not provided,
+                reads from self.fasta_string
             - atom1 (opt, str): the atom type for assign F1 column (def: 'H').
             - atom2 (opt, str): the atom type for assign F2 column (def: 'N').
             - details (opt,str): fill Details column (def: 'None').
             - reads_from_file (opt, bool): if should read from file instead
-                of from string.
-            - fasta_path (opt, str): path to fasta file, might be used if
+                of from <fasta_string>.
+            - fasta_path (opt, str): path to fasta file, must be given if
                 reads_from_file True.
         
         Reads the FASTA string and generates a 5 column DataFrame
         with the information ready to be incorporated in the peaklists
-        dataframes.
+        dataframes of FarseerSeries object.
         
-        Returns:
-            Returns and assigns self.fasta_df
+        Assigns self.fasta_df
         """
+        
+        # assignes and validades arguments ###
         fasta_path = fasta_path or self.fasta_path
-        fasta_string = fasta_string or \
-            (self.reads_fasta_from_file(fasta_path) if reads_from_file \
-                else self.fasta_string)
+        
+        if reads_from_file and fasta_string:
+            
+            msg = "A FASTA string was passed to the fasta_string parameter and \
+reads_from_file is True. This is inconsistent because if a FASTA string was \
+given there is no need to read from a file. <reads_from_file> will not be \
+considered and the FASTA string will be used."
+            wet = fsw(msg_title='NOTE', msg=msg, wet_num=37)
+            self.logger.info(wet.wet)
+        
+        elif reads_from_file and not fasta_string:
+            
+            self.reads_fasta_from_file(fasta_path)
+            fasta_string = self.fasta_string
+        
+        elif not fasta_string and not reads_from_file and self.fasta_string:
+            
+            fasta_string = self.fasta_string
+        
+        else:
+            msg = "It was not possible to assign a FASTA string. Either it \
+was not passed as argument (<fasta_string>) or is not defined as an attribute. \
+Please ensure a <fasta_string> is passed or .reads_fasta_from_file() method \
+is executed previously."
+            wet = fsw(msg_title="WARNING", msg=msg, wet_num=37)
+            self.logger.warning(wet.wet)
+            return None
         
         self.logger.debug(fasta_string)
+        
+        # arguments assigned and validated ###
         
         # Generates FASTA reference dataframe
         dd = {}
@@ -234,10 +269,9 @@ If you choose continue, Farseer-NMR will parse out the digits.'.\
             dd['ResNo'][-1])
         self.logger.info(logs)
         
-        return self.fasta_df
+        return None
 
 if __name__ == "__main__":
-    import os
     
     # the following FASTA examples are the same fasta sequence in
     # different file formats or with wrong characters in between.
@@ -317,6 +351,9 @@ MQPPCV
         print("{} correct FASTA: {}".format(f_file, fasta_clean == fh.fasta_string))
         
         fh.reads_fasta_to_dataframe(reads_from_file=True)
+        print("{} correct: {}".format(f_file, fh.fasta_df.equals(fasta_df)))
+        
+        fh.reads_fasta_to_dataframe()
         print("{} correct: {}".format(f_file, fh.fasta_df.equals(fasta_df)))
         
         if os.path.exists(f_file):
