@@ -6,8 +6,8 @@
         "perform_comparisons": false
         },
     "fasta_settings": {
-        "FASTAstart": 1,
-        "applyFASTA": false
+        "fasta_start": 1,
+        "apply_fasta": false
         },
     "explore_missing_in_other_axes": {
         "explore_missing_yy": false,
@@ -45,47 +45,47 @@
         "output_path": "",
         "spectra_path": ""
         },
-    "calcparam_PosF1_settings": {
-        "calccol_name_PosF1_delta": "H1_delta",
-        "calcs_PosF1_delta": false,
-        "yy_label_PosF1_delta": "ppm",
-        "yy_scale_PosF1_delta": 0.2
+    "calcparam_posf1_settings": {
+        "calccol_name_posf1_delta": "H1_delta",
+        "calcs_posf1_delta": false,
+        "yy_label_posf1_delta": "ppm",
+        "yy_scale_posf1_delta": 0.2
        },
-    "calcparam_PosF2_settings": {
-        "calccol_name_PosF2_delta": "N15_delta",
-        "calcs_PosF2_delta": false,
-        "yy_label_PosF2_delta": "ppm",
-        "yy_scale_PosF2_delta": 2
+    "calcparam_posf2_settings": {
+        "calccol_name_posf2_delta": "N15_delta",
+        "calcs_posf2_delta": false,
+        "yy_label_posf2_delta": "ppm",
+        "yy_scale_posf2_delta": 2
         },
-    "calcparam_Volume_ratio_settings": {
-        "calccol_name_Volume_ratio": "Vol_ratio",
-        "calcs_Volume_ratio": false,
-        "yy_label_Volume_ratio": "Vi/V0",
-        "yy_scale_Volume_ratio": 1.1
+    "calcparam_volume_ratio_settings": {
+        "calccol_name_volume_ratio": "Vol_ratio",
+        "calcs_volume_ratio": false,
+        "yy_label_volume_ratio": "Vi/V0",
+        "yy_scale_volume_ratio": 1.1
         },
-    "calcparam_Height_ratio_settings": {
-        "calccol_name_Height_ratio": "Height_ratio",
-        "calcs_Height_ratio": false,
-        "yy_label_Height_ratio": "Hi/H0",
-        "yy_scale_Height_ratio": 1.1
+    "calcparam_height_ratio_settings": {
+        "calccol_name_height_ratio": "Height_ratio",
+        "calcs_height_ratio": false,
+        "yy_label_height_ratio": "Hi/H0",
+        "yy_scale_height_ratio": 1.1
         },
-    "calcparam_CSP_settings": {
+    "calcparam_csp_settings": {
         "bar_behaviour_missing_residues": "prev",
         "csp_general_alpha_factor": 0.14,
         "csp_alpha_factor_exceptions": {
             "G": 0.2
             },
-        "calccol_name_CSP": "CSP",
-        "calcs_CSP": true,
-        "yy_label_CSP": "CSPs (ppm)",
-        "yy_scale_CSP": 0.3
+        "calccol_name_csp": "CSP",
+        "calcs_csp": true,
+        "yy_label_csp": "CSPs (ppm)",
+        "yy_scale_csp": 0.3
         },
-    "calcparam_DPRE_settings": {
-        "calcs_DPRE": false,
+    "calcparam_dpre_settings": {
+        "calcs_dpre": false,
         "gauss_x_size": 7,
         "gaussian_stdev": 1
         },
-    "Dpre_files": {
+    "dpre_files": {
         },
     "plotting_flags": {
         "do_ext_bar": true,
@@ -97,7 +97,7 @@
         "do_DPRE_plot": false,
         "do_heat_map": false
         },
-    "Bar_plots_general_settings": {
+    "bar_plots_general_settings": {
         "subtitle_fn": "Arial",
         "subtitle_fs": 8,
         "subtitle_pad": 0.99,
@@ -152,7 +152,7 @@
             "mark": "khaki"
         }
         },
-    "Bar_Extended_plot_settings": {
+    "bar_extended_plot_settings": {
         "cols_page": 1,
         "rows_page": 6,
         "x_ticks_fn": "monospace",
@@ -161,7 +161,7 @@
         "x_ticks_weight": "normal",
         "x_ticks_color_flag": true
     },
-    "Bar_Compact_plot_settings": {
+    "bar_compact_plot_settings": {
         "cols_page": 3,
         "rows_page": 5,
         "x_ticks_fn": "Arial",
@@ -171,7 +171,7 @@
         "unassigned_shade": true,
         "unassigned_shade_alpha": 0.5
     },
-    "Bar_Vertical_plot_settings": {
+    "bar_vertical_plot_settings": {
         "cols_page": 5,
         "rows_page": 2,
         "x_ticks_fn": "monospace",
@@ -180,7 +180,7 @@
         "x_ticks_weight": "normal",
         "x_ticks_color_flag": true
         },
-    "DPRE_plot_settings": {
+    "dpre_plot_settings": {
         "rows": 10,
         "width": 3,
         "y_label": "$\\Delta$PRE$_(rc-exp)$",
@@ -266,7 +266,7 @@
         "tag_line_ls": "-",
         "tag_line_lw": 0.8
     },
-    "Residue_Map_Plot_general_settings": {
+    "residue_map_plot_general_settings": {
         "cols_page": 5,
         "rows_page": 8,
         "subtitle_fn": "Arial",
@@ -292,7 +292,7 @@
         "y_ticks_weight": "normal",
         "y_ticks_rot": 0
         },
-    "Residue_Param_Evo_plot_settings": {
+    "residue_param_evo_plot_settings": {
         "set_exp_values_for_x_axis": false,
         "x_ticks_nbins": 5,
         "x_label": "ligand ratio",
@@ -309,7 +309,7 @@
         "fit_line_width": 1,
         "fit_line_style": "-"
         },
-    "Residue_Map_Scatter_settings": {
+    "residue_map_scatter_settings": {
         "markers": [
             "^",
             ">",
@@ -338,7 +338,7 @@
         "mk_missing_color": "red",
         "hide_missing": false
     },
-    "CS_Scatter_Flower_plot_settings":{
+    "cs_scatter_flower_plot_settings":{
         "subtitle_fn": "Arial",
         "subtitle_fs": 8,
         "subtitle_pad": 0.98,
