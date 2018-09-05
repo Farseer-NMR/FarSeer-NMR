@@ -204,7 +204,8 @@ def add_residue_information(peaklist_path, peak_list, fasta_path, fasta_start):
     """
     cleaned_peaklist = []
     # Generates a single string from the FASTA file
-    fh = FastaHandler(fasta_path, 1).reads_fasta_from_file()
+    fh = FastaHandler(fasta_path, fasta_start)
+    fh.reads_fasta_from_file()
     fasta = fh.fasta_string
     
     fasta_dict = \
@@ -212,7 +213,7 @@ def add_residue_information(peaklist_path, peak_list, fasta_path, fasta_start):
             for ii, residue in enumerate(fasta)}
 
     for peak in peak_list:
-
+        print(peak.residue_number)
         try:
             res_type = fasta_dict[int(peak.residue_number)]
         except KeyError:
