@@ -114,3 +114,6 @@ venv.bak/
 examples/
 .idea/*
 gui/*zip
+
+# HTML redirection link
+index.html
