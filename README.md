@@ -22,7 +22,7 @@ Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-an
 
 ## Documentation
 
-We have a [Documentation folder](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files along with the Full Documentation PDF. There is also an online a list of [helpful links](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Farseer-NMR-Helpful-links) to guide you in the use of Farseer-NMR.
+We have a [Documentation folder](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master/Documentation) where you can find a whole heap of helpful files along with the Full Documentation PDF. There is also an online a list of [helpful links](https://github.com/Farseer-NMR/FarSeer-NMR/wiki) to guide you in the use of Farseer-NMR.
 
 ## Tutorials and Examples
 
@@ -38,7 +38,7 @@ If you find bugs, mis-functional or non-functional features during your calculat
 
 ### Become a collaborator
 
-Help us implement new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork the [Farseer-NMR project](https://github.com/joaomcteixeira/FarSeer-NMR) to your own GitHub account, write the functionalities and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guide](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent. We kindly request that contributors to the project adhere to this style guide.
+Help us implement new features! Do you have your own NMR analysis routines that you would like to see implemented in Farseer-NMR? You can fork the [Farseer-NMR project](https://github.com/Farseer-NMR/FarSeer-NMR) to your own GitHub account, write the functionalities and prepare a pull request for us to review and help you out! We have prepared a [Farseer coding style guide](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Code_Style_Guide_for_Developers.md) for developers so that we keep code readability consistent. We kindly request that contributors to the project adhere to this style guide.
 
 Even if you're not an experienced programmer, please get contact with us and we will be happy join forces with you to introduce your functionalities!
 
