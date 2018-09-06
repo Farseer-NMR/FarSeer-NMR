@@ -255,15 +255,14 @@ to be specified for each Y axis condition.""")
         
         elif run_msg == "Run":
             create_directory_structure(output_path, self.variables)
-            from core.farseermain import start_logger, read_user_variables, run_farseer
+            #from core.farseermain import start_logger, read_user_variables, run_farseer
+            from core.farseermain import run_farseer
             run_config_name = "user_config_{}.json".format(
                 datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 )
             config_path = os.path.join(output_path, run_config_name)
             self.save_config(path=config_path)
-            logger = start_logger(output_path)
-            fsuv = read_user_variables(output_path, config_path, logger=logger)
-            Threading(function=run_farseer, args=[fsuv, logger])
+            Threading(function=run_farseer, args=[config_path])
         
         else:
             print('Run could not be initiated')

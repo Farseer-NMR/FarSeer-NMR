@@ -20,8 +20,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import logging.config
+#import logging
+#import logging.config
 import glob
 import os
 import numpy as np
@@ -32,8 +32,8 @@ from math import ceil
 from matplotlib import pyplot as plt
 import datetime 
 
-import core.fslibs.log_config as fslogconf
-from core.fslibs import wet as fsw
+import core.fslibs.Logger as Logger
+from core.fslibs.WetHandler import WetHandler as fsw
 
 class FarseerSeries(pd.Panel):
     """
@@ -90,55 +90,6 @@ class FarseerSeries(pd.Panel):
         fitdf (dict): stored pd.DataFrames with information on fitting.
         fit_performed (bool): defaults False. True after .perform_fit().
     
-    Methods:
-        
-        Initiates:
-            .create_attributes()
-            .log_r()
-            .exports_log()
-            .abort()
-        
-        Calculation:
-            .calc_ratio()
-            .calc_cs_diffs()
-            .calc_csp()
-                .csp_willi()
-            .perform_fit()
-            .load_theoretical_PRE()
-            .calc_Delta_PRE()
-        
-        Creates Plot:
-            .plot_base()
-        
-            Subplot routines:
-                .plot_bar_horizontal()
-                .plot_bar_vertical()
-                .plot_res_evo()
-                .plot_cs_scatter()
-                .plot_cs_scatter_flower()
-                .plot_DPRE_heatmap()
-                .plot_DPRE_plot()
-            
-            Subplot add-ons:
-                .set_item_colors()
-                .text_marker()
-                .plot_threshold()
-                .plot_theo_pre()
-                    
-                    Helper functions:
-                        .hex_to_RGB()
-                        .RGB_to_hex()
-                        .color_dict()
-                        .linear_gradient()
-            
-            Plot finishing:
-                .clean_subplots()
-                .write_plot()
-        
-        Exporting resuts:
-            .write_table()
-            .write_Chimera_attributes()
-            .export_series_to_tsv()
     """
     
     # folder names
@@ -168,13 +119,11 @@ class FarseerSeries(pd.Panel):
                 'CSP',
                 'Height_ratio',
                 'Vol_ratio'
-                ],
-            log_export_onthefly=False,
-            log_export_name='FarseerSet_log.md'):
+                ]
+            ):
         """Creates the instance attributes."""
         
-        self.logger = fslogconf.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('logger initiated')
         
         self.cs_missing = cs_missing
@@ -208,10 +157,6 @@ class FarseerSeries(pd.Panel):
         # affects plot_res_evo()
         self.fit_performed = False 
         self.PRE_loaded = False  # True after .load_theoretical_PRE
-        # log related variables
-        self.log = ''
-        self.log_export_onthefly = log_export_onthefly
-        self.log_export_name = log_export_name
         
         # defines the path to store the calculations
         # if stores the result of a calculation
@@ -265,60 +210,20 @@ class FarseerSeries(pd.Panel):
         # because Titration inherits a pd.Panel.
         return FarseerSeries
         
-    def log_r(self, logstr, istitle=False):
+    def _abort(self, wet):
         """
-        Registers the log string and prints it.
+        Aborts run with message. Writes message to log.
         
         Parameters:
-            logstr (str): the string to be registered in the log.
-            
-            istitle (bool): flag to format logstr as a title.
+            - wet (WetHandler)
         """
+        self.logs(wet.wet)
+        self.logs(wet.abort_msg())
+        wet.abort()
         
-        if istitle:
-            logstr = \
-"""
-{0}  
-{1}  
-{0}  
-""".format('*'*79, logstr)
-        
-        else:
-            logstr += '  \n'
-        
-        print(logstr)
-        self.log += logstr
-        
-        # appends log to external file on the fly
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
-        
-        return
+        return None
     
-    def exports_log( self, mod='a', path='farseer.log'):
-        """Exports log to external file.
-        
-        Parameters:
-            mod (str): python.open() arg mode.
-            
-            logfile_name (str): the external log file name.
-        """
-        
-        with open(path, mod) as logfile:
-            logfile.write(self.log)
-        
-        return
-    
-    def abort(self):
-        """Aborts run with message."""
-        
-        self.log_r(fsw.abort_msg)
-        fsw.abort()
-        
-        return
-    
-    def create_header(self, extra_info="", file_path=""):
+    def _create_header(self, extra_info="", file_path=""):
         """
         Creates description header for files and plots using "#" as
         comment character.
@@ -376,7 +281,7 @@ and stacked (compared) along "{}" axis'.format(
         
         return header_1
     
-    def hex_to_RGB(self, hexx):
+    def _hex_to_RGB(self, hexx):
         """
         This function was taken from:
         Copyright 2017 Ben Southgate
@@ -410,12 +315,11 @@ and stacked (compared) along "{}" axis'.format(
         # if clause not part of the original function, added for the Farseer-NMR Project.
         if not(hexx.startswith("#") and len(hexx) == 7):
             msg = "The input colour is not in HEX format."
-            self.log_r(fsw.gen_wet("ERROR", msg, 27))
-            self.abort()
+            self._abort(fsw(msg_title="ERROR", msg=msg, wet_num=27))
         # Pass 16 to the integer function for change of base
         return [int(hexx[i:i+2], 16) for i in range(1,6,2)]
 
-    def RGB_to_hex(self, RGB):
+    def _RGB_to_hex(self, RGB):
         """
         This function was taken verbatim from:
         Copyright 2017 Ben Southgate
@@ -453,7 +357,7 @@ and stacked (compared) along "{}" axis'.format(
             )
         return hexx
     
-    def color_dict(self, gradient):
+    def _color_dict(self, gradient):
         """
         This function was taken verbatim from:
         Copyright 2017 Ben Southgate
@@ -487,7 +391,7 @@ and stacked (compared) along "{}" axis'.format(
         defined later on.
         """
         d = {
-            "hex":[self.RGB_to_hex(RGB) for RGB in gradient],
+            "hex":[self._RGB_to_hex(RGB) for RGB in gradient],
             "r":[RGB[0] for RGB in gradient],
             "g":[RGB[1] for RGB in gradient],
             "b":[RGB[2] for RGB in gradient]
@@ -496,7 +400,7 @@ and stacked (compared) along "{}" axis'.format(
         return d
     
     
-    def linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
+    def _linear_gradient(self, start_hex, finish_hex="#FFFFFF", n=10):
         """
         This function was taken verbatim from:
         Copyright 2017 Ben Southgate
@@ -531,8 +435,8 @@ and stacked (compared) along "{}" axis'.format(
         inlcuding the number sign ("#FFFFFF")
         """
         # Starting and ending colors in RGB form
-        s = self.hex_to_RGB(start_hex)
-        f = self.hex_to_RGB(finish_hex)
+        s = self._hex_to_RGB(start_hex)
+        f = self._hex_to_RGB(finish_hex)
         # Initilize a list of the output colors with the starting color
         RGB_list = [s]
         # Calcuate a color at each evenly spaced value of t from 1 to n
@@ -544,408 +448,10 @@ and stacked (compared) along "{}" axis'.format(
             ]
             # Add it to our list of output colors
             RGB_list.append(curr_vector)
-        return self.color_dict(RGB_list)
+        
+        return self._color_dict(RGB_list)
     
-    def calc_cs_diffs(self, calccol, sourcecol):
-        """
-        Calculates the difference between two columns along a Series 
-        using as reference the column from the reference experiment, 
-        which is always stored in Item=0.
-        
-        Calculation results are stored in new columns.
-        """
-        
-        self.loc[:,:,calccol] = \
-            self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
-        
-        # sets missing peaks results according to the self.cs_missing
-        if self.cs_missing == 'full':
-            for item in self.items:
-                mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
-                self.loc[item,mask_missing,calccol] = 1.
-        
-        elif self.cs_missing == 'prev':
-            for iitem in range(1, len(self.items)):
-                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
-                self.ix[iitem,mask_missing,calccol] = \
-                    self.ix[iitem-1,mask_missing,calccol]
-        
-        elif self.cs_missing == 'zero':
-            for iitem in range(1, len(self.items)):
-                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
-                self.ix[iitem,mask_missing,calccol] = 0
-        
-        self.log_r('**Calculated** {}'.format(calccol))
-        
-        return
-    
-    def calc_ratio(self, calccol, sourcecol):
-        """
-        Calculates the ratio between two columns along a series of
-        experiments using as reference the column from the reference
-        experiment, which is always stored in Item=0.
-        
-        Calculation result is stored in a new column of each DataFrame.
-        """
-        
-        self.loc[:,:,calccol] = \
-            self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
-        self.log_r('**Calculated** {}'.format(calccol))
-        
-        return
-    
-    def csp_willi(self, s):
-        """
-        Formula that calculates Chemical Shift Perturbations (CSPs).
-        
-        Parameters:
-            s (pd.Series): s[0], 1-letter res code; s[1]; chemical shift 
-            for nuclei 1, s[2], chemical shift for nuclei 2.
-        
-        np.sqrt(0.5*(H1**2 + (alpha*N15)**2))
-
-        where the proportional normalization factor (alpha) for the 15N
-        dimension is set by default to 0.2 for Glycine and 0.14 for all
-        the other residues.
-
-        Williamson, M. P. Using chemical shift perturbation to
-        characterise ligand binding. Prog. Nuc. Magn. Res. Spect.
-        73, 1–16 (2013). SEE CORRIGENDUM
-        """
-        return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2])**2))
-    
-    def calc_csp(self, calccol='CSP', pos1='PosF1_delta', pos2='PosF2_delta'):
-        """
-        Calculates the Chemical Shift Perturbation (CSP) values
-        based on a formula.
-        
-        calccol (str): the name of the new column that stores results.
-        pos1 (str): the column name of the source data for nuclei 1.
-        pos2 (str): the column name for the source data for nuclei 2.
-        """
-
-        self.loc[:,:,calccol] = \
-            self.loc[:,:,['1-letter',pos1,pos2]].\
-                apply(lambda x: self.csp_willi(x), axis=2)
-        self.log_r('**Calculated** {}'.format(calccol))
-        
-        return
-    
-    def load_theoretical_PRE(self, spectra_path, datapoint):
-        """
-        Loads theoretical PRE values to represent in bar plots.
-        
-        Theorital PRE files (*.pre) should be stored in a '01_para' 
-        or 'para' folder at the along_z hierarchy level.
-        
-        Reads information on the tag position stored in the
-        *.pre file as an header comment, for example, '#40'.
-        
-        Parameters:
-            spectra_path (str): absolute path to the spectra/ folder.
-            
-            datapoint (str): the name of the data point.
-        
-        Modifies: 
-            self: added columns 'tag', 'Theo PRE'.
-        """
-        if not(self.para_name):
-            self.log_r(fsw.gen_wet("ERROR", "Paramagnetic Z axis name incorrect", 1))
-            self.abort()
-            return
-        self.PRE_loaded = True
-        target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
-        pre_file = glob.glob('{}*.pre'.format(target_folder))
-        
-        if len(pre_file) > 1:
-            raise ValueError(
-                '@@@ There are more than one .pre file in the folder {}'.\
-                    format(target_folder)
-                )
-        
-        elif len(pre_file) < 1:
-            raise ValueError('@@@ There is no .pre file in folder {}'.\
-                format(target_folder))
-        
-        # loads theoretical PRE data to 'Theo PRE' new column
-        # sets 1 to the diamagnetic Item.
-        predf = pd.read_csv(
-            pre_file[0],
-            sep='\s+',
-            usecols=[1],
-            names=['Theo PRE'],
-            comment='#'
-            )
-        self.log_r('**Added Theoretical PRE file** {}'.format(pre_file[0]))
-        self.log_r('*Theoretical PRE for diamagnetic set to 1 by default*')
-        self.loc[:,:,'Theo PRE'] = 1
-        self.loc[self.para_name,:,'Theo PRE'] = predf.loc[:,'Theo PRE']
-        # reads information on the tag position.
-        tagf = open(pre_file[0], 'r')
-        tag = tagf.readline().strip().strip('#')
-        
-        try:
-            tag_num = int(tag)
-        
-        except ValueError:
-            msg = \
-"Theoretical PRE file incomplete. Header with tag number is missing."
-            self.log_r(fsw.gen_wet('ERROR', msg, 15))
-            self.abort()
-        
-        # check tag residue
-        if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
-            msg = \
-'The residue number where the tag is placed according to the \*.pre file ({}) \
-is not part of the protein sequence ({}-{}).'.\
-                format(
-                    tag_num,
-                    int(self.res_info.iloc[0,0,0]),
-                    int(self.res_info.iloc[0,:,0].tail(n=1))
-                    )
-            self.log_r(fsw.gen_wet('ERROR', msg, 17))
-            self.abort()
-        
-        self.loc[self.para_name,:,'tag'] = ''
-        tagmask = self.loc[self.para_name,:,'ResNo'] == tag
-        self.loc[self.para_name,tagmask,'tag'] = '*'
-        tagf.close()
-        self.log_r('**Tag position found** at residue {}'.format(tag_num))
-        
-        return
-        
-    def calc_Delta_PRE(
-            self, sourcecol,
-            targetcol,
-            guass_x_size=7,
-            gaussian_stddev=1):
-        """
-        Calculates DELTA PRE.
-        
-        Arbesú, M. et al. The Unique Domain Forms a Fuzzy Intramolecular 
-        Complex in Src Family Kinases. Structure 25, 630–640.e4 (2017).
-        
-        Parameters:
-            sourcecol (str): the column name of the intensity data.
-            
-            targetcol (str): the column name to store delta PRE data.
-            
-            guass_x_size (int): 1D Gaussian kernel of window size.
-            
-            gaussian_stddev (int): standard deviation.
-        """
-        # astropy is imported to avoind demanding import when not necessary
-        from astropy.convolution import Gaussian1DKernel, convolve
-        
-        # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
-        gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
-        self.loc[:,:,targetcol] = \
-            self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
-        self.log_r('**Calculated DELTA PRE** for source {} in target {}'.\
-                format(sourcecol, targetcol))
-        
-        for exp in self.items:
-            # converts to 0 negative values
-            negmask = self.loc[exp,:,targetcol] < 0
-            self.loc[exp,negmask,targetcol] = 0
-            # aplies convolution with a normalized 1D Gaussian kernel
-            smooth_col = '{}_smooth'.format(targetcol)
-            self.loc[exp,:,smooth_col] = convolve(
-                np.array(self.loc[exp,:,targetcol]),
-                gauss,
-                boundary='extend',
-                normalize_kernel=True
-                )
-        self.log_r(\
-'**Calculated DELTA PRE Smoothed** for source {} in target {} \
-with window size {} and stdev {}'.\
-            format(sourcecol, smooth_col, guass_x_size, gaussian_stddev))
-
-        return
-    
-    def write_table(
-            self, restraint_folder,
-            tablecol,
-            resonance_type='Backbone'):
-        """
-        Exports to .csv file the columns along the series.
-        
-        Parameters:
-            restraint_folder (str): the folder name.
-            
-            tablecol (str): the column name to be exported.
-            
-            resonance_type (str): {'Backbone', 'Sidechains'}
-        """
-        
-        # concatenates the values of the table with the residues numbers
-        try:
-            data_table = self.loc[:,:,tablecol].astype(float)
-            is_float = True
-        
-        except ValueError:
-            data_table = self.loc[:,:,tablecol]
-            is_float = False
-            
-        if resonance_type == 'Backbone':
-            table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
-        
-        if resonance_type == 'Sidechains':
-            table = pd.concat(
-                [
-                    self.res_info.iloc[0,:,0],
-                    self.ix[0,:,'ATOM'],
-                    self.res_info.iloc[0,:,1:3],
-                    data_table
-                    ],
-                axis=1
-                )
-        
-        tablefolder = '{}/{}'.format(
-            self.tables_and_plots_folder, 
-            restraint_folder
-            )
-        
-        if not(os.path.exists(tablefolder)):
-            os.makedirs(tablefolder)
-        
-        file_path = '{}/{}.csv'.format(tablefolder, tablecol)
-        fileout = open(file_path, 'w')
-        header = \
-            "# Table for '{}' resonances.\n".format(self.resonance_type)
-        header += self.create_header(
-            extra_info="Datapoints in series: {}".\
-                format(list(self.series_datapoints)),
-            file_path=file_path
-            )
-        header += "# {} data\n#\n".format(tablecol)
-        fileout.write(header)
-        
-        if is_float:
-            fileout.write(
-                table.to_csv(
-                    sep=',',
-                    index=False,
-                    na_rep='NaN',
-                    float_format='%.4f'
-                    )
-                )
-        
-        else:
-            fileout.write(
-                table.to_csv(
-                    sep=',',
-                    index=False,
-                    na_rep='NaN',
-                    )
-                )
-        
-        fileout.close()
-        self.log_r('**Exported data table:** {}'.format(file_path))
-        
-        return
-    
-    def write_Chimera_attributes(
-            self, calccol,
-            resformat=':',
-            colformat='{:.5f}'):
-        """
-        Exports values in column to Chimera Attribute files.
-        http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
-        
-        One file is exported for each experiment in the Series.
-        
-        Parameters:
-            resformat (str): formatting prefix for the 'ResNo' column. 
-                Must match the residue selection command in Chimera.
-                See:
-                www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
-                Defined in the Chimera_ATT_Res_format variable.
-            
-            colformat (str): formatting code.
-        """
-        
-        s2w = ''
-        resform = lambda x: "\t{}{}\t".format(resformat, x)
-        colform = lambda x: colformat.format(x)
-        formatting = {'ResNo': resform}
-        
-        for item in self.items:
-            mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
-            mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
-            mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
-            file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
-            
-            if not(os.path.exists(file_path)):
-                os.makedirs(file_path)
-            
-            file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
-            fileout = open(file_name, 'w')
-            header = self.create_header(file_path=file_name)
-            attheader = \
-"""#
-#
-# missing peaks {}
-#
-# unassigned peaks {}
-#
-attribute: {}
-match mode: 1-to-1
-recipient: residues
-\t""".\
-                format(
-                    resformat+self.loc[item,mask_missing,'ResNo'].\
-                        to_string(header=False, index=False).\
-                            replace(' ', '').replace('\n', ','),
-                    resformat+self.loc[item,mask_unassigned,'ResNo'].\
-                        to_string(header=False, index=False).\
-                            replace(' ', '').replace('\n', ','),
-                    calccol.lower()
-                    )
-            fileout.write(header+attheader)
-            formatting[calccol] = colform
-            to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
-                to_string(
-                    header=False,
-                    index=False,
-                    formatters=formatting,
-                    col_space=0
-                    ).replace(' ', '')
-            fileout.write(to_write)
-            fileout.close()
-            self.log_r('**Exported Chimera Att** {}'.format(file_name))
-        
-        return
-    
-    def export_series_to_tsv(self):
-        """
-        Exports the experimental series with measured and
-        calculated data to .csv files.
-        """
-        
-        for item in self.items:
-            file_path = '{}/{}.csv'.format(self.export_series_folder, item)
-            fileout = open(file_path, 'w')
-            ###
-            header = self.create_header(
-                extra_info="Peaklist from datapoint: {}".format(item),
-                file_path=file_path
-                )
-            fileout.write(header)
-            fileout.write(
-                self.loc[item].to_csv(
-                    sep=',',
-                    index=False,
-                    na_rep='NaN',
-                    float_format='%.4f'
-                    )
-                )
-            self.log_r('**Exported parsed peaklist** {}'.format(file_path))
-            fileout.close()
-        
-        return
-    
-    def set_item_colors(self, items, series, d):
+    def _set_item_colors(self, items, series, d):
         """
         Translates the 'Peak Status' col to a dict of colours.
         
@@ -968,7 +474,7 @@ recipient: residues
                 continue
         return
     
-    def text_marker(
+    def _text_marker(
             self, ax,
             axbar, series,
             d, yy_scale,
@@ -1034,7 +540,7 @@ recipient: residues
         
         return
     
-    def plot_threshold(
+    def _plot_threshold(
             self, ax,
             series, color,
             lw, alpha,
@@ -1102,7 +608,7 @@ recipient: residues
         
         return
     
-    def plot_theo_pre(
+    def _plot_theo_pre(
             self, axs,
             exp, y,
             bartype='h',
@@ -1219,6 +725,469 @@ recipient: residues
         
         else:
             return
+    
+    def _write_plot(
+            self, fig, header_fontsize,
+            plot_name, folder,
+            calccol, fig_file_type, 
+            fig_dpi):
+        """
+        Saves plot figure to a file.
+        
+        Parameters:
+            fig (matplotlib figure object):
+            
+            plot_name (str): the name of the plot file.
+            
+            folder (str): the name of the folder to write the plot.
+            
+            calccol (str): the data column name.
+            
+            fig_file_type (str): file extension.
+            
+            fig_dpi (int): the dpi resolution.
+        """
+        
+        plot_folder = '{}/{}'.format(self.tables_and_plots_folder, folder)
+        
+        if not(os.path.exists(plot_folder)):
+            os.makedirs(plot_folder)
+        
+        file_path = '{}/{}_{}.{}'.format(
+            plot_folder,
+            calccol,
+            plot_name,
+            fig_file_type
+            )
+        
+        header = self._create_header(file_path=file_path)
+        fig.text(0.01, 0.01, header, fontsize=header_fontsize)
+        fig.savefig(file_path, dpi=fig_dpi)
+        self.logs('**Plot Saved** {}'.format(file_path))
+        
+        return
+    
+    def logs(self, logstr, istitle=False):
+        """
+        Registers the log string and prints it.
+        
+        Parameters:
+            logstr (str): the string to be registered in the log.
+            
+            istitle (opt, bool): flag to format logstr as a title.
+        """
+        
+        if istitle:
+            logstr = \
+"""
+{0}  
+{1}  
+{0}  
+""".format('*'*79, logstr)
+        
+        self.logger.info(logstr)
+        
+        return None
+    
+    def calc_cs_diffs(self, calccol, sourcecol):
+        """
+        Calculates the difference between two columns along a Series 
+        using as reference the column from the reference experiment, 
+        which is always stored in Item=0.
+        
+        Calculation results are stored in new columns.
+        """
+        
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,sourcecol].sub(self.ix[0,:,sourcecol], axis='index')
+        
+        # sets missing peaks results according to the self.cs_missing
+        if self.cs_missing == 'full':
+            for item in self.items:
+                mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
+                self.loc[item,mask_missing,calccol] = 1.
+        
+        elif self.cs_missing == 'prev':
+            for iitem in range(1, len(self.items)):
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = \
+                    self.ix[iitem-1,mask_missing,calccol]
+        
+        elif self.cs_missing == 'zero':
+            for iitem in range(1, len(self.items)):
+                mask_missing = self.ix[iitem,:,'Peak Status'] == 'missing'
+                self.ix[iitem,mask_missing,calccol] = 0
+        
+        self.logs('**Calculated** {}'.format(calccol))
+        
+        return
+    
+    def calc_ratio(self, calccol, sourcecol):
+        """
+        Calculates the ratio between two columns along a series of
+        experiments using as reference the column from the reference
+        experiment, which is always stored in Item=0.
+        
+        Calculation result is stored in a new column of each DataFrame.
+        """
+        
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,sourcecol].div(self.ix[0,:,sourcecol], axis='index')
+        self.logs('**Calculated** {}'.format(calccol))
+        
+        return
+    
+    def csp_willi(self, s):
+        """
+        Formula that calculates Chemical Shift Perturbations (CSPs).
+        
+        Parameters:
+            s (pd.Series): s[0], 1-letter res code; s[1]; chemical shift 
+            for nuclei 1, s[2], chemical shift for nuclei 2.
+        
+        np.sqrt(0.5*(H1**2 + (alpha*N15)**2))
+
+        where the proportional normalization factor (alpha) for the 15N
+        dimension is set by default to 0.2 for Glycine and 0.14 for all
+        the other residues.
+
+        Williamson, M. P. Using chemical shift perturbation to
+        characterise ligand binding. Prog. Nuc. Magn. Res. Spect.
+        73, 1–16 (2013). SEE CORRIGENDUM
+        """
+        return np.sqrt(0.5*(s[1]**2+(self.csp_alpha4res[s[0]]*s[2])**2))
+    
+    def calc_csp(self, calccol='CSP', pos1='PosF1_delta', pos2='PosF2_delta'):
+        """
+        Calculates the Chemical Shift Perturbation (CSP) values
+        based on a formula.
+        
+        calccol (str): the name of the new column that stores results.
+        pos1 (str): the column name of the source data for nuclei 1.
+        pos2 (str): the column name for the source data for nuclei 2.
+        """
+
+        self.loc[:,:,calccol] = \
+            self.loc[:,:,['1-letter',pos1,pos2]].\
+                apply(lambda x: self.csp_willi(x), axis=2)
+        self.logs('**Calculated** {}'.format(calccol))
+        
+        return
+    
+    def load_theoretical_PRE(self, spectra_path, datapoint):
+        """
+        Loads theoretical PRE values to represent in bar plots.
+        
+        Theorital PRE files (*.pre) should be stored in a '01_para' 
+        or 'para' folder at the along_z hierarchy level.
+        
+        Reads information on the tag position stored in the
+        *.pre file as an header comment, for example, '#40'.
+        
+        Parameters:
+            spectra_path (str): absolute path to the spectra/ folder.
+            
+            datapoint (str): the name of the data point.
+        
+        Modifies: 
+            self: added columns 'tag', 'Theo PRE'.
+        """
+        if not(self.para_name):
+            self._abort(fsw(
+                msg_title="ERROR",
+                msg="Paramagnetic Z axis name incorrect",
+                wet_num=1
+                ))
+            return
+        self.PRE_loaded = True
+        target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
+        pre_file = glob.glob('{}*.pre'.format(target_folder))
+        
+        if len(pre_file) > 1:
+            raise ValueError(
+                '@@@ There are more than one .pre file in the folder {}'.\
+                    format(target_folder)
+                )
+        
+        elif len(pre_file) < 1:
+            raise ValueError('@@@ There is no .pre file in folder {}'.\
+                format(target_folder))
+        
+        # loads theoretical PRE data to 'Theo PRE' new column
+        # sets 1 to the diamagnetic Item.
+        predf = pd.read_csv(
+            pre_file[0],
+            sep='\s+',
+            usecols=[1],
+            names=['Theo PRE'],
+            comment='#'
+            )
+        self.logs('**Added Theoretical PRE file** {}'.format(pre_file[0]))
+        self.logs('*Theoretical PRE for diamagnetic set to 1 by default*')
+        self.loc[:,:,'Theo PRE'] = 1
+        self.loc[self.para_name,:,'Theo PRE'] = predf.loc[:,'Theo PRE']
+        # reads information on the tag position.
+        tagf = open(pre_file[0], 'r')
+        tag = tagf.readline().strip().strip('#')
+        
+        try:
+            tag_num = int(tag)
+        
+        except ValueError:
+            msg = \
+"Theoretical PRE file incomplete. Header with tag number is missing."
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=15))
+        
+        # check tag residue
+        if not(any(self.loc[self.para_name,:,'ResNo'].isin([tag]))):
+            msg = \
+'The residue number where the tag is placed according to the \*.pre file ({}) \
+is not part of the protein sequence ({}-{}).'.\
+                format(
+                    tag_num,
+                    int(self.res_info.iloc[0,0,0]),
+                    int(self.res_info.iloc[0,:,0].tail(n=1))
+                    )
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=17))
+        
+        self.loc[self.para_name,:,'tag'] = ''
+        tagmask = self.loc[self.para_name,:,'ResNo'] == tag
+        self.loc[self.para_name,tagmask,'tag'] = '*'
+        tagf.close()
+        self.logs('**Tag position found** at residue {}'.format(tag_num))
+        
+        return
+        
+    def calc_Delta_PRE(
+            self, sourcecol,
+            targetcol,
+            guass_x_size=7,
+            gaussian_stddev=1):
+        """
+        Calculates DELTA PRE.
+        
+        Arbesú, M. et al. The Unique Domain Forms a Fuzzy Intramolecular 
+        Complex in Src Family Kinases. Structure 25, 630–640.e4 (2017).
+        
+        Parameters:
+            sourcecol (str): the column name of the intensity data.
+            
+            targetcol (str): the column name to store delta PRE data.
+            
+            guass_x_size (int): 1D Gaussian kernel of window size.
+            
+            gaussian_stddev (int): standard deviation.
+        """
+        # astropy is imported to avoind demanding import when not necessary
+        from astropy.convolution import Gaussian1DKernel, convolve
+        
+        # http://docs.astropy.org/en/stable/api/astropy.convolution.Gaussian1DKernel.html
+        gauss = Gaussian1DKernel(gaussian_stddev, x_size=guass_x_size)
+        self.loc[:,:,targetcol] = \
+            self.loc[:,:,'Theo PRE'].sub(self.loc[:,:,sourcecol])
+        self.logs('**Calculated DELTA PRE** for source {} in target {}'.\
+                format(sourcecol, targetcol))
+        
+        for exp in self.items:
+            # converts to 0 negative values
+            negmask = self.loc[exp,:,targetcol] < 0
+            self.loc[exp,negmask,targetcol] = 0
+            # aplies convolution with a normalized 1D Gaussian kernel
+            smooth_col = '{}_smooth'.format(targetcol)
+            self.loc[exp,:,smooth_col] = convolve(
+                np.array(self.loc[exp,:,targetcol]),
+                gauss,
+                boundary='extend',
+                normalize_kernel=True
+                )
+        self.logs(\
+'**Calculated DELTA PRE Smoothed** for source {} in target {} \
+with window size {} and stdev {}'.\
+            format(sourcecol, smooth_col, guass_x_size, gaussian_stddev))
+
+        return
+    
+    def write_table(
+            self, restraint_folder,
+            tablecol,
+            resonance_type='Backbone'):
+        """
+        Exports to .csv file the columns along the series.
+        
+        Parameters:
+            restraint_folder (str): the folder name.
+            
+            tablecol (str): the column name to be exported.
+            
+            resonance_type (str): {'Backbone', 'Sidechains'}
+        """
+        
+        # concatenates the values of the table with the residues numbers
+        try:
+            data_table = self.loc[:,:,tablecol].astype(float)
+            is_float = True
+        
+        except ValueError:
+            data_table = self.loc[:,:,tablecol]
+            is_float = False
+            
+        if resonance_type == 'Backbone':
+            table = pd.concat([self.res_info.iloc[0,:,0:3], data_table], axis=1)
+        
+        if resonance_type == 'Sidechains':
+            table = pd.concat(
+                [
+                    self.res_info.iloc[0,:,0],
+                    self.ix[0,:,'ATOM'],
+                    self.res_info.iloc[0,:,1:3],
+                    data_table
+                    ],
+                axis=1
+                )
+        
+        tablefolder = '{}/{}'.format(
+            self.tables_and_plots_folder, 
+            restraint_folder
+            )
+        
+        if not(os.path.exists(tablefolder)):
+            os.makedirs(tablefolder)
+        
+        file_path = '{}/{}.csv'.format(tablefolder, tablecol)
+        fileout = open(file_path, 'w')
+        header = \
+            "# Table for '{}' resonances.\n".format(self.resonance_type)
+        header += self._create_header(
+            extra_info="Datapoints in series: {}".\
+                format(list(self.series_datapoints)),
+            file_path=file_path
+            )
+        header += "# {} data\n#\n".format(tablecol)
+        fileout.write(header)
+        
+        if is_float:
+            fileout.write(
+                table.to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    float_format='%.4f'
+                    )
+                )
+        
+        else:
+            fileout.write(
+                table.to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    )
+                )
+        
+        fileout.close()
+        self.logs('**Exported data table:** {}'.format(file_path))
+        
+        return
+    
+    def write_Chimera_attributes(
+            self, calccol,
+            resformat=':',
+            colformat='{:.5f}'):
+        """
+        Exports values in column to Chimera Attribute files.
+        http://www.cgl.ucsf.edu/chimera/docs/ContributedSoftware/defineattrib/defineattrib.html#attrfile
+        
+        One file is exported for each experiment in the Series.
+        
+        Parameters:
+            resformat (str): formatting prefix for the 'ResNo' column. 
+                Must match the residue selection command in Chimera.
+                See:
+                www.cgl.ucsf.edu/chimera/docs/UsersGuide/midas/frameatom_spec.html
+                Defined in the Chimera_ATT_Res_format variable.
+            
+            colformat (str): formatting code.
+        """
+        
+        s2w = ''
+        resform = lambda x: "\t{}{}\t".format(resformat, x)
+        colform = lambda x: colformat.format(x)
+        formatting = {'ResNo': resform}
+        
+        for item in self.items:
+            mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
+            mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
+            mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
+            file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
+            
+            if not(os.path.exists(file_path)):
+                os.makedirs(file_path)
+            
+            file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
+            fileout = open(file_name, 'w')
+            header = self._create_header(file_path=file_name)
+            attheader = \
+"""#
+#
+# missing peaks {}
+#
+# unassigned peaks {}
+#
+attribute: {}
+match mode: 1-to-1
+recipient: residues
+\t""".\
+                format(
+                    resformat+self.loc[item,mask_missing,'ResNo'].\
+                        to_string(header=False, index=False).\
+                            replace(' ', '').replace('\n', ','),
+                    resformat+self.loc[item,mask_unassigned,'ResNo'].\
+                        to_string(header=False, index=False).\
+                            replace(' ', '').replace('\n', ','),
+                    calccol.lower()
+                    )
+            fileout.write(header+attheader)
+            formatting[calccol] = colform
+            to_write = self.loc[item,mask_measured,['ResNo',calccol]].\
+                to_string(
+                    header=False,
+                    index=False,
+                    formatters=formatting,
+                    col_space=0
+                    ).replace(' ', '')
+            fileout.write(to_write)
+            fileout.close()
+            self.logs('**Exported Chimera Att** {}'.format(file_name))
+        
+        return
+    
+    def export_series_to_tsv(self):
+        """
+        Exports the experimental series with measured and
+        calculated data to .csv files.
+        """
+        
+        for item in self.items:
+            file_path = '{}/{}.csv'.format(self.export_series_folder, item)
+            fileout = open(file_path, 'w')
+            ###
+            header = self._create_header(
+                extra_info="Peaklist from datapoint: {}".format(item),
+                file_path=file_path
+                )
+            fileout.write(header)
+            fileout.write(
+                self.loc[item].to_csv(
+                    sep=',',
+                    index=False,
+                    na_rep='NaN',
+                    float_format='%.4f'
+                    )
+                )
+            self.logs('**Exported parsed peaklist** {}'.format(file_path))
+            fileout.close()
+        
+        return
     
     def plot_bar_horizontal(
         self, plot_style,
@@ -1342,7 +1311,7 @@ recipient: residues
             
             # defines xticks colors
             if x_ticks_color_flag:
-                self.set_item_colors(
+                self._set_item_colors(
                     axs[i].get_xticklabels(),
                     self.loc[experiment,0::xtick_spacing,'Peak Status'],
                     {
@@ -1378,7 +1347,7 @@ recipient: residues
             
             # defines xticks colors
             if x_ticks_color_flag:
-                self.set_item_colors(
+                self._set_item_colors(
                     axs[i].get_xticklabels(),
                     self.loc[experiment, :, 'Peak Status'],
                     {
@@ -1443,7 +1412,7 @@ recipient: residues
             weight=subtitle_weight
             )
         # defines bars colors
-        self.set_item_colors(
+        self._set_item_colors(
             bars,
             self.loc[experiment,:,'Peak Status'],
             {
@@ -1509,7 +1478,7 @@ recipient: residues
         
         # Adds red line to identify significant changes.
         if threshold_flag and (calccol in self.restraint_list[:3]):
-            self.plot_threshold(
+            self._plot_threshold(
                 axs[i],
                 self.loc[experiment,:,calccol],
                 threshold_color,
@@ -1519,7 +1488,7 @@ recipient: residues
                 )
         
         if mark_prolines_flag:
-            self.text_marker(
+            self._text_marker(
                 axs[i],
                 bars,
                 self.loc[experiment,:,'1-letter'],
@@ -1529,7 +1498,7 @@ recipient: residues
                 )
         
         if mark_user_details_flag:
-            self.text_marker(
+            self._text_marker(
                 axs[i],
                 bars,
                 self.loc[experiment,:,'Details'],
@@ -1539,14 +1508,14 @@ recipient: residues
                 )
         
         if color_user_details_flag:
-            self.set_item_colors(
+            self._set_item_colors(
                 bars,
                 self.loc[experiment,:,'Details'],
                 user_bar_colors_dict
                 )
         
         if self.PRE_loaded and (calccol in self.restraint_list[3:]):
-            self.plot_theo_pre(
+            self._plot_theo_pre(
                 axs[i],
                 experiment,
                 y_lims[1]*0.05,
@@ -1683,7 +1652,7 @@ recipient: residues
             rotation=0
             )
         ## defines colors
-        self.set_item_colors(
+        self._set_item_colors(
             bars,
             self.loc[experiment,:,'Peak Status'],
             {
@@ -1694,7 +1663,7 @@ recipient: residues
             )
         
         if x_ticks_color_flag:
-            self.set_item_colors(
+            self._set_item_colors(
                 axs[i].get_yticklabels(),
                 self.loc[experiment,0::xtick_spacing,'Peak Status'],
                 {
@@ -1757,7 +1726,7 @@ recipient: residues
         
         # Adds red line to identify significant changes.
         if threshold_flag and (calccol in self.restraint_list[:3]):
-            self.plot_threshold(
+            self._plot_threshold(
                 axs[i],
                 self.loc[experiment,:,calccol],
                 threshold_color,
@@ -1768,7 +1737,7 @@ recipient: residues
                 )
         
         if mark_prolines_flag:
-            self.text_marker(
+            self._text_marker(
                 axs[i],
                 bars,
                 self.loc[experiment,:,'1-letter'],
@@ -1779,7 +1748,7 @@ recipient: residues
                 )
         
         if mark_user_details_flag:
-            self.text_marker(
+            self._text_marker(
                 axs[i],
                 bars,
                 self.loc[experiment,:,'Details'],
@@ -1790,14 +1759,14 @@ recipient: residues
                 )
         
         if color_user_details_flag:
-            self.set_item_colors(
+            self._set_item_colors(
                 bars,
                 self.loc[experiment,:,'Details'],
                 user_bar_colors_dict
                 )
         
         if self.PRE_loaded and (calccol in self.restraint_list[3:]):
-            self.plot_theo_pre(
+            self._plot_theo_pre(
                 axs[i],
                 experiment,
                 y_lims[1]*0.1,
@@ -1901,8 +1870,7 @@ recipient: residues
 data points <along_x>, i.e. input peaklists. Please correct <fitting_x_values> \
 variable or confirm you have not forgot any peaklist [{}].".\
                     format(titration_x_values, self.items)
-                self.log_r(fsw.gen_wet('ERROR', msg, 5))
-                self.abort()
+                self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=5))
             
             x = np.array(titration_x_values)
             xmin = titration_x_values[0]
@@ -2267,7 +2235,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         
         elif mk_type == 'color':
             # represents the points as circles with a gradient of color
-            mk_color = self.linear_gradient(
+            mk_color = self._linear_gradient(
                 mk_start_color,
                 finish_hex=mk_end_color,
                 n=self.shape[0]
@@ -2406,7 +2374,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         
         # if the user wants a gradient of color
         if color_grad:
-            mk_color = self.linear_gradient(
+            mk_color = self._linear_gradient(
                 mk_start_color,
                 finish_hex=mk_end_color,
                 n=len(self.items)
@@ -2415,13 +2383,28 @@ variable or confirm you have not forgot any peaklist [{}].".\
         # otherwise the user has input a list of colors
         else: 
             mk_color = color_list
-        
+                
         for i, residue in enumerate(self.major_axis):
             
-            if self.ix[0,residue,'Peak Status'] == 'unassigned':
+            if self.ix[0,residue,'Peak Status'] in ('unassigned','missing'):
                 continue
             
             mesmask = self.loc[:,residue,'Peak Status'] == 'measured'
+            
+            if self.loc[mesmask,residue,['H1_delta','N15_delta']].\
+                    isnull().values.any():
+                
+                msg = "Information for residue {} was kept out of this plot.\
+This is because a NaN value was identified in the chemical shift information.\
+This can be explained if this residues was missing in the reference peaklist \
+but measured in a subsequent peaklist".\
+                    format(self.loc[mesmask,residue,'ResNo'].\
+                        to_string(index=False))
+                
+                wet36 = fsw(msg_title='NOTE', msg=msg, wet_num=36)
+                self.logs(wet36.wet)
+                continue
+            
             axs[0].scatter(
                 self.loc[mesmask,residue,'H1_delta'],
                 self.loc[mesmask,residue,'N15_delta'],
@@ -2573,7 +2556,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         axs[i].spines['bottom'].set_zorder(10)
         axs[i].spines['top'].set_zorder(10)
-        self.plot_theo_pre(
+        self._plot_theo_pre(
             axs[i],
             experiment,
             2,
@@ -2863,7 +2846,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     fontsize=res_highlight_fs
                     )
         
-        self.plot_theo_pre(
+        self._plot_theo_pre(
             axs[i],
             experiment,
             y_lims[1]*0.1,
@@ -2875,7 +2858,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
         
         return
     
-    def clean_subplots(self, axs, start, end):
+    def _clean_subplots(self, axs, start, end):
         """Hides/Removes the unused subplots from the plotting figure."""
         
         for i in range(start, end):
@@ -2928,7 +2911,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 function.
         """
         
-        self.log_r('**Plotting** {} for {}...'.format(plot_style, calccol))
+        self.logs('**Plotting** {} for {}...'.format(plot_style, calccol))
         # this to allow folder change in PRE_analysis
         folder = calccol
         
@@ -2974,7 +2957,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                 fig.subplots_adjust(hspace=hspace)
             
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'bar_vertical':
             for i, experiment in enumerate(self):
@@ -2989,7 +2972,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'res_evo':
             for i, row_number in enumerate(self.major_axis):
@@ -3004,18 +2987,18 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter':
             for i, row_number in enumerate(self.major_axis):
                 self.plot_cs_scatter(axs, i, row_number, **param_dict)
             
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
         
         elif plot_style == 'cs_scatter_flower':
             self.plot_cs_scatter_flower(axs, **param_dict)
-            self.clean_subplots(axs, 1, len(axs))
+            self._clean_subplots(axs, 1, len(axs))
         
         elif plot_style == 'heat_map':
             for i, experiment in enumerate(self):
@@ -3030,13 +3013,13 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     **param_dict
                     )
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             
         elif plot_style == 'DPRE_plot':
-            dp_colors = self.linear_gradient(
+            dp_colors = self._linear_gradient(
                 param_dict['color_init'],
                 param_dict['color_end'],
                 n=self.shape[0]
@@ -3054,13 +3037,13 @@ variable or confirm you have not forgot any peaklist [{}].".\
                     )
             
             else:
-                self.clean_subplots(axs, num_subplots, len(axs))
+                self._clean_subplots(axs, num_subplots, len(axs))
             
             # to write all the PRE_analysis in the same folder
             folder='PRE_analysis'
             header_fontsize = 3.5
         
-        self.write_plot(
+        self._write_plot(
             fig,
             header_fontsize,
             plot_style,
@@ -3070,46 +3053,6 @@ variable or confirm you have not forgot any peaklist [{}].".\
             fig_dpi
             )
         plt.close('all')
-        
-        return
-    
-    def write_plot(
-            self, fig, header_fontsize,
-            plot_name, folder,
-            calccol, fig_file_type, 
-            fig_dpi):
-        """
-        Saves plot figure to a file.
-        
-        Parameters:
-            fig (matplotlib figure object):
-            
-            plot_name (str): the name of the plot file.
-            
-            folder (str): the name of the folder to write the plot.
-            
-            calccol (str): the data column name.
-            
-            fig_file_type (str): file extension.
-            
-            fig_dpi (int): the dpi resolution.
-        """
-        
-        plot_folder = '{}/{}'.format(self.tables_and_plots_folder, folder)
-        
-        if not(os.path.exists(plot_folder)):
-            os.makedirs(plot_folder)
-        
-        file_path = '{}/{}_{}.{}'.format(
-            plot_folder,
-            calccol,
-            plot_name,
-            fig_file_type
-            )
-        header = self.create_header(file_path=file_path)
-        fig.text(0.01, 0.01, header, fontsize=header_fontsize)
-        fig.savefig(file_path, dpi=fig_dpi)
-        self.log_r('**Plot Saved** {}'.format(file_path))
         
         return
     
@@ -3140,10 +3083,9 @@ variable or confirm you have not forgot any peaklist [{}].".\
         except TypeError:
             msg = "Chosen fitting function <{}> not an available option.".\
                 format(fit_function)
-            self.log_r(fsw.gen_wet('ERROR', msg, 23))
-            self.abort()
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=23))
         
-        self.log_r("*** Performing fit using function: {}".format(fit_function))
+        self.logs("*** Performing fit using function: {}".format(fit_function))
         # logging ###
         not_enough_data = to_fit.not_enough_data
         col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
@@ -3163,7 +3105,7 @@ variable or confirm you have not forgot any peaklist [{}].".\
             )
         logftable = open(logftable_name, 'w')
         logftable.write(to_fit.results_header())
-        self.log_r('** Performing fitting for {}...'.format(col))
+        self.logs('** Performing fitting for {}...'.format(col))
         measured_mask = self.loc[:,:, 'Peak Status'] == 'measured'
         self.xfit = np.linspace(0, x_values[-1], 200, endpoint=True)
         
@@ -3199,9 +3141,12 @@ variable or confirm you have not forgot any peaklist [{}].".\
             self.fit_plot_ydata[col_res] = e
         
         logfreport.close()
-        self.log_r("*** Fit report log file written: {}".format(logfrep_name))
+        self.logs("*** Fit report log file written: {}".format(logfrep_name))
         logftable.close()
-        self.log_r("*** Fit table log file written: {}".format(logftable_name))
+        self.logs("*** Fit table log file written: {}".format(logftable_name))
         
         return
     
+if __name__ == "__main__":
+    
+    print('FarseerSeries')

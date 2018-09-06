@@ -294,7 +294,6 @@
         "fig_width": 8.69,
         "has_sidechains": false,
         "use_sidechains": false,
-        "logfile_name": "farseer_log.md",
         "output_path": "",
         "spectra_path": ""
     },
