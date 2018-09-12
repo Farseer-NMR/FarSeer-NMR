@@ -20,15 +20,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
-import logging.config
+#import logging
+#import logging.config
 import numpy as np
 import pandas as pd
-import core.fslibs.log_config as fslogconf
+import core.fslibs.Logger as Logger
+from core.fslibs.WetHandler import WetHandler as fsw
 
 class Comparisons:
     """
-    Prepares parsed data along next and previous axis of the calculation.
+    Prepares parsed data along next and previous axes of the calculation.
     
     Given a dictionary containing all the series (FarseerSeries) along
     a given axis of the Farseer-NMR Cube, the Comparisons class stores
@@ -38,7 +39,7 @@ class Comparisons:
     
     Different dictionaries are stored for next and previous parsed axes.
     
-    Parameters:
+    Attributes:
         dimension (str): identifies the main dimension axis of the class
             where X = along_x, Y = along_y, Z = along_z
         
@@ -58,22 +59,7 @@ class Comparisons:
         
         has_points_prev_dim (bool): True if points are found along the
             previous dimension. False by default.
-        
-        log (str): stores the whole log.
-        
-        log_export_onthefly (bool): Flag that activates on-the-fly log
-            on an external file.
-        
-        log_export_name (str): the name of the external log file that is
-            written on-the-fly.
     
-    Methods:
-        .log_r()
-        .exports_log()
-        .abort()
-        .gen_next_dim()
-        .gen_prev_dim()
-        .transfer_log()
     """
     def __init__(
             self,
@@ -85,8 +71,7 @@ class Comparisons:
             dimension_dict (dict): is a dictionary containing all the
             series for the main dimension.
         """
-        self.logger = logging.getLogger(__name__)
-        logging.config.dictConfig(fslogconf.farseer_log_config)
+        self.logger = Logger.FarseerLogger(__name__).setup_log()
         self.logger.debug('logger initiated')
         
         self.p5d = pd.core.panelnd.create_nd_panel_factory(
@@ -118,11 +103,21 @@ class Comparisons:
         # becomes true after gen_comparison_*()
         self.has_points_next_dim = False
         self.has_points_prev_dim = False
-        self.log = ''  # all log goes here
-        self.log_export_onthefly = False
-        self.log_export_name = 'Comparison_log.md'
     
-    def log_r(self, logstr, istitle=False):
+    def _abort(self, wet):
+        """
+        Aborts run with message. Writes message to log.
+        
+        Parameters:
+            - wet (WetHandler)
+        """
+        self.logs(wet.wet)
+        self.logs(wet.abort_msg())
+        wet.abort()
+        
+        return None
+    
+    def logs(self, logstr, istitle=False):
         """
         Registers the log and prints to the user.
         
@@ -141,33 +136,9 @@ class Comparisons:
 """.\
                 format('*'*79, logstr)
         
-        else:
-            logstr += '  \n'
+        self.logger.info(logstr)
         
-        print(logstr)
-        self.log += logstr
-        # appends log to external file on the fly
-        
-        if self.log_export_onthefly:
-            with open(self.log_export_name, 'a') as logfile:
-                logfile.write(logstr)
-        
-        return
-    
-    def exports_log(self, mod='w', logfile_name='Comparison_log.md'):
-        """ Exports log to external file. """
-        
-        with open(logfile_name, mod) as logfile:
-            logfile.write(self.log)
-        
-        return
-    
-    def abort(self):
-        """Aborts Farseer-NMR run"""
-        self.log_r(fsw.abort_msg)
-        fsw.abort()
-        
-        return
+        return None
         
     def gen_next_dim(self, series_class, comp_kwargs):
         """
@@ -185,7 +156,7 @@ class Comparisons:
             all_next_dim (dict)
         """
         
-        self.log_r(
+        self.logs(
             'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(
                     self.dimension,
                     self.other_dim_keys[0],
@@ -215,14 +186,14 @@ class Comparisons:
                         )
                     self.all_next_dim[dp2].setdefault(dp1, comparison)
             
-            self.log_r('** Generated comparison dictionary')
+            self.logs('** Generated comparison dictionary')
             self.has_points_next_dim = True
         
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare along {}'.\
+            self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[0]))
         
-        return
+        return None
     
     def gen_prev_dim(self, series_class, comp_kwargs):
         """
@@ -240,7 +211,7 @@ class Comparisons:
             all_prev_dim (dict)
         """
         
-        self.log_r(
+        self.logs(
             'GENERATING COMPARISONS FOR **{}** ALONG {}: {}'.format(
                     self.dimension,
                     self.other_dim_keys[1],
@@ -270,31 +241,11 @@ class Comparisons:
                         )
                     self.all_prev_dim[dp2].setdefault(dp1, comparison)
             
-            self.log_r('** Generated comparison dictionary')
+            self.logs('** Generated comparison dictionary')
             self.has_points_prev_dim = True
             
         elif len(self.hyper_panel.labels) <= 1:
-            self.log_r('*** There are no points to compare along {}'.\
+            self.logs('*** There are no points to compare along {}'.\
                 format(self.other_dim_keys[1]))
         
-        return
-    
-    def transfer_log(self):
-        """
-        Transfers logs from the Series objects in self.all_prev_dim
-        and self.all_next_dim to the main class object.
-        """
-        
-        if self.has_points_next_dim:
-            for dim2_pt in sorted(self.all_next_dim.keys()):
-                for dim1_pt in sorted(self.all_next_dim[dim2_pt].keys()):
-                    self.log += self.all_next_dim[dim2_pt][dim1_pt].log
-        
-        if self.has_points_prev_dim:
-            for dim2_pt in sorted(self.all_prev_dim.keys()):
-                for dim1_pt in sorted(self.all_prev_dim[dim2_pt].keys()):
-                    self.log += self.all_prev_dim[dim2_pt][dim1_pt].log
-        
-        return
-
-
+        return None

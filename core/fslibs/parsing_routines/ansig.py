@@ -25,7 +25,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import string
 from core.fslibs.Peak import Peak
-from core.fslibs import wet as fsw
+from core.fslibs.WetHandler import WetHandler as fsw
 
 def parse_ansig_peaklist(peaklist_file):
     """Parse a 2D peaklist in ANSIG format
@@ -78,8 +78,9 @@ ANSIG v3.3 export crosspeaks file
                 counter+2,
                 peaklist_file
                 )
-            print(fsw.gen_wet('ERROR', msg, 31))
-            fsw.abort(m="Aborting...")
+            wet31 = fsw(msg_title='ERROR', msg=msg, wet_num=31)
+            print(wet31.wet)
+            wet31.abort(m="Aborting...")
 
         elif len(ls) < 15:
             continue

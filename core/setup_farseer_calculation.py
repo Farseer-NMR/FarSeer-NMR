@@ -25,8 +25,9 @@ import os
 from shutil import copy2
 
 from core.parsing import read_peaklist
-from core.utils import aal1tol3, read_fasta_file, peaklist_format_requires_fasta
-from core.fslibs import wet as fsw
+from core.utils import aal1tol3, peaklist_format_requires_fasta
+from core.fslibs.WetHandler import WetHandler as fsw
+from core.fslibs.FastaHandler import FastaHandler
 
 def check_input_construction(output_path, variables):
 
@@ -203,14 +204,16 @@ def add_residue_information(peaklist_path, peak_list, fasta_path, fasta_start):
     """
     cleaned_peaklist = []
     # Generates a single string from the FASTA file
-    fasta = read_fasta_file(fasta_path)
-
+    fh = FastaHandler(fasta_path, fasta_start)
+    fh.reads_fasta_from_file()
+    fasta = fh.fasta_string
+    
     fasta_dict = \
         {ii + fasta_start: aal1tol3.get(residue)
             for ii, residue in enumerate(fasta)}
 
     for peak in peak_list:
-
+        print(peak.residue_number)
         try:
             res_type = fasta_dict[int(peak.residue_number)]
         except KeyError:
@@ -223,8 +226,9 @@ that is not present in your FASTA file
 Please review the agreement between your peaklists and FASTA file.
 """.\
                 format(peaklist_path, fasta_path)
-            print(fsw.gen_wet("ERROR", msg, 31))
-            fsw.abort(m="Bad peaklist format")
+            wet31 = fsw(msg_title='ERROR', msg=msg, wet_num=31)
+            print(wet31.wet)
+            wet31.abort(m="Bad peaklist format")
         peak.residue_type = res_type
         cleaned_peaklist.append(peak)
 
