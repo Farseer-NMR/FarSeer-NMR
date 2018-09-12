@@ -155,7 +155,7 @@ class FarseerNMR:
         
         if self.spectra_folder_path:
             
-            spectra_path = self.spectra_folder_path
+            spectra_path = os.path.abspath(self.spectra_folder_path)
         
         elif self.fsuv["general_settings"]["output_path"]:
             
