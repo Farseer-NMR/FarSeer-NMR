@@ -53,6 +53,7 @@ class DeltaPREPlotPopup(BasePopup):
             title="DPRE Plot",
             settings_key=["DPRE_plot_settings"]
             )
+        
         self.DPRE_plot_rows = LabelledSpinBox(self, "Number of Rows", minimum=1, step=1)
         self.DPRE_plot_width = LabelledSpinBox(self, "Scale Factor for Width")
         self.DPRE_plot_y_label = LabelledLineEdit(self, "Y Label")
@@ -159,8 +160,14 @@ class DeltaPREPlotPopup(BasePopup):
 
     def get_defaults(self):
         # value
-        self.DPRE_plot_rows.setValue(self.defaults["rows"])
-        self.DPRE_plot_width.setValue(self.defaults["width"])
+        try:
+            self.DPRE_plot_rows.setValue(self.defaults["rows_page"])
+        except KeyError:
+            self.DPRE_plot_rows.setValue(self.defaults["rows"])
+        try:
+            self.DPRE_plot_width.setValue(self.defaults["wspace"])
+        except KeyError:
+            self.DPRE_plot_width.setValue(self.defaults["width"])
         self.DPRE_plot_y_label_fs.setValue(self.defaults["y_label_fs"])
         self.DPRE_plot_dpre_ms.setValue(self.defaults["dpre_ms"])
         self.DPRE_plot_dpre_alpha.setValue(self.defaults["dpre_alpha"])
@@ -191,8 +198,8 @@ class DeltaPREPlotPopup(BasePopup):
     
     def set_values(self):
         # value
-        self.local_variables["rows"] = self.DPRE_plot_rows.field.value()
-        self.local_variables["width"] = self.DPRE_plot_width.field.value()
+        self.local_variables["rows_page"] = self.DPRE_plot_rows.field.value()
+        self.local_variables["wspace"] = self.DPRE_plot_width.field.value()
         self.local_variables["y_label_fs"] = self.DPRE_plot_y_label_fs.field.value()
         self.local_variables["dpre_ms"] = self.DPRE_plot_dpre_ms.field.value()
         self.local_variables["dpre_alpha"] = self.DPRE_plot_dpre_alpha.field.value()
@@ -222,8 +229,14 @@ class DeltaPREPlotPopup(BasePopup):
 
     def get_values(self):
         # value
-        self.DPRE_plot_rows.setValue(self.local_variables["rows"])
-        self.DPRE_plot_width.setValue(self.local_variables["width"])
+        try:
+            self.DPRE_plot_rows.setValue(self.local_variables["rows_page"])
+        except KeyError:
+            self.DPRE_plot_rows.setValue(self.local_variables["rows"])
+        try:
+            self.DPRE_plot_width.setValue(self.local_variables["wspace"])
+        except KeyError:
+            self.DPRE_plot_width.setValue(self.local_variables["width"])
         self.DPRE_plot_y_label_fs.setValue(self.local_variables["y_label_fs"])
         self.DPRE_plot_dpre_ms.setValue(self.local_variables["dpre_ms"])
         self.DPRE_plot_dpre_alpha.setValue(self.local_variables["dpre_alpha"])
