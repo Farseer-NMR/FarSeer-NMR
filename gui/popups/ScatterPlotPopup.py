@@ -99,7 +99,10 @@ class ScatterPlotPopup(BasePopup):
         # value
         self.cs_scatter_cols_page.setValue(self.defaults["cols_page"])
         self.cs_scatter_rows_page.setValue(self.defaults["rows_page"])
-        self.cs_scatter_mksize.setValue(self.defaults["mksize"])
+        try:
+            self.cs_scatter_mksize.setValue(self.defaults["mk_size"])
+        except KeyError:
+            self.cs_scatter_mksize.setValue(self.defaults["mksize"])
         self.cs_scatter_scale.setValue(self.defaults["scale"])
         # text
         self.cs_scatter_x_label.field.setText(self.defaults["x_label"])
@@ -120,7 +123,10 @@ class ScatterPlotPopup(BasePopup):
         # value
         self.local_variables["cols_page"] = self.cs_scatter_cols_page.field.value()
         self.local_variables["rows_page"] = self.cs_scatter_rows_page.field.value()
-        self.local_variables["mksize"] = self.cs_scatter_mksize.field.value()
+        try:
+            self.local_variables["mk_size"] = self.cs_scatter_mksize.field.value()
+        except:
+            self.local_variables["mksize"] = self.cs_scatter_mksize.field.value()
         self.local_variables["scale"] = self.cs_scatter_scale.field.value()
         # text
         self.local_variables["x_label"] = self.cs_scatter_x_label.field.text()
@@ -147,7 +153,10 @@ class ScatterPlotPopup(BasePopup):
         # values
         self.cs_scatter_cols_page.setValue(self.local_variables["cols_page"])
         self.cs_scatter_rows_page.setValue(self.local_variables["rows_page"])
-        self.cs_scatter_mksize.setValue(self.local_variables["mksize"])
+        try:
+            self.cs_scatter_mksize.setValue(self.local_variables["mk_size"])
+        except KeyError:
+            self.cs_scatter_mksize.setValue(self.local_variables["mksize"])
         self.cs_scatter_scale.setValue(self.local_variables["scale"])
         # text
         self.cs_scatter_x_label.field.setText(self.local_variables["x_label"])

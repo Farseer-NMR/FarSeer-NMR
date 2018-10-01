@@ -69,42 +69,306 @@
     "extended_bar_settings": {
         "cols_page": 1,
         "rows_page": 6,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.99,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 8,
+        "x_label_pad": 2,
+        "x_label_weight": "bold",
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 8,
+        "y_label_pad": 3,
+        "y_label_weight": "bold",
+        "y_label_rot":90,
+        
+        "x_ticks_pad": 2,
+        "x_ticks_len": 2,
         "x_ticks_fn": "monospace",
         "x_ticks_fs": 6,
         "x_ticks_rot": 90,
         "x_ticks_weight": "normal",
-        "x_ticks_color_flag": true
+        "x_ticks_color_flag":true,
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 6,
+        "y_ticks_rot": 0,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_len": 2,
+        
+        "y_grid_flag": true,
+        "y_grid_color": "lightgrey",
+        "y_grid_linestyle": "-",
+        "y_grid_linewidth": 0.2,
+        "y_grid_alpha": 0.8,
+        
+        "theo_pre_color": "red",
+        "theo_pre_lw": 1.0,
+        
+        "tag_cartoon_color": "black",
+        "tag_cartoon_lw": 1.0,
+        "tag_cartoon_ls": "-",
+        
+        "measured_color": "black",
+        "missing_color": "red",
+        "unassigned_color": "lightgrey",
+        
+        "bar_width": 0.8,
+        "bar_alpha": 1,
+        "bar_linewidth": 0,
+        
+        "threshold_flag": true,
+        "threshold_color": "red",
+        "threshold_linewidth": 0.5,
+        "threshold_alpha": 0.8,
+        "threshold_zorder":10,
+        
+        "mark_fontsize": 4,
+        "mark_prolines_flag": true,
+        "mark_prolines_symbol": "P",
+        "mark_user_details_flag": true,
+        "color_user_details_flag": true,
+        "user_marks_dict": {
+            "foo": "f",
+            "mal": "m",
+            "bem": "b"
+        },
+        "user_bar_colors_dict": {
+            "foo": "green",
+            "mal": "yellow",
+            "bem": "magenta"
+        },
+
+        "hspace": 0.5,
+        "wspace": 0.5
     },
+    
     "compact_bar_settings": {
         "cols_page": 3,
         "rows_page": 5,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.99,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 8,
+        "x_label_pad": 2,
+        "x_label_weight": "bold",
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 8,
+        "y_label_pad": 3,
+        "y_label_weight": "bold",
+        "y_label_rot":90,
+        
+        "x_ticks_pad": 2,
+        "x_ticks_len": 2,
         "x_ticks_fn": "Arial",
         "x_ticks_fs": 6,
         "x_ticks_rot": 0,
         "x_ticks_weight": "normal",
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 6,
+        "y_ticks_rot": 0,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_len": 2,
+        
+        "y_grid_flag": true,
+        "y_grid_color": "lightgrey",
+        "y_grid_linestyle": "-",
+        "y_grid_linewidth": 0.2,
+        "y_grid_alpha": 0.8,
+        
+        "theo_pre_color": "red",
+        "theo_pre_lw": 1.0,
+        
+        "tag_cartoon_color": "black",
+        "tag_cartoon_lw": 1.0,
+        "tag_cartoon_ls": "-",
+        
+        "measured_color": "black",
+        "missing_color": "red",
+        "unassigned_color": "lightgrey",
+        
+        "bar_width": 0.8,
+        "bar_alpha": 1,
+        "bar_linewidth": 0,
+        
+        "threshold_flag": true,
+        "threshold_color": "red",
+        "threshold_linewidth": 0.5,
+        "threshold_alpha": 0.8,
+        "threshold_zorder":10,
+        
+        "mark_fontsize": 4,
+        "mark_prolines_flag": true,
+        "mark_prolines_symbol": "P",
+        "mark_user_details_flag": true,
+        "color_user_details_flag": true,
+        "user_marks_dict": {
+            "foo": "f",
+            "mal": "m",
+            "bem": "b"
+        },
+        "user_bar_colors_dict": {
+            "foo": "green",
+            "mal": "yellow",
+            "bem": "magenta"
+        },
         "unassigned_shade": true,
-        "unassigned_shade_alpha": 0.5
+        "unassigned_shade_alpha": 0.5,
+        
+        "hspace": 0.5,
+        "wspace": 0.5
     },
+    
     "vert_bar_settings": {
         "cols_page": 5,
-        "rows_page": 2
-    },
+        "rows_page": 2,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.99,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 6,
+        "x_label_pad": 10,
+        "x_label_weight": "bold",
+        "x_label_rot":-90,
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 6,
+        "y_label_pad": 5,
+        "y_label_weight": "bold",
+        "y_label_rot":0,
+        
+        "x_ticks_pad": 2,
+        "x_ticks_len": 2,
+        "x_ticks_fn": "monospace",
+        "x_ticks_fs": 4,
+        "x_ticks_rot": 0,
+        "x_ticks_weight": "normal",
+        "x_ticks_color_flag":true,
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 6,
+        "y_ticks_rot": 0,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_len": 2,
+        
+        "y_grid_flag": true,
+        "y_grid_color": "lightgrey",
+        "y_grid_linestyle": "-",
+        "y_grid_linewidth": 0.2,
+        "y_grid_alpha": 0.8,
+        
+        "theo_pre_color": "red",
+        "theo_pre_lw": 1.0,
+        
+        "tag_cartoon_color": "black",
+        "tag_cartoon_lw": 1.0,
+        "tag_cartoon_ls": "-",
+        
+        "measured_color": "black",
+        "missing_color": "red",
+        "unassigned_color": "lightgrey",
+        
+        "bar_width": 0.8,
+        "bar_alpha": 1,
+        "bar_linewidth": 0,
+        
+        "threshold_flag": true,
+        "threshold_color": "red",
+        "threshold_linewidth": 0.5,
+        "threshold_alpha": 0.8,
+        "threshold_zorder":10,
+        
+        "mark_fontsize": 4,
+        "mark_prolines_flag": true,
+        "mark_prolines_symbol": "P",
+        "mark_user_details_flag": true,
+        "color_user_details_flag": true,
+        "user_marks_dict": {
+            "foo": "f",
+            "mal": "m",
+            "bem": "b"
+        },
+        "user_bar_colors_dict": {
+            "foo": "green",
+            "mal": "yellow",
+            "bem": "magenta"
+        },
+        
+        "hspace": 0.5,
+        "wspace": 0.5
+        },
+    
     "DPRE_plot_settings": {
-        "rows": 10,
-        "width": 3,
+        "cols_page": 3,
+        "rows_page": 5,
+        
+        "ymax":1,
         "y_label": "$\\Delta$PRE$_(rc-exp)$",
-        "y_label_fs": 5,
-        "ymax": 1.0,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.99,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 8,
+        "x_label_pad": 2,
+        "x_label_weight": "bold",
+        "x_label_rot": 0,
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 8,
+        "y_label_pad": 3,
+        "y_label_weight": "bold",
+        "y_label_rot":90,
+        
+        "x_ticks_pad": 0.5,
+        "x_ticks_len": 2,
+        "x_ticks_fn": "Arial",
+        "x_ticks_fs": 6,
+        "x_ticks_rot": 0,
+        "x_ticks_weight": "normal",
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 6,
+        "y_ticks_rot": 0,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_len": 2,
+        "y_ticks_nbins": 8,
+        
+        "y_grid_flag": true,
+        "y_grid_color": "lightgrey",
+        "y_grid_linestyle": "-",
+        "y_grid_linewidth": 0.2,
+        "y_grid_alpha": 0.8,
+        
+        "tag_cartoon_color": "black",
+        "tag_cartoon_lw": 1.0,
+        "tag_cartoon_ls": "-",
+        
         "dpre_ms": 2,
         "dpre_alpha": 0.5,
         "smooth_lw": 1,
         "ref_color": "black",
         "color_init": "#000080",
         "color_end": "#FFD700",
-        "x_ticks_fn": "Arial",
-        "x_ticks_fs": 5,
-        "x_ticks_pad": 0.5,
-        "x_ticks_weight": "normal",
         "grid_color": "grey",
         "shade": false,
         "shade_regions": [
@@ -123,7 +387,10 @@
             2
         ],
         "res_highlight_fs": 4,
-        "res_highlight_y": 0.9
+        "res_highlight_y": 0.9,
+        
+        "hspace": 0.5,
+        "wspace": 0.5
     },
     "revo_settings": {
         "subtitle_fn": "Arial",
@@ -158,25 +425,106 @@
     "res_evo_settings": {
         "cols_page": 5,
         "rows_page": 8,
-        "set_x_values": false,
-        "x_ticks_nbins": 5,
+        
+        "hspace": 0.5,
+        "wspace": 0.5,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.98,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 6,
+        "x_label_pad": 2,
+        "x_label_weight": "normal",
         "x_label": "ligand ratio",
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 6,
+        "y_label_pad": 2,
+        "y_label_weight": "normal",
+        "y_label": "CSPs",
+        
+        "set_x_values": false,
+        "titration_x_values": [0,10,20,40,80,160],
+        "x_ticks_fn": "Arial",
+        "x_ticks_fs": 5,
+        "x_ticks_pad": 1,
+        "x_ticks_weight": "normal",
+        "x_ticks_rot": 30,
+        "x_ticks_len":2,
+        "x_ticks_nbins": 5,
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 5,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_rot": 0,
+        "y_ticks_len":2,
+        "y_ticks_nbins":8,
+        
         "line_style": "-",
         "line_width": 1,
         "line_color": "red",
+        
         "marker_style": "o",
         "marker_color": "darkred",
         "marker_size": 3,
+        
         "fill_between": true,
         "fill_color": "pink",
         "fill_alpha": 0.5,
+        
+        
+        "perform_resevo_fitting": false,
         "fit_line_color": "black",
         "fit_line_width": 1,
         "fit_line_style": "-"
     },
     "cs_scatter_settings": {
+        
         "cols_page": 5,
-        "rows_page": 7,
+        "rows_page": 8,
+        
+        "hspace": 0.5,
+        "wspace": 0.5,
+        
+        "subtitle_fn": "Arial",
+        "subtitle_fs": 8,
+        "subtitle_pad": 0.98,
+        "subtitle_weight": "normal",
+        
+        "x_label_fn": "Arial",
+        "x_label_fs": 6,
+        "x_label_pad": 2,
+        "x_label_weight": "normal",
+        "x_label": "1H (ppm)",
+        
+        "y_label_fn": "Arial",
+        "y_label_fs": 6,
+        "y_label_pad": 10,
+        "y_label_weight": "normal",
+        "y_label": "15N (ppm)",
+        
+        "x_ticks_fn": "Arial",
+        "x_ticks_fs": 5,
+        "x_ticks_pad": 1,
+        "x_ticks_weight": "normal",
+        "x_ticks_rot": 30,
+        "x_ticks_len":2,
+        
+        "y_ticks_fn": "Arial",
+        "y_ticks_fs": 5,
+        "y_ticks_pad": 1,
+        "y_ticks_weight": "normal",
+        "y_ticks_rot": 0,
+        "y_ticks_len":2,
+        
+        "ticks_nbins": 5,
+        "scale": 0.01,
+        
+        "mk_type": "color",
         "markers": [
             "^",
             ">",
@@ -189,69 +537,88 @@
             "*",
             "D"
         ],
-        "x_label": "1H (ppm)",
-        "y_label": "15N (ppm)",
-        "mksize": 20,
-        "scale": 0.01,
-        "mk_type": "color",
+        "mk_size": 20,
         "mk_start_color": "#696969",
         "mk_end_color": "#000000",
-        "mk_color": [
-            "none"
-        ],
-        "mk_edgecolors": [
-            "black"
-        ],
+        "mk_color": ["none"],
+        "mk_edgecolors": ["black"],
         "mk_missing_color": "red",
         "hide_missing": false
     },
+    
     "cs_scatter_flower_settings": {
+        "xlim":1,
+        "ylim":1,
+        
+        "mk_size": 8,
         "x_label": "1H (ppm)",
         "y_label": "15N (ppm)",
-        "mksize": 8,
         "color_grad": true,
         "mk_start_color": "#696969",
         "mk_end_color": "#000000",
-        "res_label_color": "gold",
         "color_list": [],
+        
+        "res_label_color": "gold",
+        
         "x_label_fn": "Arial",
         "x_label_fs": 10,
-        "x_label_pad": 2,
+        "x_label_pad": 5,
         "x_label_weight": "normal",
+        
         "y_label_fn": "Arial",
         "y_label_fs": 10,
-        "y_label_pad": 2,
+        "y_label_pad": 10,
         "y_label_weight": "normal",
+        "y_label_rot":-90,
+        
         "x_ticks_fn": "Arial",
         "x_ticks_fs": 8,
         "x_ticks_pad": 1,
+        "x_ticks_len":2,
         "x_ticks_weight": "normal",
         "x_ticks_rot": 0,
+        
         "y_ticks_fn": "Arial",
         "y_ticks_fs": 8,
         "y_ticks_pad": 1,
+        "y_ticks_len":2,
         "y_ticks_weight": "normal",
-        "y_ticks_rot": 0
+        "y_ticks_rot": 0,
+        
+        "hspace": 0.1,
+        "wspace": 0.1
     },
     "heat_map_settings": {
-        "rows": 20,
+        "cols_page": 1,
+        "rows_page": 20,
+        
         "vmin": 0.05,
         "vmax": 1.0,
+        
         "x_ticks_fn": "Arial",
         "x_ticks_fs": 4,
         "x_ticks_pad": 1,
+        "x_ticks_len": 1.5,
         "x_ticks_weight": "normal",
         "x_ticks_rot": 0,
+        
         "y_label_fn": "Arial",
         "y_label_fs": 3,
         "y_label_pad": 2,
         "y_label_weight": "bold",
+        
+        "top_margin":0.9,
         "right_margin": 0.22,
-        "bottom_margin": 0.6,
+        "bottom_margin": 0,
+        
         "cbar_font_size": 4,
+        
         "tag_line_color": "red",
         "tag_line_ls": "-",
-        "tag_line_lw": 0.8
+        "tag_line_lw": 0.8,
+        
+        "hspace": 0,
+        "rightspace": 0.3
     },
     "cs_settings": {
         "cs_correction_res_ref": 1,
