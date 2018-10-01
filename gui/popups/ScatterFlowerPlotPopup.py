@@ -181,7 +181,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         # colour
         self.color_start.get_colour(self.defaults["mk_start_color"])
         self.color_end.get_colour(self.defaults["mk_end_color"])
-        self.res_color.get_colour(self.defaults["res_label_color"])
+        self.res_color_label.get_colour(self.defaults["res_label_color"])
         # chceked
         self.color_grad.setChecked(self.defaults["color_grad"])
         # dropdown
