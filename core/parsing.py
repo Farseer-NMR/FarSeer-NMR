@@ -34,7 +34,8 @@ file_extensions = [
     'out',
     'csv',
     'prot',
-    'str'
+    'str',
+    'list'
     ]
     
 eval_elements_usr_pkl_1 = [
@@ -76,6 +77,8 @@ user3_headers = set([
     'Annotation'
     ])
 
+user4_header = "      Assignment         w1         w2     w1 (Hz)    w2 (Hz)  Data Height \n"
+
 def get_peaklist_format(file_path):
     fin = open(file_path, 'r')
 
@@ -105,25 +108,30 @@ def get_peaklist_format(file_path):
         if not line.strip():
             continue
         
-        elif (line.lstrip().startswith("Assignment") and "w1" in line) or \
-                line.startswith("<sparky save file>"):
+        elif file_ext == 'peaks' \
+                and (line.lstrip().startswith("Assignment") and "w1" in line) \
+                or line.startswith("<sparky save file>"):
             fin.close()
             return "SPARKY"
         
-        elif line.lstrip().startswith("ANSIG") and "crosspeak" in line:
+        elif file_ext == 'peaks' \
+                and line.lstrip().startswith("ANSIG") and "crosspeak" in line:
             fin.close()
             return "ANSIG"
         
-        elif line.startswith("DATA") and "X_AXIS" in line:
+        elif file_ext == 'peaks' \
+                and line.startswith("DATA") and "X_AXIS" in line:
             fin.close()
             return "NMRDRAW"
         
-        elif line.split()[0].isdigit() and line.split()[1].startswith('{'):
+        elif file_ext == 'xpk' \
+                and line.split()[0].isdigit() and line.split()[1].startswith('{'):
             fin.close()
             return "NMRVIEW"
         
         # because columns in ccpnmr peaklists may be swapped
-        elif set(line.strip().split(',')) == ccpnmr_headers:
+        elif file_ext == 'csv' \
+                and set(line.strip().split(',')) == ccpnmr_headers:
             fin.close()
             return "CCPNMRV2"
         
@@ -149,6 +157,10 @@ def get_peaklist_format(file_path):
             
             fin.close()
             return "USER_PKL_3"
+        
+        elif file_ext == 'list' and line == user4_header:
+            fin.close()
+            return "USER_PKL_4"
         
         
         # INSERT YOUR VALIDATION CODE HERE
@@ -185,6 +197,8 @@ def read_peaklist(peaklist_file):
     
     file_format = get_peaklist_format(peaklist_file)
     
+    print(file_format)
+    
     dict_of_parsing_functs = {
         'ANSIG':fspr.ansig,
         'NMRDRAW':fspr.nmrdraw,
@@ -194,6 +208,7 @@ def read_peaklist(peaklist_file):
         'USER_PKL_1':fspr.user_pkl_1,
         'USER_PKL_2':fspr.user_pkl_2,
         'USER_PKL_3':fspr.user_pkl_3,
+        "USER_PKL_4":fspr.user_pkl_4,
         'Bad peaklist format': give_none,
         'Not accepted suffix': give_none
         }
