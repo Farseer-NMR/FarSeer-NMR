@@ -8,4 +8,5 @@ from core.fslibs.parsing_routines.sparky import parse_sparky_peaklist as sparky
 from core.fslibs.parsing_routines.user_defined_1 import parse_user_peaklist_1 as user_pkl_1
 from core.fslibs.parsing_routines.user_defined_2 import parse_user_peaklist_2 as user_pkl_2
 from core.fslibs.parsing_routines.user_defined_3 import parse_user_peaklist_3 as user_pkl_3
+from core.fslibs.parsing_routines.user_defined_4 import parse_user_peaklist_4 as user_pkl_4
 #from core.fslibs.parsing_routines.YOUR_FILE import parse_YOUR_FORMAT_peaklist as YOUR_FORMAT
