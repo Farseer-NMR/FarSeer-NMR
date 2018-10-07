@@ -162,6 +162,10 @@ def get_peaklist_format(file_path):
             fin.close()
             return "USER_PKL_4"
         
+        elif file_ext == 'csv' \
+                and set(line.strip().split(',')).issubset(ccpnmr_headers):
+            fin.close()
+            return "USER_PKL_5"
         
         # INSERT YOUR VALIDATION CODE HERE
         # SO THAT YOU PEAKLIST FORMAT IS RECOGNIZED
@@ -209,6 +213,7 @@ def read_peaklist(peaklist_file):
         'USER_PKL_2':fspr.user_pkl_2,
         'USER_PKL_3':fspr.user_pkl_3,
         "USER_PKL_4":fspr.user_pkl_4,
+        'USER_PKL_5':fspr.user_pkl_5,
         'Bad peaklist format': give_none,
         'Not accepted suffix': give_none
         }
