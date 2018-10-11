@@ -122,7 +122,7 @@ class ScatterFlowerPlotPopup(BasePopup):
             maximum=360,
             step=1
             )
-        self.res_label = ColourBox(self, text="Residue Label Colour")
+        self.res_label_color = ColourBox(self, text="Residue Label Colour")
         # layout
         self.layout().addWidget(self.x_label, 0, 0)
         self.layout().addWidget(self.y_label, 1, 0)
@@ -133,7 +133,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         self.layout().addWidget(self.x_label_fn, 6, 0)
         self.layout().addWidget(self.x_label_fs, 7, 0)
         self.layout().addWidget(self.color_list, 8, 0)
-        self.layout().addWidget(self.res_label, 8, 1)
+        self.layout().addWidget(self.res_label_color, 8, 1)
         self.layout().addWidget(self.x_label_pad, 0, 1)
         self.layout().addWidget(self.x_label_weight, 1, 1)
         self.layout().addWidget(self.y_label_fn, 2, 1)
@@ -181,7 +181,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         # colour
         self.color_start.get_colour(self.defaults["mk_start_color"])
         self.color_end.get_colour(self.defaults["mk_end_color"])
-        self.res_color.get_colour(self.defaults["res_label_color"])
+        self.res_label_color.get_colour(self.defaults["res_label_color"])
         # chceked
         self.color_grad.setChecked(self.defaults["color_grad"])
         # dropdown
@@ -227,7 +227,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         # colours
         self.local_variables["mk_start_color"] = colours[self.color_start.fields.currentText()]
         self.local_variables["mk_end_color"] = colours[self.color_end.fields.currentText()]
-        self.local_variables["res_label_color"] = self.res_label.fields.currentText()
+        self.local_variables["res_label_color"] = self.res_label_color.fields.currentText()
         self.local_variables["color_list"] = \
             [x.translate(translator) for x in self.color_list.field.text().split(',')]
         self.accept()
@@ -254,7 +254,7 @@ class ScatterFlowerPlotPopup(BasePopup):
         # colours
         self.color_start.get_colour(self.local_variables["mk_start_color"])
         self.color_end.get_colour(self.local_variables["mk_end_color"])
-        self.res_label.get_colour(self.local_variables["res_label_color"])
+        self.res_label_color.get_colour(self.local_variables["res_label_color"])
         # dropdown
         self.x_label_fn.select(self.local_variables["x_label_fn"])
         self.x_label_weight.select(self.local_variables["x_label_weight"])
