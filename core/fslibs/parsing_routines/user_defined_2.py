@@ -81,12 +81,13 @@ def parse_user_peaklist_2(peaklist_file):
             peak = Peak(
                 peak_number=residue_counter,
                 positions=positions,
-                residue_type=ls[2],
+                residue_type=ls[2].title(),
                 residue_number=ls[1],
                 atoms=atom,
                 linewidths=[0, 0],
                 volume=0,
                 height=0,
+                details="None",
                 format_='user_pkl_2'
                 )
             

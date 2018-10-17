@@ -201,7 +201,7 @@ def read_peaklist(peaklist_file):
     
     file_format = get_peaklist_format(peaklist_file)
     
-    print(file_format)
+    print("{} leaded as: {}".format(peaklist_file, file_format))
     
     dict_of_parsing_functs = {
         'ANSIG':fspr.ansig,
