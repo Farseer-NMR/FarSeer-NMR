@@ -23,133 +23,38 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
-import pandas as pd
-from core.utils import aal1tol3
+
 from core.fslibs.Peak import Peak
-from core.fslibs.WetHandler import WetHandler as fsw
 
 def parse_ccpnmrv2_peaklist(peaklist_file):
     """
-    Parses CCPNMRv2 peaklists into the peakList class format.
+    Bypasses CCPNMRv2 peaklists.
+    
+    This peaklist is not parsed to Peak, a list with one
+    dummy Peak element is created with .format_ = ccpnmrv2
+    so that it is bypassed directly to spectra in
+    core.setup_farseer_calculation.py
     
     Parameters:
         - peaklist_file: path to peaklist file.
     
     Returns peakList object
     """
-    fin = pd.read_csv(peaklist_file)
-    peakList = []
-    checks_misleading_chars(fin, peaklist_file)
     
-    for row in fin.index:
-        atoms = []
-        if fin.loc[row,'Assign F1'][-4:-1] in aal1tol3.values():
-            atoms.append(fin.loc[row,'Assign F1'][-1])
-        
-        if fin.loc[row,'Assign F2'][-4:-1] in aal1tol3.values():
-            atoms.append(fin.loc[row,'Assign F2'][-1])
-        
-        peak = Peak(
-            peak_number=fin.loc[row,'Number'],
-            positions=[
-                fin.loc[row,'Position F1'],
-                fin.loc[row,'Position F2']
-                ],
-            atoms=atoms,
-            residue_number=str(fin.loc[row,'Assign F1'])[:-4],
-            residue_type=str(fin.loc[row,'Assign F1'])[-4:-1],
-            linewidths=[
-                fin.loc[row,'Line Width F1 (Hz)'],
-                fin.loc[row,'Line Width F2 (Hz)']
-                ],
-            volume=fin.loc[row,'Volume'],
-            height=fin.loc[row,'Height'],
-            fit_method=fin.loc[row,'Fit Method'],
-            merit=fin.loc[row,'Merit'],
-            volume_method=fin.loc[row,'Vol. Method'],
-            details=fin.loc[row,'Details'],
+    peakList = list()
+    
+    peakList.append(
+        Peak(
+            peak_number=None,
+            positions=None,
+            atoms=None,
+            residue_number=None,
+            residue_type=None,
+            linewidths=[None, None],
+            height=None,
+            volume=None,
             format_='ccpnmrv2'
-            )
-        peakList.append(peak)
+            ))
     
     return peakList
     
-    
-def checks_misleading_chars(pkl_df, pkl_file_path):
-    """
-    Checks for the presence misleading characters in the DataFrame.
-    This may come from entries of unassigned residues
-    that were not removed.
-    
-    Parameters:
-        - pkl_df (pd.DataFrame): contains converted input peaklist
-        -pkl_file_path (str): path to original peaklist file
-    
-    Returns:
-        - None
-    
-    """
-    # for assignment cols
-    ## empty
-    empty_cells_f1 = pkl_df.loc[:,'Assign F1'].isnull()
-    empty_cells_f2 = pkl_df.loc[:,'Assign F2'].isnull()
-    
-    if empty_cells_f1.values.any() or empty_cells_f2.values.any():
-        rows_bool = empty_cells_f1 | empty_cells_f2
-        msg = "The peaklist {} contains no assignment \
-information in lines {}. Please review that peaklist.".format(
-            pkl_file_path,
-            [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
-            )
-        wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-        print(wet29.wet)
-        wet29.abort()
-    
-    ## misleading chars
-    non_digit_f1 = \
-        pkl_df.loc[:,'Assign F1'].str.strip().str.contains('\W', regex=True)
-    
-    non_digit_f2 = \
-        pkl_df.loc[:,'Assign F2'].str.strip().str.contains('\W', regex=True)
-    
-    if  non_digit_f1.any() or non_digit_f2.any():
-        rows_bool = non_digit_f1 | non_digit_f2
-        msg = "The peaklist {} contains misleading \
-charaters in Assignment columns in line {}.".format(
-            pkl_file_path,
-            [2+int(i) for i in rows_bool.index[rows_bool].tolist()]
-            )
-        wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-        print(wet29.wet)
-        wet29.abort()
-    
-    ## for other cols.
-    cols = [
-        'Position F1',
-        'Position F2',
-        'Height',
-        'Volume',
-        'Line Width F1 (Hz)',
-        'Line Width F2 (Hz)',
-        'Merit'
-        ]
-    
-    for col in cols:
-        non_digit = pkl_df.loc[:,col].\
-            astype(str).str.strip().str.contains(
-                '[\!\"\#\$\%\&\\\'\(\)\*\,\-\/\:\;\<\=\>\?\@\[\]\^\_\`\{\|\}\~]',
-                regex=True
-                )
-        
-        if non_digit.any():
-            msg = "The peaklist {} contains misleading \
-charaters in line {} of column [{}].".format(
-                pkl_file_path,
-                [2+int(i) for i in non_digit.index[non_digit].tolist()],
-                col
-                )
-            wet29 = fsw(msg_title='ERROR', msg=msg, wet_num=29)
-            print(wet29.wet)
-            wet29.abort()
-    
-    return

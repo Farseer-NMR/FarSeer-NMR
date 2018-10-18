@@ -138,6 +138,11 @@ def create_directory_structure(output_path, variables):
                             fasta_start
                             )
                         )
+                
+                elif peaklist[0].format_ == 'ccpnmrv2':
+                    pklfh = open(peaklist_path, 'r')
+                    fout.writelines(pklfh.readlines())
+                
                 else:
                     write_peaklist_file(fout, peaklist)
 
