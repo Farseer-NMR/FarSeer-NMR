@@ -102,7 +102,7 @@ class Footer(QWidget):
         #
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
-                  '>v.1.2.7&nbsp;&nbsp;&nbsp;&nbsp;</span>'
+                  '>v.1.2.8&nbsp;&nbsp;&nbsp;&nbsp;</span>'
         self.versionLabel = QLabel(version, self)
         self.versionLabel.setAlignment(QtCore.Qt.AlignRight)
         #
@@ -133,9 +133,7 @@ class Footer(QWidget):
             )
     
     def show_git(self):
-        webbrowser.open_new_tab(
-            "https://github.com/joaomcteixeira/FarSeer-NMR"
-            )
+        webbrowser.open_new_tab("https://github.com/Farseer-NMR/FarSeer-NMR")
     
     def open_research_gate(self):
         webbrowser.open_new_tab(
