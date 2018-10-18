@@ -759,18 +759,19 @@ different lengths.".\
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.contains('[^HN]$')
+            self.has_sidechains = any(sidechains_bool)
             
             self.logger.debug("sidechains_bool.value_counts(): {}".format(
                 sidechains_bool.value_counts()
                 ))
-            self.logger.debug("Any? {}".format(any(sidechains_bool)))
+            self.logger.debug("Any? {}".format(self.has_sidechains))
             # initiates SD counter
             sd_count = {True:0}
             
             # if the user says it has sidechains and there are actually sidechains.
-            if any(sidechains_bool):
+            
+            if self.has_sidechains:
                 
-                self.has_sidechains = True
                 self.logger.debug("<has_sidechains> set to: {}".format(self.has_sidechains))
                 self.logger.debug("Is self.allsidechains? {}".format(bool(self.allsidechains)))
                 
