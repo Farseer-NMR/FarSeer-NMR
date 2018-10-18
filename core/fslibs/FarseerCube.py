@@ -425,7 +425,7 @@ in lines: {}.".format(
                 [2+int(i) for i in \
                     where_duplicates.index[where_duplicates].tolist()]
                 )
-            self._abort(wet24 = fsw(msg_title='ERROR', msg=msg, wet_num=24))
+            self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=24))
         
         return None
     
@@ -583,7 +583,7 @@ different lengths.".\
         
         return None
     
-    def init_coords_names(self):
+    def _init_coords_names(self):
         """
         Identifies coordinate names (conditions measured) for the
         Farseer-NMR Cube.
@@ -631,6 +631,24 @@ different lengths.".\
         self.logs(logs)
         
         return None
+    
+    def _transfer_coords_names(self):
+        """
+        Transfer coordinate names from allpeaklists to allsidechains.
+        """
+        for z in self.allpeaklists.keys():
+            self.allsidechains.setdefault(z, {})
+            
+            for y in self.allpeaklists[z].keys():
+                self.allsidechains[z].setdefault(y, {})
+                
+                for x in self.allpeaklists[z][y].keys():
+                    self.allpeaklists[z][y].setdefault(x, None)
+        
+        
+        self.logger.debug("allpeaklists keys transferred to allsidechains")
+        
+        return
     
     def split_res_info(self):
         """
@@ -741,12 +759,21 @@ different lengths.".\
             sidechains_bool = \
                 self.allpeaklists[z][y][x].\
                     loc[:,'Assign F1'].str.contains('[^HN]$')
+            
+            self.logger.debug("sidechains_bool.value_counts(): {}".format(
+                sidechains_bool.value_counts()
+                ))
+            self.logger.debug("Any? {}".format(any(sidechains_bool)))
             # initiates SD counter
             sd_count = {True:0}
             
             # if the user says it has sidechains and there are actually sidechains.
-            if self.has_sidechains \
-                    and (True in sidechains_bool.value_counts()):
+            if any(sidechains_bool):
+                
+                self.has_sidechains = True
+                self.logger.debug("<has_sidechains> set to: {}".format(self.has_sidechains))
+                self.logger.debug("Is self.allsidechains? {}".format(bool(self.allsidechains)))
+                
                 # two condition are evaluated in case the user has set 
                 #sidechains to True but there are actually no sidechains.
                 sd_count = sidechains_bool.value_counts()
@@ -1708,6 +1735,7 @@ the possible options.'
         self._checks_xy_datapoints_coherency(target, filetype)
         
         if main_peaklists:
-            self.init_coords_names()
+            self._init_coords_names()
+            self._transfer_coords_names()
         
         return None
