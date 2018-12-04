@@ -1,3 +1,4 @@
+import os
 import logging
 import logging.config
 
@@ -59,9 +60,9 @@ class FarseerLogger:
         
         if new_dir:
             self.farseer_log_config["handlers"]["info_file_handler"]["filename"] = \
-                "{}/farseernmr.log".format(new_dir)
+                os.path.join(new_dir, "farseernmr.log")
             self.farseer_log_config["handlers"]["debug_file_handler"]["filename"] = \
-                "{}/debug.log".format(new_dir)
+                os.path.join(new_dir, "debug.log")
         
         self.name = name
     
@@ -72,7 +73,7 @@ class FarseerLogger:
 
 if __name__ == "__main__":
     
-    loggy = FarseerLogger(__name__, new_dir='/home/joao/Programming/Farseer_testing').setup_log()
+    loggy = FarseerLogger(__name__, new_dir=os.getcwd()).setup_log()
     #logger = loggy.setup_log()
     print(loggy)
     loggy.info('hahah')

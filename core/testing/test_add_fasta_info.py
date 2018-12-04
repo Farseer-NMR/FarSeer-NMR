@@ -21,21 +21,22 @@ You should have received a copy of the GNU General Public License
 along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import unittest
+import os
 
 from core.parsing import read_peaklist
 from core.setup_farseer_calculation import add_residue_information, write_peaklist_file
 
 class Test_Case(unittest.TestCase):
     def setUp(self):
-        self.nmrdraw_peaklist = read_peaklist('test_data/nmrdraw_peaklist.peaks')
-        self.nmrview_peaklist = read_peaklist('test_data/nmrview_peaklist.xpk')
-        self.result_peaklist = read_peaklist('test_data/nmr_view_draw_result.csv')
-        self.fasta_file = 'test_data/nmr_view_draw.fasta'
+        self.nmrdraw_peaklist = read_peaklist(os.path.join('test_data', 'nmrdraw_peaklist.peaks'))
+        self.nmrview_peaklist = read_peaklist(os.path.join('test_data', 'nmrview_peaklist.xpk'))
+        self.result_peaklist = read_peaklist(os.path.join('test_data', 'nmr_view_draw_result.csv'))
+        self.fasta_file = os.path.join('test_data', 'nmr_view_draw.fasta')
         self.maxDiff = None
         
-        self.user_pkl_1 = read_peaklist('test_data/user_pkl_1.prot')
-        self.fasta_user_1 = 'test_data/user_pkl_1.fasta'
-        self.user_pkl_1_result = read_peaklist('test_data/user_pkl_1_result.csv')
+        self.user_pkl_1 = read_peaklist(os.path.join('test_data', 'user_pkl_1.prot'))
+        self.fasta_user_1 = os.path.join('test_data', 'user_pkl_1.fasta')
+        self.user_pkl_1_result = read_peaklist(os.path.join('test_data', 'user_pkl_1_result.csv'))
 
     def test_format_detected(self):
         self.assertEqual(self.nmrdraw_peaklist[0].format_, 'nmrdraw')

@@ -1,4 +1,5 @@
 import sys
+import os
 import unittest
 import json
 from PyQt5.QtWidgets import QApplication
@@ -31,9 +32,9 @@ class Test_PRETheoSelectionPopup(unittest.TestCase):
         self.assertEqual(list(self.popup.cond_widget_dict.keys()), [''])
 
     def test_set_values(self):
-        self.popup.add_field('mut1', '/test/path/1')
-        self.popup.add_field('mut2', '/test/path/2')
-        self.popup.add_field('mut3', '/test/path/3')
+        self.popup.add_field('mut1', os.path.join('test', 'path', '1'))
+        self.popup.add_field('mut2', os.path.join('test', 'path', '2'))
+        self.popup.add_field('mut3', os.path.join('test', 'path', '3'))
 
         self.popup.set_values()
 
@@ -42,34 +43,34 @@ class Test_PRETheoSelectionPopup(unittest.TestCase):
         self.assertIn("mut3", self.popup.cond_widget_dict.keys())
 
         self.assertEqual(self.popup.cond_widget_dict["mut1"][0].field.text(),
-                         '/test/path/1')
+                         os.path.join('test', 'path', '1'))
         self.assertEqual(self.popup.cond_widget_dict["mut2"][0].field.text(),
-                         '/test/path/2')
+                         os.path.join('test', 'path', '2'))
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
-                         '/test/path/3')
+                         os.path.join('test', 'path', '3'))
 
         self.assertEqual(self.popup.variables["pre_files"]["mut1"],
-                         '/test/path/1')
+                         os.path.join('test', 'path', '1'))
         self.assertEqual(self.popup.variables["pre_files"]["mut2"],
-                         '/test/path/2')
+                         os.path.join('test', 'path', '2'))
         self.assertEqual(self.popup.variables["pre_files"]["mut3"],
-                         '/test/path/3')
+                         os.path.join('test', 'path', '3'))
 
     def test_values_not_set(self):
-        self.popup.add_field('mut1', '/test/path/1')
-        self.popup.add_field('mut2', '/test/path/2')
-        self.popup.add_field('mut3', '/test/path/3')
+        self.popup.add_field('mut1', os.path.join('test', 'path', '1'))
+        self.popup.add_field('mut2', os.path.join('test', 'path', '2'))
+        self.popup.add_field('mut3', os.path.join('test', 'path', '3'))
 
         self.assertIn("mut1", self.popup.cond_widget_dict.keys())
         self.assertIn("mut2", self.popup.cond_widget_dict.keys())
         self.assertIn("mut3", self.popup.cond_widget_dict.keys())
 
         self.assertEqual(self.popup.cond_widget_dict["mut1"][0].field.text(),
-                         '/test/path/1')
+                         os.path.join('test', 'path', '1'))
         self.assertEqual(self.popup.cond_widget_dict["mut2"][0].field.text(),
-                         '/test/path/2')
+                         os.path.join('test', 'path', '2'))
         self.assertEqual(self.popup.cond_widget_dict["mut3"][0].field.text(),
-                         '/test/path/3')
+                         os.path.join('test', 'path', '3'))
 
         self.assertNotIn("mut1", self.popup.variables["pre_files"].keys())
         self.assertNotIn("mut2", self.popup.variables["pre_files"].keys())

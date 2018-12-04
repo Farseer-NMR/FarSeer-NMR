@@ -69,7 +69,7 @@ if __name__ == '__main__':
         required=False,
         help='Farseer Configuration File'
         )
-    splash_pix = QtGui.QPixmap('gui/images/splash-screen.png')
+    splash_pix = QtGui.QPixmap(os.path.join('gui', 'images', 'splash-screen.png'))
     args = parser.parse_args()
     splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     
     ex = Main(gui_settings=gui_settings, config=args.config)
     splash.finish(ex)
-    font_file = 'gui/SinkinSans/SinkinSans-400Regular.otf'
+    font_file = os.path.join('gui', 'SinkinSans', 'SinkinSans-400Regular.otf')
     font_id = QtGui.QFontDatabase.addApplicationFont(font_file)
     app.setStyleSheet(stylesheet)
     ex.show()

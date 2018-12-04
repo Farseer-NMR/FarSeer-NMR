@@ -1,25 +1,26 @@
+import os
 import unittest
 import itertools as it
 from core import parsing
 import core.fslibs.parsing_routines as fspr
 
-ansig_peaklist = 'test_data/ansig_peaklist.xpk'
-sparky_peaklist = 'test_data/sparky_peaklist.peaks'
-nmrdraw_peaklist = 'test_data/nmrdraw_peaklist.peaks'
-nmrview_peaklist = 'test_data/nmrview_peaklist.xpk'
-ccpn_peaklist = 'test_data/ccpn_peaklist.csv'
-user_pkl_1 = 'test_data/user_pkl_1.prot'
-user_pkl_2 = 'test_data/user_pkl_2.str'
+ansig_peaklist = os.path.join('test_data', 'ansig_peaklist.xpk')
+sparky_peaklist = os.path.join('test_data', 'sparky_peaklist.peaks')
+nmrdraw_peaklist = os.path.join('test_data', 'nmrdraw_peaklist.peaks')
+nmrview_peaklist = os.path.join('test_data', 'nmrview_peaklist.xpk')
+ccpn_peaklist = os.path.join('test_data', 'ccpn_peaklist.csv')
+user_pkl_1 = os.path.join('test_data', 'user_pkl_1.prot')
+user_pkl_2 = os.path.join('test_data', 'user_pkl_2.str')
 
 pkls_types = {
-    'ANSIG':'test_data/ansig_peaklist.xpk',
-    'SPARKY':'test_data/sparky_peaklist.peaks',
-    'NMRDRAW':'test_data/nmrdraw_peaklist.peaks',
-    'NMRVIEW':'test_data/nmrview_peaklist.xpk',
-    'CCPNMRV2':'test_data/ccpn_peaklist.csv',
-    'USER_PKL_1':'test_data/user_pkl_1.prot',
-    'USER_PKL_2':'test_data/user_pkl_2.str',
-    'USER_PKL_3':'test_data/user_pkl_3.csv'
+    'ANSIG':os.path.join('test_data', 'ansig_peaklist.xpk'),
+    'SPARKY':os.path.join('test_data', 'sparky_peaklist.peaks'),
+    'NMRDRAW':os.path.join('test_data', 'nmrdraw_peaklist.peaks'),
+    'NMRVIEW':os.path.join('test_data', 'nmrview_peaklist.xpk'),
+    'CCPNMRV2':os.path.join('test_data', 'ccpn_peaklist.csv'),
+    'USER_PKL_1':os.path.join('test_data', 'user_pkl_1.prot'),
+    'USER_PKL_2':os.path.join('test_data', 'user_pkl_2.str'),
+    'USER_PKL_3':os.path.join('test_data', 'user_pkl_3.csv')
     }
 
 class Test_Parsing(unittest.TestCase):
@@ -182,6 +183,13 @@ class Test_Parsing(unittest.TestCase):
     def test_parse_ccpn(self):
         """
         Test CCPN peaklist parsing
+        
+        Bypasses CCPNMRv2 peaklists.
+    
+        This peaklist is not parsed to Peak, a list with one
+        dummy Peak element is created with .format_ = ccpnmrv2
+        so that it is bypassed directly to spectra in
+        core.setup_farseer_calculation.py
         """
         peaklist = fspr.ccpnmrv2(ccpn_peaklist)
         peak_number = peaklist[0].peak_number
@@ -197,18 +205,18 @@ class Test_Parsing(unittest.TestCase):
         volume_method = peaklist[0].volume_method
         details = peaklist[0].details
 
-        self.assertIsNotNone(peak_number)
-        self.assertIsNotNone(positions)
-        self.assertIsNotNone(atoms)
-        self.assertNotIn(None, linewidths)
-        self.assertIsNotNone(volume)
-        self.assertIsNotNone(height)
-        self.assertIsNotNone(fit_method)
-        self.assertIsNotNone(volume_method)
-        self.assertIsNotNone(merit)
-        self.assertIsNotNone(details)
+        self.assertIsNone(peak_number)
+        self.assertIsNone(positions)
+        self.assertIsNone(atoms)
+        self.assertEqual([None, None], linewidths)
+        self.assertIsNone(volume)
+        self.assertIsNone(height)
+        self.assertIsNone(fit_method)
+        self.assertIsNone(volume_method)
+        self.assertIsNone(merit)
+        self.assertIsNone(details)
 
-        self.assertEqual(len(peaklist), 58)
+        self.assertEqual(len(peaklist), 1)
         #self.assertEqual(len(residue_number), 58)
 
 

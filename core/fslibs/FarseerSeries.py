@@ -161,7 +161,7 @@ class FarseerSeries(pd.Panel):
         # defines the path to store the calculations
         # if stores the result of a calculation
         if series_axis.startswith('along'):
-            self.calc_path = '{}/{}/{}/{}/{}'.format(
+            self.calc_path = os.path.join(
                 self.resonance_type,
                 self.calc_folder,
                 self.series_axis,
@@ -171,7 +171,7 @@ class FarseerSeries(pd.Panel):
         
         # if stores comparisons among calculations
         elif series_axis.startswith('C'):
-            self.calc_path = '{}/{}/{}/{}/{}/{}'.format(
+            self.calc_path = os.path.join(
                 self.resonance_type,
                 self.comparison_folder,
                 self.series_axis,
@@ -188,19 +188,19 @@ class FarseerSeries(pd.Panel):
             os.makedirs(self.calc_path)
         
         self.chimera_att_folder = \
-            "{}/{}".format(self.calc_path, self.chimera_att_folder)
+            os.path.join(self.calc_path, self.chimera_att_folder)
         
         if not(os.path.exists(self.chimera_att_folder)):
             os.makedirs(self.chimera_att_folder)
         
         self.tables_and_plots_folder = \
-            '{}/{}'.format(self.calc_path, self.tables_and_plots_folder)
+            os.path.join(self.calc_path, self.tables_and_plots_folder)
         
         if not(os.path.exists(self.tables_and_plots_folder)):
             os.makedirs(self.tables_and_plots_folder)
         
         self.export_series_folder = \
-            '{}/{}'.format(self.calc_path, self.export_series_folder)
+            os.path.join(self.calc_path, self.export_series_folder)
         
         if not(os.path.exists(self.export_series_folder)):
             os.makedirs(self.export_series_folder)
@@ -748,16 +748,14 @@ and stacked (compared) along "{}" axis'.format(
             fig_dpi (int): the dpi resolution.
         """
         
-        plot_folder = '{}/{}'.format(self.tables_and_plots_folder, folder)
+        plot_folder = os.path.join(self.tables_and_plots_folder, folder)
         
         if not(os.path.exists(plot_folder)):
             os.makedirs(plot_folder)
         
-        file_path = '{}/{}_{}.{}'.format(
+        file_path = os.path.join(
             plot_folder,
-            calccol,
-            plot_name,
-            fig_file_type
+            '{}_{}.{}'.format(calccol, plot_name, fig_file_type)
             )
         
         header = self._create_header(file_path=file_path)
@@ -900,8 +898,8 @@ and stacked (compared) along "{}" axis'.format(
                 ))
             return
         self.PRE_loaded = True
-        target_folder = '{}/{}/{}/'.format(spectra_path, self.para_name, datapoint)
-        pre_file = glob.glob('{}*.pre'.format(target_folder))
+        target_folder = os.path.join(spectra_path, self.para_name, datapoint)
+        pre_file = glob.glob(os.path.join(target_folder, "*.pre"))
         
         if len(pre_file) > 1:
             raise ValueError(
@@ -1045,7 +1043,7 @@ with window size {} and stdev {}'.\
                 axis=1
                 )
         
-        tablefolder = '{}/{}'.format(
+        tablefolder = os.path.join(
             self.tables_and_plots_folder, 
             restraint_folder
             )
@@ -1053,7 +1051,7 @@ with window size {} and stdev {}'.\
         if not(os.path.exists(tablefolder)):
             os.makedirs(tablefolder)
         
-        file_path = '{}/{}.csv'.format(tablefolder, tablecol)
+        file_path = os.path.join(tablefolder, tablecol + '.csv')
         fileout = open(file_path, 'w')
         header = \
             "# Table for '{}' resonances.\n".format(self.resonance_type)
@@ -1118,12 +1116,16 @@ with window size {} and stdev {}'.\
             mask_missing = self.loc[item,:,'Peak Status'] == 'missing'
             mask_unassigned = self.loc[item,:,'Peak Status'] == 'unassigned'
             mask_measured = self.loc[item,:,'Peak Status'] == 'measured'
-            file_path = '{}/{}'.format(self.chimera_att_folder, calccol)
+            file_path = os.path.join(self.chimera_att_folder, calccol)
             
             if not(os.path.exists(file_path)):
                 os.makedirs(file_path)
             
-            file_name = '{}/{}_{}.att'.format(file_path, item, calccol)
+            file_name = os.path.join(
+                file_path,
+                '{}_{}.att'.format(item, calccol)
+                )
+            
             fileout = open(file_name, 'w')
             header = self._create_header(file_path=file_name)
             attheader = \
@@ -1168,7 +1170,7 @@ recipient: residues
         """
         
         for item in self.items:
-            file_path = '{}/{}.csv'.format(self.export_series_folder, item)
+            file_path = os.path.join(self.export_series_folder, item + '.csv')
             fileout = open(file_path, 'w')
             ###
             header = self._create_header(
@@ -3088,20 +3090,22 @@ but measured in a subsequent peaklist".\
         self.logs("*** Performing fit using function: {}".format(fit_function))
         # logging ###
         not_enough_data = to_fit.not_enough_data
-        col_path = '{0}/{1}/'.format(self.tables_and_plots_folder, col)
+        col_path = os.path.join(self.tables_and_plots_folder, col)
         
         if not(os.path.exists(col_path)):
             os.makedirs(col_path)
         
-        logfrep_name = '{0}/{1}/{1}_fit_report.log'.format(
+        logfrep_name = os.path.join(
             self.tables_and_plots_folder,
-            col
+            col,
+            "{}_fit_report.log".format(col)
             )
         logfreport = open(logfrep_name, 'w')
         logfreport.write(to_fit.fit_log_header(col))
-        logftable_name = '{0}/{1}/{1}_fit_table.csv'.format(
+        logftable_name = os.path.join(
             self.tables_and_plots_folder,
-            col
+            col,
+            '{}_fit_table.csv'.format(col)
             )
         logftable = open(logftable_name, 'w')
         logftable.write(to_fit.results_header())

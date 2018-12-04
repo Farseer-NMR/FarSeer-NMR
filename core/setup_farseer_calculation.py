@@ -30,11 +30,8 @@ from core.fslibs.WetHandler import WetHandler as fsw
 from core.fslibs.FastaHandler import FastaHandler
 
 def check_input_construction(output_path, variables):
-
-    if not output_path.endswith('/'):
-        output_path += '/'
-
-
+    
+    
     if os.path.exists(os.path.join(output_path, 'spectra')):
         return "Spectra"
 
