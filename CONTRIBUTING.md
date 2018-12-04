@@ -1,12 +1,20 @@
+# How to contribute
+
+- Report bugs and suggestions in the [issues tab](https://github.com/Farseer-NMR/FarSeer-NMR/issues), use TAGS as appropriate.
+- **Always** submit a Pull Request from you Forked repository of Farseer-NMR.
+- Pull Requests title shoud start with a proposal of version change and, if helpful, followed by a short title: `v1.3.12 - corrected bar color bug in barplot`
+  - new version number should be updated in `install/system.py`.
+  - follow versioning standards: [_major/visible_ [ _new feature_ [ _bug correction_]]
+- Pull Request description should state the added improvements and corrections.
+- Pull Request should close issues whenever applicable.
+
 # Farseer-NMR code style
 
 This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gathers rules/suggestions to uniform the coding style of Farseer-NMR. Please follow these rules when submitting a Pull Request.
 
-These rules mainly apply when operations do not fit a single line.
-
 ## Length of line
 
-Maximum line length 79 chars.
+Maximum line length 80 chars.
 Maximum docstring length 72 chars.
 
 ## Indentation
@@ -24,27 +32,25 @@ If method call cannot fit one line, break the line after the "." followed by an 
 
 ## Function call
 
-Whenever a function call cannot fit a single line, **all** arguments should
-be followed by newlines and an extra indentation, closing the call should be aligned with args:
+Whenever a function call cannot fit a single line, create and indent block for **all** arguments, closing the call should be aligned with args:
 
 Yes:
 ```
-func(
+func_with_large_name(
     positional_arg1,
     positional_arg2,
-    kwarg1='foo',
-    kwarg2='bar'
+    arg1='foo',
+    arg2='bar'
     )
 ```
-
-### Alignment
-
 Alignment with opening delimiter it's feasible, but annoying and difficult to maintain because introduces partial indentation blocks. Let's not use it.
 
 No:
 ```
-foo = long_function_name(var_one, var_two,
-                         var_three, var_four)
+func_with_large_name(positional_arg1,
+                     positional_arg2,
+                     arg1='foo',
+                     arg2='bar')
 ```
 
 ### Kwargs
@@ -76,25 +82,26 @@ Usage in case of method calls:
 func(
     posvar1,
     message="this a big string with several {} {} {}".\
-        format(
-            a,
-            b,
-            c
-            )
+        format(a, b, c)
     kwargs=var1
     )
 ```
 
 ## Defining a function
 
-In case all the positional args and kwargs can fit a single line, break line after "(" and give an extra indent. Organize positional args in new lines allowing up to two args per line, followed by 1 kwarg per line. Give a blank line after the function definition.
+In case all the positional args and kwargs can not fit a single line,
+break line after "(" and write the args in a new indent block.
+Give a blank line after the function definition.
 
 ```
 def long_function_name(
-        var_one, var_two,
-        var_three, var_four
+        var_one,
+        var_two,
+        var_three,
+        var_four,
         kwarg1='default',
-        kwarg2=0.0):
+        kwarg2=0.0
+        ):
     
     print(var_one)
 ```
@@ -105,13 +112,17 @@ Citing PEP8: "Be consistent in return statements. Either all return statements i
 
 ## Conditionals
 
-In if statements newlines should be followed by double indentation to separate from nested code and followed by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary short alias.
+In if statements newlines should be followed by double indentation to separate from nested code and followed
+by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary
+short alias.
 
 ```
 if (True and (True or False)) \
         and (True \
             or False) \
         and False:
+    
+    # do something
 ```
 
 ## List, Dictionaries and alike
@@ -128,6 +139,13 @@ my_list = [
         ],
     ]
 ```
+
+```
+my_dict = {
+    "var1": 1,
+    "var2: 2
+    }
+``` 
  
 ## For loops
 
@@ -166,7 +184,8 @@ for dp2 in next_axis_2:
 
 ### Single line
 
-When assigning to a variable break the line if such allows the string to fit a single line, you can even avoid the usage of indentation if such allows the string to fit one line.
+When assigning to a variable break the line if such allows the string to fit a single line, you can even avoid
+the usage of indentation if such allows the string to fit one line.
 
 ```
 msg = \
@@ -179,7 +198,8 @@ even:
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
 ```
 
-Otherwise break the string in logical parts with the ```\```. And break again to apply format. You can/should avoid the use of indentation because this will be passed to the string.
+Otherwise break the string in logical parts with the ```\```. And break again to apply format.
+You can/should avoid the use of indentation because this will be passed to the string.
 
 If the string has to be formatted, break the method call to a new line and assign and additional indent.
 
@@ -197,7 +217,9 @@ logs = \
 
 ### Multiline
 
-In multiline strings always break the assignment statement to a new line and describe the string without indentation. If the string has to be formatted, break the method call and give an additional indentation considering the indentation of the varible to which the string is assigned:
+In multiline strings always break the assignment statement to a new line and describe the string without indentation.
+If the string has to be formatted, break the method call and give an additional indentation considering the
+indentation of the varible to which the string is assigned:
 
 ```
         msg = \
@@ -219,7 +241,8 @@ Follow the [rules of PEP8](https://www.python.org/dev/peps/pep-0008/#imports).
 
 Follow the [general rules of PEP8](https://www.python.org/dev/peps/pep-0008/#whitespace-in-expressions-and-statements).
 
-Inside the same indentation block, write the operations consecutively. Optionally you can separate relevant logical blocks by new lines or, preferable, by comments.
+Inside the same indentation block, write the operations consecutively.
+Optionally you can separate relevant logical blocks by new lines or, preferable, by comments.
 
 ### Separating indentation blocks
 
