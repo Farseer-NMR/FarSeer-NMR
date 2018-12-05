@@ -25,7 +25,7 @@ Indentations are 4 spaces.
 
 If method call cannot fit one line, break the line after the "." followed by an extra indentation to the current indentation block. Continue this proceedure for consecutive calls.
 
-```
+```python
 "my name is {}".\
     format(name)
 ```
@@ -35,7 +35,7 @@ If method call cannot fit one line, break the line after the "." followed by an 
 Whenever a function call cannot fit a single line, create and indent block for **all** arguments, closing the call should be aligned with args:
 
 Yes:
-```
+```python
 func_with_long_name(
     positional_arg1,
     positional_arg2,
@@ -46,7 +46,7 @@ func_with_long_name(
 Alignment with opening delimiter it's feasible, but annoying and difficult to maintain because introduces partial indentation blocks. Let's not use it.
 
 No:
-```
+```python
 func_with_long_name(positional_arg1,
                      positional_arg2,
                      arg1='foo',
@@ -58,7 +58,7 @@ func_with_long_name(positional_arg1,
 Create a line break "\" after the assignment statement of the kwarg if the argument can, in this way, fit a new line. Otherwise proceed as in [Function Call] and [Method Call].
 
 Preferable, if series_kwargs() call fit a single line:
-```
+```python
 func(
     posvar1,
     series_kwargs=\
@@ -67,7 +67,7 @@ func(
 ```
     
 Yes, if series_kwargs() call cannot fit a single line:
-```
+```python
 func(
     posvar1,
     series_kwargs=series_kwargs(
@@ -78,7 +78,7 @@ func(
 ```
 
 Usage in case of method calls:
-```
+```python
 func(
     posvar1,
     message="this a big string with several {} {} {}".\
@@ -93,7 +93,7 @@ In case all the positional args and kwargs can not fit a single line,
 break line after "(" and write the args in a new indent block.
 Give a blank line after the function definition.
 
-```
+```python
 def long_function_name(
         var_one,
         var_two,
@@ -116,7 +116,7 @@ In if statements newlines should be followed by double indentation to separate f
 by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary
 short alias.
 
-```
+```python
 if (True and (True or False)) \
         and (True \
             or False) \
@@ -128,7 +128,7 @@ if (True and (True or False)) \
 ## List, Dictionaries and alike
 
 Use the following. This applies also in function calls.
-```
+```python
 my_list = [
     value1,
     value2,
@@ -140,7 +140,7 @@ my_list = [
     ]
 ```
 
-```
+```python
 my_dict = {
     "var1": 1,
     "var2: 2
@@ -152,7 +152,7 @@ my_dict = {
 For example, if long zip() are necessary:
 
 Yes:
-```
+```python
 for sourcecol, targetcol in zip(
         fsuv["restraint_settings"].index[3:],
         ['Hgt_DPRE', 'Vol_DPRE']
@@ -164,13 +164,13 @@ for sourcecol, targetcol in zip(
 Use itertool library whenever possible.
 
 Yes:
-```
+```python
 for dp2, dp1 in it.product(next_axis_2, next_axis):
     # DO
 ```
 
 No:
-```
+```python
 for dp2 in next_axis_2:
     for dp1 in next_axis:
         # DO
@@ -187,13 +187,13 @@ for dp2 in next_axis_2:
 When assigning to a variable break the line if such allows the string to fit a single line, you can even avoid
 the usage of indentation if such allows the string to fit one line.
 
-```
+```python
 msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
 ```
 
 even:
-```
+```python
         msg = \
 "<resonance_type> argument must be 'Backbone' or 'Sidechains'."
 ```
@@ -203,7 +203,7 @@ You can/should avoid the use of indentation because this will be passed to the s
 
 If the string has to be formatted, break the method call to a new line and assign and additional indent.
 
-```
+```python
 logs = \
 '**[{}][{}][{}]** new columns inserted:  {}  \
 | sidechains user setting: {} \
@@ -221,7 +221,7 @@ In multiline strings always break the assignment statement to a new line and des
 If the string has to be formatted, break the method call and give an additional indentation considering the
 indentation of the varible to which the string is assigned:
 
-```
+```python
         msg = \
 """path: {}  
 side chains: {}  
@@ -249,7 +249,7 @@ Optionally you can separate relevant logical blocks by new lines or, preferable,
 Separate a new indentation block with a preceeding and succeeding blank line.
 Start the block right after the header. If a block initiates right after another avoid the preceeding blank line.
 
-```
+```python
 a = 1
 b = 2
 
@@ -261,7 +261,7 @@ c = 4
 
 or 
 
-```
+```python
 for char in string:
     for digit in dct[char]:
         # Do something here
