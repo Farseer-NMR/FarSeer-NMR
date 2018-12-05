@@ -1,6 +1,6 @@
-![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/FS_banner.png?raw=true)
-
 # Farseer-NMR
+
+![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/FS_workflow.png?raw=true)
 
 A Python written multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
 
@@ -34,7 +34,7 @@ Help us to improve. If you are a user, share your issues in the issues tab; if y
 
 ## Citing
 
-If you are using Farseer-NMR, or any of its components, to analyse your data, please cite our original work:
+If you are using Farseer-NMR, or any of its components, to analyse your NMR peaklist data, please cite our original work:
 
 Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. J Biomol NMR (2018) 71: 1, pp. 1-9 DOI: [10.1007/s10858-018-0182-5](https://link.springer.com/article/10.1007/s10858-018-0182-5)
 
@@ -43,3 +43,7 @@ Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automa
 The entire Farseer-NMR code comes with no liability and is licensed under the [GPL-3.0](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/COPYING).
 
 <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/GPLv3_Logo.svg/1200px-GPLv3_Logo.svg.png" width="75" height="37"></a>
+
+## Collaborations
+
+In collaboration with [Artistic Systems](https://twitter.com/artisticsystems)
