@@ -1,8 +1,8 @@
 # How to contribute
 
 - Report bugs and suggestions in the [issues tab](https://github.com/Farseer-NMR/FarSeer-NMR/issues), use TAGS as appropriate.
-- **Always** submit a Pull Request from you Forked repository of Farseer-NMR.
-- Pull Requests title shoud start with a proposal of version change and, if helpful, followed by a short title: `v1.3.12 - corrected bar color bug in barplot`
+- **Always** submit a Pull Request from you cloned repository of Farseer-NMR.
+- Pull Requests title should start with a proposal of version change and, if helpful, followed by a short title: `v1.3.12 - corrected bar color bug in barplot`
   - new version number should be updated in `install/system.py`.
   - follow versioning standards: [_major/visible_ [ _new feature_ [ _bug correction_]]
 - Pull Request description should state the added improvements and corrections.
@@ -36,7 +36,7 @@ Whenever a function call cannot fit a single line, create and indent block for *
 
 Yes:
 ```
-func_with_large_name(
+func_with_long_name(
     positional_arg1,
     positional_arg2,
     arg1='foo',
@@ -47,7 +47,7 @@ Alignment with opening delimiter it's feasible, but annoying and difficult to ma
 
 No:
 ```
-func_with_large_name(positional_arg1,
+func_with_long_name(positional_arg1,
                      positional_arg2,
                      arg1='foo',
                      arg2='bar')
