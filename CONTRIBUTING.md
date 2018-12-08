@@ -21,12 +21,12 @@ This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gath
 
 ## Length of line
 
-Maximum line length 80 chars.
+Maximum line length 79 chars.
 Maximum docstring length 72 chars.
 
 ## Indentation
 
-Indentations are 4 spaces.
+Indentations are 4 spaces NOT tabs.
 
 ## Method call
 
