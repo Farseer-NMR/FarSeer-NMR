@@ -30,7 +30,7 @@ Help us to improve. If you are a user, share your issues in the issues tab; if y
 
 - Post on our [mailing list](https://groups.google.com/forum/#!forum/farseer-nmr) for questions, discussion and help!
 - Follow us on Twitter [@farseer_nmr](https://twitter.com/farseer_nmr)
-- Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data) and on [Twitter](https://twitter.com/farseer_nmr), where our seminars PDFs are available!
+- Find us on [Research Gate](https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data), where our seminars PDFs are available!
 
 ## Citing
 
