@@ -20,7 +20,7 @@ Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-an
 
 # Documentation
 
-Find in this repository [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/wiki) the full Farseer-NMR documentation. In the `Documentation` folder you can find Tutorials and additional files to complement the documentation Wiki and PDF.
+Find in this repository [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/wiki) the Farseer-NMR documentation. Also, in the `Documentation` folder you can find Tutorials and additional files to complement the documentation Wiki and PDF.
 
 # Participate in the Farseer-NMR community
 
@@ -34,16 +34,10 @@ Help us to improve. If you are a user, share your issues in the issues tab; if y
 
 ## Citing
 
-If you are using Farseer-NMR, or any of its components, to analyse your NMR peaklist data, please cite our original work:
-
-Teixeira, JMC, Skinner, SP, Arbesú, M, Breeze, AL, Pons, M. Farseer-NMR: automatic treatment, analysis and plotting of large, multi-variable NMR data. J Biomol NMR (2018) 71: 1, pp. 1-9 DOI: [10.1007/s10858-018-0182-5](https://link.springer.com/article/10.1007/s10858-018-0182-5)
+See how to cite Farseer-NMR [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Citing).
 
 ## License
 
 The entire Farseer-NMR code comes with no liability and is licensed under the [GPL-3.0](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/COPYING).
 
 <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/GPLv3_Logo.svg/1200px-GPLv3_Logo.svg.png" width="75" height="37"></a>
-
-## Collaborations
-
-In collaboration with [Artistic Systems](https://twitter.com/artisticsystems)
