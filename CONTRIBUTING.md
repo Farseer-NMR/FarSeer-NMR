@@ -17,7 +17,7 @@ http://patorjk.com/software/taag/#p=display&h=1&f=Doom&t=---------%0AFarSeer-NMR
 
 # Farseer-NMR code style
 
-This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) and gathers rules/suggestions to uniform the coding style of Farseer-NMR. Please follow these rules when submitting a Pull Request.
+This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) rules and provides additional suggestions to uniform the coding style of Farseer-NMR. You can use [flake8](http://flake8.pycqa.org/en/latest/) to enforce yourself these rules with the options: `flake8 --hang-closing --ignore=W293`. Please follow these rules when submitting a Pull Request. 
 
 ## Length of line
 
@@ -50,7 +50,8 @@ func_with_long_name(
     arg2='bar'
     )
 ```
-Alignment with opening delimiter it's feasible, but annoying and difficult to maintain because introduces partial indentation blocks. Let's not use it.
+
+Alignment with opening delimiter it's allowed by PEP8, but annoying and difficult to maintain (in my personal opinion) because it introduces partial indentation blocks. Let's not use it.
 
 No:
 ```python
