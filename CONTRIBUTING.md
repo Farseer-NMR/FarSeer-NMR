@@ -170,7 +170,7 @@ my_dict = {
  
 ## For loops
 
-For example, if long zip() are necessary:
+For example, if long `zip()` is needed:
 
 Yes:
 ```python
