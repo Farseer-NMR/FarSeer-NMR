@@ -17,7 +17,18 @@ http://patorjk.com/software/taag/#p=display&h=1&f=Doom&t=---------%0AFarSeer-NMR
 
 # Farseer-NMR code style
 
-This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) rules and provides additional suggestions to uniform the coding style of Farseer-NMR. You can use [flake8](http://flake8.pycqa.org/en/latest/) to enforce yourself these rules with the options: `flake8 --hang-closing --ignore=W293`. Please follow these rules when submitting a Pull Request. 
+This document follows [PEP8](https://www.python.org/dev/peps/pep-0008/) rules and provides additional suggestions to uniform the coding style of Farseer-NMR. You can use [flake8](http://flake8.pycqa.org/en/latest/) to enforce yourself these rules with the options: `flake8 --hang-closing --ignore=W293,W503,E402`. Please follow these rules when submitting a Pull Request. Notice:
+
+```
+# W293 blank line contains whitespaces
+# W503 line break before binary operator, actually favoured by PEP8
+# E402 module level import not at top of file, in Farseer-NMR sometimes is necessary to import later on
+# -hang-closing, allows:
+#my_func(
+#    var1,
+#    var2,
+#    )
+```
 
 ## Length of line
 
@@ -33,8 +44,8 @@ Indentations are 4 spaces NOT tabs.
 If method call cannot fit one line, break the line after the "." followed by an extra indentation to the current indentation block. Continue this proceedure for consecutive calls.
 
 ```python
-"my name is {}".\
-    format(name)
+data_frame_with_very_long_name.\
+    loc["a",:]
 ```
 
 ## Function call
@@ -55,17 +66,18 @@ Alignment with opening delimiter it's allowed by PEP8, but annoying and difficul
 
 No:
 ```python
-func_with_long_name(positional_arg1,
-                     positional_arg2,
-                     arg1='foo',
-                     arg2='bar')
+func_with_long_name_falls_outside_tab(positional_arg1,
+                                      positional_arg2,
+                                      arg1='foo',
+                                      arg2='bar'
+)
 ```
 
 ### Kwargs
 
-Create a line break "\" after the assignment statement of the kwarg if the argument can, in this way, fit a new line. Otherwise proceed as in [Function Call] and [Method Call].
+Create a line break "\\" after the assignment statement of the kwarg if the argument can, in this way, fit a new line. Otherwise proceed as in _Function Call_ and _Method Call_ sections.
 
-Preferable, if series_kwargs() call fit a single line:
+Preferable, if `series_kwargs()` call fit a single line:
 ```python
 func(
     posvar1,
@@ -87,10 +99,13 @@ func(
 
 Usage in case of method calls:
 ```python
+
+tmp_msg = "this long string with several {} {} {}"
+tmp_msg = tmp_msg.format(a, b, c)
+
 func(
     posvar1,
-    message="this a big string with several {} {} {}".\
-        format(a, b, c)
+    message=tmp_msg
     kwargs=var1
     )
 ```
@@ -120,9 +135,7 @@ Citing PEP8: "Be consistent in return statements. Either all return statements i
 
 ## Conditionals
 
-In if statements newlines should be followed by double indentation to separate from nested code and followed
-by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary
-short alias.
+In if statements newlines should be followed by double indentation to separate from nested code and followed by the necessary subindentation. If long conditionals have to be created feel free to create variables to assign temporary short alias. Allows `flake8 --ignore=W503`.
 
 ```python
 if (True and (True or False)) \
@@ -186,68 +199,49 @@ for dp2 in next_axis_2:
 
 ## Break in binary operators.
 
-[Break before as in PEP8](https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator).
+[Break before as in PEP8](https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator). Allows `flake8 --ignore=W503`.
 
 ## Strings
 
 ### Single line
 
-When assigning to a variable break the line if such allows the string to fit a single line, you can even avoid
-the usage of indentation if such allows the string to fit one line.
+When assigning long strings:
 
 ```python
-msg = \
-"<resonance_type> argument must be 'Backbone' or 'Sidechains'."
+msg = (
+    "this big string message"
+    "with that cannot fit in"
+    "single line and that has"
+    "lots of formatters {} {}"
+    "and some {} {} {}"
+    )
 ```
 
-even:
-```python
-        msg = \
-"<resonance_type> argument must be 'Backbone' or 'Sidechains'."
-```
-
-Otherwise break the string in logical parts with the ```\```. And break again to apply format.
-You can/should avoid the use of indentation because this will be passed to the string.
-
-If the string has to be formatted, break the method call to a new line and assign and additional indent.
+using multi-line strings:
 
 ```python
-logs = \
-'**[{}][{}][{}]** new columns inserted:  {}  \
-| sidechains user setting: {} \
-| sidechains identified: {} | SD count: {}'.\
-    format(
-        a,
-        b,
-        c,
-        etc...
-```
-
-### Multiline
-
-In multiline strings always break the assignment statement to a new line and describe the string without indentation.
-If the string has to be formatted, break the method call and give an additional indentation considering the
-indentation of the varible to which the string is assigned:
-
-```python
-        msg = \
-"""path: {}  
-side chains: {}  
-FASTA starting residue: {}  """.\
-            format(
-                spectra_path,
-                self.has_sidechains,
-                self.FASTAstart
-                )
+    def dummy_func():
+        multiline_log_message = """
+**[{}][{}][{}]** new columns inserted:  {}
+| sidechains user setting: {}
+| sidechains identified: {} | SD count: {}
+"""
+        msg = multiline_log_message.format(
+            a,
+            b,
+            c,
+            d
+            )
 ```
 
 ## Imports
 
-Follow the [rules of PEP8](https://www.python.org/dev/peps/pep-0008/#imports).
+Follow the [rules of PEP8](https://www.python.org/dev/peps/pep-0008/#imports).  
+In Farseer-NMR sometimes it is necessary to perform imports away from the first lines. __allows__ `flake8 --ignore=E402`.
 
 ## Blank lines and Whitespaces
 
-Follow the [general rules of PEP8](https://www.python.org/dev/peps/pep-0008/#whitespace-in-expressions-and-statements).
+Follow the [general rules of PEP8](https://www.python.org/dev/peps/pep-0008/#whitespace-in-expressions-and-statements). `flake8 --ignore=W293` is allowed.
 
 Inside the same indentation block, write the operations consecutively.
 Optionally you can separate relevant logical blocks by new lines or, preferable, by comments.
