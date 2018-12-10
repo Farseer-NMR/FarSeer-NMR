@@ -2,7 +2,7 @@
 
 ![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/GitHub_Farseer-NMR_Workflow.png?raw=true)
 
-A Python written multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
+A Python written, multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
 
 With Farseer-NMR, you have:
 
