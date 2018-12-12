@@ -40,7 +40,7 @@ class FarseerCube:
     dictionary where the hierarchy is dictated by the acquisition
     schedule of the different measured variables (temperature,
     ligand ratio, etc...).
-    Peaklists should be stored in a spectra/ folder.
+    Peaklists should be stored in a 'spectra' folder.
     
     Peaklists in dictionary are read as pd.DataFrames.
     
@@ -52,7 +52,7 @@ class FarseerCube:
     Parameters:
         paths (list): absolute paths of all the input peaklists
         
-        allpeaklists (dict): nested dictionary created from spectra/.
+        allpeaklists (dict): nested dictionary created from 'spectra'.
             Stores all the peaklists (.csv) in pd.DataFrame format.
             Only data regarding Backbone atoms.
         
@@ -104,7 +104,7 @@ class FarseerCube:
         #logging.config.dictConfig(fslogconf.farseer_log_config)
         self.logger.debug('logger initiated')
         
-        # Decomposing the spectra/ path
+        # Decomposing the 'spectra' path
         # self.paths will be used in load_experiments()
         # http://stackoverflow.com/questions/14798220/how-can-i-search-sub-folders-using-glob-glob-module-in-python
         self.paths = \
@@ -238,7 +238,7 @@ correspond to nitrogen assignment labels.'.format(z, y, x)
     
     def _checks_filetype(self, filetype):
         """
-        Confirms that file type exists in spectra/ before loading.
+        Confirms that file type exists in 'spectra' before loading.
         
         If not, call WET#9.
         
@@ -258,7 +258,7 @@ if Farseer-NMR can't do nothing with them? :-)".\
         
         # checks if files exists
         if not(any([p.endswith(filetype) for p in self.paths])):
-            msg = "There are no files in spectra/ with extension {}".\
+            msg = "There are no files in 'spectra' folder with extension {}".\
                 format(filetype)
             self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=9))
             
@@ -275,7 +275,7 @@ if Farseer-NMR can't do nothing with them? :-)".\
         Raises WET#12 otherwise.
         
         Confirms wether the number of files of <filetype> is the same
-        in every subdirectory of spectra/.
+        in every subdirectory of 'spectra'.
         Raises WET#8 otherwise.
         
         Confirms that the files of <filetype> have the same names in all
@@ -284,7 +284,7 @@ if Farseer-NMR can't do nothing with them? :-)".\
         
         Parameters:
             target (dict): nested dictionary representing the
-                folder tree in spectra/
+                folder tree in 'spectra'
             
             filetype (str): {'.csv', '.fasta'}
         """
@@ -293,9 +293,14 @@ if Farseer-NMR can't do nothing with them? :-)".\
         ykeys = list(target[zkeys[0]].keys())
         xkeys = list(target[zkeys[0]][ykeys[0]].keys())
         key_len = len(zkeys) * len(ykeys) * len(xkeys)
+        self.logger.debug("x: {}, y: {}, z: {}".format(xkeys, ykeys, zkeys))
+        self.logger.debug("key_len: {}".format(key_len))
         ### Checks coherency of y folders
         all_y_folders = \
-            set([y.split('/')[-2] for y in self.paths if y.endswith(filetype)])
+            set([os.path.split(os.path.split(y)[0])[1]
+                for y in self.paths if y.endswith(filetype)])
+        
+        self.logger.debug("all_y_folders: {}".format(all_y_folders))
         
         if len(set(all_y_folders)) > len(ykeys):
             msg = \
@@ -305,7 +310,7 @@ Names must be equal accross every Z axis datapoint folder."
         
         if filetype == '.fasta':
             all_fasta_files = \
-                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+                [os.path.basename(x) for x in self.paths if x.endswith(filetype)]
             
             
             if len(all_fasta_files) != (len(ykeys) * len(zkeys)):
@@ -326,7 +331,7 @@ Check for the missing ones!'.\
                 self._abort(fsw(msg_title='ERROR', msg=msg, wet_num=8))
             
             x_files_names = set(
-                [x.split('/')[-1] for x in self.paths if x.endswith(filetype)]
+                [os.path.basename(x) for x in self.paths if x.endswith(filetype)]
                 )
             
             if (len(x_files_names) > len(xkeys)):
@@ -1569,12 +1574,12 @@ more details."
         self.logs(title, istitle=True)
         
         for z, y, x in it.product(self.zzcoords, self.yycoords, self.xxcoords):
-            folder = 'spectra_parsed/{}/{}'.format(z,y)
+            folder = os.path.join('spectra_parsed', z, y)
             
             if not(os.path.exists(folder)):
                 os.makedirs(folder)
             
-            fpath = '{}/{}.csv'.format(folder, x)
+            fpath = os.path.join(folder, x + '.csv')
             fileout = open(fpath, 'w')
             fileout.write(
                 self.allpeaklists[z][y][x].to_csv(
@@ -1588,12 +1593,12 @@ more details."
             self.logs(msg)
         
             if self.has_sidechains:
-                folder = 'spectra_SD_parsed/{}/{}'.format(z,y)
+                folder = os.path.join('spectra_SD_parsed', z, y)
                 
                 if not(os.path.exists(folder)):
                     os.makedirs(folder)
                 
-                fpath = '{}/{}.csv'.format(folder, x)
+                fpath = os.path.join(folder, x + '.csv')
                 fileout = open(fpath, 'w')
                 fileout.write(
                     self.allsidechains[z][y][x].to_csv(
@@ -1703,29 +1708,49 @@ the possible options.'
         
         # loads files in nested dictionaries
         # piece of code found in stackoverflow, reference missing
+        
         for p in self.paths:
-            parts = p.split('spectra')[-1].split('/')
+            #https://stackoverflow.com/questions/8384737/extract-file-name-from-path-no-matter-what-the-os-path-format
+            
+            x_file = os.path.split(p)[1]
+            y_dir = os.path.split(os.path.split(p)[0])[1]
+            z_dir = os.path.split(os.path.split(os.path.split(p)[0])[0])[1]
+            
+            #self.logger.debug("dirname: {}".format(os.path.dirname(p)))
+            self.logger.debug("p: {}".format(p))
+            #self.logger.debug("dirs: {}".format(dirs))
+            self.logger.debug("x file:{}".format(x_file))
+            self.logger.debug("y folder: {}".format(y_dir))
+            self.logger.debug("z folder: {}".format(z_dir))
+            
+            parts = [z_dir, y_dir]
+            self.logger.debug("parts: {}".format(parts))
+            
             branch = target
             
-            for part in parts[1:-1]:
+            if not x_file.endswith(filetype):
+                continue
+            
+            for part in parts:
+                
                 branch = branch.setdefault(part, {})
             
             # reads the .csv file to a pd.DataFrame removes
             # the '.csv' from the key name to increase asthetics in output
-            if parts[-1].lower().endswith(filetype):
+            if x_file.lower().endswith(filetype):
                 self.logs('* {}'.format(p))
-                lessparts = parts[-1].split('.')[0]
+                lessparts = x_file.split('.')[0]
                 
                 try:
                     if filetype == '.csv':
-                        branch[lessparts] = branch.get(parts[-1], f(p))
+                        branch[lessparts] = branch.get(x_file, f(p))
                     elif filetype == '.fasta':
                         fh = FastaHandler(
                                 fasta_file_path=p,
                                 fasta_start_num=self.FASTAstart
                                 )
                         fh.reads_fasta_to_dataframe(reads_from_file=True)
-                        branch[lessparts] = branch.get(parts[-1], fh.fasta_df)
+                        branch[lessparts] = branch.get(x_file, fh.fasta_df)
                 
                 except pd.errors.EmptyDataError:
                     msg = \

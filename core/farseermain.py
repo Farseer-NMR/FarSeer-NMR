@@ -56,7 +56,7 @@ class FarseerNMR:
                     - (dict) Python dictionary containing all user defined
                             variables.
             - spectra_folder_path (opt, str): path to the parent folder
-                of the spectra/ folder where the peaklist dataset is stored.
+                of the 'spectra' folder where the peaklist dataset is stored.
         """
         # reads user variables
         # this has to be done before starting logging system
@@ -129,14 +129,14 @@ class FarseerNMR:
     
     def _update_spectra_dir(self):
         """
-        Updates the path to the spectra/ folder containing the peaklist
+        Updates the path to the 'spectra' folder containing the peaklist
         dataset.
         """
         
         # this code is synchronized with the one of the GUI
         # in the GUI spectra_path refers to the folder where all the original
         # non parsed peaklist are stored. While in the core spectra_path
-        # relates to the parent folder of spectra/ where the parsed peaklists
+        # relates to the parent folder of 'spectra' where the parsed peaklists
         # are stored.
         #
         # In future versions this can be corrected to better descriminate the
@@ -667,7 +667,7 @@ Settings.'.\
         """
         
         how_to_run = """*** execute Farseer-NMR as
-*** $ python <path_to>/farseermain.py <path_to_run_folder> <path_to_conf.json>"""
+*** $ python <path_to farseermain.py> <path_to_run_folder> <path_to_conf.json>"""
         
         # Reads json config absolute path
         json_cwd = os.path.abspath(fsuv_json_path)
@@ -713,7 +713,7 @@ Settings.'.\
             apply_fasta=False):
         """
         Creates the Farseer-NMR peaklist dataset (instance of
-        FarseerCube class) from the peaklist hierarchycal folder 'spectra/' 
+        FarseerCube class) from the peaklist hierarchycal folder 'spectra' 
         in self.fsuv["general_settings"]["input_spectra_path"]
         
         Parameters:
@@ -773,7 +773,7 @@ Settings.'.\
         
         Compares reference peaklists along Y and Z axis of the Farseer-NMR
         Cube and generates the corresponding 'missing' residues.
-        This function is useful when analysing dia/ and paramagnetic/ series
+        This function is useful when analysing dia and paramagnetic series
         along the Z axis.
         
         Parameters:
@@ -906,7 +906,7 @@ Settings.'.\
         
         Parameters:
             series_class (FarseerSeries class): The class that will 
-                initiate the series, normally fslibs/FarseerSeries.py
+                initiate the series, normally fslibs.FarseerSeries.py
             
             resonance_type (opt, str): {'Backbone', 'Sidechains'} depending
                 on data in <exp>.
@@ -1342,7 +1342,7 @@ Nothing to calculate here.')
         
         for observable in list_of_observables:
             farseer_series.write_table(
-                "observables/"+observable,
+                os.path.join("observables", observable),
                 observable,
                 resonance_type=resonance_type
                 )
@@ -1903,7 +1903,7 @@ Nothing to calculate here.')
             os.pardir
             )
         
-        file_path = '{}/{}'.format(
+        file_path = os.path.join(
             self.fsuv["general_settings"]["output_path"],
             file_name
             )

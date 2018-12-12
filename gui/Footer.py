@@ -55,35 +55,35 @@ class Footer(QWidget):
         self.layout().addWidget(self.label3, 2, 0)
         #
         self.paper_button = QToolButton()
-        self.paper_button.setIcon(Icon('icons/footer-icon-paper.png'))
+        self.paper_button.setIcon(Icon(os.path.join('icons', 'footer-icon-paper.png')))
         self.paper_button.setCheckable(True)
         self.paper_button.toggled.connect(self.link_to_article)
         #
         self.documentation = QToolButton()
-        self.documentation.setIcon(Icon('icons/footer-icon-documentation.png'))
+        self.documentation.setIcon(Icon(os.path.join('icons', 'footer-icon-documentation.png')))
         self.documentation.setCheckable(True)
         self.documentation.toggled.connect(self.show_documentation)
         #
         self.mailing_list_button = QToolButton()
-        self.mailing_list_button.setIcon(Icon('icons/footer-icon-email.png'))
+        self.mailing_list_button.setIcon(Icon(os.path.join('icons', 'footer-icon-email.png')))
         self.mailing_list_button.setCheckable(True)
         self.mailing_list_button.toggled.connect(self.mailing_list)
         #
         self.git_button = QToolButton()
         # icon from
         # https://www.iconsdb.com/caribbean-blue-icons/github-11-icon.html
-        self.git_button.setIcon(Icon('icons/footer-icon-git.png'))
+        self.git_button.setIcon(Icon(os.path.join('icons', 'footer-icon-git.png')))
         self.git_button.setCheckable(True)
         self.git_button.toggled.connect(self.show_git)
         #
         self.rg = QToolButton()
-        self.rg.setIcon(Icon('icons/footer-icon-rg.png'))
+        self.rg.setIcon(Icon(os.path.join('icons', 'footer-icon-rg.png')))
         self.rg.setCheckable(True)
         self.rg.toggled.connect(self.open_research_gate)
         #
         self.twitter_button = QToolButton()
         self.twitter_button.setCheckable(True)
-        self.twitter_button.setIcon(Icon('icons/footer-icon-twitter.png'))
+        self.twitter_button.setIcon(Icon(os.path.join('icons', 'footer-icon-twitter.png')))
         self.twitter_button.toggled.connect(self.open_twitter)
         #
         self.paper_button.setIconSize(self.paper_button.size())
@@ -102,7 +102,7 @@ class Footer(QWidget):
         #
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
-                  '>v.1.2.9&nbsp;&nbsp;&nbsp;&nbsp;</span>'
+                  '>v.1.2.10&nbsp;&nbsp;&nbsp;&nbsp;</span>'
         self.versionLabel = QLabel(version, self)
         self.versionLabel.setAlignment(QtCore.Qt.AlignRight)
         #
@@ -112,7 +112,7 @@ class Footer(QWidget):
         self.layout().addWidget(self.versionLabel, 0, 10, 1, 1)
         #
         self.ctfpLabel = QLabel('', self)
-        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons/footer-artistic-systems.png'))
+        pixmap = QtGui.QPixmap(os.path.join(ICON_DIR, 'icons', 'footer-artistic-systems.png'))
         self.ctfpLabel.setPixmap(pixmap)
         self.ctfpLabel.setAlignment(QtCore.Qt.AlignRight)
         self.layout().addWidget(self.ctfpLabel, 1, 9, 2, 2)
