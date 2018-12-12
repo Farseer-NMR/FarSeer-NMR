@@ -146,7 +146,7 @@ class SideBar(QTreeWidget):
         if os.path.isdir(file_path):
             return
         
-        name = file_path.split('/')[-1].split('.')[0]
+        name = os.path.basename(file_path)
         
         if name not in self.peakLists.keys():
             peaklist = read_peaklist(file_path)

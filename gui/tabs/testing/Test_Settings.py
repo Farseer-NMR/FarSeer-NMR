@@ -180,8 +180,8 @@ class Test_Case(unittest.TestCase):
 
     def test_set_values(self):
 
-        self.widget.spectrum_path.setText('/path/to/spectrum/test')
-        self.widget.output_path.setText('/path/to/output/test')
+        self.widget.spectrum_path.setText(os.path.join('path', 'to', 'spectrum', 'test'))
+        self.widget.output_path.setText(os.path.join('path', 'to', 'output', 'test'))
         self.widget.has_sidechains_checkbox.setChecked(True)
         self.widget.use_sidechains_checkbox.setChecked(True)
         self.widget.figure_width.setValue(5.76)
@@ -253,9 +253,9 @@ class Test_Case(unittest.TestCase):
         plotting_flags = self.widget.variables["plotting_flags"]
 
         self.assertEqual(self.widget.spectrum_path.field.text(),
-                         '/path/to/spectrum/test')
+                         (os.path.join('path', 'to', 'spectrum', 'test')))
         self.assertEqual(self.widget.output_path.field.text(),
-                         '/path/to/output/test')
+                        (os.path.join('path', 'to', 'output', 'test')))
         self.assertEqual(self.widget.has_sidechains_checkbox.isChecked(), True)
         self.assertEqual(self.widget.use_sidechains_checkbox.isChecked(), True)
         self.assertEqual(self.widget.figure_width.field.value(), 5.76)
@@ -323,8 +323,8 @@ class Test_Case(unittest.TestCase):
 
         self.widget.save_config()
 
-        self.assertEqual(general["spectra_path"], '/path/to/spectrum/test')
-        self.assertEqual(general["output_path"], '/path/to/output/test')
+        self.assertEqual(general["spectra_path"], (os.path.join('path', 'to', 'spectrum', 'test')))
+        self.assertEqual(general["output_path"], (os.path.join('path', 'to', 'output', 'test')))
         self.assertEqual(general["has_sidechains"], True)
         self.assertEqual(general["use_sidechains"], True)
         self.assertEqual(general["fig_width"], 5.76)
@@ -398,8 +398,8 @@ class Test_Case(unittest.TestCase):
 
     def test_values_not_set(self):
 
-        self.widget.spectrum_path.setText('/path/to/spectrum/test')
-        self.widget.output_path.setText('/path/to/output/test')
+        self.widget.spectrum_path.setText((os.path.join('path', 'to', 'spectrum', 'test')))
+        self.widget.output_path.setText((os.path.join('path', 'to', 'output', 'test')))
         self.widget.has_sidechains_checkbox.setChecked(True)
         self.widget.use_sidechains_checkbox.setChecked(True)
         self.widget.figure_width.setValue(5.76)
@@ -471,9 +471,9 @@ class Test_Case(unittest.TestCase):
         plotting_flags = self.widget.variables["plotting_flags"]
 
         self.assertEqual(self.widget.spectrum_path.field.text(),
-                         '/path/to/spectrum/test')
+                         os.path.join('path', 'to', 'spectrum', 'test'))
         self.assertEqual(self.widget.output_path.field.text(),
-                         '/path/to/output/test')
+                         os.path.join('path', 'to', 'output', 'test'))
         self.assertEqual(self.widget.has_sidechains_checkbox.isChecked(), True)
         self.assertEqual(self.widget.use_sidechains_checkbox.isChecked(), True)
         self.assertEqual(self.widget.figure_width.field.value(), 5.76)
@@ -544,8 +544,8 @@ class Test_Case(unittest.TestCase):
 
         self.assertEqual(self.widget.do_pre_checkbox.isChecked(), True)
 
-        self.assertNotEqual(general["spectra_path"], '/path/to/spectrum/test')
-        self.assertNotEqual(general["output_path"], '/path/to/output/test')
+        self.assertNotEqual(general["spectra_path"], (os.path.join('path', 'to', 'spectrum', 'test')))
+        self.assertNotEqual(general["output_path"], (os.path.join('path', 'to', 'output', 'test')))
         self.assertNotEqual(general["has_sidechains"], True)
         self.assertNotEqual(general["use_sidechains"], True)
         self.assertNotEqual(general["fig_width"], 5.76)
