@@ -22,6 +22,8 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 import os
+import argparse
+from gui import gui_utils
 
 from PyQt5 import QtCore, QtGui
 
@@ -57,6 +59,42 @@ class Main(QWidget):
         self.layout().addWidget(tabWidget)
         self.layout().addWidget(footer)
         self.setObjectName("MainWidget")
+    
+def run(argv):
+    app = QApplication(argv)
+    
+    parser = argparse.ArgumentParser(description='Run Farseer')
+    parser.add_argument(
+        '--config',
+        metavar='path',
+        required=False,
+        help='Farseer Configuration File'
+        )
+    splash_file = os.path.join(os.pardir, 'gui', 'images', 'splash-screen.png')
+    splash_pix = QtGui.QPixmap(splash_file)
+    args = parser.parse_args()
+    splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
+    splash.setEnabled(False)
+    splash.show()
+    screen_resolution = app.desktop().screenGeometry()
+    
+    gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
+    
+    ex = Main(gui_settings=gui_settings, config=args.config)
+    splash.finish(ex)
+    font_file = os.path.join(os.pardir, 'gui', 'SinkinSans', 'SinkinSans-400Regular.otf')
+    font_id = QtGui.QFontDatabase.addApplicationFont(font_file)
+    app.setStyleSheet(stylesheet)
+    ex.show()
+    ex.raise_()
+    execution = app.exec_()
+
+    del ex
+    del app
+
+    sys.exit(execution)
+    return
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
