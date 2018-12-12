@@ -79,8 +79,7 @@ class FarseerUpdater():
             self,
             install_wd,
             update_log="update.log",
-            new_version_url="https://github.com/joaomcteixeira/FarSeer-NMR/archive/installation.zip",
-            #new_version_url="https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip",
+            new_version_url="https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip",
             new_version_zip="master.zip",
             folders_to_remove=["Documentation", "gui", "core", "install", ".idea"]
             ):
