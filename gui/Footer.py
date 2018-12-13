@@ -27,6 +27,7 @@ from PyQt5 import QtCore, QtGui
 
 from gui.components.Icon import Icon, ICON_DIR
 
+from install import system
 
 class Footer(QWidget):
 
@@ -100,9 +101,11 @@ class Footer(QWidget):
         self.layout().addWidget(self.rg, 0, 8, 3, 1)
         self.layout().addWidget(self.twitter_button, 0, 9, 3, 1)
         #
+        footer_version_code = "v{0[0]}.{0[1]}.{0[2]}"
+        farseer_version = footer_version_code.format(system.farseer_version)
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
-                  '>v.1.2.10&nbsp;&nbsp;&nbsp;&nbsp;</span>'
+                  '>{}&nbsp;&nbsp;&nbsp;&nbsp;</span>'.format(farseer_version)
         self.versionLabel = QLabel(version, self)
         self.versionLabel.setAlignment(QtCore.Qt.AlignRight)
         #
