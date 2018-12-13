@@ -1291,17 +1291,25 @@ recipient: residues
             # ticks positions:
             # this is used to fit both applyFASTA=True or False
             # reduces xticks to 100 as maximum to avoid ticklabel overlap
-            if self.shape[1] > 100:
-                xtick_spacing = self.shape[1]//100
             
-            else:
-                xtick_spacing = 1
+            
+            ## quick patch introduced in 1.3.1 to solve x axis issue
+            ## before release of version 1.4.0
+            # Define tick spacing
+            for j in range(101,10000,100):
+                if j>len(bars):
+                    mod_ = j//100
+                    break
+            self.logger.debug("Tick spacing set to: {}".format(mod_))
+            
+            # set xticks and xticks_labels to be represented
+            xticks = np.arange(len(bars))[0::mod_]
             
             ticklabels = \
-                self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
+                self.loc[experiment,0::mod_,['ResNo','1-letter']].\
                     apply(lambda x: ''.join(x), axis=1)
             # Configure XX ticks and Label
-            axs[i].set_xticks(self.major_axis)
+            axs[i].set_xticks(xticks)
             ## https://github.com/matplotlib/matplotlib/issues/6266
             axs[i].set_xticklabels(
                 ticklabels,
@@ -1315,7 +1323,7 @@ recipient: residues
             if x_ticks_color_flag:
                 self._set_item_colors(
                     axs[i].get_xticklabels(),
-                    self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                    self.loc[experiment,0::mod_,'Peak Status'],
                     {
                         'measured':measured_color,
                         'missing':missing_color,
@@ -1361,7 +1369,7 @@ recipient: residues
         
         elif plot_style == 'bar_compacted':
             bars = axs[i].bar(
-                self.loc[experiment,:,'ResNo'].astype(float),
+                self.major_axis,
                 self.loc[experiment,:,calccol].fillna(0),
                 width=bar_width,
                 align='center',
@@ -1370,19 +1378,37 @@ recipient: residues
                 zorder=4
                 )
             
-            initialresidue = int(self.ix[0, 0, 'ResNo'])
-            finalresidue = int(self.loc[experiment,:,'ResNo'].tail(1))
+            ## quick patch introduced in 1.3.1 to solve x axis issue
+            ## before release of version 1.4.0
+            num_of_bars = len(bars)
+            number_of_ticks = num_of_bars
+            mod_ = 10
+            sanity_counter = 0
             
-            if self.shape[1] > 100:
-                xtick_spacing = self.shape[1]//100*10
+            tmp_xticks = self.loc[experiment,:,'ResNo'].astype(float)
             
-            else:
-                xtick_spacing = 10
+            while number_of_ticks > 10 and sanity_counter < 100000:
+                
+                mask = np.where(tmp_xticks % mod_ == 0)[0]
+                
+                xticks = self.major_axis[mask]  #np.arange(num_of_bars)[mask]
+                xticks_labels = self.loc[experiment,mask,'ResNo']
+                number_of_ticks = len(xticks)
+    
+                mod_ *= 10
+                sanity_counter += 1
             
-            first_tick = ceil(initialresidue/10)*xtick_spacing
-            xtickarange = np.arange(first_tick, finalresidue+1, xtick_spacing)
-            axs[i].set_xticks(xtickarange)
-            # https://github.com/matplotlib/matplotlib/issues/6266
+            self.logger.debug("sanity_counter: {}".format(sanity_counter))
+            
+            # set xticks and xticks_labels to be represented
+            self.logger.debug("xticks represented: {}".format(xticks))
+            self.logger.debug("xticks labels represented: {}".format(xticks_labels))
+        
+            # Set X ticks
+            axs[i].set_xticks(xticks)
+            xtickarange = xticks_labels
+            
+            # # https://github.com/matplotlib/matplotlib/issues/6266
             axs[i].set_xticklabels(
                 xtickarange,
                 fontname=x_ticks_fn,
@@ -1396,7 +1422,7 @@ recipient: residues
                     self.loc[experiment, :, 'Peak Status'] == 'unassigned'
                 
                 for residue in self.loc[experiment, unassignedmask, 'ResNo']:
-                    residue = int(residue) - 0.5
+                    residue = int(residue) - 1.5
                     axs[i].axvspan(
                         residue,
                         residue+1,
@@ -1637,16 +1663,26 @@ recipient: residues
         ## Configure XX ticks and Label
         axs[i].margins(y=0.01)
         
-        if self.shape[1] > 100:
-            xtick_spacing = self.shape[1]//100
+        ## quick patch introduced in 1.3.1 to solve x axis issue
+        ## before release of version 1.4.0
+        # Define tick spacing
+        for j in range(101,10000,100):
+            if j>len(bars):
+                mod_ = j//100
+                break
+        self.logger.debug("Tick spacing set to: {}".format(mod_))
         
-        else:
-            xtick_spacing = 1
+        # set xticks and xticks_labels to be represented
+        xticks = np.arange(len(bars))[0::mod_]
         
-        axs[i].set_yticks(self.major_axis)
+        ticklabels = \
+            self.loc[experiment,0::mod_,['ResNo','1-letter']].\
+                apply(lambda x: ''.join(x), axis=1)
+        # Configure XX ticks and Label
+        axs[i].set_yticks(xticks)
         # https://github.com/matplotlib/matplotlib/issues/6266
         axs[i].set_yticklabels(
-            self.loc[experiment,0::xtick_spacing,['ResNo','1-letter']].\
+            self.loc[experiment,0::mod_,['ResNo','1-letter']].\
                 apply(lambda x: ''.join(x), axis=1),
             fontname=x_ticks_fn,
             fontsize=x_ticks_fs-2,
@@ -1667,7 +1703,7 @@ recipient: residues
         if x_ticks_color_flag:
             self._set_item_colors(
                 axs[i].get_yticklabels(),
-                self.loc[experiment,0::xtick_spacing,'Peak Status'],
+                self.loc[experiment,0::mod_,'Peak Status'],
                 {
                     'measured':measured_color,
                     'missing':missing_color,

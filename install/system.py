@@ -39,7 +39,7 @@ along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 import platform as pltfrm
 import os
 
-farseer_version = (1, 3, 0)  # v1.3.0
+farseer_version = (1, 3, 1)  # v1.3.0
 
 min_space_allowed = 3  # GB
 
