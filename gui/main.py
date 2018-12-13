@@ -62,6 +62,7 @@ class Main(QWidget):
     
 def run(argv):
     app = QApplication(argv)
+    import argparse
     
     parser = argparse.ArgumentParser(description='Run Farseer')
     parser.add_argument(
@@ -97,37 +98,5 @@ def run(argv):
     return
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    import argparse
     
-    parser = argparse.ArgumentParser(description='Run Farseer')
-    parser.add_argument(
-        '--config',
-        metavar='path',
-        required=False,
-        help='Farseer Configuration File'
-        )
-    splash_pix = QtGui.QPixmap(os.path.join('gui', 'images', 'splash-screen.png'))
-    args = parser.parse_args()
-    splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
-    splash.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
-    splash.setEnabled(False)
-    splash.show()
-    screen_resolution = app.desktop().screenGeometry()
-    
-    from gui import gui_utils
-    gui_settings, stylesheet = gui_utils.deliver_settings(screen_resolution)
-    
-    ex = Main(gui_settings=gui_settings, config=args.config)
-    splash.finish(ex)
-    font_file = os.path.join('gui', 'SinkinSans', 'SinkinSans-400Regular.otf')
-    font_id = QtGui.QFontDatabase.addApplicationFont(font_file)
-    app.setStyleSheet(stylesheet)
-    ex.show()
-    ex.raise_()
-    execution = app.exec_()
-
-    del ex
-    del app
-
-    sys.exit(execution)
+    run(sys.argv)
