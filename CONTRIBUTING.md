@@ -5,6 +5,10 @@
 - Report bugs and suggestions in the [issues tab](https://github.com/Farseer-NMR/FarSeer-NMR/issues), use TAGS as appropriate.
 - Or, alternatively, to our mailing list farseer-nmr@googlegroups.com
 
+## Projects
+
+All discussions regarding Farseer-NMR major developments, bug reporting and triage and general discussions are registered in [our projects](https://github.com/Farseer-NMR/FarSeer-NMR/projects) page, feel free to browse them. _How do we organize our projects?_ Opened issues are catalogued in projects and consequently closed if an inmediate action is not expected, they are then reopened once under development. Project's "Done" columns identify finished tasks.
+
 ## Guide to Developers
 
 Please read our [Guide to Developers](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/guide-to-developers), where you will find information regarding Coding Style and detailed documenation on the Farseer-NMR architecture.
