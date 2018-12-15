@@ -24,7 +24,7 @@ Find in this repository [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/w
 
 # Participate in the Farseer-NMR community
 
-Help us to improve. If you are a user, share your issues in the issues tab; if you are a developer: read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
+Help us to improve. If you are a user, share your issues in the issues tab; if you are a developer read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
 
 # Find us!
 
