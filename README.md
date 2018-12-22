@@ -16,7 +16,13 @@ With Farseer-NMR, you have:
 
 # Download, Install and Update
 
-Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-and-Update) on how to setup your Farseer-NMR installation - it's very easy!
+To install Farseer-NMR simply run the installation script:
+
+```
+python install_farseernmr.py
+```
+
+Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-and-Update) some additional detail on how to setup your Farseer-NMR installation - it's very easy!
 
 # Documentation
 
@@ -24,7 +30,7 @@ Find in this repository [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/w
 
 # Participate in the Farseer-NMR community
 
-Help us to improve. If you are a user, share your issues in the issues tab; if you are a developer: read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
+Help us to improve. If you are a user, share your issues in the issues tab; if you are a developer read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
 
 # Find us!
 
