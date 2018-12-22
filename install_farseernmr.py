@@ -1,23 +1,46 @@
 """
-Tree-of-Life installer.
+Farseer-NMR installer.
 
-Copyright © 2018-2019 Tree-of-Life
+Copyright © 2017-2019 Farseer-NMR Project
+
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.0 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
+
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
+- J. BioMol NMR Publication:
+    https://link.springer.com/article/10.1007/s10858-018-0182-5
+
+- GitHub: https://github.com/Farseer-NMR
+
+- Mail list: https://groups.google.com/forum/#!forum/farseer-nmr
+    email: farseer-nmr@googlegroups.com
+
+- Research Gate: https://goo.gl/z8dPJU
+
+- Twitter: https://twitter.com/farseer_nmr
+
+THIS FILE IS PART OF THE FARSEER-NMR PROJECT.
 
 Contributors to this file:
 - João M.C. Teixeira (https://github.com/joaomcteixeira)
 
-Tree-of-Life is free software: you can redistribute it and/or modify
-it under the terms of the LGPL - GNU Lesser General Public License
-as published by the Free Software Foundation, either version 3
-of the License, or (at your option) any later version.
+Farseer-NMR is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
+Farseer-NMR is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-LGPL - GNU Lesser General Public License for more details.
+GNU General Public License for more details.
 
-You should have received a copy of the this license along
-with this library. If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with Farseer-NMR. If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 import os
