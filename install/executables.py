@@ -296,9 +296,9 @@ commons.sys_exit()
 """
 
 # executable scripts file names and extensions
-run_cmd = "run_cmd{}".format(system.exec_file_extension)
-run_gui = "run_gui{}".format(system.exec_file_extension)
-updatescript = "update{}".format(system.exec_file_extension)
+run_cmd = "farseer_cmd{}".format(system.exec_file_extension)
+run_gui = "farseer_gui{}".format(system.exec_file_extension)
+updatescript = "farseer_update{}".format(system.exec_file_extension)
 
 # dictionary listing the executable scripts
 # keys are file names, values the string with code
