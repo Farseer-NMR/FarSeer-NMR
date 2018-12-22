@@ -1,11 +1,17 @@
-# -*- coding: utf-8 -*-
 """
-COMMON FUNCTIONS TO FARSEER-NMR INSTALLATION AND UPDATE ROUTINES.
+Commons fuctions that serve installation and update.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.0 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -46,6 +52,7 @@ import ctypes
 from install import logger
 from install import system
 from install import messages
+from install import executables
 
 log = logger.InstallLogger(__name__).gen_logger()
 
@@ -69,7 +76,7 @@ else:
     log.info(messages.something_wrong)
     log.info(messages.additional_help)
     log.info(messages.abort)
-    user_input("Press ENTER to Terminate")
+    user_input(messages.terminate)
     sys.exit(1)
 
 
@@ -284,16 +291,16 @@ def sub_call(exec_line):
     return proc
 
 
-def create_executables(installation_folder, env_exec):
+def create_executables(installation_folder, python_exec):
     """
-    Creates Farseer-NMR executables based on install.system lib.
+    Creates executables based on user.executables module.
     
     Parameters:
     
-        - installation_folder (str): the Farseer-NMR installation folder,
+        - installation_folder (str): the software installation folder,
             where the 'bin' folder will reside
         
-        - env_exec (str): the full path for the python executable
+        - python_exec (str): the full path for the python executable
     """
     
     log.info(messages.gen_files_msg_head)
@@ -306,22 +313,16 @@ def create_executables(installation_folder, env_exec):
     else:
         log.debug("'bin' folder already existed")
     
-    log.debug("<env_exec>: {}".format(env_exec))
+    log.debug("<python_exec>: {}".format(python_exec))
     
-    dict_of_execs = {
-        'gui': (system.gui_file, system.run_gui),
-        'cmd': (system.cmd_file, system.run_cmd),
-        'updater': (system.update_file, system.update_script)
-        }
-    
-    for key, executable in dict_of_execs.items():
+    for exec_name, code in executables.executable_files.items():
         
-        exec_file = os.path.join(bin_folder, executable[0])
+        exec_file = os.path.join(bin_folder, exec_name)
         
         fout = open(exec_file, 'w')
         log.debug("opened {}".format(exec_file))
         
-        fout.write(executable[1].format(env_exec))
+        fout.write(code.format(python_exec))
         fout.close()
         
         change_permissions_777(exec_file)
@@ -333,9 +334,10 @@ def create_executables(installation_folder, env_exec):
 
 def register_install_vars(
         install_dir,
-        env_exec=None,
+        python_exec=None,
         install_option=None,
         conda_exec=None,
+        env_file=None,
         env_name=None,
         env_version=None,
         miniconda_folder=None
@@ -344,16 +346,16 @@ def register_install_vars(
     Writes installation variables to .py file.
     """
     
-    install_reg_name = os.path.join(install_dir, 'install_reg.py')
+    install_reg_name = os.path.join(install_dir, 'installation_vars.py')
     
     fout = open(install_reg_name, 'w')
     log.debug("install_reg.py openned: {}".format(install_reg_name))
     
-    install_register = """
+    installation_vars = """
 # This file registers the installation variables
-# which are required for update purposes.
+# which are required for debugging and updating purposes.
 #
-# Please do not delete it from the Farseer-NMR folder
+# Please do not delete it from the installation folder
 #
 # For additional help, please write us at:
 # {}
@@ -361,26 +363,28 @@ def register_install_vars(
 from pathlib import Path
 
 install_option = {}
-install_wd = Path(r'{}')
+install_dir = Path(r'{}')
 conda_exec = {}
 python_exec = {}
 miniconda_folder = {}
-farseer_env_name = {}
-farseer_env_version = {}
+installed_env_file = {}
+installed_env_name = {}
+installed_env_version = {}
 """.format(
-        messages.maillist_mail,
+        messages.mailist,
         install_option,
         install_dir,
         "Path(r'{}')".format(conda_exec) if conda_exec else None,
-        "Path(r'{}')".format(env_exec) if env_exec else None,
+        "Path(r'{}')".format(python_exec) if python_exec else None,
         "Path(r'{}')".format(miniconda_folder) if miniconda_folder else None,
+        "Path(r'{}')".format(env_file) if env_file else None,
         "'{}'".format(env_name) if env_name else None,
         env_version
         )
     
-    log.debug(install_register)
+    log.debug(installation_vars)
     
-    fout.write(install_register)
+    fout.write(installation_vars)
     fout.close()
     log.debug("install_reg created")
     
@@ -388,6 +392,6 @@ farseer_env_version = {}
 
 
 def sys_exit(number=1):
-    user_input("Press ENTER to TERMINATE")
+    user_input(messages.terminate)
     sys.exit(number)
     return

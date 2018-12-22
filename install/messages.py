@@ -1,11 +1,17 @@
-# -*- coding: utf-8 -*-
 """
-INFORMATIVE MESSAGES FOR FARSEER-NMR INSTALLATION AND UPDATE.
+Informative messages for the installation and update processes.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.0 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -40,10 +46,11 @@ import os
 import textwrap
 
 from install import system
+from install import executables
 
-install_wiki = "https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-and-Update"
-windows_wiki = "https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Documentation#running-on-windows"
-maillist_mail = "farseer-nmr@googlegroups.com"
+# provide a link and e-mail with further documentation on the install process
+install_wiki = "https://github.com/Farseer-NMR/FarSeer-NMR/wiki"
+mailist = "farseer-nmr@googlegroups.com"
 
 # configure textwrapper
 
@@ -53,7 +60,7 @@ tw.break_long_words = False
 tw.drop_whitespace = True
 tw.initial_indent = "* "
 tw.subsequent_indent = "* "
-tw.width=70
+tw.width = 70
 
 
 def _formats_message_body(s):
@@ -65,12 +72,12 @@ def _formats_message_body(s):
         [tw.fill(line) for line in s.splitlines() if line.strip() != '']
         )
     
-    return body+"\n"
+    return body + "\n"
 
 
 def _formats_main_title(s):
     
-    star = 72*'*'
+    star = 72 * '*'
     title = "*** {: ^64} ***".format(s.upper())
     return "{}\n{}\n{}\n".format(star, title, star)
 
@@ -82,8 +89,8 @@ def _formats_short_title(s):
     s = " {} ".format(s.upper())
     return "{:*^72}\n".format(s)
 
-# GENERAL
 
+# GENERAL MESSAGES
 query = "-> provide a valid option: "
 
 big_query = """
@@ -91,56 +98,36 @@ big_query = """
 - Type any '{}' to abort
 """.format(", ".join(system.deny))
 
-gen_files_msg_head = \
-    _formats_main_title("Generated Farseer-NMR executable files")
+gen_files_msg_head = _formats_main_title("Generated executable files")
 
-gen_files_msg_tail = _formats_message_body("""
-Three executable files were generated inside the Farseer-NMR installation folder:
-{} <- runs GUI interface (recommended)
-{} <- runs command line (advanced)
-{} <- updates Farseer-NMR
-""".format(
-        os.path.join('bin', system.gui_file),
-        os.path.join('bin', system.cmd_file),
-        os.path.join('bin', system.update_file)
-        )
+
+list_of_files = ""
+for file_ in executables.executable_files.keys():
+    list_of_files += "-> {}\n".format(os.path.join('bin', file_))
+
+gen_files_msg_tail = _formats_message_body(
+    "Executable files were generated inside the installation folder:\n"
+    + list_of_files
     )
 
-_windows_advice = \
-"""
-Farseer-NMR is EXPECTED to work on Windows machines tough, support for Windows is limited.
+# SUCCESS MESSAGES
 
-You are advised to read the additional instructions on HOW TO run Farseer-NMR on windows before proceeding,
-
-please visit:
-"""
-
-windows_additional_support = (
-    _formats_short_title("WINDOWS USERS") +
-    _formats_message_body(_windows_advice) +
-    "* {}\n".format(windows_wiki) +
-    _formats_message_body("Thank you :-)") +
-    72*'*'+"\n"
-    )
-
-_install_perfect = \
-"""
-Farseer-NMR installation COMPLETED successfully
-Press ENTER to finish
+_install_perfect = """
+The software installation COMPLETED successfully
 """
 
 install_completed = (
-    _formats_main_title("perfect") +
-    _formats_message_body(_install_perfect)
+    _formats_main_title("perfect")
+    + _formats_message_body(_install_perfect)
     )
 
 # INSTALLATION
 
-start_install = _formats_message_body("Starting Installation of Farseer-NMR")
+start_install = _formats_message_body("Starting installation...")
 
 install_header = (
-    _formats_short_title("The required Python libraries must be installed") +
-    _formats_message_body("Choose an installation option")
+    _formats_short_title("The required Python libraries must be installed")
+    + _formats_message_body("Choose an installation option")
     )
 
 install_options_full = """
@@ -152,49 +139,51 @@ install_options_full = """
 
 # MINICONDA INSTALL
 
-_auto_install_message = """
-Miniconda (https://www.anaconda.com/) along with the Farseer-NMR Python dependencies will be installed in the Farseer-NMR folder where the install_farseernmr.py file resides.
-
-{}
-
-This Miniconda installation will serve ONLY Farseer-NMR, not interfeering with your system's Python installation.
-
-Miniconda will be installed in SILENT mode, without additional queries to the user. If you continue, you accept Anaconda License and Terms and Conditions.
-
-You can READ Anaconda Terms and Conditions in the link bellow:
-
-https://anaconda.org/about/legal/terms
-
-If you do NOT agree type 'exit', 'no', or 'abort' to abort installation.
-
-You can, instead, choose to install the required Python libraries manually and independently of the Anaconda distribution, just restart the installation process and choose install option [2].
-
-If you AGREE with Anaconda Terms just press ENTER to continue the installation.
-
-""".format(system.installation_folder)
+_auto_install_message = (
+    "Miniconda (https://www.anaconda.com/) along with the "
+    "Python dependencies will be installed in the following folder:\n"
+    "{}\n"
+    "This Miniconda installation will serve ONLY this folder "
+    "not interfeering with your system's Python installation.\n"
+    "\n"
+    "Miniconda will be installed in SILENT mode, "
+    "without additional queries to the user. If you continue, "
+    "you accept Anaconda License and Terms and Conditions."
+    "\n"
+    "You can READ Anaconda Terms and Conditions in the link bellow:\n"
+    "\n"
+    "https://anaconda.org/about/legal/terms\n"
+    "\n"
+    "If you do NOT agree type 'exit', 'no', or 'abort' to abort installation. "
+    "You can, instead, choose to install the required Python libraries "
+    "manually and independently of the Anaconda distribution, "
+    "just restart the installation process and choose install option [2].\n"
+    "If you AGREE with Anaconda Terms just press ENTER to continue "
+    "the installation.\n"
+    )
 
 install_miniconda_terms_and_conditions = (
-    _formats_short_title("NOTICE") +
-    _formats_message_body(_auto_install_message)
+    _formats_short_title("NOTICE")
+    + _formats_message_body(_auto_install_message)
     )
 
 install_miniconda_proceed = _formats_message_body(
-    "A dedicated Miniconda distribution for Farseer-NMR will be installed"
+    "A dedicated Miniconda distribution will be installed"
     )
 
 _query_miniconda_reinstall = """
-A Miniconda installation already exists in the Farseer-NMR folder.
-Do you want to reinstall Miniconda for Farseer-NMR?
+A Miniconda installation already exists in this folder.
+Do you want to reinstall Miniconda"?
 
 If YES, the current Miniconda will be DELETED and a NEW one installed.
 If NO, the installation will abort.
 
-[YES/no]: 
+[YES/no]:
 """
 
 query_miniconda_reinstall = (
-    _formats_short_title("QUERY") +
-    _formats_message_body(_query_miniconda_reinstall)
+    _formats_short_title("QUERY")
+    + _formats_message_body(_query_miniconda_reinstall)
     )
 
 reinstall_canceled = """
@@ -202,56 +191,86 @@ reinstall_canceled = """
 * Installation CANCELED
 """
 
-envs_okay = "* OK * The Farseer-NMR Anaconda Environment installed SUCCESSFULLY"
+envs_okay = "* OK * The Anaconda Environment installed SUCCESSFULLY"
 
 # MANUAL INSTALL
 
-_manual_install = \
-"""
-You chose to configure Farseer-NMR installation manually, no Python libraries will be installed now.
-
-We assume that you are a proficient Python user and you can and want to READ, UNDERSTAND and INSTALL the required dependencies on your own.
-
-You can check the required Python libraries in the '.yml' env file inside the 'install' folder. Use this file to create your own Anaconda environment if you use Anaconda or as a guide to know which are the Python dependencies of Farseer-NMR.
-
-The installer will now generate TEMPLATE executable files. You may WISH or NEED to MODIFY the Farseer-NMR executable files according to your system's and Python preferences.
-
-If you don't install the required Python libraries and don't correctly configure the executable files, Farseer-NMR MIGHT NOT WORK.
-"""
+_manual_install = (
+    "You chose to configure {} manually, ".format(system.software_name)
+    + "no Python libraries will be installed now.\n"
+    "\n"
+    "We assume that you are a proficient Python user and "
+    "you can and want to READ, UNDERSTAND and INSTALL the "
+    "required dependencies on your own.\n"
+    "\n"
+    "You can check the required Python libraries in the '.yml' env file "
+    "inside the 'install' folder. Use this file to create your own "
+    "Anaconda environment if you use Anaconda or as a guide to know "
+    "which are the Python dependencies for {}.\n".format(system.software_name)
+    + "\n"
+    "The installer will now generate TEMPLATE executable files. You may "
+    "WISH or NEED to MODIFY {}'s".format(system.software_name)
+    + " executable files according to "
+    "your system's and Python preferences.\n"
+    "If you don't install the required Python libraries and don't correctly "
+    "configure the executable files, "
+    "{} MIGHT NOT WORK.".format(system.software_name)
+    )
 
 manual_install = (
-    _formats_short_title("notice") +
-    _formats_message_body(_manual_install)
+    _formats_short_title("notice")
+    + _formats_message_body(_manual_install)
     )
 
 # UPDATER
 
-_update_perfect = \
-"""
-Farseer-NMR update COMPLETED successfully
-Press ENTER to finish
+update_var_missing = (
+    _formats_short_title("error")
+    + _formats_message_body(
+        "An installation variable necessary for UPDATING"
+        " is missing or broken in installation_vars.py"
+        )
+    )
+
+update_continues = """
+* Despite the ERRORS the update will continue
 """
 
+consider_reinstall = (
+    _formats_short_title("notice")
+    + _formats_message_body(
+        "Something went wrong during the updating process. "
+        "The easiest method to solve this issue is to reinstall "
+        "the software."
+        )
+    )
+
+_update_perfect = """
+{} update COMPLETED successfully
+Press ENTER to finish
+""".format(system.software_name)
+
 update_completed = (
-    _formats_main_title("perfect") +
-    _formats_message_body(_update_perfect)
+    _formats_main_title("perfect")
+    + _formats_message_body(_update_perfect)
     )
 
 # HELP MESSAGES
 
-_add_help = \
-"""
-For additional help, please:
-- contact us via mailing list ({}) providing the .log file  created during the installation/update process.
-
-- or check out our installation wiki page:
-""".format(maillist_mail)
+_add_help = (
+    "For additional help, please:\n"
+    "- contact us via mailing list ({}) ".format(mailist)
+    + "providing the .log file "
+    "created during the installation/update process.\n"
+    "- or check out our installation wiki page:\n"
+    "{}".format(install_wiki)
+    )
 
 additional_help = (
-    _formats_short_title("help") +
-    _formats_message_body(_add_help) +
-    "* {}\n".format(install_wiki) +
-    72*'*'+"\n"
+    _formats_short_title("help")
+    + _formats_message_body(_add_help)
+    + 72 * '*'
+    + "\n"
     )
 
 # ERRORS
@@ -276,7 +295,7 @@ url_unknown = """
 """
 
 fs_env_failed = """
-* ERROR * The Farseer-NMR Anaconda Environment COULD NOT be installed.
+* ERROR * The Anaconda Environment COULD NOT be installed.
 * ERROR * Check the following error mensage:
 
 {}
@@ -295,13 +314,15 @@ something_wrong = """
 * ERROR * and provide the log file created during the process
 * ERROR * so that we can help you solve this problem
 * ERROR * Thank you!
-""".format(maillist_mail)
+""".format(mailist)
 
 abort = """
 *** Aborting installation ***
 """
 
-# http://patorjk.com/software/taag/#p=display&h=1&f=Doom&t=---------%0AFarSeer-NMR%0Av1.3.0%0A---------
+terminate = "Press ENTER to TERMINATE"
+
+# http://patorjk.com/software/taag/#p=display&h=1&f=Sweet&t=Tree%20of%20Life
 banner = r"""
                                                                         
                                                                         
@@ -319,12 +340,12 @@ ______           _____                            _   _ ___  _________
 \_|  \__,_||_|  \____/  \___| \___||_|           \_| \_/\_|  |_/\_| \_| 
                                                                         
                                                                         
-        __      _____    __                                             
-       /  |    |____ |  /  |                                            
-__   __`| |        / /  `| |                                            
-\ \ / / | |        \ \   | |                                            
- \ V / _| |_ _ .___/ /_ _| |_                                           
-  \_/  \___/(_)\____/(_)\___/                                           
+        __      _____    _____                                          
+       /  |    |____ |  / __  \                                         
+__   __`| |        / /  `' / /'                                         
+\ \ / / | |        \ \    / /                                           
+ \ V / _| |_ _ .___/ /_ ./ /___                                         
+  \_/  \___/(_)\____/(_)\_____/                                         
                                                                         
                                                                         
                                                                         
@@ -342,7 +363,6 @@ if __name__ == "__main__":
     print(big_query)
     print(gen_files_msg_head)
     print(gen_files_msg_tail)
-    print(windows_additional_support)
     print(install_completed)
     print(start_install)
     print(install_header)
@@ -353,7 +373,10 @@ if __name__ == "__main__":
     print(reinstall_canceled)
     print(envs_okay)
     print(manual_install)
+    print(update_var_missing)
     print(update_completed)
+    print(update_continues)
+    print(consider_reinstall)
     print(additional_help)
     print(not_enough_space)
     print(unknown_python)
