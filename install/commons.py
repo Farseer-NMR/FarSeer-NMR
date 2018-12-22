@@ -3,7 +3,7 @@ Commons fuctions that serve installation and update.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.0 - LGPLv3)
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
 AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
 Visit the original Tree-of-Life project at:
