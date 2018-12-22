@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-A MODULE TO MANAGE FARSEER-NMR PYTHON DEPENDENCIES VIA MINICONDA.
+Manages Miniconda and ENV installation.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -59,16 +66,18 @@ from install import commons
 
 class CondaManager():
     """
-    Manages Miniconda installation and ENV configuration for
-    Farseer-NMR.
+    Manages Miniconda installation and ENV configuration.
     """
     
-    def __init__(self, cwd=None):
+    def __init__(self, cwd=None, env=None):
         """
         Parameters:
             
             - cwd (opt, str): the Miniconda installation path.
                 Defaults to os.get_cwd()
+            
+            - env (opt): a YML env file. If None provided, can't install
+                environment.
         """
         
         self.log = logger.InstallLogger(__name__).gen_logger()
@@ -103,13 +112,11 @@ class CondaManager():
         self.set_miniconda_install_folder(
             os.path.join(
                 self.get_install_folder(),
-                system.miniconda_folder
+                system.default_miniconda_folder
                 )
             )
         
-        self.set_env_file(system.latest_env_file)
-        
-        self.set_env_version(system.latest_env_version)
+        self.set_env_file(env)
         
         return
     
@@ -199,12 +206,20 @@ class CondaManager():
     
     def set_env_file(self, env_file):
         """
-        Sets Miniconda Farseer-NMR environment file.
+        Sets Miniconda environment file for host project.
         
         Parameters:
         
             - env_file (str): path to Anaconda Env (.yml) file.
         """
+        
+        if env_file is None:
+            self._env_file = None
+            self.log.debug("<env_file>: ".format(self._env_file))
+            self.set_env_name(None)
+            self.set_env_version(None)
+            
+            return
         
         self.log.debug("reading env_file: {}".format(env_file))
         
@@ -271,9 +286,9 @@ class CondaManager():
     
         return
     
-    def set_env_name(self, name='farseernmr'):
+    def set_env_name(self, name='treeoflife'):
         """
-        Sets Farseer-NMR Conda environment name.
+        Sets Conda environment name.
         """
         
         self._env_name = name
@@ -282,7 +297,7 @@ class CondaManager():
     
     def set_env_python_exec(self, python_exec):
         """
-        Defines Python executable for Farseer-NMR environment.
+        Defines Python executable for host project.
         """
         
         self._env_python_exec = python_exec
@@ -293,14 +308,21 @@ class CondaManager():
     
     def set_env_version(self, env_version):
         """
-        Sets Farsee-NMR Miniconda environment version.
+        Sets Miniconda environment version.
         Should be integer.
         """
         try:
             int(env_version)
+        
+        except TypeError as e:
+            self._env_version = None
+            self.log.debug(e)
+            self.log.debug("<env_version>: None")
+            return
+        
         except ValueError as e:
             self.log.info(
-                "* ERROR * Farseer-NMR Python environment version"
+                "* ERROR * Python environment version"
                 "should be integer type"
                 )
             self.log.info("* ERROR * env version not set")
@@ -375,7 +397,7 @@ class CondaManager():
     def check_previous_miniconda_folder(self, folder='[M|m]iniconda.*'):
         """
         Checks if a Miniconda related folder exists inside
-        the Farseer-NMR folder. Accepts regex.
+        the host project installation folder. Accepts regex.
         
         Returns folder name, False otherwise.
         """
@@ -472,7 +494,7 @@ class CondaManager():
         # installs miniconda
         commons.sub_call(exec_line)
         
-        # sets miniconda conda exec file
+        # sets miniconda conda and python exec files
         if system.platform in ("Windows"):
             # https://stackoverflow.com/questions/37117571/where-does-anaconda-python-install-on-windows
             # https://stackoverflow.com/questions/44597662/conda-command-is-not-recognized-on-windows-10
@@ -484,6 +506,13 @@ class CondaManager():
                     'conda.exe'
                     )
                 )
+            
+            self.set_env_python_exec(
+                os.path.join(
+                    self.get_miniconda_install_folder(),
+                    'python.exe'
+                    )
+                )
         
         else:  # UNIX systems
             self.set_conda_exec(
@@ -491,6 +520,14 @@ class CondaManager():
                     self.get_miniconda_install_folder(),
                     'bin',
                     'conda'
+                    )
+                )
+            
+            self.set_env_python_exec(
+                os.path.join(
+                    self.get_miniconda_install_folder(),
+                    'bin',
+                    'python'
                     )
                 )
         
@@ -549,6 +586,10 @@ class CondaManager():
         Installs Anaconda Environment.
         """
         
+        if self.get_env_name() is None:
+            self.log.debug("no environment to install... ignoring...")
+            return
+        
         self.log.info("* Starts Miniconda Environment Installation")
         
         # defines command to create environment from .yml file
@@ -595,8 +636,13 @@ class CondaManager():
     
     def logs_env_information(self):
         """
-        Register installed env to log file.
+        Registers installed env to log file.
         """
+        
+        if self.get_env_name() is None:
+            self.log.debug("no environment to install... ignoring...")
+            return
+        
         self.log.info("* Registering environment...")
         
         # confirm environment was installed correctly
@@ -614,7 +660,7 @@ class CondaManager():
     
     def add_install_folder_to_site_packages(self):
         """
-        Adds Farseer-NMR directory to Miniconda Farseer-NMR environment.
+        Adds the host project directory to the Miniconda environment.
         """
         
         # https://stackoverflow.com/questions/37006114/anaconda-permanently-include-external-packages-like-in-pythonpath
@@ -634,7 +680,7 @@ class CondaManager():
         result = commons.sub_call(exec_line).decode("utf-8").split('\n')
         
         self.log.debug("\n".join(result))
-        self.log.debug("Farseer-NMR folder added to site-packges")
+        self.log.debug("Host project folder added to site-packges")
     
         return
     
@@ -642,6 +688,11 @@ class CondaManager():
         """
         Removes Miniconda Environment.
         """
+        
+        if self.get_env_name() is None:
+            self.log.debug("no environment to remove... ignoring...")
+            return
+        
         self.log.info("* Removing Miniconda Environment")
         
         exec_line = '{} remove -vy --name {} --all'.format(
@@ -656,4 +707,4 @@ class CondaManager():
 
 if __name__ == "__main__":
     
-    print('I am Miniconder')
+    print('I am Tree-of-Life')
