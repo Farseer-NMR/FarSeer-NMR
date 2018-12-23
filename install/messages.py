@@ -322,7 +322,7 @@ abort = """
 
 terminate = "Press ENTER to TERMINATE"
 
-# http://patorjk.com/software/taag/#p=display&h=1&f=Sweet&t=Tree%20of%20Life
+# http://patorjk.com/software/taag/#p=display&h=1&f=Doom&t=---------%0AFarseer-NMR%0Av1.3.3%0A---------
 banner = r"""
                                                                         
                                                                         
@@ -341,11 +341,11 @@ ______           _____                            _   _ ___  _________
                                                                         
                                                                         
         __      _____    _____                                          
-       /  |    |____ |  / __  \                                         
-__   __`| |        / /  `' / /'                                         
-\ \ / / | |        \ \    / /                                           
- \ V / _| |_ _ .___/ /_ ./ /___                                         
-  \_/  \___/(_)\____/(_)\_____/                                         
+       /  |    |____ |  |____ |                                         
+__   __`| |        / /      / /                                         
+\ \ / / | |        \ \      \ \                                         
+ \ V / _| |_ _ .___/ /_ .___/ /                                         
+  \_/  \___/(_)\____/(_)\____/                                          
                                                                         
                                                                         
                                                                         
