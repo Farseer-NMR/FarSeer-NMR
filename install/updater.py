@@ -70,7 +70,14 @@ from install import messages
 _new_version_url = \
     "https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip"
 _new_version_zip = "master.zip"
-_folders_to_remove = ["Documentation", "gui", "core", "install", ".idea"]
+_folders_to_remove = [
+    "Documentation",
+    "gui",
+    "core",
+    "install",
+    ".idea",
+    ".github"
+    ]
 
 
 class Updater():
