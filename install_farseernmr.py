@@ -1,11 +1,17 @@
-# -*- coding: utf-8 -*-
 """
-FARSEER-NMR INSTALLER.
+Farseer-NMR installer.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -40,28 +46,28 @@ import sys
 import os
 import time  # used to give a more human feeling to the install process
 
-installation_folder = \
-    os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+libs_folder = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 # appends 'install' folder to allow lib import
-sys.path.append(os.path.join(installation_folder, "install"))
+sys.path.append(os.path.join(libs_folder, "install"))
 
+from install import system
+from install import messages
+# logging is required before importing the other package libs
 from install import logger
 
-logfile_name = os.path.join(installation_folder, 'install.log')
+# STARTS LOGGING
+logfile_name = os.path.join(
+    system.installation_folder,
+    system.installation_log_name
+    )
 
 if os.path.exists(logfile_name):
     os.remove(logfile_name)
 
 log = logger.InstallLogger(__name__, log_file_name=logfile_name).gen_logger()
-log.debug("install_farseernmr.py initiated")
-log.debug("<installation_folder>: {}".format(installation_folder))
 
-from install import system
-from install import messages
-from install import commons
-from install import miniconder
-
+# CONFIRMS PYTHON VERSION
 python_version = sys.version_info[0]
 log.debug("* Python version: {}".format(python_version))
 
@@ -74,45 +80,57 @@ elif python_version == 3:
 else:
     log.info(messages.unknown_python)
     log.info("* You are running Python version: {}".format(python_version))
-    log.info("Farseer-NMR setup.py requires Python 2.7 or 3.x to execute")
+    _name = system.software_name
+    log.info("* {} requires Python 2.7 or 3.x to execute".format(_name))
     log.info(messages.additional_help)
     log.info(messages.abort)
-    commons.sys_exit()
+    user_input(messages.terminate)
+    sys.exit(1)
 
-if installation_folder.find(" ") > 0:
-    log.info(messages.path_with_spaces.format(installation_folder))
+if system.installation_folder.find(" ") > 0:
+    log.info(messages.path_with_spaces.format(system.installation_folder))
     log.info(messages.additional_help)
     log.info(messages.abort)
-    commons.sys_exit()
+    user_input(messages.terminate)
+    sys.exit(1)
+
+# continues importing log dependent libs
+from install import commons
+from install import condamanager
 
 # STARTS INSTALLATION
-
+log.debug("{} installation initiated".format(system.software_name))
+log.debug("<installation_folder>: {}".format(system.installation_folder))
 log.info(messages.banner)
 log.info(messages.start_install)
 time.sleep(0.5)
 
-# Queries installation option
 log.info(messages.install_header)
 log.info(messages.install_options_full)
 
-choice = None
-while choice not in ("1", "2", "3"):
-    choice = user_input(messages.query)
-    log.debug("install_choice: {}".format(choice))
-    if choice == "4":
+# Queries installation option
+install_choice = None
+while install_choice not in ("1", "2", "3"):
+    install_choice = user_input(messages.query).strip()
+    log.debug("install_choice: {}".format(install_choice))
+    if install_choice == "4":
         log.info(messages.additional_help)
         log.info(messages.install_options_full)
 
-log.debug("final install_choice: {}".format(choice))
+log.debug("final install_choice: {}".format(install_choice))
 log.info("\n")
+
 time.sleep(0.5)
 
 # Applies choice
-if choice == "1":  # installs Miniconda and Farseer-NMR Environment
+if install_choice == "1":  # installs Miniconda and Python Environment
     
     log.debug("entered install option 1")
     
-    miniconda_handler = miniconder.CondaManager(cwd=installation_folder)
+    miniconda_handler = condamanager.CondaManager(
+        cwd=system.installation_folder,
+        env=system.latest_env_file
+        )
     
     # returns name of folder, if found.
     previous_miniconda_folder = \
@@ -132,7 +150,7 @@ if choice == "1":  # installs Miniconda and Farseer-NMR Environment
         
         choice = None
         while not(choice in system.approve) and not(choice in system.deny):
-            choice = user_input(messages.query).upper()
+            choice = user_input(messages.query).strip().upper()
             log.debug("<choice>: {}".format(choice))
         
         log.debug("Resinstall option chosen: {}".format(choice))
@@ -156,22 +174,22 @@ if choice == "1":  # installs Miniconda and Farseer-NMR Environment
     
     log.info(messages.install_miniconda_proceed)
     
-    if not(commons.check_available_disk_space()):  # requires 3GB minimum
+    if not(commons.check_available_disk_space()):
         log.info(messages.not_enough_space)
         log.info(messages.additional_help)
         log.info(messages.abort)
         commons.sys_exit()
     
     # Queries user to agree with Anaconda Terms and Conditions
-    log.info(messages.install_miniconda_terms_and_conditions)
+    mf = os.path.abspath(system.default_miniconda_folder)
+    log.info(messages.install_miniconda_terms_and_conditions.format(mf))
     choice = 1
-    while not(choice in system.approve) \
-            and not(choice in system.deny) \
-            and not(choice == ""):
-        
-        choice = user_input(messages.query).upper()
+    approve = system.approve + [""]
     
-    if choice in system.approve or choice == "":
+    while choice not in approve and choice not in system.deny:
+        choice = user_input(messages.query).strip().upper()
+    
+    if choice in approve:
         log.info("continuing...")
     
     elif choice in system.deny:
@@ -188,7 +206,10 @@ if choice == "1":  # installs Miniconda and Farseer-NMR Environment
     # registers installation variables
     install_option = 1
     conda_exec = miniconda_handler.get_conda_exec()
-    env_exec = miniconda_handler.get_env_python_exec()
+    python_exec = miniconda_handler.get_env_python_exec()
+    env_file = miniconda_handler.get_env_file()
+    env_name = miniconda_handler.get_env_name()
+    env_version = miniconda_handler.get_env_version()
     miniconda_folder = miniconda_handler.get_miniconda_install_folder()
     
     # cleans
@@ -196,10 +217,10 @@ if choice == "1":  # installs Miniconda and Farseer-NMR Environment
     os.remove(miniconda_install_file)
     log.debug("removed: {}".format(miniconda_install_file))
 
-elif choice == "2":  # Manual Python libs installation
+elif install_choice == "2":  # Manual Python libs installation
     
     log.info(messages.manual_install)
-    choice = user_input(messages.big_query).upper()
+    choice = user_input(messages.big_query).strip().upper()
     
     if choice in system.deny:
         log.info(messages.additional_help)
@@ -208,11 +229,14 @@ elif choice == "2":  # Manual Python libs installation
     
     # registers installation variables
     install_option = 2
-    env_exec = sys.executable
+    python_exec = sys.executable
+    env_file = None
+    env_name = None
+    env_version = None
     conda_exec = None
     miniconda_folder = None
 
-elif choice == "3":
+elif install_choice == "3":
     log.info(messages.additional_help)
     log.info(messages.abort)
     commons.sys_exit()
@@ -224,19 +248,20 @@ else:  # expecting the unexpected
 
 time.sleep(1)
 
-# creates Farseer-NMR executable files
-commons.create_executables(installation_folder, env_exec)
+# creates executable files
+commons.create_executables(system.installation_folder, python_exec)
 
 # registers installation variables in a file.py
 commons.register_install_vars(
-    install_dir=installation_folder,
-    env_exec=env_exec,
+    install_dir=system.installation_folder,
+    python_exec=python_exec,
     install_option=install_option,
     conda_exec=conda_exec,
-    env_name=system.latest_env_name,
-    env_version=system.latest_env_version,
+    env_file=env_file,
+    env_name=env_name,
+    env_version=env_version,
     miniconda_folder=miniconda_folder
     )
 
 log.info(messages.install_completed)
-user_input()
+user_input(messages.terminate)

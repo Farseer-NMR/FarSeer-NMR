@@ -1,10 +1,17 @@
 """
-A MODULE TO MANAGE FARSEER-NMR UPDATE.
+Manages software updates.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -46,8 +53,7 @@ elif python_version == 2:
 
 if python_version != 3:
     python_version_error = """
-Python 3 is required to run Farseer-NMR
-       Press ENTER to terminate
+Python 3 is required. Press ENTER to terminate.
 """
     user_input(python_version_error)
     sys.exit(1)
@@ -61,15 +67,20 @@ from install import logger
 from install import commons
 from install import messages
 
+_new_version_url = \
+    "https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip"
+_new_version_zip = "master.zip"
+_folders_to_remove = ["Documentation", "gui", "core", "install", ".idea"]
 
-class FarseerUpdater():
+
+class Updater():
     """
-    Controls Farseer-NMR version Updating methods.
+    Controls version Updating methods.
     
     Strategy:
-        Downloads master branch from Farseer-NMR repository.
+        Downloads master branch .zip file from project repository.
         Unzips.
-        Removes old Farseer-NMR files and folders.
+        Removes old files and folders.
         Replaces with new version files and folders.
         Maintains install configuration, namely Miniconda installation
             and Python executable paths on bin files.
@@ -79,19 +90,19 @@ class FarseerUpdater():
             self,
             install_wd,
             update_log="update.log",
-            new_version_url="https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip",
-            new_version_zip="master.zip",
-            folders_to_remove=["Documentation", "gui", "core", "install", ".idea"]
+            new_version_url=_new_version_url,
+            new_version_zip=_new_version_zip,
+            folders_to_remove=_folders_to_remove
             ):
         """
         
         Parameters:
-            - install_wd (str): the Farseer-NMR installation directory
+            - install_wd (str): the software installation directory
             
             - update_log (opt): the name of the log file (df: 'update.log')
             
             - new_version_url (opt): link to new version
-                (df: https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip)
+                (df: https://github.com/<archive>/master.zip)
             
             - new_version_zip (opt): ZIP file to temporarily save new version
                 (df: 'master.zip')
@@ -102,7 +113,7 @@ class FarseerUpdater():
         """
         
         self.log = logger.InstallLogger(__name__).gen_logger()
-        self.log.debug("Initiated FarseerUpdater instance")
+        self.log.debug("Initiated Updater instance")
         
         self.set_install_wd(install_wd)
         
@@ -114,17 +125,17 @@ class FarseerUpdater():
         return
     
     def get_new_version_url(self):
-        """Returns URL for Farseer-NMR new version."""
+        """Returns URL for the software new version."""
         return self._new_version_url
     
     def get_new_version_zip(self):
-        """Returns name of ZIP file for Farseer-NMR new version."""
+        """Returns name of ZIP file for software's new version."""
         return self._new_version_zip
     
     def get_folders_to_remove(self):
         """
         Returns list of old folders to remove
-        when updating to Farseer-NMR new version.
+        when updating to software's new version.
         """
         return self._folders_to_remove
     
@@ -139,7 +150,7 @@ class FarseerUpdater():
     
     def get_install_wd(self):
         """
-        Returns Farseer-NMR installation directory to be updated
+        Returns software's installation directory to be updated
         to the new version.
         """
         return self._install_wd
@@ -165,7 +176,7 @@ class FarseerUpdater():
         return
     
     def set_install_wd(self, folder):
-        """Sets Farseer-NMR installation (update) folder."""
+        """Sets software's installation (update) folder."""
         
         if not os.path.exists(folder):
             e = "* ERROR * Folder does not exist: '{}'".format(folder)
@@ -186,10 +197,10 @@ class FarseerUpdater():
         self.log.debug("<zip_folder>: {}".format(zip_folder))
         return
     
-    def download_farseernmr(self):
-        """Downloads the new version of Farseer-NMR."""
+    def download_software(self):
+        """Downloads the software's new version."""
         
-        self.log.info("* Starting Farseer-NMR new version download.")
+        self.log.info("* Starting software's new version download.")
         
         commons.download_file(
             self.get_new_version_url(),
@@ -202,7 +213,7 @@ class FarseerUpdater():
         return
     
     def remove_old_version(self):
-        """Removes previous Farseer-NMR folders"""
+        """Removes previous software's folders"""
         
         self.log.info("* Removing old folders...")
         self.log.debug("install_wd: {}".format(self.get_install_wd()))
@@ -224,7 +235,7 @@ class FarseerUpdater():
     def unzip_new_version(self):
         """Unzips new version"""
         
-        # lists current files/folders in Farseer-NMR folder
+        # lists current files/folders in installation folder
         previous_dirs = set(os.listdir(self.get_install_wd()))
         self.log.debug("<previous_dirs>: {}".format("\n".join(previous_dirs)))
         
@@ -243,7 +254,7 @@ class FarseerUpdater():
         zip_ref.extractall(self.get_install_wd())
         zip_ref.close()
         
-        # lists files/folders in Farseer-NMR folder
+        # lists files/folders in installation folder
         new_dirs = set(os.listdir(self.get_install_wd()))
         self.log.debug("<new_dirs> set: {}".format("\n".join(new_dirs)))
         
@@ -277,7 +288,7 @@ class FarseerUpdater():
     
     def move_new_files(self):
         """
-        Moves new files to Farseer-NMR installation directory.
+        Moves new files to software's installation directory.
         """
         
         self.log.info("* Moving new files...")
@@ -367,13 +378,13 @@ class FarseerUpdater():
     
     def run(self):
         """Runs standard update algorythm."""
-        self.log.info("\n*** Starting Farseer-NMR update ***\n")
-        self.download_farseernmr()
+        self.log.info("\n*** Starting update ***\n")
+        self.download_software()
         self.unzip_new_version()
         self.remove_old_version()
         self.move_new_files()
         self.clean_files()
-        self.log.info("\n*** Farseer-NMR Update Completed ***\n")
+        self.log.info("\n*** Update Completed ***\n")
         return
 
 

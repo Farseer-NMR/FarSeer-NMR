@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-LOGGER MODULE.
+Logger module.
 
 Copyright © 2017-2019 Farseer-NMR Project
 
-Find us at:
+THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
+AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 
+Visit the original Tree-of-Life project at:
+
+https://github.com/joaomcteixeira/Tree-of-Life
+
+
+Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
     https://link.springer.com/article/10.1007/s10858-018-0182-5
 
@@ -42,7 +49,7 @@ import sys
 
 class InstallLogger():
 
-    log_file_name = 'log.log'
+    log_file_name = 'farseernmr.log'
     
     def __init__(self, name, log_file_name=None):
         """

@@ -102,7 +102,7 @@ class Footer(QWidget):
         self.layout().addWidget(self.twitter_button, 0, 9, 3, 1)
         #
         footer_version_code = "v{0[0]}.{0[1]}.{0[2]}"
-        farseer_version = footer_version_code.format(system.farseer_version)
+        farseer_version = footer_version_code.format(system.software_version)
         version = '<span style="color: #036D8F; font-size: 6pt; ' \
                   'font-weight: 400; margin-right: 29px; margin-top: 4px;"' \
                   '>{}&nbsp;&nbsp;&nbsp;&nbsp;</span>'.format(farseer_version)
