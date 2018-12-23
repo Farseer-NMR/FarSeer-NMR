@@ -16,6 +16,8 @@ With Farseer-NMR, you have:
 
 # Download, Install and Update
 
+[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip)
+
 To install Farseer-NMR simply run the installation script:
 
 ```
@@ -26,11 +28,11 @@ Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-an
 
 # Documentation
 
-Find in this repository [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/wiki) the Farseer-NMR documentation. Also, in the `Documentation` folder you can find Tutorials and additional files to complement the documentation Wiki and PDF.
+The complete Farseer-NMR documentation is available on our [Wiki page](https://github.com/Farseer-NMR/FarSeer-NMR/wiki).
 
-# Participate in the Farseer-NMR community
+# Participate in the Farseer-NMR development
 
-Help us to improve. If you are a user, share your issues in the issues tab; if you are a developer read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
+To contribute to the development of Farseer-NMR [visit our GitHub project](https://github.com/Farseer-NMR/FarSeer-NMR). If you are a user, share your experience in the issues tab (reporting bugs, suggestions or discussions); if you are a developer read our [CONTRIBUTING](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/CONTRIBUTING.md) guidelines. 
 
 # Find us!
 
