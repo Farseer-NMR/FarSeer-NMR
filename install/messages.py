@@ -1,7 +1,7 @@
 """
 Informative messages for the installation and update processes.
 
-Copyright © 2017-2019 Farseer-NMR Project
+2017-2019 Farseer-NMR Project.
 
 THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
 AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
@@ -9,7 +9,6 @@ AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 Visit the original Tree-of-Life project at:
 
 https://github.com/joaomcteixeira/Tree-of-Life
-
 
 Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
@@ -27,7 +26,7 @@ Find Farseer-NMR project at:
 THIS FILE IS PART OF THE FARSEER-NMR PROJECT.
 
 Contributors to this file:
-- João M.C. Teixeira (https://github.com/joaomcteixeira)
+- Joao M.C. Teixeira (https://github.com/joaomcteixeira)
 
 Farseer-NMR is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -332,20 +331,20 @@ banner = r"""
                                                                         
                                                                         
                                                                         
-______           _____                            _   _ ___  _________  
-|  ___|         /  ___|                          | \ | ||  \/  || ___ \ 
-| |_  __ _  _ __\ `--.   ___   ___  _ __  ______ |  \| || .  . || |_/ / 
-|  _|/ _` || '__|`--. \ / _ \ / _ \| '__||______|| . ` || |\/| ||    /  
-| | | (_| || |  /\__/ /|  __/|  __/| |           | |\  || |  | || |\ \  
-\_|  \__,_||_|  \____/  \___| \___||_|           \_| \_/\_|  |_/\_| \_| 
+______                                           _   _ ___  _________   
+|  ___|                                         | \ | ||  \/  || ___ \  
+| |_  __ _  _ __  ___   ___   ___  _ __  ______ |  \| || .  . || |_/ /  
+|  _|/ _` || '__|/ __| / _ \ / _ \| '__||______|| . ` || |\/| ||    /   
+| | | (_| || |   \__ \|  __/|  __/| |           | |\  || |  | || |\ \   
+\_|  \__,_||_|   |___/ \___| \___||_|           \_| \_/\_|  |_/\_| \_|  
                                                                         
                                                                         
-        __      _____    _____                                          
-       /  |    |____ |  |____ |                                         
-__   __`| |        / /      / /                                         
-\ \ / / | |        \ \      \ \                                         
- \ V / _| |_ _ .___/ /_ .___/ /                                         
-  \_/  \___/(_)\____/(_)\____/                                          
+        __      _____     ___                                           
+       /  |    |____ |   /   |                                          
+__   __`| |        / /  / /| |                                          
+\ \ / / | |        \ \ / /_| |                                          
+ \ V / _| |_ _ .___/ /_\___  |                                          
+  \_/  \___/(_)\____/(_)   |_/                                          
                                                                         
                                                                         
                                                                         

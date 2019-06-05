@@ -1,7 +1,7 @@
 """
 Farseer-NMR installer.
 
-Copyright © 2017-2019 Farseer-NMR Project
+2017-2019 Farseer-NMR Project.
 
 THIS FILE WAS ADAPTED FROM TREE-OF-LIFE PROJECT (version 1.0.1 - LGPLv3)
 AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
@@ -9,7 +9,6 @@ AND MODIFIED ACCORDINGLY TO THE NEEDS OF THE FARSEER-NMR PROJECT.
 Visit the original Tree-of-Life project at:
 
 https://github.com/joaomcteixeira/Tree-of-Life
-
 
 Find Farseer-NMR project at:
 - J. BioMol NMR Publication:
@@ -27,7 +26,7 @@ Find Farseer-NMR project at:
 THIS FILE IS PART OF THE FARSEER-NMR PROJECT.
 
 Contributors to this file:
-- João M.C. Teixeira (https://github.com/joaomcteixeira)
+- Joao M.C. Teixeira (https://github.com/joaomcteixeira)
 
 Farseer-NMR is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
