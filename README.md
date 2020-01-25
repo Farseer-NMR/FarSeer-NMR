@@ -1,6 +1,6 @@
 # FarSeer-NMR
 
-![FarSeer-NMR v2 logo](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/img/GitHub-FS_logo_version2.png?raw=true)
+![FarSeer-NMR v2 logo](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/img/GitHub-FS_logo_version2_small.png?raw=true)
 
 **Attention Attention Attention**
 
