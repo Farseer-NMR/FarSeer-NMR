@@ -1,5 +1,10 @@
 # Farseer-NMR
 
+This branch refers to Farseer-NMR **version 1**, it is functional as is. We are now working on the development of Version 2, see version 2 branch. Once completed, version 2 will be merge to the [master](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master) branch.
+
+Farseer-NMR runs purely on volunteer work without any official assigned funds. All help is welcomed, engage with us!
+
+
 ![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/GitHub_Farseer-NMR_Workflow.png?raw=true)
 
 A Python written, multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
