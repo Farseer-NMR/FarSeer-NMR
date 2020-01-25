@@ -1,8 +1,20 @@
-# Farseer-NMR
+# FarSeer-NMR
 
-We are now working on the development of Version 2, see [version 2 branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/version2). Once functional, version 2 will be merged to the [master branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master).
+![FarSeer-NMR v2 logo](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/img/GitHub-FS_logo_version2.png?raw=true)
+
+**Attention Attention Attention**
+
+We are currently rewriting Farseer-NMR towards **version 2**.  
+
+**Version 1** is still functional and working, though not much supported apart from minor bugs. You can download the latest stable version, v1.3.5, on the [releases tab](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.5), or visit the complete version 1 code and its documentation in [version 1 branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/version1) on GitHub.
+
+Our original publication is available at [JBioMolNMR](https://link.springer.com/article/10.1007/s10858-018-0182-5), cite us if you use Farseer-NMR for your research.
+
+Please note that the [master branch](https://github.com/Farseer-NMR/FarSeer-NMR) currently hosts the development of version 2, which is UNFINISHED and software, again refer to version 1 for a stable and functional release.
 
 Farseer-NMR runs purely on volunteer work without any official assigned funds. All help is welcomed, [engage with us](https://groups.google.com/forum/#!forum/farseer-nmr)!
+
+**Attention Attention Attention**
 
 ![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/GitHub_Farseer-NMR_Workflow.png?raw=true)
 
@@ -20,7 +32,7 @@ With Farseer-NMR, you have:
 
 # Download, Install and Update
 
-[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip)
+[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/releases)
 
 To install Farseer-NMR simply run the installation script:
 
