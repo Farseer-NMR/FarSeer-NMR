@@ -1,11 +1,12 @@
 # Farseer-NMR
 
-This branch refers to Farseer-NMR **version 1**, it is functional as is. We are now working on the development of Version 2, see version 2 branch. Once completed, version 2 will be merge to the [master](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master) branch.
+This branch refers to Farseer-NMR **version 1**, it is functional as is. Download the **latest** and **stable** version 1 release [here](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.5).
+
+We are now working on the development of Version 2, which is taking place on the [master master](https://github.com/Farseer-NMR/FarSeer-NMR/tree/master) of this repository.
 
 Farseer-NMR runs purely on volunteer work without any official assigned funds. All help is welcomed, engage with us!
 
-
-![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/master/Documentation/Figures/GitHub_Farseer-NMR_Workflow.png?raw=true)
+![FarSeer Banner](https://github.com/Farseer-NMR/FarSeer-NMR/blob/version1/Documentation/Figures/GitHub_Farseer-NMR_Workflow.png?raw=true)
 
 A Python written, multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
 
@@ -21,7 +22,7 @@ With Farseer-NMR, you have:
 
 # Download, Install and Update
 
-[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/archive/master.zip)
+[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.5)
 
 To install Farseer-NMR simply run the installation script:
 
