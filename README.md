@@ -8,9 +8,9 @@ We are currently rewriting Farseer-NMR towards **version 2**.
 
 **Version 1** is still functional and working, though not much supported apart from minor bugs. You can download the latest stable version, v1.3.5, on the [releases tab](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.5), or visit the complete version 1 code and its documentation in [version 1 branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/version1) on GitHub.
 
-Our original publication is available at [JBioMolNMR](https://link.springer.com/article/10.1007/s10858-018-0182-5), cite us if you use Farseer-NMR for your research.
+Our original publication is available at [JBioMolNMR](https://link.springer.com/article/10.1007/s10858-018-0182-5), cite us if you use Farseer-NMR for your research, regardless of which version you use.
 
-Please note that the [master branch](https://github.com/Farseer-NMR/FarSeer-NMR) currently hosts the development of version 2, which is UNFINISHED and software, again refer to version 1 for a stable and functional release.
+Please note that the [master branch](https://github.com/Farseer-NMR/FarSeer-NMR) currently hosts the development of version 2, which is UNFINISHED software; again, please, refer to *version 1* for a stable and functional release.
 
 Farseer-NMR runs purely on volunteer work without any official assigned funds. All help is welcomed, [engage with us](https://groups.google.com/forum/#!forum/farseer-nmr)!
 
