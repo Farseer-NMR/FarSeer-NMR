@@ -26,7 +26,7 @@ matrix:
     - os: windows
       language: sh
       python: "3.x"
-      env: TOXEN=py38,codecov,coveralls
+      env: TOXENV=py38,codecov,coveralls
       before_install:
         - choco install python3 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
