@@ -1,7 +1,10 @@
 Welcome to FarSeer-NMR Documentation!
-===================================
+=====================================
 
 .. include:: ../README.rst
+   :start-after: .. start-readme
+   :end-before: .. end-readme
+
 
 You can read now through the **contents** bellow.
 
@@ -16,7 +19,7 @@ Contents
    contributing
    citing
    authors
-   acknowledgments
+   acknowledgements
    license
    versioning
    reference/index

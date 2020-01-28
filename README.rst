@@ -1,8 +1,10 @@
+.. start-readme
+
 ===========
 FarSeer-NMR
 ===========
 
-.. image:: Documentation/img/GitHub-FS_logo_version2_small.png
+.. image:: https://raw.githubusercontent.com/Farseer-NMR/FarSeer-NMR/master/docs/img/GitHub-FS_logo_version2_small.png
 
 **Attention Attention Attention**
 
@@ -18,7 +20,7 @@ Farseer-NMR runs purely on volunteer work without any official assigned funds. A
 
 **Attention Attention Attention**
 
-.. image:: Documentation/Figures/GitHub_Farseer-NMR_Workflow.png
+.. image:: https://raw.githubusercontent.com/Farseer-NMR/FarSeer-NMR/master/docs/img/GitHub_Farseer-NMR_Workflow.png
 
 A Python written, multi-platform and fully community-driven suite to analyse datasets of **peaklist files** extracted from multivariable series of Biomolecular Nuclear Magnetic Resonance (NMR) experiments. 
 
@@ -31,6 +33,8 @@ With Farseer-NMR, you have:
 * Comprehensive organization of the output
 * Large suite of publication-ready plotting templates
 * Full traceability via `Markdown <https://en.wikipedia.org/wiki/Markdown>`_) formatted log file.
+
+.. end-readme
 
 Download, Install and Update
 ============================
@@ -59,6 +63,7 @@ Social Media
 - Post on our `mailing list <https://groups.google.com/forum/#!forum/farseer-nmr>`_) for questions, discussion and help!
 - Follow us on Twitter `@farseer_nmr <https://twitter.com/farseer_nmr>`_)
 - Find us on `Research Gate <https://www.researchgate.net/project/Farseer-NMR-automatic-treatment-and-plotting-of-large-scale-NMR-titration-data>`_), where our seminars PDFs are available!
+
 
 .. start-citing
 
