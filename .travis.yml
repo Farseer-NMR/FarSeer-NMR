@@ -131,11 +131,11 @@ matrix:
       env: TOXENV=py38,codecov
       before_install:
         - brew update
-        - brew unlink python@2
-        - brew upgrade python@3.8
-        - python3 -m pip install virtualenv
-        - virtualenv .venv -p python3
-        - source .venv/bin/activate
+        - brew install pyenv
+        - export PATH="$(pyenv root)/shims:$PATH"
+        - pyenv install --list | grep 3.8
+        - pyenv install 3.8.1
+        - pyenv versions
     - os: osx
       language: sh
       python: "3.7"
