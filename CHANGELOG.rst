@@ -1,0 +1,24 @@
+Versioning
+==========
+
+This project follows strictly `Semantic Versioning 2.0 <https://semver.org/#semantic-versioning-200>`_ for version control. 
+
+
+Changelog
+=========
+
+Version 2
+---------
+
+* under development
+
+Version 1
+---------
+
+* For list of v1 releases visit `project releases <https://github.com/Farseer-NMR/FarSeer-NMR/releases>`_.
+* Latest v1 release hosted in `version1 <https://github.com/Farseer-NMR/FarSeer-NMR/tree/version1>`_ branch.
+
+Version 0
+---------
+
+* pre-publication no JBioNMR, changes not tracked in detail.
