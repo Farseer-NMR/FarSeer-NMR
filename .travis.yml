@@ -1,9 +1,9 @@
 language: python
 dist: bionic
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
+#python:
+#  - "3.6"
+#  - "3.7"
+#  - "3.8"
 #cache: false
 
 #os:
@@ -16,17 +16,39 @@ branches:
   only:
   - master
 
-env:
-  global:
-    - CC_TEST_REPORTER_ID=4e9cfa018d9b0ac4e62642a256e34f05f82942865680bc681c585c418783b267
+#env:
+  #global:
+    #- CC_TEST_REPORTER_ID=
 # https://github.com/WeblateOrg/translation-finder/blob/master/.travis.yml#L20-L26
 
 matrix: 
   inclue:
     - os: windows
       language: sh
-      python: "3.x"
-      env: TOXENV=py38,codecov,coveralls
+      python: "3.8"
+      env: 
+        - TOXENV=py38,codecov
+        #- SENDCOV=1
+      before_install:
+        - choco install python3 --params "/InstallDir:C:\\Python"
+        - export PATH="/c/Python:/c/Python/Scripts:$PATH"
+        - python -m pip install --upgrade pip wheel
+    - os: windows
+      language: sh
+      python: "3.7"
+      env:
+        - TOXENV=py37,codecov
+        #- SENDCOV=1
+      before_install:
+        - choco install python3 --params "/InstallDir:C:\\Python"
+        - export PATH="/c/Python:/c/Python/Scripts:$PATH"
+        - python -m pip install --upgrade pip wheel
+    - os: windows
+      language: sh
+      python: "3.6"
+      env:
+        - TOXENV=py36,codecov
+        #- SENDCOV=1
       before_install:
         - choco install python3 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
@@ -84,6 +106,7 @@ matrix:
 before_install:
   - python --version
   - pip install --upgrade pip wheel
+ # - if [[ $SENDCOV ]]  
   #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   #- chmod +x ./cc-test-reporter
   #- ./cc-test-reporter before-build
