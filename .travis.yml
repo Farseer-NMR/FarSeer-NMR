@@ -1,9 +1,9 @@
 language: python
 dist: bionic
-#python:
-#  - "3.6"
-#  - "3.7"
-#  - "3.8"
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
 #cache: false
 
 #os:
