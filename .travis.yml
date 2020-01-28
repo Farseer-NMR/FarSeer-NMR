@@ -90,67 +90,67 @@ matrix:
         - python -m pip install --upgrade pip wheel
     - os: linux
       python: 3.8
-      env: TOXEN=py38,codecov
+      env: TOXENV=py38,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
     - os: linux
       python: 3.7
-      env: TOXEN=py37,codecov
+      env: TOXENV=py37,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
     - os: linux
       python: 3.6
-      env: TOXEN=py36,codecov
+      env: TOXENV=py36,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
     - os: osx
       language: sh
       python: "3.8"
-      env: TOXEN=check,radon
+      env: TOXENV=check,radon
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3.8
+        - brew upgrade python3
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
       language: sh
       python: "3.8"
-      env: TOXEN=docs
+      env: TOXENV=docs
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3.8
+        - brew upgrade python3
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
       language: sh
       python: "3.8"
-      env: TOXEN=py38,codecov
+      env: TOXENV=py38,codecov
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3.8
+        - brew upgrade python3
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
       language: sh
       python: "3.7"
-      env: TOXEN=py37,codecov
+      env: TOXENV=py37,codecov
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3.7
+        - brew upgrade python3
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
       language: sh
       python: "3.6"
-      env: TOXEN=py37,codecov
+      env: TOXENV=py37,codecov
       before_install:
         - brew update
         - brew unlink python@2
@@ -166,49 +166,49 @@ matrix:
 #  include:
 #    - os: linux
 #      python: 3.8
-#      env: TOXEN=check
+#      env: TOXENV=check
 #    - os: linux
 #      python: 3.8
-#      env: TOXEN=docs
+#      env: TOXENV=docs
 #    - os: linux
 #      python: 3.8
-#      env: TOXEN=py38,codecov,coveralls
+#      env: TOXENV=py38,codecov,coveralls
 #    - os: linux
 #      python: 3.7
-#      env: TOXEN=py37,codecov,coveralls
+#      env: TOXENV=py37,codecov,coveralls
 #    - os: linux
 #      python: 3.6
-#      env: TOXEN=py36,codecov,coveralls
+#      env: TOXENV=py36,codecov,coveralls
 #    - os: osx
 #      python: 3.8
-#      env: TOXEN=check
+#      env: TOXENV=check
 #    - os: osx
 #      python: 3.8
-#      env: TOXEN=docs
+#      env: TOXENV=docs
 #    - os: osx
 #      python: 3.8
-#      env: TOXEN=py38,codecov,coveralls
+#      env: TOXENV=py38,codecov,coveralls
 #    - os: osx
 #      python: 3.7
-#      env: TOXEN=py37,codecov,coveralls
+#      env: TOXENV=py37,codecov,coveralls
 #    - os: osx
 #      python: 3.6
-#      env: TOXEN=py36,codecov,coveralls
+#      env: TOXENV=py36,codecov,coveralls
 #    - os: windows
 #      python: 3.8
-#      env: TOXEN=check
+#      env: TOXENV=check
 #    - os: windows
 #      python: 3.8
-#      env: TOXEN=docs
+#      env: TOXENV=docs
 #    - os: windows
 #      python: 3.8
-#      env: TOXEN=py38,codecov,coveralls
+#      env: TOXENV=py38,codecov,coveralls
 #    - os: windows
 #      python: 3.7
-#      env: TOXEN=py37,codecov,coveralls
+#      env: TOXENV=py37,codecov,coveralls
 #    - os: windows
 #      python: 3.6
-#      env: TOXEN=py36,codecov,coveralls
+#      env: TOXENV=py36,codecov,coveralls
 #
 #before_install:
   #- chmod +x ./cc-test-reporter
