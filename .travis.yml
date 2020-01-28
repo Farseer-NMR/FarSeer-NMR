@@ -1,0 +1,59 @@
+language: python
+dist: xenial
+cache: false
+
+os:
+  - linux
+  - osx
+  - windows
+
+# safelist
+branches:
+  only:
+  - master
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=4e9cfa018d9b0ac4e62642a256e34f05f82942865680bc681c585c418783b267
+matrix:
+  include:
+    - python: '3.8'
+      env:
+        - TOXENV=check
+    - python: '3.8'
+      env:
+        - TOXENV=docs
+    - env:
+        - TOXENV=py36,codecov,coveralls
+      python: '3.6'
+    - env:
+        - TOXENV=py37,codecov,coveralls
+      python: '3.7'
+    - env:
+        - TOXENV=py38,codecov,coveralls
+      python: '3.8'
+
+before_install:
+  - python --version
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+
+install:
+  - pip install tox tox-venv
+  - tox --version
+
+script:
+  - tox -v
+
+after_script:
+    - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+after_failure:
+  - more .tox/log/* | cat
+  - more .tox/*/log/* | cat
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
