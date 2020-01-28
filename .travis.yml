@@ -1,3 +1,4 @@
+# https://pip.pypa.io/en/stable/installing/
 language: python
 dist: bionic
 #python:
@@ -40,7 +41,7 @@ matrix:
         - TOXENV=py37,codecov
         #- SENDCOV=1
       before_install:
-        - choco install python --version=3.7.6 pip --params "/InstallDir:C:\\Python"
+        - choco install python --version=3.7.6 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
         - curl https://bootstrap.pypa.io/get-pip.py -O get-pip.py
         - python get-pip.py
@@ -51,7 +52,7 @@ matrix:
         - TOXENV=py36,codecov
         #- SENDCOV=1
       before_install:
-        - choco install python --version=3.6.8 pip --params "/InstallDir:C:\\Python"
+        - choco install python --version=3.6.8 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
         - curl https://bootstrap.pypa.io/get-pip.py -O get-pip.py
         - python get-pip.py
