@@ -2,10 +2,10 @@ language: python
 dist: xenial
 cache: false
 
-os:
-  - linux
-  - osx
-  - windows
+#os:
+#  - linux
+#  - osx
+#  - windows
 
 # safelist
 branches:
@@ -17,21 +17,15 @@ env:
     - CC_TEST_REPORTER_ID=4e9cfa018d9b0ac4e62642a256e34f05f82942865680bc681c585c418783b267
 matrix:
   include:
-    - python: '3.8'
-      env:
-        - TOXENV=check
-    - python: '3.8'
-      env:
-        - TOXENV=docs
-    - env:
-        - TOXENV=py36,codecov,coveralls
-      python: '3.6'
-    - env:
-        - TOXENV=py37,codecov,coveralls
-      python: '3.7'
-    - env:
-        - TOXENV=py38,codecov,coveralls
-      python: '3.8'
+    - os: linux
+      python: 3.8
+      env: TOXEN=check
+    - os: linux
+      python: 3.8
+      env: TOXEN=docs
+    - os: linux
+      python: 3.8
+      env: TOXEN=py38,codecov,coveralls
 
 before_install:
   - python --version
