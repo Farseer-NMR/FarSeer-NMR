@@ -103,15 +103,14 @@ matrix:
 #      python: 3.6
 #      env: TOXEN=py36,codecov,coveralls
 #
-before_install:
-  - python --version
-  - pip install --upgrade pip wheel
- # - if [[ $SENDCOV ]]  
-  #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+#before_install:
   #- chmod +x ./cc-test-reporter
   #- ./cc-test-reporter before-build
 
 install:
+  - python --version
+ # - if [[ $SENDCOV ]]  
+  #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - pip install tox tox-venv
   - tox --version
 
