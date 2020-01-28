@@ -1,6 +1,10 @@
 =======
 # GitHub .gitignore boilerplate from https://github.com/github/gitignore/blob/master/Python.gitignore
 
+*.swp
+*.log
+*.debug
+
 # Ignore the local run_farseer*.sh files
 run_farseer.sh
 exec_farseer_commandline.sh
