@@ -14,6 +14,8 @@ include AUTHORS.rst
 include CHANGELOG.rst
 include CONTRIBUTING.rst
 include COPYING
+include CODE_OF_CONDUCT.md
+include PULL_REQUEST_TEMPLATE.md
 
 include tox.ini .travis.yml
 
@@ -21,3 +23,10 @@ global-exclude *.py[cod] __pycache__/* *.so *.dylib
 global-exclude tags
 global-exclude *.swp
 global-exclude *.debug *.log
+
+prune gui
+prune core
+prune Documentation
+prune install
+prune .idea
+exclude install_farseernmr.py
