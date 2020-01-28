@@ -110,8 +110,8 @@ matrix:
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3
-        - python3 -m pip install virtualenv
+        - brew upgrade python@3.8
+        - python3 -m pip install --upgrade pip wheel virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
@@ -121,8 +121,8 @@ matrix:
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3
-        - python3 -m pip install virtualenv
+        - brew upgrade python@3.8
+        - python3 -m pip install --upgrade pip wheel virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
     - os: osx
@@ -132,7 +132,7 @@ matrix:
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3
+        - brew upgrade python@3.8
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
@@ -150,11 +150,12 @@ matrix:
     - os: osx
       language: sh
       python: "3.6"
-      env: TOXENV=py37,codecov
+      env: TOXENV=py36,codecov
       before_install:
         - brew update
         - brew unlink python@2
-        - brew upgrade python3.6
+        - brew install --ignore-dependencies https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
+        - brew switch python 3.6.5_1
         - python3 -m pip install virtualenv
         - virtualenv .venv -p python3
         - source .venv/bin/activate
