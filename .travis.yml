@@ -40,7 +40,7 @@ matrix:
         - TOXENV=py37,codecov
         #- SENDCOV=1
       before_install:
-        - choco install python --version=python3.7 --params "/InstallDir:C:\\Python"
+        - choco install python --version=3.7 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
         - python -m pip install --upgrade pip wheel
     - os: windows
@@ -50,7 +50,7 @@ matrix:
         - TOXENV=py36,codecov
         #- SENDCOV=1
       before_install:
-        - choco install python --version=python3.6 --params "/InstallDir:C:\\Python"
+        - choco install python --version=3.6 --params "/InstallDir:C:\\Python"
         - export PATH="/c/Python:/c/Python/Scripts:$PATH"
         - python -m pip install --upgrade pip wheel
 
