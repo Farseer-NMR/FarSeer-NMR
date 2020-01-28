@@ -10,6 +10,7 @@ include .codeclimate.yml
 include pyproject.toml
 
 include README.rst
+include README.md
 include AUTHORS.rst
 include CHANGELOG.rst
 include CONTRIBUTING.rst

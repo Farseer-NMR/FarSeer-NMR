@@ -1,6 +1,6 @@
 language: python
-dist: xenial
-cache: false
+#dist: xenial
+#cache: false
 
 #os:
 #  - linux
@@ -15,6 +15,7 @@ branches:
 env:
   global:
     - CC_TEST_REPORTER_ID=4e9cfa018d9b0ac4e62642a256e34f05f82942865680bc681c585c418783b267
+
 matrix:
   include:
     - os: linux
@@ -26,6 +27,42 @@ matrix:
     - os: linux
       python: 3.8
       env: TOXEN=py38,codecov,coveralls
+    - os: linux
+      python: 3.7
+      env: TOXEN=py37,codecov,coveralls
+    - os: linux
+      python: 3.6
+      env: TOXEN=py36,codecov,coveralls
+    - os: osx
+      python: 3.8
+      env: TOXEN=check
+    - os: osx
+      python: 3.8
+      env: TOXEN=docs
+    - os: osx
+      python: 3.8
+      env: TOXEN=py38,codecov,coveralls
+    - os: osx
+      python: 3.7
+      env: TOXEN=py37,codecov,coveralls
+    - os: osx
+      python: 3.6
+      env: TOXEN=py36,codecov,coveralls
+    - os: windows
+      python: 3.8
+      env: TOXEN=check
+    - os: windows
+      python: 3.8
+      env: TOXEN=docs
+    - os: windows
+      python: 3.8
+      env: TOXEN=py38,codecov,coveralls
+    - os: windows
+      python: 3.7
+      env: TOXEN=py37,codecov,coveralls
+    - os: windows
+      python: 3.6
+      env: TOXEN=py36,codecov,coveralls
 
 before_install:
   - python --version
