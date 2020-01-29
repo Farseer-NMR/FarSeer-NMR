@@ -106,6 +106,7 @@ matrix:
       before_install:
         - python -m pip install --upgrade pip wheel
 
+
     - name: "OSX Check Radon"
       os: osx
       osx_image: xcode11.3
@@ -114,42 +115,62 @@ matrix:
         TOXENV=check,radon
         PATH="/usr/local/opt/python@3.8/bin:$PATH"
       before_install:
-        - python3 -m pip install --upgrade pip wheel virtualenv
+        - python3 -m pip install --upgrade pip wheel
+        - python3 --version
       addons:
         homebrew:
           packages: python@38
 
-    - name: "OSX DOCS py38 xcode11.3"
+
+    - name: "OSX DOCS py38 docs"
       os: osx
       osx_image: xcode11.3
       language: sh
       env: TOXENV=docs
       before_install:
         - python3 -m pip install --upgrade pip wheel virtualenv python=3.8
+      addons:
+        homebrew:
+          packages: python@38
 
-    - name: "OSX py38 xcode11.3"
+
+    - name: "OSX py38 codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
       env: TOXENV=py38,codecov
       before_install:
         - python3 -m pip install --upgrade pip wheel virtualenv
+      addons:
+        homebrew:
+          packages: python@38
+
     
-    - name: "OSX py37 xcode10.3"
+    - name: "OSX py37 USING DEFAULT PYTHON"
       os: osx
-      osx_image: xcode10.3
+      osx_image: xcode11.3
       language: sh
       env: TOXENV=py37,codecov
       before_install:
         - python3 -m pip install --upgrade pip wheel virtualenv
 
-    - name: "OSX py36 xcode9.4"
+
+    - name: "OSX py36 codecov"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode11.3
       language: sh
       env: TOXENV=py36,codecov
       before_install:
+        # https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew
+        - brew unlink python # ONLY if you have installed (with brew) another version of python 3
+        - brew install --ignore-dependencies https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
         - python3 -m pip install --upgrade pip wheel virtualenv
+        - brew info python
+        - brew switch python 3.6.5_1
+      addons:
+        homebrew:
+          packages: python
+
 
 
 #before_install:
@@ -166,7 +187,6 @@ install:
   #- tox --version
 
 script:
-  - python --version
   - tox --version
   - tox -v
 
