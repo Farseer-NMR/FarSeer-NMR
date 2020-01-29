@@ -128,7 +128,7 @@ matrix:
       language: sh
       env: TOXENV=docs
       before_install:
-        - python3 -m pip install --upgrade pip wheel virtualenv python=3.8
+        - python3 -m pip install --upgrade pip wheel python==3.8
       addons:
         homebrew:
           packages: python@38
@@ -152,7 +152,7 @@ matrix:
       language: sh
       env: TOXENV=py37,codecov
       before_install:
-        - python3 -m pip install --upgrade pip wheel virtualenv
+        - python3 -m pip install --upgrade pip wheel
 
 
     - name: "OSX py36 codecov"
@@ -164,7 +164,7 @@ matrix:
         # https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew
         - brew unlink python # ONLY if you have installed (with brew) another version of python 3
         - brew install --ignore-dependencies https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
-        - python3 -m pip install --upgrade pip wheel virtualenv
+        - python3 -m pip install --upgrade pip wheel
         - brew info python
         - brew switch python 3.6.5_1
       addons:
