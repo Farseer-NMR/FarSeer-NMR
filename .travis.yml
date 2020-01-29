@@ -115,11 +115,13 @@ matrix:
         TOXENV=check,radon
         PATH="/usr/local/opt/python@3.8/bin:$PATH"
       before_install:
+        #- brew info python
+        #- brew switch python 3.8.0
         - python3 -m pip install --upgrade pip wheel
-        - python3 --version
+        #- python3 --version
       addons:
         homebrew:
-          packages: python@38
+          packages: python
 
 
     - name: "OSX DOCS py38 docs"
@@ -128,10 +130,13 @@ matrix:
       language: sh
       env: TOXENV=docs
       before_install:
+        - brew info python
+        - brew install python@38
+        - brew switch python 3.8.0
         - python3 -m pip install --upgrade pip wheel python==3.8
       addons:
         homebrew:
-          packages: python@38
+          packages: python
 
 
     - name: "OSX py38 codecov"
@@ -140,10 +145,14 @@ matrix:
       language: sh
       env: TOXENV=py38,codecov
       before_install:
-        - python3 -m pip install --upgrade pip wheel virtualenv
+        - brew info python
+        - brew unlink python
+        - brew install python@38
+        - brew switch python 3.8.0
+        - python3 -m pip install --upgrade pip wheel
       addons:
         homebrew:
-          packages: python@38
+          packages: python
 
     
     - name: "OSX py37 USING DEFAULT PYTHON"
@@ -163,10 +172,11 @@ matrix:
       before_install:
         # https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew
         - brew unlink python # ONLY if you have installed (with brew) another version of python 3
+        - brew uninstall --ignore-dependencies openssl; brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
         - brew install --ignore-dependencies https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
-        - python3 -m pip install --upgrade pip wheel
         - brew info python
         - brew switch python 3.6.5_1
+        - python3 -m pip install --upgrade pip wheel
       addons:
         homebrew:
           packages: python
