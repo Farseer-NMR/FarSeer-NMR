@@ -106,12 +106,18 @@ matrix:
       before_install:
         - python -m pip install --upgrade pip wheel
 
-    - os: osx
+    - name: "OSX Check Radon"
+      os: osx
       osx_image: xcode11.3
       language: sh
-      env: TOXENV=check,radon
+      env:
+        TOXENV=check,radon
+        PATH="/usr/local/opt/python@3.8/bin:$PATH"
       before_install:
         - python3 -m pip install --upgrade pip wheel virtualenv
+      addons:
+        homebrew:
+          packages: python@38
 
     - name: "OSX DOCS py38 xcode11.3"
       os: osx
