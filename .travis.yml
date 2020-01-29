@@ -130,10 +130,11 @@ matrix:
       language: sh
       env: TOXENV=docs
       before_install:
-        - brew info python
-        - brew install python@38
-        - brew switch python 3.8.0
-        - python3 -m pip install --upgrade pip wheel python==3.8
+        - python3 -m pip install --upgrade pip wheel
+        #- brew info python
+        #- brew install python@3.8
+        #- brew switch python 3.8.0
+        #- python3 -m pip install --upgrade pip wheel python==3.8
       addons:
         homebrew:
           packages: python
@@ -147,7 +148,7 @@ matrix:
       before_install:
         - brew info python
         - brew unlink python
-        - brew install python@38
+        - brew install python@3.8
         - brew switch python 3.8.0
         - python3 -m pip install --upgrade pip wheel
       addons:
