@@ -25,68 +25,60 @@ branches:
 
 matrix: 
   include:
-    - os: windows
+    - name: "Windows Check Radon Choco"
+      os: windows
       language: sh
       python: 3.8
       env: 
         - TOXENV=check,radon
         - PATH=/c/Python38:/c/Python38/Scripts:$PATH
       before_install:
-        - python --version
         - choco install python --version=3.8.1
         - pip3 install --upgrade --user pip
-        #- python -m pip install --upgrade pip
-        - python --version
 
-    - os: windows
+    - name: "Windows Check Docs"
+      os: windows
       language: sh
       python: 3.8
       env: 
         - TOXENV=docs
         - PATH=/c/Python38:/c/Python38/Scripts:$PATH
       before_install:
-        - python --version
         - choco install python --version=3.8.1
-        - python -m pip install --upgrade --user pip
-        - python --version
+        - pip3 install --upgrade --user pip
     
-    - os: windows
+    - name: "Windows Check py38"
+      os: windows
       language: sh
       python: 3.8
       env: 
         - TOXENV=py38,codecov
         - PATH=/c/Python38:/c/Python38/Scripts:$PATH
       before_install:
-        - python --version
         - choco install python --version=3.8.1
-        - python -m pip install --upgrade --user pip
-        - python --version
+        - pip3 install --upgrade --user pip
 
-    - os: windows
+    - name: "Windows Check py37"
+      os: windows
       language: sh
       python: 3.7
       env:
         - TOXENV=py37,codecov
         - PATH=/c/Python37:/c/Python37/Scripts:$PATH
       before_install:
-        - python --version
         - choco install python --version=3.7.6
         - pip3 install --upgrade --user pip
-        #- python -m pip install --upgrade pip
-        - python --version
 
-    - os: windows
+    - name: "Windows Check py36"
+      os: windows
       language: sh
       python: 3.6
       env:
         - TOXENV=py36,codecov
         - PATH=/c/Python36:/c/Python36/Scripts:$PATH
       before_install:
-        - python --version
         - choco install python --version=3.6.8
         - pip3 install --upgrade --user pip
-        #- python -m pip install --upgrade pip
-        - python --version
 
     - os: linux
       python: 3.8
@@ -154,54 +146,6 @@ matrix:
         - python3 -m pip install --upgrade pip wheel virtualenv
 
 
-#matrix:
-#  include:
-#    - os: linux
-#      python: 3.8
-#      env: TOXENV=check
-#    - os: linux
-#      python: 3.8
-#      env: TOXENV=docs
-#    - os: linux
-#      python: 3.8
-#      env: TOXENV=py38,codecov,coveralls
-#    - os: linux
-#      python: 3.7
-#      env: TOXENV=py37,codecov,coveralls
-#    - os: linux
-#      python: 3.6
-#      env: TOXENV=py36,codecov,coveralls
-#    - os: osx
-#      python: 3.8
-#      env: TOXENV=check
-#    - os: osx
-#      python: 3.8
-#      env: TOXENV=docs
-#    - os: osx
-#      python: 3.8
-#      env: TOXENV=py38,codecov,coveralls
-#    - os: osx
-#      python: 3.7
-#      env: TOXENV=py37,codecov,coveralls
-#    - os: osx
-#      python: 3.6
-#      env: TOXENV=py36,codecov,coveralls
-#    - os: windows
-#      python: 3.8
-#      env: TOXENV=check
-#    - os: windows
-#      python: 3.8
-#      env: TOXENV=docs
-#    - os: windows
-#      python: 3.8
-#      env: TOXENV=py38,codecov,coveralls
-#    - os: windows
-#      python: 3.7
-#      env: TOXENV=py37,codecov,coveralls
-#    - os: windows
-#      python: 3.6
-#      env: TOXENV=py36,codecov,coveralls
-#
 #before_install:
   #- chmod +x ./cc-test-reporter
   #- ./cc-test-reporter before-build
@@ -216,10 +160,9 @@ install:
   #- tox --version
 
 script:
-  #- tox -v
-  - python3 --version
   - python --version
   - tox --version
+  - tox -v
 
 #after_script:
     #- ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
