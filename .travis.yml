@@ -34,7 +34,8 @@ matrix:
       before_install:
         - python --version
         - choco install python --version=3.8.1
-        - python -m pip install --upgrade pip
+        - pip3 install --upgrade pip
+        #- python -m pip install --upgrade pip
         - python --version
 
     - os: windows
@@ -70,7 +71,9 @@ matrix:
       before_install:
         - python --version
         - choco install python --version=3.7.6
-        - python -m pip install --upgrade pip
+        - pip3 install --upgrade pip
+        #- python -m pip install --upgrade pip
+        - python --version
         - python --version
 
     - os: windows
@@ -82,7 +85,8 @@ matrix:
       before_install:
         - python --version
         - choco install python --version=3.6.8
-        - python -m pip install --upgrade pip
+        - pip3 install --upgrade pip
+        #- python -m pip install --upgrade pip
         - python --version
 
     - os: linux
@@ -196,16 +200,17 @@ matrix:
   #- ./cc-test-reporter before-build
 
 install:
-  - pip install -U pip
+  #- pip3 install -U pip
   #- python --version
   #- python -m pip --version
  # - if [[ $SENDCOV ]]  
   #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - pip install tox tox-venv
+  - pip3 install tox tox-venv
   #- tox --version
 
 script:
   #- tox -v
+  - python3 --version
   - python --version
   - tox --version
 
