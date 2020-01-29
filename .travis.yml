@@ -119,7 +119,7 @@ matrix:
       language: sh
       env: TOXENV=docs
       before_install:
-        - python3 -m pip install --upgrade pip wheel virtualenv
+        - python3 -m pip install --upgrade pip wheel virtualenv python=3.8
 
     - name: "OSX py38 xcode11.3"
       os: osx
