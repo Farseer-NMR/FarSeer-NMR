@@ -80,87 +80,86 @@ matrix:
         - choco install python --version=3.6.8
         - pip3 install --upgrade --user pip
 
-    - os: linux
+    - name: "Linux Python 3.8 Check"
+      os: linux
       python: 3.8
       env: TOXENV=check,radon
       before_install:
         - python -m pip install --upgrade pip wheel
-    - os: linux
+    - name: "Linux Python 3.8 Docs"
+      os: linux
       python: 3.8
       env: TOXENV=docs
       before_install:
         - python -m pip install --upgrade pip wheel
-    - os: linux
+
+    - name: "Linux Python 3.8 pytest codecov"
+      os: linux
       python: 3.8
       env: TOXENV=py38,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
-    - os: linux
+    
+    - name: "Linux Python 3.7 pytest codecov"
+      os: linux
       python: 3.7
       env: TOXENV=py37,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
-    - os: linux
+
+    - name: "Linux Python 3.7 pytest codecov"
+      os: linux
       python: 3.6
       env: TOXENV=py36,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
 
 
-    - name: "OSX Check Radon"
+    - name: "OSX Default python Check Radon"
       os: osx
       osx_image: xcode11.3
       language: sh
       env:
         TOXENV=check,radon
-        #PATH="/usr/local/opt/python@3.8/bin:$PATH"
       before_install:
-        #- brew info python
-        #- brew switch python 3.8.0
         - python3 -m pip install --upgrade pip wheel
-        #- python3 --version
       addons:
         homebrew:
           packages: python
 
 
-    - name: "OSX DOCS py38 docs"
+    - name: "OSX DOCS Default Python"
       os: osx
       osx_image: xcode11.3
       language: sh
       env: TOXENV=docs
       before_install:
         - python3 -m pip install --upgrade pip wheel
-        #- brew info python
-        #- brew install python@3.8
-        #- brew switch python 3.8.0
-        #- python3 -m pip install --upgrade pip wheel python==3.8
       addons:
         homebrew:
           packages: python
 
 
-    - name: "OSX py38 codecov"
+    - name: "OSX Conda py38 codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
+      python: "3.8"
       env: TOXENV=py38,codecov
       before_install:
-        #- brew info python
-        #- brew unlink python
-        - brew install python@3.8
-        - brew switch python 3.8
-        # https://stackoverflow.com/questions/59131553/problem-in-installing-and-configuring-latest-python-3-8-on-macos
-        #- brew install pyenv
-        #- pyenv init
-        #- eval "$(pyenv init -)"
-        #- pyenv install 3.8.0
-        #- pyenv global 3.8.0
-        - python3 --version
-        - python3 -m pip install --upgrade pip wheel
-      addons:
-        homebrew:
-          packages: python
+        - wget https://repo.continuum.io/miniconda/Miniconda3-4.7.12.1-MacOSX-x86_64.sh -O miniconda.sh
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - source "$HOME/miniconda/etc/profile.d/conda.sh"
+        - hash -r
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        - conda info -a
+        - conda create -q -n travenv python=$TRAVIS_PYTHON_VERSION
+        #- conda install pip3 wheel
+        #- python3 -m pip install --upgrade pip wheel
+      #addons:
+      #  homebrew:
+      #    packages: python
     
     - name: "OSX py37 USING DEFAULT PYTHON"
       os: osx
