@@ -10,7 +10,10 @@ Changelog
 v2
 --
 
-* under development
+* *under development*
+* added configuration files for CI and deployment
+* configured tox.ini
+* configured Travis-CI multiplaform, multi Python CI #316
 
 v1
 --
