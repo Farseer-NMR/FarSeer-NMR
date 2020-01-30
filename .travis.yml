@@ -113,7 +113,7 @@ matrix:
       language: sh
       env:
         TOXENV=check,radon
-        PATH="/usr/local/opt/python@3.8/bin:$PATH"
+        #PATH="/usr/local/opt/python@3.8/bin:$PATH"
       before_install:
         #- brew info python
         #- brew switch python 3.8.0
@@ -146,10 +146,16 @@ matrix:
       language: sh
       env: TOXENV=py38,codecov
       before_install:
-        - brew info python
-        - brew unlink python
-        - brew install python@3.8
-        - brew switch python 3.8.0
+        #- brew info python
+        #- brew unlink python
+        #- brew install python@3.8
+        #- brew switch python 3.8.0
+        # https://stackoverflow.com/questions/59131553/problem-in-installing-and-configuring-latest-python-3-8-on-macos
+        - brew install pyenv
+        - pyenv init
+        - eval "$(pyenv init -)"
+        - pyenv install 3.8.0
+        - pyenv global 3.8.0
         - python3 -m pip install --upgrade pip wheel
       addons:
         homebrew:
