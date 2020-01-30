@@ -149,7 +149,7 @@ matrix:
         #- brew info python
         #- brew unlink python
         - brew install python@3.8
-        #- brew switch python 3.8.0
+        - brew switch python 3.8
         # https://stackoverflow.com/questions/59131553/problem-in-installing-and-configuring-latest-python-3-8-on-macos
         #- brew install pyenv
         #- pyenv init
@@ -161,21 +161,6 @@ matrix:
       addons:
         homebrew:
           packages: python
-
-    - name: "OSX py38 codecov tox"
-      os: osx
-      osx_image: xcode11.3
-      language: sh
-      env: TOXENV=py38,codecov
-      before_install:
-        - brew install tox
-        - python3 --version
-        - python3 -m pip install --upgrade pip wheel
-        - tox -v
-      addons:
-        homebrew:
-          packages: python
-
     
     - name: "OSX py37 USING DEFAULT PYTHON"
       os: osx
