@@ -1,31 +1,14 @@
-# https://pip.pypa.io/en/stable/installing/
 language: python
 dist: bionic
-#python:
-#  - "3.6"
-#  - "3.7"
-#  - "3.8"
-#cache: false
-
-#os:
-#  - linux
-#  - osx
-#  - windows
 
 # safelist
 branches:
   only:
     - master
-    - ciconfig
-
-#env:
-  #global:
-    #- CC_TEST_REPORTER_ID=
-# https://github.com/WeblateOrg/translation-finder/blob/master/.travis.yml#L20-L26
 
 matrix: 
   include:
-    - name: "Windows Check Radon Choco"
+    - name: "Windows Choco 3.8 TOXENV=Check,Radon"
       os: windows
       language: sh
       python: 3.8
@@ -36,7 +19,7 @@ matrix:
         - choco install python --version=3.8.1
         - pip3 install --upgrade --user pip
 
-    - name: "Windows Check Docs"
+    - name: "Windows Choco 3.8 TOXENV=Docs"
       os: windows
       language: sh
       python: 3.8
@@ -47,7 +30,7 @@ matrix:
         - choco install python --version=3.8.1
         - pip3 install --upgrade --user pip
     
-    - name: "Windows Check py38"
+    - name: "Windows Choco 3.8 TOXENV=py38,coveralls"
       os: windows
       language: sh
       python: 3.8
@@ -58,7 +41,7 @@ matrix:
         - choco install python --version=3.8.1
         - pip3 install --upgrade --user pip
 
-    - name: "Windows Check py37"
+    - name: "Windows Choco 3.7 TOXENV=py37,coveralls"
       os: windows
       language: sh
       python: 3.7
@@ -69,7 +52,7 @@ matrix:
         - choco install python --version=3.7.6
         - pip3 install --upgrade --user pip
 
-    - name: "Windows Check py36"
+    - name: "Windows Choco 3.6 TOXENV=py36,coveralls"
       os: windows
       language: sh
       python: 3.6
@@ -80,42 +63,42 @@ matrix:
         - choco install python --version=3.6.8
         - pip3 install --upgrade --user pip
 
-    - name: "Linux Python 3.8 Check"
+    - name: "Linux Python 3.8 TOXENV=check,radon"
       os: linux
       python: 3.8
       env: TOXENV=check,radon
       before_install:
         - python -m pip install --upgrade pip wheel
-    - name: "Linux Python 3.8 Docs"
+
+    - name: "Linux Python 3.8 TOXENV=docs"
       os: linux
       python: 3.8
       env: TOXENV=docs
       before_install:
         - python -m pip install --upgrade pip wheel
 
-    - name: "Linux Python 3.8 pytest codecov"
+    - name: "Linux Python 3.8 TOXENV=py38,codecov"
       os: linux
       python: 3.8
       env: TOXENV=py38,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
     
-    - name: "Linux Python 3.7 pytest codecov"
+    - name: "Linux Python 3.7 TOXENV=py37,codecov"
       os: linux
       python: 3.7
       env: TOXENV=py37,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
 
-    - name: "Linux Python 3.7 pytest codecov"
+    - name: "Linux Python 3.6 TOXENV=py36,codecov"
       os: linux
       python: 3.6
       env: TOXENV=py36,codecov
       before_install:
         - python -m pip install --upgrade pip wheel
 
-
-    - name: "OSX Default python Check Radon"
+    - name: "OSX Default Python 3.7 TOXENV=check,radon"
       os: osx
       osx_image: xcode11.3
       language: sh
@@ -123,24 +106,16 @@ matrix:
         TOXENV=check,radon
       before_install:
         - python3 -m pip install --upgrade pip wheel
-      addons:
-        homebrew:
-          packages: python
 
-
-    - name: "OSX DOCS Default Python"
+    - name: "OSX Default Python 3.7 TOXENV=docs"
       os: osx
       osx_image: xcode11.3
       language: sh
       env: TOXENV=docs
       before_install:
         - python3 -m pip install --upgrade pip wheel
-      addons:
-        homebrew:
-          packages: python
 
-
-    - name: "OSX Conda py38 codecov"
+    - name: "OSX Conda 3.8 TOXENV=py38,codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
@@ -156,13 +131,8 @@ matrix:
         - conda info -a
         - conda create -q -n travenv python=$TRAVIS_PYTHON_VERSION
         - conda activate travenv
-        #- conda install pip3 wheel
-        #- python3 -m pip install --upgrade pip wheel
-      #addons:
-      #  homebrew:
-      #    packages: python
     
-    - name: "OSX py37 USING DEFAULT PYTHON"
+    - name: "OSX Default Python 3.7 TOXENV=py37,codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
@@ -170,15 +140,14 @@ matrix:
       before_install:
         - python3 -m pip install --upgrade pip wheel
 
-
-    - name: "OSX py36 codecov"
+    - name: "OSX Brew Python 3.6 TOXENV=py36,codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
       env: TOXENV=py36,codecov
       before_install:
-        # https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew
-        - brew unlink python # ONLY if you have installed (with brew) another version of python 3
+        # https://stackoverflow.com/questions/51125013/
+        - brew unlink python
         - brew uninstall --ignore-dependencies openssl; brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
         - brew install --ignore-dependencies https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
         - brew info python
@@ -188,27 +157,12 @@ matrix:
         homebrew:
           packages: python
 
-
-
-#before_install:
-  #- chmod +x ./cc-test-reporter
-  #- ./cc-test-reporter before-build
-
 install:
-  #- pip3 install -U pip
-  #- python --version
-  #- python -m pip --version
- # - if [[ $SENDCOV ]]  
-  #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - pip3 install tox tox-venv
-  #- tox --version
+  - tox --version
 
 script:
-  - tox --version
   - tox -v
-
-#after_script:
-    #- ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
 after_failure:
   - more .tox/log/* | cat
