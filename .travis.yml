@@ -25,122 +25,122 @@ branches:
 
 matrix: 
   include:
-    - name: "Windows Check Radon Choco"
-      os: windows
-      language: sh
-      python: 3.8
-      env: 
-        - TOXENV=check,radon
-        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
-      before_install:
-        - choco install python --version=3.8.1
-        - pip3 install --upgrade --user pip
+    #- name: "Windows Check Radon Choco"
+    #  os: windows
+    #  language: sh
+    #  python: 3.8
+    #  env: 
+    #    - TOXENV=check,radon
+    #    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+    #  before_install:
+    #    - choco install python --version=3.8.1
+    #    - pip3 install --upgrade --user pip
 
-    - name: "Windows Check Docs"
-      os: windows
-      language: sh
-      python: 3.8
-      env: 
-        - TOXENV=docs
-        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
-      before_install:
-        - choco install python --version=3.8.1
-        - pip3 install --upgrade --user pip
-    
-    - name: "Windows Check py38"
-      os: windows
-      language: sh
-      python: 3.8
-      env: 
-        - TOXENV=py38,codecov
-        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
-      before_install:
-        - choco install python --version=3.8.1
-        - pip3 install --upgrade --user pip
+    #- name: "Windows Check Docs"
+    #  os: windows
+    #  language: sh
+    #  python: 3.8
+    #  env: 
+    #    - TOXENV=docs
+    #    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+    #  before_install:
+    #    - choco install python --version=3.8.1
+    #    - pip3 install --upgrade --user pip
+    #
+    #- name: "Windows Check py38"
+    #  os: windows
+    #  language: sh
+    #  python: 3.8
+    #  env: 
+    #    - TOXENV=py38,codecov
+    #    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+    #  before_install:
+    #    - choco install python --version=3.8.1
+    #    - pip3 install --upgrade --user pip
 
-    - name: "Windows Check py37"
-      os: windows
-      language: sh
-      python: 3.7
-      env:
-        - TOXENV=py37,codecov
-        - PATH=/c/Python37:/c/Python37/Scripts:$PATH
-      before_install:
-        - choco install python --version=3.7.6
-        - pip3 install --upgrade --user pip
+    #- name: "Windows Check py37"
+    #  os: windows
+    #  language: sh
+    #  python: 3.7
+    #  env:
+    #    - TOXENV=py37,codecov
+    #    - PATH=/c/Python37:/c/Python37/Scripts:$PATH
+    #  before_install:
+    #    - choco install python --version=3.7.6
+    #    - pip3 install --upgrade --user pip
 
-    - name: "Windows Check py36"
-      os: windows
-      language: sh
-      python: 3.6
-      env:
-        - TOXENV=py36,codecov
-        - PATH=/c/Python36:/c/Python36/Scripts:$PATH
-      before_install:
-        - choco install python --version=3.6.8
-        - pip3 install --upgrade --user pip
+    #- name: "Windows Check py36"
+    #  os: windows
+    #  language: sh
+    #  python: 3.6
+    #  env:
+    #    - TOXENV=py36,codecov
+    #    - PATH=/c/Python36:/c/Python36/Scripts:$PATH
+    #  before_install:
+    #    - choco install python --version=3.6.8
+    #    - pip3 install --upgrade --user pip
 
-    - os: linux
-      python: 3.8
-      env: TOXENV=check,radon
-      before_install:
-        - python -m pip install --upgrade pip wheel
-    - os: linux
-      python: 3.8
-      env: TOXENV=docs
-      before_install:
-        - python -m pip install --upgrade pip wheel
-    - os: linux
-      python: 3.8
-      env: TOXENV=py38,codecov
-      before_install:
-        - python -m pip install --upgrade pip wheel
-    - os: linux
-      python: 3.7
-      env: TOXENV=py37,codecov
-      before_install:
-        - python -m pip install --upgrade pip wheel
-    - os: linux
-      python: 3.6
-      env: TOXENV=py36,codecov
-      before_install:
-        - python -m pip install --upgrade pip wheel
-
-
-    - name: "OSX Check Radon"
-      os: osx
-      osx_image: xcode11.3
-      language: sh
-      env:
-        TOXENV=check,radon
-        #PATH="/usr/local/opt/python@3.8/bin:$PATH"
-      before_install:
-        #- brew info python
-        #- brew switch python 3.8.0
-        - python3 -m pip install --upgrade pip wheel
-        #- python3 --version
-      addons:
-        homebrew:
-          packages: python
+    #- os: linux
+    #  python: 3.8
+    #  env: TOXENV=check,radon
+    #  before_install:
+    #    - python -m pip install --upgrade pip wheel
+    #- os: linux
+    #  python: 3.8
+    #  env: TOXENV=docs
+    #  before_install:
+    #    - python -m pip install --upgrade pip wheel
+    #- os: linux
+    #  python: 3.8
+    #  env: TOXENV=py38,codecov
+    #  before_install:
+    #    - python -m pip install --upgrade pip wheel
+    #- os: linux
+    #  python: 3.7
+    #  env: TOXENV=py37,codecov
+    #  before_install:
+    #    - python -m pip install --upgrade pip wheel
+    #- os: linux
+    #  python: 3.6
+    #  env: TOXENV=py36,codecov
+    #  before_install:
+    #    - python -m pip install --upgrade pip wheel
 
 
-    - name: "OSX DOCS py38 docs"
-      os: osx
-      osx_image: xcode11.3
-      language: sh
-      env: TOXENV=docs
-      before_install:
-        - python3 -m pip install --upgrade pip wheel
-        #- brew info python
-        #- brew install python@3.8
-        #- brew switch python 3.8.0
-        #- python3 -m pip install --upgrade pip wheel python==3.8
-      addons:
-        homebrew:
-          packages: python
+    #- name: "OSX Check Radon"
+    #  os: osx
+    #  osx_image: xcode11.3
+    #  language: sh
+    #  env:
+    #    TOXENV=check,radon
+    #    #PATH="/usr/local/opt/python@3.8/bin:$PATH"
+    #  before_install:
+    #    #- brew info python
+    #    #- brew switch python 3.8.0
+    #    - python3 -m pip install --upgrade pip wheel
+    #    #- python3 --version
+    #  addons:
+    #    homebrew:
+    #      packages: python
 
 
-    - name: "OSX py38 codecov"
+    #- name: "OSX DOCS py38 docs"
+    #  os: osx
+    #  osx_image: xcode11.3
+    #  language: sh
+    #  env: TOXENV=docs
+    #  before_install:
+    #    - python3 -m pip install --upgrade pip wheel
+    #    #- brew info python
+    #    #- brew install python@3.8
+    #    #- brew switch python 3.8.0
+    #    #- python3 -m pip install --upgrade pip wheel python==3.8
+    #  addons:
+    #    homebrew:
+    #      packages: python
+
+
+    #- name: "OSX py38 codecov"
       os: osx
       osx_image: xcode11.3
       language: sh
@@ -153,7 +153,7 @@ matrix:
         # https://stackoverflow.com/questions/59131553/problem-in-installing-and-configuring-latest-python-3-8-on-macos
         #- brew install pyenv
         - pyenv init
-        - eval "$(pyenv init -)"
+        #- eval "$(pyenv init -)"
         - pyenv install 3.8.0
         - pyenv global 3.8.0
         - python3 -m pip install --upgrade pip wheel
