@@ -156,6 +156,7 @@ matrix:
         #- eval "$(pyenv init -)"
         - pyenv install 3.8.0
         - pyenv global 3.8.0
+        - python3 --version
         - python3 -m pip install --upgrade pip wheel
       addons:
         homebrew:
