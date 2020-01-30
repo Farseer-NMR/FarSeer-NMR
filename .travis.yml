@@ -155,6 +155,7 @@ matrix:
         - conda update -q conda
         - conda info -a
         - conda create -q -n travenv python=$TRAVIS_PYTHON_VERSION
+        - conda activate travenv
         #- conda install pip3 wheel
         #- python3 -m pip install --upgrade pip wheel
       #addons:
