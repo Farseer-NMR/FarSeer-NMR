@@ -19,15 +19,15 @@ matrix:
         - choco install python --version=3.8.1
         - pip3 install --upgrade --user pip
 
-    - name: "Windows Choco 3.8 TOXENV=Docs"
+    - name: "Windows Choco 3.7 TOXENV=docs"
       os: windows
       language: sh
-      python: 3.8
-      env: 
+      python: 3.7
+      env:
         - TOXENV=docs
-        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+        - PATH=/c/Python37:/c/Python37/Scripts:$PATH
       before_install:
-        - choco install python --version=3.8.1
+        - choco install python --version=3.7.6
         - pip3 install --upgrade --user pip
     
     - name: "Windows Choco 3.8 TOXENV=py38,coveralls"
@@ -72,7 +72,7 @@ matrix:
 
     - name: "Linux Python 3.8 TOXENV=docs"
       os: linux
-      python: 3.8
+      python: 3.7
       env: TOXENV=docs
       before_install:
         - python -m pip install --upgrade pip wheel
