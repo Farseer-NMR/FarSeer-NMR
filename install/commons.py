@@ -28,7 +28,6 @@ THIS FILE IS PART OF THE FARSEER-NMR PROJECT.
 
 Contributors to this file:
 - Joao M.C. Teixeira (https://github.com/joaomcteixeira)
-
 Farseer-NMR is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -61,12 +60,15 @@ log.debug("* Python version: {}".format(python_version))
 
 if python_version < 3:
     import urllib as url
+    from urllib2 import HTTPError
+    url_request_error = urllib2.HTTPError
     url_not_found_error = IOError
     user_input = raw_input
 
 elif python_version == 3:
     import urllib
     import urllib.request as url
+    url_request_error = urllib.error.HTTPError
     url_not_found_error = urllib.error.URLError
     user_input = input
 
@@ -158,26 +160,39 @@ def reporthook(blocknum, blocksize, totalsize):
 def download_file(link, destination):
     """
     Downloads file.
-    
+
     Parameters:
         - link (str): the file URL
         - destination (str): where to save file in computer
     """
     log.info("* Downloading {}...".format(link))
     log.info("* ... to destination: {}".format(destination))
-    
     try:
         url.urlretrieve(
             link,
             destination,
             reporthook
             )
+    except url_request_error as err:
+        if os.path.exists(destination):
+            pass
+        else:
+            errmsg = (
+                '* ATTENTION * Anaconda servers have blocked the download of Miniconda.\n'
+                '* ATTENTION * Please download manually the Miniconda installation file\n'
+                '* ATTENTION * provided in the link bellow:\n'
+                f'* ATTENTION * {link}\n'
+                '* ATTENTION * place the Miniconda installation file int he FarSeer-NMR folder\n'
+                '* ATTENTION * and repeat the installation process again.'
+                )
+            log.info(errmsg)
+            sys.exit()
     except url_not_found_error as e:
         log.info(messages.url_error)
         log.info(messages.something_wrong)
         log.debug(e)
         log.info(messages.abort)
-        sys_exit()
+        sys.exit()
     except ValueError as e:
         log.info(messages.url_unkown)
         log.debug(e)
@@ -189,7 +204,7 @@ def download_file(link, destination):
         log.info(messages.something_wrong)
         log.info(messages.abort)
         sys_exit()
-    
+
     if os.path.exists(destination):
         log.debug("destination file found: {}".format(destination))
         log.info("... Download completed")

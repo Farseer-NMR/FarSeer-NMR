@@ -4,7 +4,7 @@
 
 We are currently rewriting Farseer-NMR towards **version 2**. And you are now visiting **version 1** branch.
 
-**Version 1** is still functional and working, though not much supported apart from minor bugs. You can download the latest stable version, v1.3.5, on the [releases tab](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.5), or visit the complete version 1 code and its documentation in [version 1 branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/version1) on GitHub.
+**Version 1** is still functional and working, though not much supported apart from minor bugs. You can download the latest stable version, v1.3.6, on the [releases tab](https://github.com/Farseer-NMR/FarSeer-NMR/releases/tag/v1.3.6), or visit the complete version 1 code and its documentation in [version 1 branch](https://github.com/Farseer-NMR/FarSeer-NMR/tree/version1) on GitHub.
 
 Our original publication is available at [JBioMolNMR](https://link.springer.com/article/10.1007/s10858-018-0182-5), cite us if you use Farseer-NMR for your research, regardless of which version you use.
 
@@ -30,7 +30,9 @@ With Farseer-NMR, you have:
 
 # Download, Install and Update
 
-[Download here the latest version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/releases)
+[Download here the latest stable version of Farseer-NMR.](https://github.com/Farseer-NMR/FarSeer-NMR/releases), **please note that the version at the `master` branch is not stable.**
+
+Unpack the download compressed file and navigate to the newly created `FarSeer-NMR` folder.
 
 To install Farseer-NMR simply run the installation script:
 
@@ -38,7 +40,7 @@ To install Farseer-NMR simply run the installation script:
 python install_farseernmr.py
 ```
 
-Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-and-Update) some additional detail on how to setup your Farseer-NMR installation - it's very easy!
+Read [here](https://github.com/Farseer-NMR/FarSeer-NMR/wiki/Download,-Install-and-Update) some additional details on how to setup your Farseer-NMR installation - it's very easy!
 
 # Documentation
 
