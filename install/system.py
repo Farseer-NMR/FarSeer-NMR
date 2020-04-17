@@ -48,7 +48,7 @@ import os
 
 # configure accordingly to the host project
 software_name = "Farseer-NMR"
-software_version = (1, 3, 5)  # v1.0.0
+software_version = (1, 3, 6)  # v1.0.0
 min_space_allowed = 3  # min GB required to install your software
 installation_log_name = "install.log"
 update_log_name = "update.log"
